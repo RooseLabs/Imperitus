@@ -1,5 +1,6 @@
 using FishNet;
 using FishNet.Managing;
+using FishNet.Managing.Scened;
 using FishNet.Transporting;
 using RooseLabs.Core;
 using TMPro;
@@ -39,11 +40,11 @@ namespace RooseLabs.UI
         private void ServerManager_OnServerConnectionState(ServerConnectionStateArgs obj)
         {
             if (obj.ConnectionState != LocalConnectionState.Started) return;
-            // SceneLoadData sld = new SceneLoadData("DevelopmentScene1")
-            // {
-            //     ReplaceScenes = ReplaceOption.All
-            // };
-            // InstanceFinder.SceneManager.LoadGlobalScenes(sld);
+            SceneLoadData sld = new SceneLoadData("DevelopmentScene1")
+            {
+                ReplaceScenes = ReplaceOption.All
+            };
+            InstanceFinder.SceneManager.LoadGlobalScenes(sld);
         }
 
         private void Start()
