@@ -1,9 +1,15 @@
+using System.Threading.Tasks;
 using FishNet;
 using FishNet.Managing;
 using FishNet.Managing.Scened;
 using FishNet.Transporting;
+using FishNet.Transporting.UTP;
 using RooseLabs.Core;
 using TMPro;
+using Unity.Services.Authentication;
+using Unity.Services.Core;
+using Unity.Services.Relay;
+using Unity.Services.Relay.Models;
 using UnityEngine;
 
 namespace RooseLabs.UI
@@ -15,8 +21,7 @@ namespace RooseLabs.UI
         // [SerializeField] private UICreditsManager creditsPanel;
 
         // TODO: These should be moved to a JoinGamePanel script
-        [SerializeField] private TMP_InputField ipAddressInputField;
-        [SerializeField] private TMP_InputField portInputField;
+        [SerializeField] private TMP_InputField joinCodeInputField;
 
         private NetworkManager m_networkManager;
 
@@ -59,17 +64,19 @@ namespace RooseLabs.UI
 
         private void HostGameButtonClicked()
         {
-            m_networkManager.ServerManager.StartConnection();
-            m_networkManager.ClientManager.StartConnection();
+            StartHostWithRelay(4, "udp").ContinueWith(task =>
+            {
+                Debug.Log("Join Code: " + task.Result);
+            });
         }
 
         private void OpenJoinGameScreen()
         {
-            string ipAddress = string.IsNullOrWhiteSpace(ipAddressInputField.text) ? "localhost" : ipAddressInputField.text;
-            m_networkManager.TransportManager.Transport.SetClientAddress(ipAddress);
-            if (ushort.TryParse(portInputField.text, out var port))
-                m_networkManager.TransportManager.Transport.SetPort(port);
-            m_networkManager.ClientManager.StartConnection();
+            StartClientWithRelay(joinCodeInputField.text, "udp").ContinueWith(task =>
+            {
+                if (!task.Result)
+                    Debug.LogError("Failed to connect to the server");
+            });
         }
 
         private void OpenSettingsScreen()
@@ -95,6 +102,45 @@ namespace RooseLabs.UI
         private void QuitGame()
         {
             Application.Quit();
+        }
+        
+        private async Task<string> StartHostWithRelay(int maxConnections, string connectionType)
+        {
+            await UnityServices.InitializeAsync();
+            if (!AuthenticationService.Instance.IsSignedIn)
+            {
+                await AuthenticationService.Instance.SignInAnonymouslyAsync();
+            }
+
+            // Request allocation and join code
+            Allocation allocation = await RelayService.Instance.CreateAllocationAsync(maxConnections);
+            var joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
+            // Configure transport
+            var unityTransport = m_networkManager.TransportManager.GetTransport<UnityTransport>();
+            unityTransport.SetRelayServerData(AllocationUtils.ToRelayServerData(allocation, connectionType));
+
+            // Start host
+            if (m_networkManager.ServerManager.StartConnection()) // Server is successfully started.
+            {
+                m_networkManager.ClientManager.StartConnection(); // You can choose not to call this method. Then only the server will start.
+                return joinCode;
+            }
+            return null;
+        }
+
+        private async Task<bool> StartClientWithRelay(string joinCode, string connectionType)
+        {
+            if (string.IsNullOrEmpty(joinCode)) return false;
+            await UnityServices.InitializeAsync();
+            if (!AuthenticationService.Instance.IsSignedIn)
+            {
+                await AuthenticationService.Instance.SignInAnonymouslyAsync();
+            }
+
+            var allocation = await RelayService.Instance.JoinAllocationAsync(joinCode: joinCode);
+            var unityTransport = m_networkManager.TransportManager.GetTransport<UnityTransport>();
+            unityTransport.SetRelayServerData(AllocationUtils.ToRelayServerData(allocation, connectionType));
+            return m_networkManager.ClientManager.StartConnection();
         }
     }
 }
