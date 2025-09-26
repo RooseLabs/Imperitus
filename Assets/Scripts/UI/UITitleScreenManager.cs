@@ -1,15 +1,10 @@
-using System.Threading.Tasks;
 using FishNet;
 using FishNet.Managing;
 using FishNet.Managing.Scened;
 using FishNet.Transporting;
-using FishNet.Transporting.UTP;
 using RooseLabs.Core;
+using RooseLabs.Network;
 using TMPro;
-using Unity.Services.Authentication;
-using Unity.Services.Core;
-using Unity.Services.Relay;
-using Unity.Services.Relay.Models;
 using UnityEngine;
 
 namespace RooseLabs.UI
@@ -20,7 +15,7 @@ namespace RooseLabs.UI
         // [SerializeField] private UISettingsManager settingsPanel;
         // [SerializeField] private UICreditsManager creditsPanel;
 
-        // TODO: These should be moved to a JoinGamePanel script
+        // TODO: This should be moved to a JoinGamePanel script
         [SerializeField] private TMP_InputField joinCodeInputField;
 
         private NetworkManager m_networkManager;
@@ -55,24 +50,35 @@ namespace RooseLabs.UI
         private void Start()
         {
             InputHandler.Instance.EnableMenuInput();
-            mainMenuPanel.HostGameButtonAction += HostGameButtonClicked;
+            mainMenuPanel.HostLocalGameButtonAction += HostLocalGameButtonClicked;
+            mainMenuPanel.HostOnlineGameButtonAction += HostOnlineGameButtonClicked;
             mainMenuPanel.JoinGameButtonAction += OpenJoinGameScreen;
             mainMenuPanel.SettingsButtonAction += OpenSettingsScreen;
             mainMenuPanel.CreditsButtonAction += OpenCreditsScreen;
             mainMenuPanel.QuitGameButtonAction += QuitGame;
         }
 
-        private void HostGameButtonClicked()
+        private void HostLocalGameButtonClicked()
         {
-            StartHostWithRelay(4, "udp").ContinueWith(task =>
+            NetworkConnector.Instance.StartHostLocally();
+        }
+
+        private void HostOnlineGameButtonClicked()
+        {
+            NetworkConnector.Instance.StartHostWithRelay().ContinueWith(task =>
             {
-                Debug.Log("Join Code: " + task.Result);
+                Debug.Log($"Lobby Code: {task.Result}");
             });
         }
 
         private void OpenJoinGameScreen()
         {
-            StartClientWithRelay(joinCodeInputField.text, "udp").ContinueWith(task =>
+            if (string.IsNullOrWhiteSpace(joinCodeInputField.text))
+            {
+                NetworkConnector.Instance.StartClientLocally();
+                return;
+            }
+            NetworkConnector.Instance.StartClientWithRelay(joinCodeInputField.text).ContinueWith(task =>
             {
                 if (!task.Result)
                     Debug.LogError("Failed to connect to the server");
@@ -102,45 +108,6 @@ namespace RooseLabs.UI
         private void QuitGame()
         {
             Application.Quit();
-        }
-        
-        private async Task<string> StartHostWithRelay(int maxConnections, string connectionType)
-        {
-            await UnityServices.InitializeAsync();
-            if (!AuthenticationService.Instance.IsSignedIn)
-            {
-                await AuthenticationService.Instance.SignInAnonymouslyAsync();
-            }
-
-            // Request allocation and join code
-            Allocation allocation = await RelayService.Instance.CreateAllocationAsync(maxConnections);
-            var joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
-            // Configure transport
-            var unityTransport = m_networkManager.TransportManager.GetTransport<UnityTransport>();
-            unityTransport.SetRelayServerData(AllocationUtils.ToRelayServerData(allocation, connectionType));
-
-            // Start host
-            if (m_networkManager.ServerManager.StartConnection()) // Server is successfully started.
-            {
-                m_networkManager.ClientManager.StartConnection(); // You can choose not to call this method. Then only the server will start.
-                return joinCode;
-            }
-            return null;
-        }
-
-        private async Task<bool> StartClientWithRelay(string joinCode, string connectionType)
-        {
-            if (string.IsNullOrEmpty(joinCode)) return false;
-            await UnityServices.InitializeAsync();
-            if (!AuthenticationService.Instance.IsSignedIn)
-            {
-                await AuthenticationService.Instance.SignInAnonymouslyAsync();
-            }
-
-            var allocation = await RelayService.Instance.JoinAllocationAsync(joinCode: joinCode);
-            var unityTransport = m_networkManager.TransportManager.GetTransport<UnityTransport>();
-            unityTransport.SetRelayServerData(AllocationUtils.ToRelayServerData(allocation, connectionType));
-            return m_networkManager.ClientManager.StartConnection();
         }
     }
 }
