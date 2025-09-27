@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3237569681669784700
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3316079625447672383}
+  m_Layer: 0
+  m_Name: PickupPosition
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3316079625447672383
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3237569681669784700}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 2.089, z: 0.951}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5397910713435017860}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6183669148573936208
 GameObject:
   m_ObjectHideFlags: 0
@@ -28,7 +59,7 @@ Transform:
   m_GameObject: {fileID: 6183669148573936208}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.191, z: 0.41}
+  m_LocalPosition: {x: 0, y: 0.191, z: 0.353}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -151,6 +182,7 @@ GameObject:
   - component: {fileID: 1956255819182837124}
   - component: {fileID: 3786785878294777648}
   - component: {fileID: 7557353418741795802}
+  - component: {fileID: 6341907708972921574}
   - component: {fileID: 452143820547138584}
   - component: {fileID: 1142586187544801534}
   m_Layer: 0
@@ -174,6 +206,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6026643965114535170}
+  - {fileID: 3316079625447672383}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!143 &521522133795131242
@@ -275,6 +308,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b553be8b7a44a7a4f80de3445f1aeef2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Player.PlayerData
+--- !u!114 &6341907708972921574
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8687437876907095851}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9dd1f9693821a9a47b400501c874822a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.PlayerPickup
+  _componentIndexCache: 2
+  _addedNetworkObject: {fileID: 452143820547138584}
+  _networkObjectCache: {fileID: 0}
+  raycastDistance: 3
+  pickupLayer:
+    serializedVersion: 2
+    m_Bits: 256
+  pickupPosition: {fileID: 3316079625447672383}
 --- !u!114 &452143820547138584
 MonoBehaviour:
   m_ObjectHideFlags: 0
