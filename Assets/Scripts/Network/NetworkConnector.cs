@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using FishNet.Managing;
 using FishNet.Transporting.Multipass;
@@ -40,8 +41,8 @@ namespace RooseLabs.Network
         private void Awake()
         {
             m_multipass = networkManager.TransportManager.GetTransport<Multipass>();
-            m_tugboat = networkManager.TransportManager.GetTransport<Tugboat>();
-            m_unityTransport = networkManager.TransportManager.GetTransport<UnityTransport>();
+            m_tugboat = m_multipass.GetTransport<Tugboat>();
+            m_unityTransport = m_multipass.GetTransport<UnityTransport>();
             Instance = this;
         }
 
@@ -58,48 +59,63 @@ namespace RooseLabs.Network
 
         public async Task<string> StartHostWithRelay()
         {
-            await UnityServices.InitializeAsync();
-            if (!AuthenticationService.Instance.IsSignedIn)
+            try
             {
-                await AuthenticationService.Instance.SignInAnonymouslyAsync();
-            }
+                await UnityServices.InitializeAsync();
+                if (!AuthenticationService.Instance.IsSignedIn)
+                {
+                    await AuthenticationService.Instance.SignInAnonymouslyAsync();
+                }
 
-            // Request allocation and join code
-            Allocation allocation = await RelayService.Instance.CreateAllocationAsync(maxConnections);
-            string joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
-            // Configure transport
-            m_unityTransport.SetRelayServerData(allocation.ToRelayServerData(nameof(connectionType).ToLower()));
+                // Request allocation and join code
+                Allocation allocation = await RelayService.Instance.CreateAllocationAsync(maxConnections);
+                string joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
+                // Configure transport
+                m_unityTransport.SetRelayServerData(allocation.ToRelayServerData(connectionType.ToString().ToLower()));
 
-            // Start host
-            if (m_unityTransport.StartConnection(true))
-            {
+                // Start host
+                if (!m_unityTransport.StartConnection(true)) return null;
                 CurrentSessionJoinCode = joinCode;
                 m_multipass.SetClientTransport<UnityTransport>();
                 m_unityTransport.StartConnection(false);
                 return joinCode;
             }
-            return null;
+            catch (Exception e)
+            {
+                Debug.LogError($"[NetworkConnector] Failed to start host with relay: {e.Message}");
+                return null;
+            }
         }
 
         public async Task<bool> StartClientWithRelay(string joinCode)
         {
-            if (string.IsNullOrWhiteSpace(joinCode))
+            try
             {
-                Debug.LogWarning("[NetworkConnector] Join code cannot be empty!");
+                if (string.IsNullOrWhiteSpace(joinCode))
+                {
+                    Debug.LogWarning("[NetworkConnector] Join code cannot be empty!");
+                    return false;
+                }
+                joinCode = joinCode.ToUpper();
+
+                await UnityServices.InitializeAsync();
+                if (!AuthenticationService.Instance.IsSignedIn)
+                {
+                    await AuthenticationService.Instance.SignInAnonymouslyAsync();
+                }
+
+                JoinAllocation allocation = await RelayService.Instance.JoinAllocationAsync(joinCode);
+                m_unityTransport.SetRelayServerData(allocation.ToRelayServerData(connectionType.ToString().ToLower()));
+                m_multipass.SetClientTransport<UnityTransport>();
+                if (!m_unityTransport.StartConnection(false)) return false;
+                CurrentSessionJoinCode = joinCode;
+                return true;
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[NetworkConnector] Failed to start client with relay: {e.Message}");
                 return false;
             }
-            await UnityServices.InitializeAsync();
-            if (!AuthenticationService.Instance.IsSignedIn)
-            {
-                await AuthenticationService.Instance.SignInAnonymouslyAsync();
-            }
-
-            JoinAllocation allocation = await RelayService.Instance.JoinAllocationAsync(joinCode);
-            m_unityTransport.SetRelayServerData(allocation.ToRelayServerData(nameof(connectionType).ToLower()));
-            m_multipass.SetClientTransport<UnityTransport>();
-            if (!m_unityTransport.StartConnection(false)) return false;
-            CurrentSessionJoinCode = joinCode;
-            return true;
         }
     }
 }

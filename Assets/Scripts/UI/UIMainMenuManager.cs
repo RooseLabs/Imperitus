@@ -5,12 +5,12 @@ namespace RooseLabs.UI
 {
     public class UIMainMenuManager : MonoBehaviour
     {
-        public Action HostLocalGameButtonAction;
-        public Action HostOnlineGameButtonAction;
-        public Action JoinGameButtonAction;
-        public Action SettingsButtonAction;
-        public Action CreditsButtonAction;
-        public Action QuitGameButtonAction;
+        public event Action HostLocalGameButtonAction = delegate {};
+        public event Action HostOnlineGameButtonAction = delegate {};
+        public event Action JoinGameButtonAction = delegate {};
+        public event Action SettingsButtonAction = delegate {};
+        public event Action CreditsButtonAction = delegate {};
+        public event Action QuitGameButtonAction = delegate {};
 
         public void HostLocalGameButton()
         {
