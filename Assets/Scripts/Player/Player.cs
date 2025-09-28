@@ -1,11 +1,10 @@
-﻿using FishNet.Component.Transforming;
-using FishNet.Object;
+﻿using FishNet.Object;
 using RooseLabs.Core;
 using UnityEngine;
 
 namespace RooseLabs.Player
 {
-    [RequireComponent(typeof(NetworkTransform))]
+    [DefaultExecutionOrder(-99)]
     [RequireComponent(typeof(PlayerMovement))]
     [RequireComponent(typeof(PlayerInput))]
     [RequireComponent(typeof(PlayerData))]
@@ -14,7 +13,7 @@ namespace RooseLabs.Player
         public static Player LocalPlayer;
 
         [field: SerializeField]
-        public GameObject Camera { get; private set; }
+        public Camera Camera { get; private set; }
 
         public PlayerMovement Movement { get; private set; }
         public PlayerInput Input { get; private set; }
@@ -30,7 +29,7 @@ namespace RooseLabs.Player
             if (IsOwner)
             {
                 LocalPlayer = this;
-                Camera.SetActive(true);
+                Camera.gameObject.SetActive(true);
                 InputHandler.Instance.EnableGameplayInput();
                 Cursor.lockState = CursorLockMode.Locked;
             }
@@ -38,8 +37,7 @@ namespace RooseLabs.Player
 
         private void Update()
         {
-            if (!IsOwner)
-                return;
+            if (!IsOwner) return;
             Input.Sample();
         }
     }

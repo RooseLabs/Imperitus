@@ -30,8 +30,8 @@ namespace RooseLabs.Player
 
         private void Update()
         {
-            if (!m_player.IsOwner)
-                return;
+            if (!m_player.IsOwner) return;
+            if (!m_characterController.enabled) return;
             HandleRotation();
             HandleMovement();
         }
