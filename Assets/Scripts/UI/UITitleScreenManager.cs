@@ -63,20 +63,19 @@ namespace RooseLabs.UI
             NetworkConnector.Instance.StartHostLocally();
         }
 
-        private async void HostOnlineGameButtonClicked()
+        private void HostOnlineGameButtonClicked()
         {
-            string code = await NetworkConnector.Instance.StartHostWithRelay();
-            Debug.Log($"Lobby Code: {code}");
+            _ = NetworkConnector.Instance.StartHostWithRelay();
         }
 
-        private async void OpenJoinGameScreen()
+        private void OpenJoinGameScreen()
         {
             if (string.IsNullOrWhiteSpace(joinCodeInputField.text))
             {
                 NetworkConnector.Instance.StartClientLocally();
                 return;
             }
-            await NetworkConnector.Instance.StartClientWithRelay(joinCodeInputField.text);
+            _ = NetworkConnector.Instance.StartClientWithRelay(joinCodeInputField.text);
         }
 
         private void OpenSettingsScreen()
