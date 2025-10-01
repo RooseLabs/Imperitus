@@ -9,7 +9,6 @@ namespace RooseLabs.Player
         [SerializeField] private LayerMask pickupLayer;
         [SerializeField] private Transform pickupPosition;
 
-        // Reference to player and player input
         private Player m_player;
 
         private bool m_hasObjectInHand;
@@ -74,27 +73,16 @@ namespace RooseLabs.Player
 
         private void Pickup()
         {
+            if (m_hasObjectInHand) return;
+
             Debug.Log("[PlayerPickup] Attempting pickup raycast.");
             if (Physics.Raycast(m_player.Camera.transform.position, m_player.Camera.transform.forward, out RaycastHit hit, raycastDistance, pickupLayer))
             {
                 Debug.Log($"[PlayerPickup] Raycast hit: {hit.transform.gameObject.name}");
-
-                if (!m_hasObjectInHand)
-                {
-                    Debug.Log("[PlayerPickup] No object in hand, picking up new object.");
-                    SetObjectInHandServer(hit.transform.gameObject, pickupPosition.position, pickupPosition.rotation, gameObject);
-                    m_objInHand = hit.transform.gameObject;
-                    m_hasObjectInHand = true;
-                }
-                else if (m_hasObjectInHand)
-                {
-                    Debug.Log("[PlayerPickup] Already holding object, dropping and picking up new object.");
-                    Drop();
-
-                    SetObjectInHandServer(hit.transform.gameObject, pickupPosition.position, pickupPosition.rotation, gameObject);
-                    m_objInHand = hit.transform.gameObject;
-                    m_hasObjectInHand = true;
-                }
+                Debug.Log("[PlayerPickup] No object in hand, picking up new object.");
+                Pickup_ServerRPC(hit.transform.gameObject, pickupPosition.position, pickupPosition.rotation, gameObject);
+                m_objInHand = hit.transform.gameObject;
+                m_hasObjectInHand = true;
             }
             else
             {
@@ -103,16 +91,16 @@ namespace RooseLabs.Player
         }
 
         [ServerRpc(RequireOwnership = false)]
-        private void SetObjectInHandServer(GameObject obj, Vector3 position, Quaternion rotation, GameObject player)
+        private void Pickup_ServerRPC(GameObject obj, Vector3 position, Quaternion rotation, GameObject player)
         {
-            Debug.Log($"[PlayerPickup] [ServerRpc] SetObjectInHandServer called for {obj.name}");
-            SetObjectInHandObserver(obj, position, rotation, player);
+            Debug.Log($"[PlayerPickup] Pickup_ServerRPC called for {obj.name}");
+            Pickup_ObserversRPC(obj, position, rotation, player);
         }
 
         [ObserversRpc]
-        private void SetObjectInHandObserver(GameObject obj, Vector3 position, Quaternion rotation, GameObject player)
+        private void Pickup_ObserversRPC(GameObject obj, Vector3 position, Quaternion rotation, GameObject player)
         {
-            Debug.Log($"[PlayerPickup] [ObserversRpc] SetObjectInHandObserver called for {obj.name}");
+            Debug.Log($"[PlayerPickup] Pickup_ObserversRPC called for {obj.name}");
             obj.transform.position = position;
             obj.transform.rotation = rotation;
             obj.transform.parent = player.transform;
@@ -134,22 +122,22 @@ namespace RooseLabs.Player
             }
 
             Debug.Log("[PlayerPickup] Dropping object.");
-            DropObjectServer(m_objInHand, m_worldObjectHolder);
+            Drop_ServerRPC(m_objInHand, m_worldObjectHolder);
             m_hasObjectInHand = false;
             m_objInHand = null;
         }
 
         [ServerRpc(RequireOwnership = false)]
-        private void DropObjectServer(GameObject obj, Transform worldHolder)
+        private void Drop_ServerRPC(GameObject obj, Transform worldHolder)
         {
-            Debug.Log($"[PlayerPickup] [ServerRpc] DropObjectServer called for {obj.name}");
-            DropObjectObserver(obj, worldHolder);
+            Debug.Log($"[PlayerPickup] Drop_ServerRPC called for {obj.name}");
+            Drop_ObserversRPC(obj, worldHolder);
         }
 
         [ObserversRpc]
-        private void DropObjectObserver(GameObject obj, Transform worldHolder)
+        private void Drop_ObserversRPC(GameObject obj, Transform worldHolder)
         {
-            Debug.Log($"[PlayerPickup] [ObserversRpc] DropObjectObserver called for {obj.name}");
+            Debug.Log($"[PlayerPickup] Drop_ObserversRPC called for {obj.name}");
             obj.transform.parent = worldHolder;
 
             var rb = obj.GetComponent<Rigidbody>();
