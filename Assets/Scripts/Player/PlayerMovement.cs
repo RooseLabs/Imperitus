@@ -22,7 +22,7 @@ namespace RooseLabs.Player
 
         private const float GravityForce = 9.81f;
 
-        private void Awake()
+        private void Start()
         {
             m_player = GetComponent<Player>();
             m_characterController = GetComponent<CharacterController>();
@@ -78,12 +78,12 @@ namespace RooseLabs.Player
             return Physics.Raycast(transform.position + Vector3.up * 0.03f, Vector3.down, groundCheckDistance);
         }
 
-#if UNITY_EDITOR
+        #if UNITY_EDITOR
         private void OnDrawGizmosSelected()
         {
             Gizmos.color = Color.red;
             Gizmos.DrawRay(transform.position + Vector3.up * 0.03f, Vector3.down * groundCheckDistance);
         }
-#endif
+        #endif
     }
 }

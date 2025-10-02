@@ -16,7 +16,9 @@ namespace RooseLabs.Core
         public InputActionMap UIActions => m_uiActionMap;
 
         #region Event Actions
+
         public event Action<InputDevice> InputDeviceChanged = delegate { };
+
         #endregion
 
         private void Awake()

@@ -31,6 +31,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 5397910713435017860}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &5494883616830174824
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4476353137626172686}
+  m_Layer: 0
+  m_Name: CastPosition
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4476353137626172686
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5494883616830174824}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.281, y: 2, z: 1.242}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5397910713435017860}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6183669148573936208
 GameObject:
   m_ObjectHideFlags: 0
@@ -183,6 +214,7 @@ GameObject:
   - component: {fileID: 3786785878294777648}
   - component: {fileID: 7557353418741795802}
   - component: {fileID: 6341907708972921574}
+  - component: {fileID: 5852382446851324227}
   - component: {fileID: 452143820547138584}
   - component: {fileID: 1142586187544801534}
   m_Layer: 0
@@ -207,6 +239,7 @@ Transform:
   m_Children:
   - {fileID: 6026643965114535170}
   - {fileID: 3316079625447672383}
+  - {fileID: 4476353137626172686}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!143 &521522133795131242
@@ -328,6 +361,24 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 256
   pickupPosition: {fileID: 3316079625447672383}
+--- !u!114 &5852382446851324227
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8687437876907095851}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d9d478c9daf84c5b88cf2fc46ca7b2d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Player.PlayerCast
+  _componentIndexCache: 255
+  _addedNetworkObject: {fileID: 452143820547138584}
+  _networkObjectCache: {fileID: 0}
+  castPoint: {fileID: 4476353137626172686}
+  projectilePrefab: {fileID: 4420710090149408639, guid: ebd0073e4eff6ac4ca6de6e83db93f84, type: 3}
+  projectileSpeed: 10
 --- !u!114 &452143820547138584
 MonoBehaviour:
   m_ObjectHideFlags: 0
