@@ -1,0 +1,1397 @@
+fileFormatVersion: 2
+guid: 67ff826993ce8da48b8965d2c4f581ab
+ModelImporter:
+  serializedVersion: 24200
+  internalIDToNameTable: []
+  externalObjects: {}
+  materials:
+    materialImportMode: 2
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    removeConstantScaleCurves: 0
+    motionNodeName: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
+    animationCompression: 3
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: BaseRigPlayer|Backwards
+      takeName: BaseRigPlayer|Backwards
+      internalID: -8017829042584121031
+      firstFrame: 0
+      lastFrame: 62
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 1
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: BaseRigPlayer|Crouch4Diagonal
+      takeName: BaseRigPlayer|Crouch4Diagonal
+      internalID: -8086739433767295908
+      firstFrame: 0
+      lastFrame: 135
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 1
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: BaseRigPlayer|Crouch4Front
+      takeName: BaseRigPlayer|Crouch4Front
+      internalID: -2237873243512242963
+      firstFrame: 0
+      lastFrame: 135
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 1
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: BaseRigPlayer|Crouch4Idle
+      takeName: BaseRigPlayer|Crouch4Idle
+      internalID: 2195758751338613816
+      firstFrame: 0
+      lastFrame: 119
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 1
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: BaseRigPlayer|Crouch4Strafe
+      takeName: BaseRigPlayer|Crouch4Strafe
+      internalID: -7924415350689533467
+      firstFrame: 0
+      lastFrame: 135
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 1
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: BaseRigPlayer|CrouchBack
+      takeName: BaseRigPlayer|CrouchBack
+      internalID: 740088913081891492
+      firstFrame: 0
+      lastFrame: 105
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 1
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: BaseRigPlayer|CrouchDiagonalB
+      takeName: BaseRigPlayer|CrouchDiagonalB
+      internalID: -2714232797758071030
+      firstFrame: 0
+      lastFrame: 105
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 1
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: BaseRigPlayer|CrouchDiagonalF
+      takeName: BaseRigPlayer|CrouchDiagonalF
+      internalID: 3764106211179334393
+      firstFrame: 0
+      lastFrame: 107
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 1
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: BaseRigPlayer|CrouchFront
+      takeName: BaseRigPlayer|CrouchFront
+      internalID: 4169709807630220054
+      firstFrame: 0
+      lastFrame: 105
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 1
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: BaseRigPlayer|CrouchIdle
+      takeName: BaseRigPlayer|CrouchIdle
+      internalID: 2796035680105503425
+      firstFrame: 0
+      lastFrame: 119
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 1
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: BaseRigPlayer|CrouchStrafe
+      takeName: BaseRigPlayer|CrouchStrafe
+      internalID: 6659909623892243662
+      firstFrame: 0
+      lastFrame: 103
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 1
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: BaseRigPlayer|DownBack
+      takeName: BaseRigPlayer|DownBack
+      internalID: 4002490693551813531
+      firstFrame: 0
+      lastFrame: 314
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 1
+      keepOriginalOrientation: 1
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 1
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: BaseRigPlayer|DownFront
+      takeName: BaseRigPlayer|DownFront
+      internalID: 8169563722441327036
+      firstFrame: 0
+      lastFrame: 452
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 1
+      keepOriginalOrientation: 1
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 1
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: BaseRigPlayer|Idle
+      takeName: BaseRigPlayer|Idle
+      internalID: -1616899435852592466
+      firstFrame: 0
+      lastFrame: 109
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 1
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: BaseRigPlayer|Jump
+      takeName: BaseRigPlayer|Jump
+      internalID: -4372648887694145622
+      firstFrame: 0
+      lastFrame: 40
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 1
+      keepOriginalPositionY: 0
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 1
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: BaseRigPlayer|Run
+      takeName: BaseRigPlayer|Run
+      internalID: -4967257241599465556
+      firstFrame: 0
+      lastFrame: 43
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 1
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: BaseRigPlayer|Strafe
+      takeName: BaseRigPlayer|Strafe
+      internalID: -4786734025588667747
+      firstFrame: 0
+      lastFrame: 62
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 1
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: BaseRigPlayer|StrafeBack
+      takeName: BaseRigPlayer|StrafeBack
+      internalID: -1559489576317680055
+      firstFrame: 0
+      lastFrame: 68
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 1
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: BaseRigPlayer|StrafeFront
+      takeName: BaseRigPlayer|StrafeFront
+      internalID: 3347958318919314260
+      firstFrame: 0
+      lastFrame: 62
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 1
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    isReadable: 0
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    useSRGBMaterialColor: 1
+    sortHierarchyByName: 1
+    importPhysicalCameras: 1
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    nodeNameCollisionStrategy: 1
+    fileIdsGeneration: 2
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    keepQuads: 0
+    weldVertices: 1
+    bakeAxisConversion: 0
+    preserveHierarchy: 0
+    skinWeightsMode: 0
+    maxBonesPerVertex: 4
+    minBoneWeight: 0.001
+    optimizeBones: 1
+    generateMeshLods: 0
+    meshLodGenerationFlags: 0
+    maximumMeshLod: -1
+    meshOptimizationFlags: -1
+    indexFormat: 0
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVMarginMethod: 1
+    secondaryUVMinLightmapResolution: 40
+    secondaryUVMinObjectScale: 1
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+    strictVertexDataChecks: 0
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+    legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
+    blendShapeNormalImportMode: 1
+    normalSmoothingSource: 0
+  referencedClips: []
+  importAnimation: 1
+  humanDescription:
+    serializedVersion: 3
+    human:
+    - boneName: Def_Torso
+      humanName: Hips
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Def_Leg.L
+      humanName: LeftUpperLeg
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Def_Leg.R
+      humanName: RightUpperLeg
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Def_Leg.L.001
+      humanName: LeftLowerLeg
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Def_Leg.R.001
+      humanName: RightLowerLeg
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Def_Feet.L
+      humanName: LeftFoot
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Def_Feet.R
+      humanName: RightFoot
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Def_Torso.001
+      humanName: Spine
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Def_Torso.002
+      humanName: Chest
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Def:Neck
+      humanName: Neck
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Def_Head
+      humanName: Head
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Def_Shoulder.L
+      humanName: LeftShoulder
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Def_Shoulder.R
+      humanName: RightShoulder
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Def_Arm.L
+      humanName: LeftUpperArm
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Def_Arm.R
+      humanName: RightUpperArm
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Def_Arm.L.001
+      humanName: LeftLowerArm
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Def_Arm.R.001
+      humanName: RightLowerArm
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Def_Hand.L.002
+      humanName: LeftHand
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Def_Hand.R.002
+      humanName: RightHand
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Def_Feet.L.001
+      humanName: LeftToes
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Def_Feet.R.001
+      humanName: RightToes
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Def_Thumb.L
+      humanName: Left Thumb Proximal
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Def_Thumb.L.001
+      humanName: Left Thumb Intermediate
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Def_Thumb.L.002
+      humanName: Left Thumb Distal
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Def_Index.L
+      humanName: Left Index Proximal
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Def_Index.L.001
+      humanName: Left Index Intermediate
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Def_Index.L.002
+      humanName: Left Index Distal
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Def_Middle.L
+      humanName: Left Middle Proximal
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Def_Middle.L.001
+      humanName: Left Middle Intermediate
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Def_Middle.L.002
+      humanName: Left Middle Distal
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Def_Ring.L
+      humanName: Left Ring Proximal
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Def_Ring.L.001
+      humanName: Left Ring Intermediate
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Def_Ring.L.002
+      humanName: Left Ring Distal
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Def_Little.L
+      humanName: Left Little Proximal
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Def_Little.L.001
+      humanName: Left Little Intermediate
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Def_Little.L.002
+      humanName: Left Little Distal
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Def_Thumb.R
+      humanName: Right Thumb Proximal
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Def_Thumb.R.001
+      humanName: Right Thumb Intermediate
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Def_Thumb.R.002
+      humanName: Right Thumb Distal
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Def_Index.R
+      humanName: Right Index Proximal
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Def_Index.R.001
+      humanName: Right Index Intermediate
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Def_Index.R.002
+      humanName: Right Index Distal
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Def_Middle.R
+      humanName: Right Middle Proximal
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Def_Middle.R.001
+      humanName: Right Middle Intermediate
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Def_Middle.R.002
+      humanName: Right Middle Distal
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Def_Ring.R
+      humanName: Right Ring Proximal
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Def_Ring.R.001
+      humanName: Right Ring Intermediate
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Def_Ring.R.002
+      humanName: Right Ring Distal
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Def_Little.R
+      humanName: Right Little Proximal
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Def_Little.R.001
+      humanName: Right Little Intermediate
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Def_Little.R.002
+      humanName: Right Little Distal
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Def_Torso.003
+      humanName: UpperChest
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    skeleton:
+    - name: IneptusPlayer(Clone)
+      parentName: 
+      position: {x: 0, y: 0, z: 0}
+      rotation: {x: 0, y: 0, z: 0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: BaseRigPlayer
+      parentName: IneptusPlayer(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: -0.7071067, y: 5.302452e-33, z: 5.302451e-33, w: 0.7071068}
+      scale: {x: 100, y: 100, z: 100}
+    - name: Root
+      parentName: BaseRigPlayer
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0.7071068, y: -0.00000003090862, z: 0.00000003090863, w: 0.7071068}
+      scale: {x: 1, y: 0.9999998, z: 0.9999998}
+    - name: CTRL_Hip
+      parentName: Root
+      position: {x: -0, y: 0.020708026, z: -0.0017592867}
+      rotation: {x: -0.70710677, y: -0.0000001685874, z: 0.00000016858739, w: 0.7071069}
+      scale: {x: 1, y: 0.99999976, z: 0.99999976}
+    - name: Def_Torso
+      parentName: CTRL_Hip
+      position: {x: -0.000000001386329, y: 0.0003657329, z: -0.0029073427}
+      rotation: {x: 0.74993753, y: -5.6843412e-14, z: -0.0000003575981, w: 0.6615088}
+      scale: {x: 1, y: 1.0000006, z: 1.0000006}
+    - name: Def_Torso.001
+      parentName: Def_Torso
+      position: {x: -8.6669814e-17, y: 0.002930257, z: -1.4901161e-10}
+      rotation: {x: -0.02574047, y: 0.00000011916982, z: 0.000000009205507, w: 0.9996687}
+      scale: {x: 1, y: 1.0000001, z: 1.0000001}
+    - name: Def_Torso.002
+      parentName: Def_Torso.001
+      position: {x: -2.856183e-17, y: 0.0029152432, z: 0}
+      rotation: {x: -0.059905645, y: -1.4210851e-14, z: 0.000000014282635, w: 0.99820405}
+      scale: {x: 1, y: 0.9999996, z: 0.9999996}
+    - name: Def_Torso.003
+      parentName: Def_Torso.002
+      position: {x: 2.1812437e-17, y: 0.0029104522, z: 0}
+      rotation: {x: -0.035129495, y: 2.999733e-14, z: 0.000000008375507, w: 0.9993828}
+      scale: {x: 1, y: 0.9999997, z: 0.99999964}
+    - name: Def_tie
+      parentName: Def_Torso.003
+      position: {x: 5.8920535e-10, y: 0.000092173796, z: 0.0024713064}
+      rotation: {x: 0.7067889, y: 0.021203313, z: 0.70678866, w: 0.021203168}
+      scale: {x: 1.0000004, y: 1.0000006, z: 1.0000036}
+    - name: Def_tie.003
+      parentName: Def_tie
+      position: {x: 7.450581e-11, y: 0.0009332322, z: -2.5757173e-16}
+      rotation: {x: -0.000000027939667, y: 0.00000008865024, z: 0.00000026915214, w: 1}
+      scale: {x: 1.0000005, y: 0.9999999, z: 1}
+    - name: Def_tie.001
+      parentName: Def_tie.003
+      position: {x: 9.313225e-11, y: 0.00093323295, z: 8.2156505e-17}
+      rotation: {x: -0, y: -0, z: 2.4768582e-15, w: 1}
+      scale: {x: 1.0000008, y: 1.0000014, z: 1.0000013}
+    - name: Def_tie.002
+      parentName: Def_tie.001
+      position: {x: -3.72529e-10, y: 0.00093323376, z: -1.4210854e-16}
+      rotation: {x: 0.000000021420428, y: -0.000000029162024, z: -0.00000027287743, w: 1}
+      scale: {x: 1.0000017, y: 1.0000029, z: 1.0000013}
+    - name: Def:Neck
+      parentName: Def_Torso.003
+      position: {x: 6.2858156e-11, y: 0.0045370073, z: 0.00026364616}
+      rotation: {x: 0.106336676, y: 4.5731587e-14, z: -0.000000025352668, w: 0.99433017}
+      scale: {x: 1, y: 1.0000001, z: 1.0000001}
+    - name: Def_Head
+      parentName: Def:Neck
+      position: {x: 1.10675304e-16, y: 0.0019609344, z: -1.8626451e-11}
+      rotation: {x: 0.014461091, y: -4.885926e-14, z: -0.000000003447769, w: 0.9998955}
+      scale: {x: 1, y: 0.99999964, z: 0.9999998}
+    - name: Def_Shoulder.L
+      parentName: Def_Torso.003
+      position: {x: -0.0013434174, y: 0.003130068, z: 4.693073e-10}
+      rotation: {x: 0.044649053, y: -0.03736267, z: 0.6406668, w: 0.76560867}
+      scale: {x: 1.0000006, y: 1.0000002, z: 1.0000004}
+    - name: Def_Arm.L
+      parentName: Def_Shoulder.L
+      position: {x: 0.0000000042840838, y: 0.0022860323, z: -6.624168e-10}
+      rotation: {x: 0.002374711, y: -0.035460934, z: 0.114364706, w: 0.9928029}
+      scale: {x: 1.0000008, y: 1.0000008, z: 1}
+    - name: Def_Arm.L.001
+      parentName: Def_Arm.L
+      position: {x: 0.0000000018021091, y: 0.0046765422, z: 0.0000000011920929}
+      rotation: {x: 0.041181475, y: 0.00034971142, z: -0.027389271, w: 0.9987762}
+      scale: {x: 0.99999917, y: 0.99999946, z: 1}
+    - name: Def_Hand.L.002
+      parentName: Def_Arm.L.001
+      position: {x: -5.2154064e-10, y: 0.0055869, z: 2.9802322e-10}
+      rotation: {x: -0.026142638, y: 0.019829588, z: -0.03637388, w: 0.99879944}
+      scale: {x: 1.0000017, y: 1.0000011, z: 1}
+    - name: Def_Little.L
+      parentName: Def_Hand.L.002
+      position: {x: -0.00008652779, y: 0.0023984755, z: -0.0008485123}
+      rotation: {x: -0.035380535, y: 0.1498583, z: 0.0029233536, w: 0.98807}
+      scale: {x: 1.0000025, y: 1.0000024, z: 1.0000008}
+    - name: Def_Little.L.001
+      parentName: Def_Little.L
+      position: {x: -8.1956386e-10, y: 0.0006380428, z: 0}
+      rotation: {x: 0.0058913343, y: -0.000025361762, z: -0.018116897, w: 0.99981856}
+      scale: {x: 0.9999997, y: 1, z: 0.9999995}
+    - name: Def_Little.L.002
+      parentName: Def_Little.L.001
+      position: {x: 4.4703483e-10, y: 0.00031498267, z: 1.4901161e-10}
+      rotation: {x: -0.0039442005, y: 0.000032726748, z: 0.012129107, w: 0.9999187}
+      scale: {x: 1.0000002, y: 0.9999998, z: 1.0000001}
+    - name: Def_Ring.L
+      parentName: Def_Hand.L.002
+      position: {x: 0.000014809363, y: 0.0026085132, z: -0.00029893153}
+      rotation: {x: -0.039063085, y: 0.059819344, z: -0.0044888877, w: 0.9974345}
+      scale: {x: 1.0000011, y: 1.0000007, z: 0.99999994}
+    - name: Def_Ring.L.001
+      parentName: Def_Ring.L
+      position: {x: -2.2235326e-10, y: 0.0007748288, z: -1.4901161e-10}
+      rotation: {x: -0.0026697824, y: 0.00024775017, z: 0.041035693, w: 0.99915415}
+      scale: {x: 1.0000019, y: 1.0000018, z: 1.0000001}
+    - name: Def_Ring.L.002
+      parentName: Def_Ring.L.001
+      position: {x: -0.0000000015087426, y: 0.00052298006, z: 1.4901161e-10}
+      rotation: {x: -0.011645253, y: -0.00056192366, z: 0.011284762, w: 0.99986845}
+      scale: {x: 1.0000027, y: 1.0000019, z: 1.0000008}
+    - name: Def_Middle.L
+      parentName: Def_Hand.L.002
+      position: {x: 0.000030307789, y: 0.0025673464, z: 0.0002157692}
+      rotation: {x: 0.0036227724, y: -0.03206677, z: 0.009572025, w: 0.99943334}
+      scale: {x: 1.0000006, y: 1.000001, z: 1.000001}
+    - name: Def_Middle.L.001
+      parentName: Def_Middle.L
+      position: {x: 3.1664968e-10, y: 0.00089148333, z: 0}
+      rotation: {x: -0.003683425, y: -0.000022526823, z: 0.041229162, w: 0.99914294}
+      scale: {x: 1.0000025, y: 1.0000024, z: 0.9999994}
+    - name: Def_Middle.L.002
+      parentName: Def_Middle.L.001
+      position: {x: -0.0000000021979212, y: 0.0006291867, z: 1.4901161e-10}
+      rotation: {x: -0.00007975213, y: 0.000000049683848, z: 0.008890996, w: 0.9999605}
+      scale: {x: 1.0000011, y: 1.0000017, z: 1.0000006}
+    - name: Def_Index.L
+      parentName: Def_Hand.L.002
+      position: {x: -0.000076521246, y: 0.0024943182, z: 0.0007783471}
+      rotation: {x: 0.08509834, y: -0.15385081, z: -0.0076297913, w: 0.9843933}
+      scale: {x: 1.0000023, y: 1.000002, z: 1.0000002}
+    - name: Def_Index.L.001
+      parentName: Def_Index.L
+      position: {x: 3.7252902e-11, y: 0.0008194093, z: 0}
+      rotation: {x: 0.008868202, y: -0.0002938357, z: 0.04046057, w: 0.99914175}
+      scale: {x: 1.0000011, y: 1.0000001, z: 0.9999998}
+    - name: Def_Index.L.002
+      parentName: Def_Index.L.001
+      position: {x: -1.4901161e-10, y: 0.0005834641, z: -2.9802322e-10}
+      rotation: {x: 0.012592072, y: 0.000019680963, z: 0.015962789, w: 0.99979335}
+      scale: {x: 1.0000005, y: 0.99999994, z: 0.9999998}
+    - name: Def_Thumb.L
+      parentName: Def_Hand.L.002
+      position: {x: -0.0004893638, y: 0.000899059, z: 0.0006642774}
+      rotation: {x: 0.4315311, y: -0.23081914, z: -0.04978832, w: 0.8706461}
+      scale: {x: 1.0000019, y: 1.000002, z: 1.0000001}
+    - name: Def_Thumb.L.001
+      parentName: Def_Thumb.L
+      position: {x: 2.6077032e-10, y: 0.00059172435, z: 6.705522e-10}
+      rotation: {x: -0.030398905, y: -0.0006779128, z: 0.018056257, w: 0.99937457}
+      scale: {x: 1.0000004, y: 0.99999803, z: 1.0000005}
+    - name: Def_Thumb.L.002
+      parentName: Def_Thumb.L.001
+      position: {x: -1.4901161e-10, y: 0.00048201362, z: -1.862645e-10}
+      rotation: {x: -0.061585024, y: -0.040251914, z: -0.013235749, w: 0.9972021}
+      scale: {x: 1.0000024, y: 1.0000032, z: 0.9999997}
+    - name: Def_Shoulder.R
+      parentName: Def_Torso.003
+      position: {x: 0.0013434174, y: 0.003130068, z: -9.67783e-11}
+      rotation: {x: 0.044648968, y: 0.037362833, z: -0.6406667, w: 0.7656086}
+      scale: {x: 1.0000007, y: 1.0000001, z: 1.0000005}
+    - name: Def_Arm.R
+      parentName: Def_Shoulder.R
+      position: {x: -0.0000000015646219, y: 0.0022860337, z: -3.7778078e-10}
+      rotation: {x: -0.002374152, y: -0.03546064, z: 0.11436476, w: -0.99280286}
+      scale: {x: 1.0000011, y: 1.0000006, z: 0.99999994}
+    - name: Def_Arm.R.001
+      parentName: Def_Arm.R
+      position: {x: 3.352761e-10, y: 0.0046765404, z: 0.000000002682209}
+      rotation: {x: 0.04118193, y: -0.00034975988, z: 0.027389456, w: 0.9987762}
+      scale: {x: 1.0000006, y: 1.0000008, z: 1.0000001}
+    - name: Def_Hand.R.002
+      parentName: Def_Arm.R.001
+      position: {x: 9.685754e-10, y: 0.005586899, z: -7.4505804e-11}
+      rotation: {x: -0.02614268, y: -0.01982956, z: 0.03637364, w: 0.9987995}
+      scale: {x: 1.0000015, y: 1.0000018, z: 1.0000007}
+    - name: Def_Little.R
+      parentName: Def_Hand.R.002
+      position: {x: 0.000086528715, y: 0.0023984772, z: -0.00084851286}
+      rotation: {x: -0.035381664, y: -0.1498579, z: -0.002924177, w: 0.9880699}
+      scale: {x: 1.0000002, y: 1, z: 0.9999995}
+    - name: Def_Little.R.001
+      parentName: Def_Little.R
+      position: {x: 5.9604643e-10, y: 0.0006380455, z: 4.4703483e-10}
+      rotation: {x: 0.00589135, y: 0.000025302159, z: 0.01811695, w: 0.9998185}
+      scale: {x: 0.9999996, y: 1.0000005, z: 1.0000004}
+    - name: Def_Little.R.002
+      parentName: Def_Little.R.001
+      position: {x: 4.842877e-10, y: 0.00031498107, z: -1.4901161e-10}
+      rotation: {x: -0.0039441097, y: -0.000032535132, z: -0.0121291885, w: 0.9999187}
+      scale: {x: 1.0000008, y: 1.0000007, z: 1.0000006}
+    - name: Def_Ring.R
+      parentName: Def_Hand.R.002
+      position: {x: -0.000014809014, y: 0.0026085132, z: -0.00029893193}
+      rotation: {x: -0.03906493, y: -0.05981934, z: 0.004488929, w: 0.9974345}
+      scale: {x: 1.0000018, y: 1.0000015, z: 0.9999994}
+    - name: Def_Ring.R.001
+      parentName: Def_Ring.R
+      position: {x: -4.0978193e-10, y: 0.0007748293, z: 7.4505804e-11}
+      rotation: {x: -0.0026691905, y: -0.00024769807, z: -0.04103879, w: 0.999154}
+      scale: {x: 1.0000007, y: 1.0000007, z: 1.0000005}
+    - name: Def_Ring.R.002
+      parentName: Def_Ring.R.001
+      position: {x: -0.000000001238659, y: 0.00052297977, z: 7.4505804e-11}
+      rotation: {x: -0.011645194, y: 0.00056205667, z: -0.011284814, w: 0.9998684}
+      scale: {x: 1.0000012, y: 1.0000011, z: 0.999999}
+    - name: Def_Middle.R
+      parentName: Def_Hand.R.002
+      position: {x: -0.000030306177, y: 0.00256735, z: 0.00021576819}
+      rotation: {x: 0.003622685, y: 0.03206678, z: -0.00957186, w: 0.99943334}
+      scale: {x: 1.000001, y: 1.0000001, z: 1.0000002}
+    - name: Def_Middle.R.001
+      parentName: Def_Middle.R
+      position: {x: 1.4901161e-10, y: 0.0008914846, z: 2.0489097e-10}
+      rotation: {x: -0.0036834474, y: 0.00002243369, z: -0.041229136, w: 0.999143}
+      scale: {x: 0.9999998, y: 1.0000015, z: 0.99999994}
+    - name: Def_Middle.R.002
+      parentName: Def_Middle.R.001
+      position: {x: 0.0000000016577542, y: 0.00062918616, z: 4.6566126e-11}
+      rotation: {x: -0.00007969091, y: -0.000000017307675, z: -0.008890952, w: 0.99996054}
+      scale: {x: 1.0000024, y: 1.0000017, z: 1.0000004}
+    - name: Def_Index.R
+      parentName: Def_Hand.R.002
+      position: {x: 0.00007652217, y: 0.0024943198, z: 0.0007783463}
+      rotation: {x: 0.08509841, y: 0.15385082, z: 0.007629779, w: 0.9843933}
+      scale: {x: 1.0000014, y: 1.000001, z: 1.0000005}
+    - name: Def_Index.R.001
+      parentName: Def_Index.R
+      position: {x: 9.313225e-11, y: 0.00081940833, z: 7.4505804e-11}
+      rotation: {x: 0.008867761, y: 0.00029391018, z: -0.040458582, w: 0.9991418}
+      scale: {x: 1.0000014, y: 1.0000021, z: 0.99999934}
+    - name: Def_Index.R.002
+      parentName: Def_Index.R.001
+      position: {x: -2.6077032e-10, y: 0.0005834645, z: -2.9802322e-10}
+      rotation: {x: 0.012592147, y: -0.000019707735, z: -0.015962832, w: 0.9997933}
+      scale: {x: 1.0000017, y: 1.0000002, z: 1}
+    - name: Def_Thumb.R
+      parentName: Def_Hand.R.002
+      position: {x: 0.000489364, y: 0.0008990609, z: 0.0006642768}
+      rotation: {x: 0.43153238, y: 0.23081987, z: 0.049788058, w: 0.8706453}
+      scale: {x: 1.0000006, y: 1.0000006, z: 1}
+    - name: Def_Thumb.R.001
+      parentName: Def_Thumb.R
+      position: {x: 8.1956386e-10, y: 0.00059172214, z: 8.5681673e-10}
+      rotation: {x: -0.03040586, y: 0.00067709346, z: -0.01805183, w: 0.99937445}
+      scale: {x: 1.0000008, y: 0.9999986, z: 1.0000005}
+    - name: Def_Thumb.R.002
+      parentName: Def_Thumb.R.001
+      position: {x: 1.862645e-10, y: 0.0004820121, z: -6.3329936e-10}
+      rotation: {x: -0.061584912, y: 0.04025207, z: 0.013235759, w: 0.99720204}
+      scale: {x: 1.0000021, y: 1.0000018, z: 0.9999995}
+    - name: Def_Leg.L
+      parentName: Def_Torso
+      position: {x: -0.0021763362, y: -0.00027304192, z: 0.000034348213}
+      rotation: {x: 0.99607277, y: 0.000000008213044, z: -0.00000035641676, w: 0.08853838}
+      scale: {x: 1, y: 1.0000021, z: 1.0000037}
+    - name: Def_Leg.L.001
+      parentName: Def_Leg.L
+      position: {x: 1.1423253e-10, y: 0.007585013, z: 2.7939677e-11}
+      rotation: {x: 0.035851892, y: -0.00000011834798, z: -0.0000000163024, w: 0.99935716}
+      scale: {x: 0.9999998, y: 1.0000021, z: 1.0000013}
+    - name: Def_Feet.L
+      parentName: Def_Leg.L.001
+      position: {x: 1.0244548e-10, y: 0.0071587586, z: -6.554182e-10}
+      rotation: {x: -0.36551377, y: 0.0014353083, z: 0.0066117304, w: 0.93078136}
+      scale: {x: 0.9999999, y: 1.000002, z: 0.99999994}
+    - name: Def_Feet.L.001
+      parentName: Def_Feet.L
+      position: {x: -1.8626451e-11, y: 0.0018488076, z: 4.703179e-10}
+      rotation: {x: -0.2910521, y: 0.004784902, z: -0.000535671, w: 0.9566951}
+      scale: {x: 1.0000002, y: 0.9999994, z: 1.0000027}
+    - name: Def_Leg.R
+      parentName: Def_Torso
+      position: {x: 0.0021763362, y: -0.00027303954, z: 0.000034345987}
+      rotation: {x: 0.99607277, y: 0.000000028613567, z: -0.00000011689488, w: 0.088538446}
+      scale: {x: 1, y: 1.0000015, z: 1.0000048}
+    - name: Def_Leg.R.001
+      parentName: Def_Leg.R
+      position: {x: -4.6566126e-11, y: 0.0075850138, z: -1.5832484e-10}
+      rotation: {x: 0.03585196, y: 0.000000116263855, z: 0.000000010236527, w: 0.99935716}
+      scale: {x: 1, y: 1.0000015, z: 1.0000018}
+    - name: Def_Feet.R
+      parentName: Def_Leg.R.001
+      position: {x: -7.683411e-11, y: 0.0071587595, z: 1.0244548e-10}
+      rotation: {x: -0.36551377, y: -0.0014353124, z: -0.006611726, w: 0.9307813}
+      scale: {x: 1, y: 1.0000008, z: 0.99999815}
+    - name: Def_Feet.R.001
+      parentName: Def_Feet.R
+      position: {x: -1.9557773e-10, y: 0.001848807, z: 2.3283063e-11}
+      rotation: {x: -0.29105225, y: -0.004784895, z: 0.000535671, w: 0.9566951}
+      scale: {x: 1.0000002, y: 0.999994, z: 1.0000061}
+    - name: ClothesM
+      parentName: IneptusPlayer(Clone)
+      position: {x: -0, y: 2.21335, z: 0}
+      rotation: {x: -0.7071067, y: -0.000000030908616, z: 0.000000030908623, w: 0.7071068}
+      scale: {x: 100, y: 100, z: 100}
+    - name: head
+      parentName: IneptusPlayer(Clone)
+      position: {x: -0, y: 3.1922336, z: 0}
+      rotation: {x: -0.7071067, y: -0.000000030908616, z: 0.000000030908623, w: 0.7071068}
+      scale: {x: 100, y: 100, z: 100}
+    - name: head.005
+      parentName: IneptusPlayer(Clone)
+      position: {x: -0, y: 3.1922336, z: 0}
+      rotation: {x: -0.7071067, y: -0.000000030908616, z: 0.000000030908623, w: 0.7071068}
+      scale: {x: 100, y: 100, z: 100}
+    - name: tieM
+      parentName: IneptusPlayer(Clone)
+      position: {x: -0, y: 3.0078511, z: 0}
+      rotation: {x: -0.7071067, y: -0.000000030908616, z: 0.000000030908623, w: 0.7071068}
+      scale: {x: 100, y: 100, z: 100}
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    globalScale: 1
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+    hasExtraRoot: 1
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  autoGenerateAvatarMappingIfUnspecified: 1
+  animationType: 3
+  humanoidOversampling: 1
+  avatarSetup: 1
+  addHumanoidExtraRootOnlyWhenUsingAvatar: 1
+  importBlendShapeDeformPercent: 1
+  remapMaterialsIfMaterialImportModeIsNone: 0
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
