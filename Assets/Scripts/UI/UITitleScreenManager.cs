@@ -12,17 +12,37 @@ namespace RooseLabs.UI
     public class UITitleScreenManager : MonoBehaviour
     {
         [SerializeField] private UIMainMenuManager mainMenuPanel;
+        [SerializeField] private GameObject usernamePanel;
+        [SerializeField] private TextMeshProUGUI currentUsernameGO;
         // [SerializeField] private UISettingsManager settingsPanel;
         // [SerializeField] private UICreditsManager creditsPanel;
 
         // TODO: This should be moved to a JoinGamePanel script
         [SerializeField] private TMP_InputField joinCodeInputField;
 
+        // Temporary for testing
+        [SerializeField] private string initialSceneName = "DevelopmentScene1";
+
         private NetworkManager m_networkManager;
 
         private void Awake()
         {
             m_networkManager = InstanceFinder.NetworkManager;
+            CheckIfValidUsername();
+        }
+
+        private void CheckIfValidUsername()
+        {
+            if (string.IsNullOrWhiteSpace(NetworkConnector.Instance.PlayerName))
+            {
+                SetDefaultPlayerName();
+            }
+        }
+
+        private void SetDefaultPlayerName()
+        {
+            NetworkConnector.Instance.PlayerName = "Player" + UnityEngine.Random.Range(1000, 9999);
+            currentUsernameGO.text = NetworkConnector.Instance.PlayerName;
         }
 
         private void OnEnable()
@@ -40,7 +60,7 @@ namespace RooseLabs.UI
         private void ServerManager_OnServerConnectionState(ServerConnectionStateArgs obj)
         {
             if (obj.ConnectionState != LocalConnectionState.Started) return;
-            SceneLoadData sld = new SceneLoadData("DevelopmentScene1")
+            SceneLoadData sld = new SceneLoadData(initialSceneName)
             {
                 ReplaceScenes = ReplaceOption.All
             };
@@ -56,6 +76,9 @@ namespace RooseLabs.UI
             mainMenuPanel.SettingsButtonAction += OpenSettingsScreen;
             mainMenuPanel.CreditsButtonAction += OpenCreditsScreen;
             mainMenuPanel.QuitGameButtonAction += QuitGame;
+            mainMenuPanel.UsernameButtonAction += OpenUsernameScreen;
+            mainMenuPanel.CloseUsernameAction += CloseUsernameScreen;
+            mainMenuPanel.SaveUsernameAction += SaveUsername;
         }
 
         private void HostLocalGameButtonClicked()
@@ -78,6 +101,50 @@ namespace RooseLabs.UI
             _ = NetworkConnector.Instance.StartClientWithRelay(joinCodeInputField.text);
         }
 
+        private void OpenUsernameScreen()
+        {
+            if (mainMenuPanel != null && mainMenuPanel.gameObject != null)
+            {
+                Transform parentTransform = mainMenuPanel.gameObject.transform;
+                for (int i = 0; i < parentTransform.childCount; i++)
+                {
+                    parentTransform.GetChild(i).gameObject.SetActive(false);
+                }
+            }
+
+            if (usernamePanel != null)
+            {
+                usernamePanel.SetActive(true);
+            }
+        }
+
+        private void CloseUsernameScreen()
+        {
+            mainMenuPanel.gameObject.SetActive(true);
+
+            if (mainMenuPanel != null && mainMenuPanel.gameObject != null)
+            {
+                Transform parentTransform = mainMenuPanel.gameObject.transform;
+                for (int i = 0; i < parentTransform.childCount; i++)
+                {
+                    parentTransform.GetChild(i).gameObject.SetActive(true);
+                }
+            }
+
+            if (usernamePanel != null)
+            {
+                usernamePanel.SetActive(false);
+            }
+        }
+
+        private void SaveUsername()
+        {
+            string newUsername = usernamePanel.GetComponentInChildren<TMP_InputField>().text;
+            currentUsernameGO.text = newUsername;
+            NetworkConnector.Instance.PlayerName = newUsername;
+            CloseUsernameScreen();
+        }
+
         private void OpenSettingsScreen()
         {
             // mainMenuPanel.gameObject.SetActive(false);
@@ -86,7 +153,7 @@ namespace RooseLabs.UI
 
         private void OpenCreditsScreen()
         {
-            mainMenuPanel.gameObject.SetActive(false);
+            //mainMenuPanel.gameObject.SetActive(false);
             // creditsPanel.gameObject.SetActive(true);
             // creditsPanel.BackButtonAction += CloseCreditsScreen;
         }

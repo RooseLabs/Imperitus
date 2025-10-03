@@ -11,6 +11,9 @@ namespace RooseLabs.UI
         public event Action SettingsButtonAction = delegate {};
         public event Action CreditsButtonAction = delegate {};
         public event Action QuitGameButtonAction = delegate {};
+        public event Action UsernameButtonAction = delegate {};
+        public event Action CloseUsernameAction = delegate {};
+        public event Action SaveUsernameAction = delegate {};
 
         public void HostLocalGameButton()
         {
@@ -40,6 +43,21 @@ namespace RooseLabs.UI
         public void QuitGameButton()
         {
             QuitGameButtonAction.Invoke();
+        }
+
+        public void UsernameButton()
+        {
+            UsernameButtonAction.Invoke();
+        }
+
+        public void CloseUsername()
+        {
+            CloseUsernameAction.Invoke();
+        }
+
+        public void SaveUsername()
+        {
+            SaveUsernameAction.Invoke();
         }
     }
 }

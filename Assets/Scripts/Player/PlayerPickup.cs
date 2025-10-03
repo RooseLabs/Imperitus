@@ -22,22 +22,22 @@ namespace RooseLabs.Player
 
         private void Start()
         {
-            Debug.Log("[PlayerPickup] Start called.");
+            //Debug.Log("[PlayerPickup] Start called.");
 
             if (m_player == null)
             {
-                Debug.LogWarning("[PlayerPickup] No Player component found on the GameObject.");
+                //Debug.LogWarning("[PlayerPickup] No Player component found on the GameObject.");
             }
 
             var worldObj = GameObject.FindGameObjectWithTag("WorldObjects");
             if (worldObj != null)
             {
                 m_worldObjectHolder = worldObj.transform;
-                Debug.Log("[PlayerPickup] WorldObjects holder found and assigned.");
+                //Debug.Log("[PlayerPickup] WorldObjects holder found and assigned.");
             }
             else
             {
-                Debug.LogWarning("[PlayerPickup] No GameObject with tag 'WorldObjects' found.");
+                //Debug.LogWarning("[PlayerPickup] No GameObject with tag 'WorldObjects' found.");
             }
         }
 
@@ -47,12 +47,12 @@ namespace RooseLabs.Player
 
             if (!IsOwner)
             {
-                Debug.Log("[PlayerPickup] Not owner, disabling script.");
+                //Debug.Log("[PlayerPickup] Not owner, disabling script.");
                 enabled = false;
             }
             else
             {
-                Debug.Log("[PlayerPickup] Is owner, script enabled.");
+                //Debug.Log("[PlayerPickup] Is owner, script enabled.");
             }
         }
 
@@ -60,13 +60,13 @@ namespace RooseLabs.Player
         {
             if (m_player.Input.interactWasPressed)
             {
-                Debug.Log("[PlayerPickup] Interact input detected.");
+                //Debug.Log("[PlayerPickup] Interact input detected.");
                 Pickup();
             }
 
             if (m_player.Input.dropWasPressed)
             {
-                Debug.Log("[PlayerPickup] Drop input detected.");
+                //Debug.Log("[PlayerPickup] Drop input detected.");
                 Drop();
             }
         }
@@ -75,32 +75,32 @@ namespace RooseLabs.Player
         {
             if (m_hasObjectInHand) return;
 
-            Debug.Log("[PlayerPickup] Attempting pickup raycast.");
+            //Debug.Log("[PlayerPickup] Attempting pickup raycast.");
             if (Physics.Raycast(m_player.Camera.transform.position, m_player.Camera.transform.forward, out RaycastHit hit, raycastDistance, pickupLayer))
             {
-                Debug.Log($"[PlayerPickup] Raycast hit: {hit.transform.gameObject.name}");
-                Debug.Log("[PlayerPickup] No object in hand, picking up new object.");
+                //Debug.Log($"[PlayerPickup] Raycast hit: {hit.transform.gameObject.name}");
+                //Debug.Log("[PlayerPickup] No object in hand, picking up new object.");
                 Pickup_ServerRPC(hit.transform.gameObject, pickupPosition.position, pickupPosition.rotation, gameObject);
                 m_objInHand = hit.transform.gameObject;
                 m_hasObjectInHand = true;
             }
             else
             {
-                Debug.Log("[PlayerPickup] Raycast did not hit any object.");
+                //Debug.Log("[PlayerPickup] Raycast did not hit any object.");
             }
         }
 
         [ServerRpc(RequireOwnership = false)]
         private void Pickup_ServerRPC(GameObject obj, Vector3 position, Quaternion rotation, GameObject player)
         {
-            Debug.Log($"[PlayerPickup] Pickup_ServerRPC called for {obj.name}");
+            //Debug.Log($"[PlayerPickup] Pickup_ServerRPC called for {obj.name}");
             Pickup_ObserversRPC(obj, position, rotation, player);
         }
 
         [ObserversRpc]
         private void Pickup_ObserversRPC(GameObject obj, Vector3 position, Quaternion rotation, GameObject player)
         {
-            Debug.Log($"[PlayerPickup] Pickup_ObserversRPC called for {obj.name}");
+            //Debug.Log($"[PlayerPickup] Pickup_ObserversRPC called for {obj.name}");
             obj.transform.position = position;
             obj.transform.rotation = rotation;
             obj.transform.parent = player.transform;
@@ -109,7 +109,7 @@ namespace RooseLabs.Player
             if (rb != null)
             {
                 rb.isKinematic = true;
-                Debug.Log("[PlayerPickup] Rigidbody set to kinematic.");
+                //Debug.Log("[PlayerPickup] Rigidbody set to kinematic.");
             }
         }
 
@@ -117,11 +117,11 @@ namespace RooseLabs.Player
         {
             if (!m_hasObjectInHand)
             {
-                Debug.Log("[PlayerPickup] Drop called but no object in hand.");
+                //Debug.Log("[PlayerPickup] Drop called but no object in hand.");
                 return;
             }
 
-            Debug.Log("[PlayerPickup] Dropping object.");
+            //Debug.Log("[PlayerPickup] Dropping object.");
             Drop_ServerRPC(m_objInHand, m_worldObjectHolder);
             m_hasObjectInHand = false;
             m_objInHand = null;
@@ -130,21 +130,21 @@ namespace RooseLabs.Player
         [ServerRpc(RequireOwnership = false)]
         private void Drop_ServerRPC(GameObject obj, Transform worldHolder)
         {
-            Debug.Log($"[PlayerPickup] Drop_ServerRPC called for {obj.name}");
+            //Debug.Log($"[PlayerPickup] Drop_ServerRPC called for {obj.name}");
             Drop_ObserversRPC(obj, worldHolder);
         }
 
         [ObserversRpc]
         private void Drop_ObserversRPC(GameObject obj, Transform worldHolder)
         {
-            Debug.Log($"[PlayerPickup] Drop_ObserversRPC called for {obj.name}");
+            //Debug.Log($"[PlayerPickup] Drop_ObserversRPC called for {obj.name}");
             obj.transform.parent = worldHolder;
 
             var rb = obj.GetComponent<Rigidbody>();
             if (rb != null)
             {
                 rb.isKinematic = false;
-                Debug.Log("[PlayerPickup] Rigidbody set to non-kinematic.");
+                //Debug.Log("[PlayerPickup] Rigidbody set to non-kinematic.");
             }
         }
     }
