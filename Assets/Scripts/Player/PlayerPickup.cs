@@ -10,10 +10,10 @@ namespace RooseLabs.Player
         [SerializeField] private Transform pickupPosition;
 
         private Player m_player;
+        private Book m_bookInHand;
 
         private bool m_hasObjectInHand;
         private GameObject m_objInHand;
-        private Transform m_worldObjectHolder;
 
         private void Awake()
         {
@@ -27,17 +27,6 @@ namespace RooseLabs.Player
             if (m_player == null)
             {
                 //Debug.LogWarning("[PlayerPickup] No Player component found on the GameObject.");
-            }
-
-            var worldObj = GameObject.FindGameObjectWithTag("WorldObjects");
-            if (worldObj != null)
-            {
-                m_worldObjectHolder = worldObj.transform;
-                //Debug.Log("[PlayerPickup] WorldObjects holder found and assigned.");
-            }
-            else
-            {
-                //Debug.LogWarning("[PlayerPickup] No GameObject with tag 'WorldObjects' found.");
             }
         }
 
@@ -60,8 +49,17 @@ namespace RooseLabs.Player
         {
             if (m_player.Input.interactWasPressed)
             {
-                //Debug.Log("[PlayerPickup] Interact input detected.");
-                Pickup();
+                Debug.Log("[PlayerPickup] Interact input detected.");
+                if (m_bookInHand != null)
+                {
+                    Debug.Log("[PlayerPickup] Interacting with book in hand.");
+                    m_bookInHand.OnInteract(m_player, this);
+                }
+                else
+                {
+                    Debug.Log("[PlayerPickup] No book in hand, attempting pickup.");
+                    Pickup();
+                }
             }
 
             if (m_player.Input.dropWasPressed)
@@ -80,8 +78,15 @@ namespace RooseLabs.Player
             {
                 //Debug.Log($"[PlayerPickup] Raycast hit: {hit.transform.gameObject.name}");
                 //Debug.Log("[PlayerPickup] No object in hand, picking up new object.");
-                Pickup_ServerRPC(hit.transform.gameObject, pickupPosition.position, pickupPosition.rotation, gameObject);
+                Pickup_ServerRPC(hit.transform.gameObject, gameObject);
                 m_objInHand = hit.transform.gameObject;
+
+                m_bookInHand = m_objInHand.GetComponent<Book>();
+                if (m_bookInHand != null)
+                {
+                    m_bookInHand.OnPickup(m_player, this);
+                }
+
                 m_hasObjectInHand = true;
             }
             else
@@ -91,27 +96,41 @@ namespace RooseLabs.Player
         }
 
         [ServerRpc(RequireOwnership = false)]
-        private void Pickup_ServerRPC(GameObject obj, Vector3 position, Quaternion rotation, GameObject player)
+        private void Pickup_ServerRPC(GameObject obj, GameObject player)
         {
-            //Debug.Log($"[PlayerPickup] Pickup_ServerRPC called for {obj.name}");
-            Pickup_ObserversRPC(obj, position, rotation, player);
+            Pickup_ObserversRPC(obj, player);
         }
 
         [ObserversRpc]
-        private void Pickup_ObserversRPC(GameObject obj, Vector3 position, Quaternion rotation, GameObject player)
+        private void Pickup_ObserversRPC(GameObject obj, GameObject player)
         {
-            //Debug.Log($"[PlayerPickup] Pickup_ObserversRPC called for {obj.name}");
-            obj.transform.position = position;
-            obj.transform.rotation = rotation;
-            obj.transform.parent = player.transform;
+            var pickup = player.GetComponent<PlayerPickup>().pickupPosition;
+
+            obj.transform.SetParent(pickup, false);
+            SetObjectPositionAndOrRotation(obj, new Vector3(-0.11f, 0f, 0f), Quaternion.Euler(-116f, -180f, 90f));
+            //obj.transform.localPosition = new Vector3(-0.11f, 0f, 0f);
+            //obj.transform.localRotation = Quaternion.Euler(-90f, 0f, -90f);
+
+            //Debug.Log($"[Pickup] World rotation: {obj.transform.rotation.eulerAngles}, Local rotation: {obj.transform.localRotation.eulerAngles}");
 
             var rb = obj.GetComponent<Rigidbody>();
             if (rb != null)
-            {
                 rb.isKinematic = true;
-                //Debug.Log("[PlayerPickup] Rigidbody set to kinematic.");
+        }
+
+        public void SetObjectPositionAndOrRotation(GameObject obj, Vector3? localPosition = null, Quaternion? localRotation = null)
+        {
+            if (obj == null) return;
+            if (localPosition.HasValue)
+            {
+                obj.transform.localPosition = localPosition.Value;
+            }
+            if (localRotation.HasValue)
+            {
+                obj.transform.localRotation = localRotation.Value;
             }
         }
+
 
         private void Drop()
         {
@@ -122,29 +141,39 @@ namespace RooseLabs.Player
             }
 
             //Debug.Log("[PlayerPickup] Dropping object.");
-            Drop_ServerRPC(m_objInHand, m_worldObjectHolder);
+            Drop_ServerRPC(m_objInHand);
             m_hasObjectInHand = false;
             m_objInHand = null;
+            m_bookInHand = null;
         }
 
         [ServerRpc(RequireOwnership = false)]
-        private void Drop_ServerRPC(GameObject obj, Transform worldHolder)
+        private void Drop_ServerRPC(GameObject obj)
         {
-            //Debug.Log($"[PlayerPickup] Drop_ServerRPC called for {obj.name}");
-            Drop_ObserversRPC(obj, worldHolder);
+            Drop_ObserversRPC(obj);
         }
 
+
         [ObserversRpc]
-        private void Drop_ObserversRPC(GameObject obj, Transform worldHolder)
+        private void Drop_ObserversRPC(GameObject obj)
         {
-            //Debug.Log($"[PlayerPickup] Drop_ObserversRPC called for {obj.name}");
-            obj.transform.parent = worldHolder;
+            // Always find WorldObjects locally (safe, since it exists in the scene everywhere)
+            var worldHolder = GameObject.FindGameObjectWithTag("WorldObjects")?.transform;
+
+            if (worldHolder != null)
+            {
+                obj.transform.parent = worldHolder;
+            }
+            else
+            {
+                obj.transform.parent = null; // fallback
+                Debug.LogWarning("[PlayerPickup] Could not find WorldObjects holder, defaulting to root.");
+            }
 
             var rb = obj.GetComponent<Rigidbody>();
             if (rb != null)
             {
                 rb.isKinematic = false;
-                //Debug.Log("[PlayerPickup] Rigidbody set to non-kinematic.");
             }
         }
     }

@@ -243,7 +243,7 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.3
+  near clip plane: 0.2
   far clip plane: 1000
   field of view: 60
   orthographic: 0
@@ -502,7 +502,6 @@ GameObject:
   - component: {fileID: 3658825048781463768}
   - component: {fileID: 452143820547138584}
   - component: {fileID: 1142586187544801534}
-  - component: {fileID: 4821092478100601964}
   m_Layer: 12
   m_Name: PlayerPlaceholderModel
   m_TagString: Player
@@ -570,7 +569,6 @@ MonoBehaviour:
   _addedNetworkObject: {fileID: 452143820547138584}
   _networkObjectCache: {fileID: 452143820547138584}
   <Camera>k__BackingField: {fileID: 4862826597145645331}
-  nameTag: {fileID: 8746950215376194266}
 --- !u!114 &1956255819182837124
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -769,7 +767,7 @@ MonoBehaviour:
   _componentIndexCache: 2
   _addedNetworkObject: {fileID: 452143820547138584}
   _networkObjectCache: {fileID: 452143820547138584}
-  _componentConfiguration: 0
+  _componentConfiguration: 1
   _synchronizeParent: 0
   _packing:
     Position: 1
@@ -799,29 +797,6 @@ MonoBehaviour:
     X: 0
     Y: 0
     Z: 0
---- !u!136 &4821092478100601964
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8687437876907095851}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5
-  m_Height: 3.0113444
-  m_Direction: 1
-  m_Center: {x: 0, y: 1.4924746, z: 0}
 --- !u!1001 &6064177970172013289
 PrefabInstance:
   m_ObjectHideFlags: 0
