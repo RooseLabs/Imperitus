@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 2489426599944299231}
   - component: {fileID: 8821364005396434945}
   - component: {fileID: 837466252685479144}
+  - component: {fileID: 8637104491120377896}
   m_Layer: 0
   m_Name: BookAnimated
   m_TagString: Untagged
@@ -117,6 +118,28 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &8637104491120377896
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4653433818338141148}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8cac635f24954048aad3a6ff9110beb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FishNet.Runtime::FishNet.Component.Animating.NetworkAnimator
+  _componentIndexCache: 255
+  _addedNetworkObject: {fileID: 7954330056381621737}
+  _networkObjectCache: {fileID: 0}
+  IgnoredParameters: []
+  _animator: {fileID: 837466252685479144}
+  _synchronizeWhenDisabled: 0
+  _smoothFloats: 1
+  _interpolation: 2
+  _clientAuthoritative: 0
+  _sendToOwner: 1
 --- !u!1 &7882887988042570973
 GameObject:
   m_ObjectHideFlags: 0
@@ -248,7 +271,7 @@ MonoBehaviour:
   _teleportThreshold: 1
   <PrefabId>k__BackingField: 2
   <SpawnableCollectionId>k__BackingField: 0
-  <AssetPathHash>k__BackingField: 4384590100837346145
+  <AssetPathHash>k__BackingField: 5897967652602268569
   <SceneId>k__BackingField: 0
   SerializedTransformProperties:
     Position: {x: 0, y: 0, z: 0}
@@ -276,7 +299,6 @@ MonoBehaviour:
     Position: 1
     Rotation: 1
     Scale: 0
-  _useScaledTime: 1
   _interpolation: 2
   _extrapolation: 2
   _enableTeleport: 0
@@ -313,4 +335,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c731ba3656773f34996ae52fef517ec1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Book
+  _componentIndexCache: 255
+  _addedNetworkObject: {fileID: 7954330056381621737}
+  _networkObjectCache: {fileID: 0}
   animator: {fileID: 837466252685479144}

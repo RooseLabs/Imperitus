@@ -1,9 +1,11 @@
+using FishNet.Component.Animating;
+using FishNet.Object;
 using RooseLabs.Player;
 using UnityEngine;
 
 namespace RooseLabs
 {
-    public class Book : MonoBehaviour
+    public class Book : NetworkBehaviour
     {
         [SerializeField] private Animator animator;
 
@@ -14,25 +16,29 @@ namespace RooseLabs
 
         public void OnInteract(Player.Player player, PlayerPickup playerPickup)
         {
-            if (animator != null)
-            {
-                // Get the current state
-                bool isOpen = animator.GetBool("Open");
-                // Toggle the state
-                bool newOpenState = !isOpen;
-                animator.SetBool("Open", newOpenState);
+            ToggleBook_ServerRPC(playerPickup);
+        }
 
-                // Set position based on the new state
-                if (newOpenState)
-                {
-                    // Book is opening
-                    playerPickup.SetObjectPositionAndOrRotation(gameObject, new Vector3(0f,0.2f,-0.25f), Quaternion.Euler(-116f,-180f,90f));
-                }
-                else
-                {
-                    // Book is closing, set to a different position
-                    playerPickup.SetObjectPositionAndOrRotation(gameObject, new Vector3(-0.11f, 0f, 0f));
-                }
+        [ServerRpc(RequireOwnership = false)]
+        private void ToggleBook_ServerRPC(PlayerPickup playerPickup)
+        {
+            if (animator == null)
+                animator = GetComponentInChildren<Animator>();
+
+            bool isOpen = animator.GetBool("Open");
+            bool newOpenState = !isOpen;
+
+            animator.SetBool("Open", newOpenState);
+
+            if (newOpenState)
+            {
+                // Opening
+                playerPickup.SetObjectPositionAndOrRotation(gameObject, new Vector3(0f, 0.2f, -0.25f), Quaternion.Euler(-116f, -180f, 90f));
+            }
+            else
+            {
+                // Closing
+                playerPickup.SetObjectPositionAndOrRotation(gameObject, new Vector3(-0.11f, 0f, 0f));
             }
         }
     }
