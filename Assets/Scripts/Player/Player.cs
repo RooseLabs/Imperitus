@@ -17,11 +17,13 @@ namespace RooseLabs.Player
 
         public PlayerMovement Movement { get; private set; }
         public PlayerInput Input { get; private set; }
+        public PlayerData Data { get; private set; }
 
         private void Awake()
         {
             Movement = GetComponent<PlayerMovement>();
             Input = GetComponent<PlayerInput>();
+            Data = GetComponent<PlayerData>();
         }
 
         public override void OnStartClient()

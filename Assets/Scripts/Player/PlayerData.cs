@@ -18,5 +18,12 @@ namespace RooseLabs.Player
             get => m_stamina;
             set => m_stamina = Mathf.Clamp01(value);
         }
+
+        public Vector2 lookValues;
+        public Vector3 lookDirection;
+        public Vector3 lookDirection_Flat;
+
+        public bool isCrouching = false;
+        public bool isCrawling = false;
     }
 }

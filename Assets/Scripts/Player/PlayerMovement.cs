@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using RooseLabs.Utils;
+using UnityEngine;
 
 namespace RooseLabs.Player
 {
@@ -7,8 +8,8 @@ namespace RooseLabs.Player
     {
         private Player m_player;
         private CharacterController m_characterController;
+        // private Animator m_animator;
         private Vector3 m_velocity;
-        private float m_verticalRotation = 0f;
 
         [Header("Movement Settings")]
         [SerializeField] private float movementSpeed = 5f;
@@ -16,23 +17,20 @@ namespace RooseLabs.Player
         [SerializeField] private float jumpForce = 1f;
         [SerializeField] private float groundCheckDistance = 0.2f;
 
-        [Header("Look Settings")]
-        [SerializeField] private float lookSensitivity = 1f;
-        [SerializeField] private float maxLookAngle = 80f;
-
         private const float GravityForce = 9.81f;
 
         private void Start()
         {
             m_player = GetComponent<Player>();
             m_characterController = GetComponent<CharacterController>();
+            // m_animator = GetComponent<Animator>();
         }
 
         private void Update()
         {
             if (!m_player.IsOwner) return;
             if (!m_characterController.enabled) return;
-            HandleRotation();
+            HandleLook();
             HandleMovement();
         }
 
@@ -50,10 +48,24 @@ namespace RooseLabs.Player
                 currentSpeed *= sprintMultiplier;
             }
 
-            Vector3 moveDirection = transform.right * m_player.Input.movementInput.x + transform.forward * m_player.Input.movementInput.y;
-            m_characterController.Move(moveDirection * (currentSpeed * Time.deltaTime));
+            if (m_player.Input.movementInput.magnitude > 0f)
+            {
+                Vector3 forward = new Vector3(m_player.Data.lookDirection_Flat.x, 0, m_player.Data.lookDirection_Flat.z).normalized;
+                Vector3 right = new Vector3(forward.z, 0, -forward.x).normalized;
+                Vector3 moveDirection = right * m_player.Input.movementInput.x + forward * m_player.Input.movementInput.y;
+                m_characterController.Move(moveDirection * (currentSpeed * Time.deltaTime));
 
-            if (m_player.Input.jumpWasPressed && isGrounded)
+                // Rotate player towards movement direction
+                Quaternion targetRotation = Quaternion.LookRotation(m_player.Data.lookDirection_Flat);
+                transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, Time.deltaTime * 10f);
+            }
+
+            if (m_player.Input.crouchWasPressed)
+            {
+                m_player.Data.isCrouching = !m_player.Data.isCrouching;
+                // m_animator.SetBool("IsCrouching", m_player.Data.isCrouching);
+            }
+            if (m_player.Input.jumpWasPressed && CanJump())
             {
                 m_velocity.y = Mathf.Sqrt(jumpForce * 2f * GravityForce);
             }
@@ -62,16 +74,30 @@ namespace RooseLabs.Player
             m_characterController.Move(m_velocity * Time.deltaTime);
         }
 
-        private void HandleRotation()
+        private void HandleLook()
         {
-            Vector2 delta = m_player.Input.lookInput * lookSensitivity;
+            Vector2 delta = m_player.Input.lookInput * 0.1f;
 
-            m_verticalRotation -= delta.y;
-            m_verticalRotation = Mathf.Clamp(m_verticalRotation, -maxLookAngle, maxLookAngle);
-            m_player.Camera.transform.localRotation = Quaternion.Euler(m_verticalRotation, 0f, 0f);
+            m_player.Data.lookValues += delta;
+            m_player.Data.lookValues.y = Mathf.Clamp(m_player.Data.lookValues.y, -85f, 85f);
 
-            transform.Rotate(Vector3.up * delta.x);
+            Vector3 normalized = HelperFunctions.LookToDirection(m_player.Data.lookValues, Vector3.forward).normalized;
+            m_player.Data.lookDirection = normalized;
+            normalized.y = 0.0f;
+            normalized.Normalize();
+            m_player.Data.lookDirection_Flat = normalized;
+
+            // If look direction is above a certain threshold, rotate the player
+            float angle = Vector3.Angle(transform.forward, m_player.Data.lookDirection_Flat);
+            if (angle > 45f)
+            {
+                Quaternion targetRotation = Quaternion.LookRotation(m_player.Data.lookDirection_Flat);
+                float lerpSpeed = Time.deltaTime * 10f * (angle / 90f);
+                transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, lerpSpeed);
+            }
         }
+
+        private bool CanJump() => IsGrounded() && !m_player.Data.isCrouching && !m_player.Data.isCrawling;
 
         private bool IsGrounded()
         {
