@@ -23,6 +23,7 @@ namespace RooseLabs.Player
         public Vector3 lookDirection;
         public Vector3 lookDirection_Flat;
 
+        public bool isRunning = false;
         public bool isCrouching = false;
         public bool isCrawling = false;
     }

@@ -15,7 +15,7 @@ namespace RooseLabs.UI
         private void OnEnable()
         {
             var select = m_lastSelectedGameObject ?? defaultSelection?.gameObject;
-            if (select is not null && !InputHandler.Instance.IsCurrentDeviceKeyboardMouse())
+            if (select is not null && !InputHandler.Instance.IsCurrentDeviceKBM())
                 EventSystem.current?.SetSelectedGameObject(select);
             InputHandler.Instance.InputDeviceChanged += OnInputDeviceChanged;
         }

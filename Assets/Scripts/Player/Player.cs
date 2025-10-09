@@ -5,7 +5,6 @@ using UnityEngine;
 namespace RooseLabs.Player
 {
     [DefaultExecutionOrder(-99)]
-    [RequireComponent(typeof(PlayerMovement))]
     [RequireComponent(typeof(PlayerInput))]
     [RequireComponent(typeof(PlayerData))]
     public class Player : NetworkBehaviour

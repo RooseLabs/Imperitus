@@ -361,6 +361,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Player.CameraController
   standPosition: {fileID: 0}
+  runPosition: {fileID: 0}
   crouchPosition: {fileID: 0}
   crawlPosition: {fileID: 0}
 --- !u!1 &8281229958315017346
@@ -541,9 +542,9 @@ GameObject:
   - component: {fileID: 5397910713435017860}
   - component: {fileID: 521522133795131242}
   - component: {fileID: 5533986560193803945}
-  - component: {fileID: 1956255819182837124}
   - component: {fileID: 3786785878294777648}
   - component: {fileID: 7557353418741795802}
+  - component: {fileID: 7565857294406075520}
   - component: {fileID: 6341907708972921574}
   - component: {fileID: 7258842005530243359}
   - component: {fileID: -3236939703112310886}
@@ -618,22 +619,6 @@ MonoBehaviour:
   _addedNetworkObject: {fileID: 452143820547138584}
   _networkObjectCache: {fileID: 452143820547138584}
   <Camera>k__BackingField: {fileID: 7938350937132309746}
---- !u!114 &1956255819182837124
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8687437876907095851}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8448d5c5204f4fb0bb07f01b030cc919, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Player.PlayerMovement
-  movementSpeed: 5
-  sprintMultiplier: 1.5
-  jumpForce: 1
-  groundCheckDistance: 0.2
 --- !u!114 &3786785878294777648
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -677,8 +662,27 @@ MonoBehaviour:
   lookValues: {x: 0, y: 0}
   lookDirection: {x: 0, y: 0, z: 0}
   lookDirection_Flat: {x: 0, y: 0, z: 0}
+  isRunning: 0
   isCrouching: 0
   isCrawling: 0
+--- !u!114 &7565857294406075520
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8687437876907095851}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e0f5a002dfb4179bce30a09b1f3ba5a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Player.PlayerMovementCC
+  walkSpeed: 1.5
+  runSpeed: 5
+  crouchSpeed: 0.67
+  crawlSpeed: 0.25
+  jumpHeight: 0.5
+  groundCheckDistance: 0.1
 --- !u!114 &6341907708972921574
 MonoBehaviour:
   m_ObjectHideFlags: 0

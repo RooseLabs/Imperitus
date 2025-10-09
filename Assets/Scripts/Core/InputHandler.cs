@@ -85,7 +85,7 @@ namespace RooseLabs.Core
             }
         }
 
-        public bool IsCurrentDeviceKeyboardMouse()
+        public bool IsCurrentDeviceKBM()
         {
             return m_currentDevice is Keyboard or Pointer;
         }
