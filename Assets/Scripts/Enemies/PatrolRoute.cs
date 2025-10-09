@@ -11,7 +11,7 @@ namespace RooseLabs.Enemies
         public Transform GetWaypoint(int index)
         {
             if (waypoints == null || waypoints.Count == 0) return null;
-            index = Mathf.Clamp(index, 0, waypoints.Count - 1);
+            if (index < 0 || index >= waypoints.Count) return null;
             return waypoints[index];
         }
 

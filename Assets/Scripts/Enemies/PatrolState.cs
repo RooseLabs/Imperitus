@@ -24,6 +24,25 @@ namespace RooseLabs.Enemies
                 ai.StopMovement();
                 return;
             }
+
+            // Find nearest waypoint index
+            float minDist = float.MaxValue;
+            int nearestIndex = 0;
+            Vector3 enemyPos = ai.transform.position;
+
+            for (int i = 0; i < route.Count; i++)
+            {
+                Transform wp = route.GetWaypoint(i);
+                if (wp == null) continue;
+                float dist = Vector3.Distance(enemyPos, wp.position);
+                if (dist < minDist)
+                {
+                    minDist = dist;
+                    nearestIndex = i;
+                }
+            }
+
+            currentIndex = nearestIndex;
             MoveToCurrentWaypoint();
         }
 
@@ -39,7 +58,9 @@ namespace RooseLabs.Enemies
             if (wp == null) return;
 
             float dist = Vector3.Distance(ai.transform.position, wp.position);
-            if (dist <= ai.navAgent.stoppingDistance + 0.2f)
+            Debug.Log($"[PatrolState] CurrentIndex: {currentIndex}, WaypointPos: {wp.position}, AgentPos: {ai.transform.position}, Dist: {dist}");
+
+            if (dist <= ai.navAgent.stoppingDistance + 1.2f)
             {
                 currentIndex++;
                 if (currentIndex >= route.Count)

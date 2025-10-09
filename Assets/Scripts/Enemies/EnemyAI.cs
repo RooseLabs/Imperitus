@@ -104,7 +104,10 @@ namespace RooseLabs.Enemies
             currentState = newState;
 
             if (currentState != null)
+            {
+                Debug.Log($"[EnemyAI] Entered state: {currentState.GetType().Name}");
                 currentState.Enter();
+            }
         }
 
         #region Movement & Attack APIs (Server-side)
@@ -113,6 +116,7 @@ namespace RooseLabs.Enemies
             if (!base.IsServerInitialized) return;
             navAgent.isStopped = false;
             navAgent.SetDestination(position);
+            Debug.Log($"[EnemyAI] MoveTo called. Destination: {position}, PathStatus: {navAgent.pathStatus}");
         }
 
         public void StopMovement()

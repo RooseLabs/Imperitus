@@ -99,10 +99,14 @@ namespace RooseLabs.Enemies
             }
 
             if (best != null)
+            {
                 DetectedTarget = best;
+                Debug.Log($"[EnemyDetection] Target detected: {best.name}");
+            }
         }
 
-        #region Debug - FOV Mesh
+        #region Debug - FOV Mesh/Gizmo
+
         void DrawFieldOfView()
         {
             int stepCount = Mathf.RoundToInt(viewAngle * meshResolution);
@@ -163,14 +167,6 @@ namespace RooseLabs.Enemies
             }
         }
 
-        public Vector3 DirFromAngle(float angleInDegrees, bool angleIsGlobal)
-        {
-            if (!angleIsGlobal)
-                angleInDegrees += transform.eulerAngles.y;
-            float rad = angleInDegrees * Mathf.Deg2Rad;
-            return new Vector3(Mathf.Sin(rad), 0, Mathf.Cos(rad));
-        }
-
         public struct ViewCastInfo
         {
             public bool hit;
@@ -182,6 +178,45 @@ namespace RooseLabs.Enemies
                 hit = _hit; point = _point; dist = _dist; angle = _angle;
             }
         }
+
+        public Vector3 DirFromAngle(float angleInDegrees, bool angleIsGlobal)
+        {
+            if (!angleIsGlobal)
+                angleInDegrees += transform.eulerAngles.y;
+            float rad = angleInDegrees * Mathf.Deg2Rad;
+            return new Vector3(Mathf.Sin(rad), 0, Mathf.Cos(rad));
+        }
+
+#if UNITY_EDITOR
+        private void OnDrawGizmos()
+        {
+            if (!drawFOV) return;
+
+            Gizmos.color = new Color(0, 1, 0, 0.3f); // Semi-transparent green
+
+            // Draw view radius
+            Gizmos.DrawWireSphere(transform.position, viewRadius);
+
+            // Draw FOV lines
+            Vector3 leftBoundary = DirFromAngle(-viewAngle / 2, false);
+            Vector3 rightBoundary = DirFromAngle(viewAngle / 2, false);
+
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawLine(transform.position, transform.position + leftBoundary * viewRadius);
+            Gizmos.DrawLine(transform.position, transform.position + rightBoundary * viewRadius);
+
+            // Optionally, draw multiple lines to fill the FOV arc
+            Gizmos.color = new Color(1, 1, 0, 0.1f);
+            int stepCount = Mathf.RoundToInt(viewAngle * 0.5f);
+            for (int i = 0; i <= stepCount; i++)
+            {
+                float angle = -viewAngle / 2 + (viewAngle / stepCount) * i;
+                Vector3 dir = DirFromAngle(angle, false);
+                Gizmos.DrawLine(transform.position, transform.position + dir * viewRadius);
+            }
+        }
+#endif
+
         #endregion
     }
 }
