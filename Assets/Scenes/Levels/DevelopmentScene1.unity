@@ -11436,10 +11436,11 @@ MonoBehaviour:
   patrolRoute: {fileID: 7137246505553529277}
   animator: {fileID: 0}
   attackRange: 2
-  attackCooldown: 1.2
+  attackCooldown: 2
   attackDamage: 10
   startWaypointIndex: 0
   loopPatrol: 1
+  forgetTargetTime: 3
 --- !u!1 &2033980411625570383
 GameObject:
   m_ObjectHideFlags: 0
@@ -11477,8 +11478,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13cbb35eb5c493f4f843c3d657154686, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.EnemyDetection
-  viewRadius: 7
-  viewAngle: 90
+  viewRadius: 10
+  viewAngle: 120
+  verticalViewAngle: 100
   targetMask:
     serializedVersion: 2
     m_Bits: 4096
@@ -11491,7 +11493,7 @@ MonoBehaviour:
   edgeResolveIterations: 4
   edgeDstThreshold: 0.5
   fovMaterial: {fileID: 2100000, guid: 96f5d440b5f093044bf135016bfee8ee, type: 2}
-  fovAlpha: 0.05
+  fovAlpha: 0.3
 --- !u!1 &2175770093013053476
 GameObject:
   m_ObjectHideFlags: 0

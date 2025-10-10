@@ -10,6 +10,8 @@ namespace RooseLabs.Enemies
         public float viewRadius = 10f;
         [Range(0f, 360f)]
         public float viewAngle = 90f;
+        [Range(0f, 180f)]
+        public float verticalViewAngle = 60f;
 
         [Header("Detection")]
         public LayerMask targetMask;
@@ -81,12 +83,14 @@ namespace RooseLabs.Enemies
                 Transform target = col.transform;
                 Vector3 dirToTarget = (target.position - transform.position).normalized;
 
-                // angle check
-                if (Vector3.Angle(transform.forward, dirToTarget) < viewAngle * 0.5f)
+                // Horizontal angle
+                float horizontalAngle = Vector3.Angle(transform.forward, Vector3.ProjectOnPlane(dirToTarget, transform.up));
+                // Vertical angle
+                float verticalAngle = Vector3.Angle(dirToTarget, Vector3.ProjectOnPlane(dirToTarget, transform.right));
+
+                if (horizontalAngle < viewAngle * 0.5f && verticalAngle < verticalViewAngle * 0.5f)
                 {
                     float dstToTarget = Vector3.Distance(transform.position, target.position);
-
-                    // obstruction check
                     if (!Physics.Raycast(transform.position + Vector3.up * 0.5f, dirToTarget, dstToTarget, obstructionMask))
                     {
                         if (dstToTarget < bestDistance)
@@ -192,28 +196,31 @@ namespace RooseLabs.Enemies
         {
             if (!drawFOV) return;
 
-            Gizmos.color = new Color(0, 1, 0, 0.3f); // Semi-transparent green
-
-            // Draw view radius
+            Gizmos.color = new Color(0, 1, 0, 0.3f);
             Gizmos.DrawWireSphere(transform.position, viewRadius);
 
-            // Draw FOV lines
-            Vector3 leftBoundary = DirFromAngle(-viewAngle / 2, false);
-            Vector3 rightBoundary = DirFromAngle(viewAngle / 2, false);
+            Vector3 forward = transform.forward * viewRadius;
+            Quaternion leftRot = Quaternion.Euler(0, -viewAngle / 2f, 0);
+            Quaternion rightRot = Quaternion.Euler(0, viewAngle / 2f, 0);
+            Vector3 leftDir = leftRot * forward;
+            Vector3 rightDir = rightRot * forward;
 
             Gizmos.color = Color.yellow;
-            Gizmos.DrawLine(transform.position, transform.position + leftBoundary * viewRadius);
-            Gizmos.DrawLine(transform.position, transform.position + rightBoundary * viewRadius);
+            Gizmos.DrawLine(transform.position, transform.position + leftDir);
+            Gizmos.DrawLine(transform.position, transform.position + rightDir);
 
-            // Optionally, draw multiple lines to fill the FOV arc
-            Gizmos.color = new Color(1, 1, 0, 0.1f);
-            int stepCount = Mathf.RoundToInt(viewAngle * 0.5f);
-            for (int i = 0; i <= stepCount; i++)
-            {
-                float angle = -viewAngle / 2 + (viewAngle / stepCount) * i;
-                Vector3 dir = DirFromAngle(angle, false);
-                Gizmos.DrawLine(transform.position, transform.position + dir * viewRadius);
-            }
+            Gizmos.color = Color.cyan;
+
+            forward = transform.forward;
+            Vector3 up = transform.up;
+            Quaternion upRot = Quaternion.AngleAxis(-verticalViewAngle / 2f, transform.right);
+            Quaternion downRot = Quaternion.AngleAxis(verticalViewAngle / 2f, transform.right);
+            Vector3 topDir = upRot * forward;
+            Vector3 bottomDir = downRot * forward;
+            Gizmos.DrawLine(transform.position, transform.position + topDir * viewRadius);
+            Gizmos.DrawLine(transform.position, transform.position + bottomDir * viewRadius);
+            Gizmos.DrawWireSphere(transform.position + topDir * viewRadius, 0.1f);
+            Gizmos.DrawWireSphere(transform.position + bottomDir * viewRadius, 0.1f);
         }
 #endif
 

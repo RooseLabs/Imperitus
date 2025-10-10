@@ -58,7 +58,7 @@ namespace RooseLabs.Enemies
             if (wp == null) return;
 
             float dist = Vector3.Distance(ai.transform.position, wp.position);
-            Debug.Log($"[PatrolState] CurrentIndex: {currentIndex}, WaypointPos: {wp.position}, AgentPos: {ai.transform.position}, Dist: {dist}");
+            //Debug.Log($"[PatrolState] CurrentIndex: {currentIndex}, WaypointPos: {wp.position}, AgentPos: {ai.transform.position}, Dist: {dist}");
 
             if (dist <= ai.navAgent.stoppingDistance + 1.2f)
             {

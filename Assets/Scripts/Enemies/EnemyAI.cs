@@ -21,13 +21,23 @@ namespace RooseLabs.Enemies
 
         [Header("Patrol")]
         public int startWaypointIndex = 0;
-        public bool loopPatrol = true;  
+        public bool loopPatrol = true;
+
+        [Header("Chase")]
+        public float forgetTargetTime = 3f; // time to forget target after losing sight
+        private float forgetTimer = 0f;
+        public Vector3? LastKnownTargetPosition { get; set; }
 
         // FSM states
         private IEnemyState currentState;
         private PatrolState patrolState;
         private ChaseState chaseState;
         private AttackState attackState;
+        public IEnemyState CurrentState => currentState;
+        public PatrolState PatrolState => patrolState;
+        public ChaseState ChaseState => chaseState;
+        public AttackState AttackState => attackState;
+
 
         // Server-controlled target reference (only used server-side)
         public Transform CurrentTarget { get; private set; }
@@ -58,22 +68,21 @@ namespace RooseLabs.Enemies
 
         private void Update()
         {
-            // Only run AI on server (server authoritative)
-            if (!base.IsServerInitialized) // FishNet: IsServerInitialized indicates running as server
+            if (!base.IsServerInitialized)
                 return;
 
-            // Tick state
             currentState?.Tick();
 
-            // Common per-frame
             attackTimer -= Time.deltaTime;
 
-            // detection -> transitions
             Transform detected = detection.DetectedTarget;
+
             if (detected != null)
             {
-                // set current target
+                // Player detected
                 CurrentTarget = detected;
+                LastKnownTargetPosition = CurrentTarget.position;
+                forgetTimer = forgetTargetTime;
 
                 float dist = Vector3.Distance(transform.position, CurrentTarget.position);
                 if (dist <= attackRange)
@@ -87,10 +96,28 @@ namespace RooseLabs.Enemies
                         EnterState(chaseState);
                 }
             }
+            else if (CurrentTarget != null)
+            {
+                // Lost sight but still have a last known position
+                forgetTimer -= Time.deltaTime;
+                if (forgetTimer > 0f && LastKnownTargetPosition.HasValue)
+                {
+                    // Keep chasing to last known position
+                    if (!(currentState is ChaseState))
+                        EnterState(chaseState);
+                }
+                else
+                {
+                    // Forget the target
+                    CurrentTarget = null;
+                    LastKnownTargetPosition = null;
+                    if (!(currentState is PatrolState))
+                        EnterState(patrolState);
+                }
+            }
             else
             {
-                CurrentTarget = null;
-                // if no target -> return to patrol
+                // No target at all -> patrol
                 if (!(currentState is PatrolState))
                     EnterState(patrolState);
             }
@@ -116,7 +143,7 @@ namespace RooseLabs.Enemies
             if (!base.IsServerInitialized) return;
             navAgent.isStopped = false;
             navAgent.SetDestination(position);
-            Debug.Log($"[EnemyAI] MoveTo called. Destination: {position}, PathStatus: {navAgent.pathStatus}");
+            //Debug.Log($"[EnemyAI] MoveTo called. Destination: {position}, PathStatus: {navAgent.pathStatus}");
         }
 
         public void StopMovement()
@@ -143,7 +170,7 @@ namespace RooseLabs.Enemies
             attackTimer = attackCooldown;
 
             // notify clients to play attack animation (ObserversRpc will run on observing clients)
-            Rpc_PlayAttackAnimation();
+            //Rpc_PlayAttackAnimation();
 
             return true;
         }
