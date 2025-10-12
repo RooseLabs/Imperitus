@@ -662,7 +662,7 @@ Transform:
   m_GameObject: {fileID: 97493829}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 16.05391, y: -1.7062187, z: -14.391565}
+  m_LocalPosition: {x: 16.217, y: -1.7062187, z: -14.391565}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -859,7 +859,7 @@ Transform:
   m_GameObject: {fileID: 105178722}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 4.4310894, y: -5.6670046, z: -14.396587}
+  m_LocalPosition: {x: 4.4310894, y: -6.515, z: -14.397}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2127,7 +2127,7 @@ Transform:
   m_GameObject: {fileID: 349155634}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 6.4771976, y: 5.3288546, z: -14.396589}
+  m_LocalPosition: {x: 6.4771976, y: 4.39, z: -14.4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3595,7 +3595,7 @@ Transform:
   m_GameObject: {fileID: 733419068}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 16.053917, y: 1.8703098, z: -14.391564}
+  m_LocalPosition: {x: 16.18, y: 1.8703098, z: -14.391564}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3879,7 +3879,9 @@ GameObject:
   - component: {fileID: 819928820}
   - component: {fileID: 819928819}
   - component: {fileID: 819928822}
-  m_Layer: 0
+  - component: {fileID: 819928823}
+  - component: {fileID: 819928824}
+  m_Layer: 13
   m_Name: Table_A2.001
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3999,6 +4001,39 @@ MonoBehaviour:
   m_IgnoreFromBuild: 0
   m_ApplyToChildren: 1
   m_AffectedAgents: ffffffff
+--- !u!65 &819928823
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 819928817}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2.7936554, y: 1.7828233, z: 1.0195931}
+  m_Center: {x: 0, y: 0.09349215, z: -0.4355432}
+--- !u!114 &819928824
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 819928817}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12e9a4e631b85e34e9f51b986e93a8f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.TableCrawlZone
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
@@ -4061,7 +4096,9 @@ GameObject:
   - component: {fileID: 834841824}
   - component: {fileID: 834841823}
   - component: {fileID: 834841826}
-  m_Layer: 0
+  - component: {fileID: 834841827}
+  - component: {fileID: 834841828}
+  m_Layer: 13
   m_Name: Table.002
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4181,6 +4218,39 @@ MonoBehaviour:
   m_IgnoreFromBuild: 0
   m_ApplyToChildren: 1
   m_AffectedAgents: ffffffff
+--- !u!65 &834841827
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 834841821}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.9384987, y: 2.969885, z: 0.9885094}
+  m_Center: {x: 0.002709508, y: -0.019736052, z: -5.8421503e-17}
+--- !u!114 &834841828
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 834841821}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12e9a4e631b85e34e9f51b986e93a8f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.TableCrawlZone
 --- !u!1 &840859028
 GameObject:
   m_ObjectHideFlags: 0
@@ -4679,7 +4749,7 @@ Transform:
   m_GameObject: {fileID: 937047692}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.9748385, y: -5.6670103, z: -14.39659}
+  m_LocalPosition: {x: -0.9748385, y: -6.73, z: -14.4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5072,7 +5142,7 @@ Transform:
   m_GameObject: {fileID: 971198275}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 14.452716, y: 1.857214, z: -14.391564}
+  m_LocalPosition: {x: 14.12, y: 1.857214, z: -14.391564}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5205,7 +5275,7 @@ Transform:
   m_GameObject: {fileID: 978130432}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.9657657, y: 5.3288546, z: -14.396589}
+  m_LocalPosition: {x: -0.9657657, y: 6.342, z: -14.4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5962,7 +6032,7 @@ Transform:
   m_GameObject: {fileID: 1121996946}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -3.0118735, y: -5.6670046, z: -14.396589}
+  m_LocalPosition: {x: -3.0118735, y: -4.764, z: -14.397}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6600,7 +6670,7 @@ Transform:
   m_GameObject: {fileID: 1189106424}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 4.4401627, y: 5.328864, z: -14.396588}
+  m_LocalPosition: {x: 4.4401627, y: 6.335, z: -14.4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -7274,7 +7344,7 @@ Transform:
   m_GameObject: {fileID: 1354037354}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 14.45271, y: -1.7193146, z: -14.391565}
+  m_LocalPosition: {x: 14.123, y: -1.7193146, z: -14.391565}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -7407,7 +7477,7 @@ Transform:
   m_GameObject: {fileID: 1402016941}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -3.0028002, y: 5.328862, z: -14.396589}
+  m_LocalPosition: {x: -3.0028002, y: 4.366, z: -14.397}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -8202,7 +8272,9 @@ GameObject:
   - component: {fileID: 1478103897}
   - component: {fileID: 1478103896}
   - component: {fileID: 1478103899}
-  m_Layer: 0
+  - component: {fileID: 1478103900}
+  - component: {fileID: 1478103901}
+  m_Layer: 13
   m_Name: Table.001
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -8322,6 +8394,39 @@ MonoBehaviour:
   m_IgnoreFromBuild: 0
   m_ApplyToChildren: 1
   m_AffectedAgents: ffffffff
+--- !u!65 &1478103900
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1478103894}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.9384987, y: 2.969885, z: 0.9885094}
+  m_Center: {x: 0.002709508, y: -0.019736052, z: -5.8421503e-17}
+--- !u!114 &1478103901
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1478103894}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12e9a4e631b85e34e9f51b986e93a8f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.TableCrawlZone
 --- !u!1 &1479800224
 GameObject:
   m_ObjectHideFlags: 0
@@ -9605,7 +9710,9 @@ GameObject:
   - component: {fileID: 1806716990}
   - component: {fileID: 1806716989}
   - component: {fileID: 1806716992}
-  m_Layer: 0
+  - component: {fileID: 1806716993}
+  - component: {fileID: 1806716994}
+  m_Layer: 13
   m_Name: Table_A2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9725,6 +9832,39 @@ MonoBehaviour:
   m_IgnoreFromBuild: 0
   m_ApplyToChildren: 1
   m_AffectedAgents: ffffffff
+--- !u!65 &1806716993
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1806716987}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2.9437017, y: 3.6060297, z: 0.98850965}
+  m_Center: {x: -0.0020070076, y: 0.007712484, z: 5.4089817e-17}
+--- !u!114 &1806716994
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1806716987}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12e9a4e631b85e34e9f51b986e93a8f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.TableCrawlZone
 --- !u!1 &1808785851
 GameObject:
   m_ObjectHideFlags: 0
@@ -9738,7 +9878,9 @@ GameObject:
   - component: {fileID: 1808785854}
   - component: {fileID: 1808785853}
   - component: {fileID: 1808785856}
-  m_Layer: 0
+  - component: {fileID: 1808785857}
+  - component: {fileID: 1808785858}
+  m_Layer: 13
   m_Name: Table.003
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9754,7 +9896,7 @@ Transform:
   m_GameObject: {fileID: 1808785851}
   serializedVersion: 2
   m_LocalRotation: {x: -0.7071068, y: -0, z: -0, w: 0.7071067}
-  m_LocalPosition: {x: 2.24, y: 0.8538139, z: 5.4774323}
+  m_LocalPosition: {x: 2.24, y: 0.8538139, z: 5.29}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -9858,6 +10000,39 @@ MonoBehaviour:
   m_IgnoreFromBuild: 0
   m_ApplyToChildren: 1
   m_AffectedAgents: ffffffff
+--- !u!65 &1808785857
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1808785851}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.9384987, y: 2.969885, z: 0.9885094}
+  m_Center: {x: 0.002709508, y: -0.019736052, z: -5.8421503e-17}
+--- !u!114 &1808785858
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1808785851}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12e9a4e631b85e34e9f51b986e93a8f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.TableCrawlZone
 --- !u!1 &1809991205
 GameObject:
   m_ObjectHideFlags: 0
@@ -10483,7 +10658,7 @@ Transform:
   m_GameObject: {fileID: 1917295473}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 6.4681253, y: -5.6670094, z: -14.396591}
+  m_LocalPosition: {x: 6.4681253, y: -4.68, z: -14.4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -10983,7 +11158,9 @@ GameObject:
   - component: {fileID: 2032274849}
   - component: {fileID: 2032274848}
   - component: {fileID: 2032274851}
-  m_Layer: 0
+  - component: {fileID: 2032274852}
+  - component: {fileID: 2032274853}
+  m_Layer: 13
   m_Name: Table.004
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11103,6 +11280,39 @@ MonoBehaviour:
   m_IgnoreFromBuild: 0
   m_ApplyToChildren: 1
   m_AffectedAgents: ffffffff
+--- !u!65 &2032274852
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2032274846}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.9384987, y: 2.969885, z: 0.9885094}
+  m_Center: {x: 0.002709508, y: -0.019736052, z: -5.8421503e-17}
+--- !u!114 &2032274853
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2032274846}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12e9a4e631b85e34e9f51b986e93a8f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.TableCrawlZone
 --- !u!1 &2051436535
 GameObject:
   m_ObjectHideFlags: 0
@@ -11249,7 +11459,9 @@ GameObject:
   - component: {fileID: 2114821717}
   - component: {fileID: 2114821716}
   - component: {fileID: 2114821719}
-  m_Layer: 0
+  - component: {fileID: 2114821720}
+  - component: {fileID: 2114821721}
+  m_Layer: 13
   m_Name: Table_A2.002
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11369,6 +11581,39 @@ MonoBehaviour:
   m_IgnoreFromBuild: 0
   m_ApplyToChildren: 1
   m_AffectedAgents: ffffffff
+--- !u!65 &2114821720
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2114821714}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2.7936554, y: 2.0794675, z: 1.0195931}
+  m_Center: {x: 0, y: 0.077815264, z: -0.4355451}
+--- !u!114 &2114821721
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2114821714}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12e9a4e631b85e34e9f51b986e93a8f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.TableCrawlZone
 --- !u!1 &2135949657
 GameObject:
   m_ObjectHideFlags: 0
@@ -11902,7 +12147,7 @@ MonoBehaviour:
     m_Bits: 4096
   obstructionMask:
     serializedVersion: 2
-    m_Bits: 2049
+    m_Bits: 10241
   checkInterval: 0.2
   drawFOV: 1
   meshResolution: 30

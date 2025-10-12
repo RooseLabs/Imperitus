@@ -105,8 +105,36 @@ namespace RooseLabs.Enemies
             if (best != null)
             {
                 DetectedTarget = best;
-                Debug.Log($"[EnemyDetection] Target detected: {best.name}");
+                //Debug.Log($"[EnemyDetection] Target detected: {best.name}");
             }
+
+#if UNITY_EDITOR
+            if (best != null)
+            {
+                // Draw green line to the detected target
+                Debug.DrawLine(transform.position + Vector3.up * 0.5f, best.position, Color.green, checkInterval);
+            }
+            else
+            {
+                // Debug rays to all potential targets to visualize what’s blocking view
+                foreach (Collider col in targetsInViewRadius)
+                {
+                    Vector3 dirToTarget = (col.transform.position - transform.position).normalized;
+                    float dstToTarget = Vector3.Distance(transform.position, col.transform.position);
+
+                    if (Physics.Raycast(transform.position + Vector3.up * 0.5f, dirToTarget, out RaycastHit hit, dstToTarget, obstructionMask))
+                    {
+                        // Red: something blocks the view (like a table)
+                        Debug.DrawLine(transform.position + Vector3.up * 0.5f, hit.point, Color.red, checkInterval);
+                    }
+                    else
+                    {
+                        // Yellow: line of sight is clear but outside FOV angles
+                        Debug.DrawLine(transform.position + Vector3.up * 0.5f, col.transform.position, Color.yellow, checkInterval);
+                    }
+                }
+            }
+#endif
         }
 
         #region Debug - FOV Mesh/Gizmo

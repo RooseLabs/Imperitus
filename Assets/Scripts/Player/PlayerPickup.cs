@@ -8,6 +8,9 @@ namespace RooseLabs.Player
         [SerializeField] private float raycastDistance;
         [SerializeField] private LayerMask pickupLayer;
         [SerializeField] private Transform pickupPosition;
+        [SerializeField] public Vector3 crouchPickupOffset = new Vector3(0f, 0.5f, 0.85f);
+        public Vector3 standingPickupPosition;
+        private bool lastCrouchState;
 
         private Player m_player;
         private Book m_bookInHand;
@@ -28,6 +31,8 @@ namespace RooseLabs.Player
             {
                 //Debug.LogWarning("[PlayerPickup] No Player component found on the GameObject.");
             }
+
+            standingPickupPosition = pickupPosition.localPosition;
         }
 
         public override void OnStartClient()
@@ -47,6 +52,10 @@ namespace RooseLabs.Player
 
         private void Update()
         {
+            // Prevent pickup if crawling
+            if (m_player.Data.isCrawling)
+                return;
+
             if (m_player.Input.interactWasPressed)
             {
                 Debug.Log("[PlayerPickup] Interact input detected.");
@@ -132,7 +141,7 @@ namespace RooseLabs.Player
         }
 
 
-        private void Drop()
+        public void Drop()
         {
             if (!m_hasObjectInHand)
             {
@@ -175,6 +184,42 @@ namespace RooseLabs.Player
             {
                 rb.isKinematic = false;
             }
+        }
+
+        public bool HasItemInHand()
+        {
+            return m_hasObjectInHand && m_objInHand != null;
+        }
+
+        public void SetPickupPositionForCrouch(bool isCrouching)
+        {
+            if (pickupPosition == null) return;
+            if (isCrouching == lastCrouchState) return; // skip duplicate
+
+            lastCrouchState = isCrouching;
+
+            pickupPosition.localPosition = isCrouching
+                ? crouchPickupOffset
+                : standingPickupPosition;
+
+            UpdatePickupPosition_ServerRpc(isCrouching);
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        public void UpdatePickupPosition_ServerRpc(bool isCrouching)
+        {
+            UpdatePickupPosition_ObserversRpc(isCrouching);
+        }
+
+        [ObserversRpc]
+        private void UpdatePickupPosition_ObserversRpc(bool isCrouching)
+        {
+            if (pickupPosition == null)
+                return;
+
+            pickupPosition.localPosition = isCrouching
+                ? crouchPickupOffset
+                : standingPickupPosition;
         }
     }
 }

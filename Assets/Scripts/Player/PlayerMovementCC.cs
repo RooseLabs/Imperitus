@@ -8,6 +8,7 @@ namespace RooseLabs.Player
     public class PlayerMovementCC : MonoBehaviour
     {
         private Player m_player;
+        private PlayerPickup m_pickup;
         private CharacterController m_cc;
         private Animator m_animator;
         private InputHandler m_inputHandler;
@@ -15,8 +16,8 @@ namespace RooseLabs.Player
         [Header("Movement Settings")]
         [SerializeField] private float walkSpeed   = 1.50f; // Average speed from animation: 1.20f;
         [SerializeField] private float runSpeed    = 5.00f; // Average speed from animation: 5.83f;
-        [SerializeField] private float crouchSpeed = 0.67f; // Average speed from animation: 0.67f;
-        [SerializeField] private float crawlSpeed  = 0.25f; // Average speed from animation: 0.25f;
+        [SerializeField] private float crouchSpeed = 1.00f; // Average speed from animation: 0.67f;
+        [SerializeField] private float crawlSpeed  = 0.50f; // Average speed from animation: 0.25f;
         [SerializeField] private float jumpHeight  = 0.50f;
         [SerializeField] private float groundCheckDistance = 0.1f;
 
@@ -24,6 +25,8 @@ namespace RooseLabs.Player
         private float m_verticalVelocity = 0f;
 
         private const float GravityForce = 9.81f;
+
+        private bool m_nearTable = false;
 
         public float CurrentStateSpeed
         {
@@ -39,6 +42,7 @@ namespace RooseLabs.Player
         private void Start()
         {
             m_player = GetComponent<Player>();
+            m_pickup = GetComponent<PlayerPickup>();
             m_cc = GetComponent<CharacterController>();
             m_animator = GetComponent<Animator>();
             m_inputHandler = InputHandler.Instance;
@@ -95,8 +99,48 @@ namespace RooseLabs.Player
 
             if (m_player.Input.crouchWasPressed)
             {
-                m_player.Data.isCrouching = !m_player.Data.isCrouching;
-                m_animator.SetBool(PlayerAnimations.B_IsCrouching, m_player.Data.isCrouching);
+                if (m_player.Data.isCrawling)
+                {
+                    Debug.Log("[Crawl] Ignored crouch input — currently crawling");
+                }
+                else
+                {
+                    // Toggle crouch state
+                    m_player.Data.isCrouching = !m_player.Data.isCrouching;
+                    m_animator.SetBool(PlayerAnimations.B_IsCrouching, m_player.Data.isCrouching);
+                    Debug.Log($"[Crouch] Toggled crouch → {m_player.Data.isCrouching}");
+
+                    // Adjust character controller height for crouch
+                    if (m_player.Data.isCrouching)
+                    {
+                        AdjustCharacterControllerHeight(0.96f); // half standing 
+
+                        // Move pickup spot for crouching
+                        if (m_pickup != null)
+                            m_pickup.SetPickupPositionForCrouch(true);
+                    }
+                    else
+                    {
+                        AdjustCharacterControllerHeight(1.53f); // standing height
+                        
+                        // Restore pickup spot for standing
+                        if (m_pickup != null)
+                            m_pickup.SetPickupPositionForCrouch(false);
+                    }
+                        
+                }
+            }
+
+            // Crawl auto-transition logic
+            if (m_player.Data.isCrouching && m_nearTable && !m_player.Data.isCrawling)
+            {
+                Debug.Log("[Crawl] EnterCrawl triggered (crouching + near table)");
+                EnterCrawl();
+            }
+            else if (m_player.Data.isCrawling && !m_nearTable)
+            {
+                Debug.Log("[Crawl] ExitCrawl triggered (left table area)");
+                ExitCrawl();
             }
 
             bool canRun = movementValue > 0.0f && !m_player.Data.isCrouching && !m_player.Data.isCrawling;
@@ -197,7 +241,56 @@ namespace RooseLabs.Player
             hitRigidbody.AddForce(hit.moveDirection * 1.5f, ForceMode.Impulse);
         }
 
-        #if UNITY_EDITOR
+        private void EnterCrawl()
+        {
+            // Drop any held item
+            if (m_pickup != null && m_pickup.HasItemInHand())
+            {
+                m_pickup.Drop();
+                Debug.Log("[PlayerMovementCC] Dropped held item because crawling started.");
+            }
+
+            m_player.Data.isCrawling = true;
+            m_player.Data.isCrouching = false;
+            m_animator.SetBool(PlayerAnimations.B_IsCrouching, false);
+            m_animator.SetBool(PlayerAnimations.B_IsCrawling, true);
+
+            // Shrink collider
+            AdjustCharacterControllerHeight(0.5f);
+        }
+
+
+        private void ExitCrawl()
+        {
+            Debug.Log("[Crawl] Exiting crawl state");
+
+            m_player.Data.isCrawling = false;
+            m_animator.SetBool(PlayerAnimations.B_IsCrawling, false);
+
+            AdjustCharacterControllerHeight(1.53f);
+            Debug.Log($"[Crawl] Collider restored → height: {m_cc.height:F2}, center.y: {m_cc.center.y:F2}");
+        }
+
+        private void AdjustCharacterControllerHeight(float newHeight)
+        {
+            float oldHeight = m_cc.height;
+            m_cc.height = newHeight;
+            m_cc.center = new Vector3(0, newHeight / 2f, 0);
+            Debug.Log($"[Crawl] AdjustCharacterControllerHeight() old: {oldHeight:F2} → new: {newHeight:F2}");
+        }
+
+        public void SetNearTable(bool value)
+        {
+            if (m_nearTable != value)
+            {
+                Debug.Log($"[Crawl] NearTable changed → {value}");
+            }
+            m_nearTable = value;
+        }
+
+
+
+#if UNITY_EDITOR
         private void OnDrawGizmos()
         {
             // Gizmos.color = Color.red;
