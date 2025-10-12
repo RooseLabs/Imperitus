@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace RooseLabs.Player
 {
-    [DefaultExecutionOrder(-99)]
+    [DefaultExecutionOrder(-98)]
     [RequireComponent(typeof(PlayerInput))]
     [RequireComponent(typeof(PlayerData))]
     public class Player : NetworkBehaviour
@@ -14,13 +14,13 @@ namespace RooseLabs.Player
         [field: SerializeField]
         public Camera Camera { get; private set; }
 
-        public PlayerMovement Movement { get; private set; }
+        public PlayerMovementCC Movement { get; private set; }
         public PlayerInput Input { get; private set; }
         public PlayerData Data { get; private set; }
 
         private void Awake()
         {
-            Movement = GetComponent<PlayerMovement>();
+            Movement = GetComponent<PlayerMovementCC>();
             Input = GetComponent<PlayerInput>();
             Data = GetComponent<PlayerData>();
         }

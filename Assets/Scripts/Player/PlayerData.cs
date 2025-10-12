@@ -26,5 +26,7 @@ namespace RooseLabs.Player
         public bool isRunning = false;
         public bool isCrouching = false;
         public bool isCrawling = false;
+
+        public float currentSpeed;
     }
 }

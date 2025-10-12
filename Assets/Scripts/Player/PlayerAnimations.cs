@@ -15,6 +15,13 @@ namespace RooseLabs.Player
         public static readonly int B_IsCrawling = Animator.StringToHash("IsCrawling");
         #endregion
 
+        #region Default Average Movement Speeds
+        private const float AnimWalkSpeed   = 1.20f;
+        private const float AnimRunSpeed    = 5.83f;
+        private const float AnimCrouchSpeed = 0.67f;
+        private const float AnimCrawlSpeed  = 0.25f;
+        #endregion
+
         [SerializeField] private Transform headLookTarget;
 
         private Player m_player;
@@ -33,17 +40,28 @@ namespace RooseLabs.Player
 
         private void LateUpdate()
         {
+            AdjustAnimationSpeed();
             RecalculateHeadLookTarget();
+        }
+
+        private void AdjustAnimationSpeed()
+        {
+            float speed;
+            if (m_player.Data.isCrawling) speed = m_player.Data.currentSpeed / AnimCrawlSpeed;
+            else if (m_player.Data.isCrouching) speed = m_player.Data.currentSpeed / AnimCrouchSpeed;
+            else if (m_player.Data.isRunning) speed = m_player.Data.currentSpeed / AnimRunSpeed;
+            else speed = m_player.Data.currentSpeed / AnimWalkSpeed;
+            m_animator.speed = Mathf.Clamp(speed, 1f, 2f);
         }
 
         private void RecalculateHeadLookTarget()
         {
-            const float minAngleStanding = 60f;
-            const float maxAngleStanding = 115f;
+            const float minAngleStanding  = 60f;
+            const float maxAngleStanding  = 115f;
             const float minAngleCrouching = 110f;
             const float maxAngleCrouching = 150f;
-            const float minAngleCrawling = 115f;
-            const float maxAngleCrawling = 175f;
+            const float minAngleCrawling  = 115f;
+            const float maxAngleCrawling  = 175f;
 
             float minAngle = m_player.Data.isCrawling ? minAngleCrawling : (m_player.Data.isCrouching ? minAngleCrouching : minAngleStanding);
             float maxAngle = m_player.Data.isCrawling ? maxAngleCrawling : (m_player.Data.isCrouching ? maxAngleCrouching : maxAngleStanding);

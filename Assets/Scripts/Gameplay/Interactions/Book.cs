@@ -1,12 +1,14 @@
-using FishNet.Component.Animating;
 using FishNet.Object;
+using RooseLabs.Gameplay;
 using RooseLabs.Player;
+using RooseLabs.ScriptableObjects;
 using UnityEngine;
 
 namespace RooseLabs
 {
     public class Book : NetworkBehaviour
     {
+        [SerializeField] private RuneSO rune;
         [SerializeField] private Animator animator;
 
         public void OnPickup(Player.Player player, PlayerPickup playerPickup)
@@ -34,6 +36,11 @@ namespace RooseLabs
             {
                 // Opening
                 playerPickup.SetObjectPositionAndOrRotation(gameObject, new Vector3(0f, 0.2f, -0.25f), Quaternion.Euler(-116f, -180f, 90f));
+                if (rune != null)
+                {
+                    GameHandler.Instance.AddRune(rune);
+                    rune = null; // Ensure the rune can only be collected once
+                }
             }
             else
             {

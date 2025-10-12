@@ -21,11 +21,10 @@ namespace RooseLabs.Player
         [SerializeField] private float jumpHeight  = 0.50f;
         [SerializeField] private float groundCheckDistance = 0.1f;
 
-        private float m_lastVerticalInputSignal = 1f;
-        private float m_verticalVelocity = 0f;
-
         private const float GravityForce = 9.81f;
 
+        private float m_lastVerticalInputSignal = 1f;
+        private float m_verticalVelocity = 0f;
         private bool m_nearTable = false;
 
         public float CurrentStateSpeed
@@ -186,7 +185,8 @@ namespace RooseLabs.Player
             }
             m_verticalVelocity -= GravityForce * Time.deltaTime;
 
-            Vector3 deltaMovement = transform.rotation * new Vector3(0.0f, 0.0f, movementValue) * (CurrentStateSpeed * Time.deltaTime);
+            m_player.Data.currentSpeed = CurrentStateSpeed;
+            Vector3 deltaMovement = transform.rotation * new Vector3(0.0f, 0.0f, movementValue) * (m_player.Data.currentSpeed * Time.deltaTime);
             deltaMovement.y = m_verticalVelocity * Time.deltaTime;
             m_cc.Move(deltaMovement);
         }
@@ -259,7 +259,6 @@ namespace RooseLabs.Player
             AdjustCharacterControllerHeight(0.5f);
         }
 
-
         private void ExitCrawl()
         {
             Debug.Log("[Crawl] Exiting crawl state");
@@ -288,9 +287,7 @@ namespace RooseLabs.Player
             m_nearTable = value;
         }
 
-
-
-#if UNITY_EDITOR
+        #if UNITY_EDITOR
         private void OnDrawGizmos()
         {
             // Gizmos.color = Color.red;

@@ -1,10 +1,9 @@
 using FishNet.Object;
+using RooseLabs.Gameplay;
 using UnityEngine;
 
 namespace RooseLabs.Player
 {
-    // TODO: Most of this is likely to be replaced by a more robust Item-Action system, with spells
-    //       being considered items that can be "selected/held" and "used".
     public class PlayerCast : NetworkBehaviour
     {
         private Player m_player;
@@ -38,22 +37,21 @@ namespace RooseLabs.Player
 
         private void Update()
         {
-            if (m_player.Input.aimIsPressed && m_player.Input.attackWasPressed)
-            {
-                // Create a ray from the camera's position in the direction it is facing
-                Ray ray = new Ray(m_player.Camera.transform.position, m_player.Camera.transform.forward);
+            if (!m_player.Input.aimIsPressed || !m_player.Input.attackWasPressed) return;
+            if (GameHandler.Instance.CollectedRunes.Count < 3) return;
+            // Create a ray from the camera's position in the direction it is facing
+            Ray ray = new Ray(m_player.Camera.transform.position, m_player.Camera.transform.forward);
 
-                // Try to find the first object hit by the ray within 100 units, ignoring the Projectile layer
-                Vector3 targetPoint = Physics.Raycast(ray, out RaycastHit hit, 100f, s_layerMask)
-                    ? hit.point // If something is hit, use that point as the target
-                    : ray.GetPoint(100f); // Otherwise, use a point 100 units ahead
+            // Try to find the first object hit by the ray within 100 units, ignoring the Projectile layer
+            Vector3 targetPoint = Physics.Raycast(ray, out RaycastHit hit, 100f, s_layerMask)
+                ? hit.point // If something is hit, use that point as the target
+                : ray.GetPoint(100f); // Otherwise, use a point 100 units ahead
 
-                // Calculate the normalized direction vector from the cast point to the target point
-                Vector3 direction = (targetPoint - castPoint.position).normalized;
+            // Calculate the normalized direction vector from the cast point to the target point
+            Vector3 direction = (targetPoint - castPoint.position).normalized;
 
-                // Request the server to spawn and launch the projectile in the calculated direction
-                CastSpell_ServerRpc(direction);
-            }
+            // Request the server to spawn and launch the projectile in the calculated direction
+            CastSpell_ServerRpc(direction);
         }
 
         [ServerRpc(RequireOwnership = true)]
