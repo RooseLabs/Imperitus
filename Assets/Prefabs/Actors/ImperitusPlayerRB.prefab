@@ -719,7 +719,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: c7d48a079d40bd94a9483826266718bb, type: 3}
       propertyPath: m_Layer
-      value: 12
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: c7d48a079d40bd94a9483826266718bb, type: 3}
       propertyPath: m_TagString
@@ -1197,6 +1197,7 @@ MonoBehaviour:
   isRunning: 0
   isCrouching: 0
   isCrawling: 0
+  currentSpeed: 0
 --- !u!114 &5335711195600062082
 MonoBehaviour:
   m_ObjectHideFlags: 0

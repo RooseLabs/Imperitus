@@ -133,12 +133,10 @@ namespace RooseLabs.Player
             // Crawl auto-transition logic
             if (m_player.Data.isCrouching && m_nearTable && !m_player.Data.isCrawling)
             {
-                Debug.Log("[Crawl] EnterCrawl triggered (crouching + near table)");
                 EnterCrawl();
             }
             else if (m_player.Data.isCrawling && !m_nearTable)
             {
-                Debug.Log("[Crawl] ExitCrawl triggered (left table area)");
                 ExitCrawl();
             }
 
@@ -280,10 +278,6 @@ namespace RooseLabs.Player
 
         public void SetNearTable(bool value)
         {
-            if (m_nearTable != value)
-            {
-                Debug.Log($"[Crawl] NearTable changed → {value}");
-            }
             m_nearTable = value;
         }
 

@@ -1,7 +1,7 @@
 using RooseLabs.Player;
 using UnityEngine;
 
-namespace RooseLabs
+namespace RooseLabs.Gameplay
 {
     public class TableCrawlZone : MonoBehaviour
     {

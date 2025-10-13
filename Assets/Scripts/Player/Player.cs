@@ -23,6 +23,9 @@ namespace RooseLabs.Player
             Movement = GetComponent<PlayerMovementCC>();
             Input = GetComponent<PlayerInput>();
             Data = GetComponent<PlayerData>();
+
+            // Initialize look values based on spawn rotation
+            Data.lookValues.x = transform.eulerAngles.y;
         }
 
         public override void OnStartClient()
