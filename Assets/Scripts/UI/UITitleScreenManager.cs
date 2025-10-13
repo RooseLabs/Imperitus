@@ -17,6 +17,8 @@ namespace RooseLabs.UI
         // TODO: This should be moved to a JoinGamePanel script
         [SerializeField] private TMP_InputField joinCodeInputField;
 
+        private const string PrefsUsernameKey = "PlayerUsername";
+
         private void Start()
         {
             InputHandler.Instance.EnableMenuInput();
@@ -35,11 +37,17 @@ namespace RooseLabs.UI
 
         private void SetPlayerName()
         {
+            if (PlayerPrefs.HasKey(PrefsUsernameKey))
+            {
+                PlayerConnection.Nickname = PlayerPrefs.GetString(PrefsUsernameKey);
+            }
             if (string.IsNullOrWhiteSpace(PlayerConnection.Nickname))
             {
                 PlayerConnection.Nickname = "Player" + Random.Range(1000, 9999);
             }
             currentUsernameGO.text = PlayerConnection.Nickname;
+            PlayerPrefs.SetString(PrefsUsernameKey, PlayerConnection.Nickname);
+            PlayerPrefs.Save();
         }
 
         private void HostLocalGameButtonClicked()
@@ -76,6 +84,9 @@ namespace RooseLabs.UI
             if (usernamePanel != null)
             {
                 usernamePanel.SetActive(true);
+                var input = usernamePanel.GetComponentInChildren<TMP_InputField>();
+                if (input != null)
+                    input.text = PlayerConnection.Nickname;
             }
         }
 
@@ -100,8 +111,20 @@ namespace RooseLabs.UI
 
         private void SaveUsername()
         {
-            PlayerConnection.Nickname = usernamePanel.GetComponentInChildren<TMP_InputField>().text;
-            currentUsernameGO.text = PlayerConnection.Nickname;
+            var input = usernamePanel.GetComponentInChildren<TMP_InputField>();
+            if (input == null) return;
+
+            string newUsername = input.text.Trim();
+
+            if (string.IsNullOrWhiteSpace(newUsername))
+                return;
+
+            PlayerConnection.Nickname = newUsername;
+            currentUsernameGO.text = newUsername;
+
+            PlayerPrefs.SetString(PrefsUsernameKey, newUsername);
+            PlayerPrefs.Save();
+
             CloseUsernameScreen();
         }
 
