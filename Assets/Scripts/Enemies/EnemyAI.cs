@@ -1,4 +1,5 @@
 using System.Collections;
+using FishNet.Connection;
 using FishNet.Object;
 using UnityEngine;
 using UnityEngine.AI;
@@ -172,12 +173,20 @@ namespace RooseLabs.Enemies
             //    dmg.ApplyDamage(attackDamage);
             //}
             attackTimer = attackCooldown;
-            StartCoroutine(FlashVignette());
+
+            NetworkObject nobTarget = CurrentTarget.GetComponent<NetworkBehaviour>();
+            FlashVignette_TargetRPC(nobTarget.LocalConnection);
 
             // notify clients to play attack animation (ObserversRpc will run on observing clients)
             //Rpc_PlayAttackAnimation();
 
             return true;
+        }
+
+        [TargetRpc]
+        private void FlashVignette_TargetRPC(NetworkConnection _)
+        {
+            StartCoroutine(FlashVignette());
         }
 
         private bool isFlashingVignette = false;

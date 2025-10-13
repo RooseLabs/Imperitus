@@ -1,7 +1,3 @@
-using FishNet;
-using FishNet.Managing;
-using FishNet.Managing.Scened;
-using FishNet.Transporting;
 using RooseLabs.Core;
 using RooseLabs.Network;
 using TMPro;
@@ -20,14 +16,8 @@ namespace RooseLabs.UI
         // TODO: This should be moved to a JoinGamePanel script
         [SerializeField] private TMP_InputField joinCodeInputField;
 
-        // Temporary for testing
-        [SerializeField] private string initialSceneName = "DevelopmentScene1";
-
-        private NetworkManager m_networkManager;
-
         private void Awake()
         {
-            m_networkManager = InstanceFinder.NetworkManager;
             CheckIfValidUsername();
         }
 
@@ -41,30 +31,8 @@ namespace RooseLabs.UI
 
         private void SetDefaultPlayerName()
         {
-            NetworkConnector.Instance.PlayerName = "Player" + UnityEngine.Random.Range(1000, 9999);
+            NetworkConnector.Instance.PlayerName = "Player" + Random.Range(1000, 9999);
             currentUsernameGO.text = NetworkConnector.Instance.PlayerName;
-        }
-
-        private void OnEnable()
-        {
-            if (!m_networkManager) return;
-            m_networkManager.ServerManager.OnServerConnectionState += ServerManager_OnServerConnectionState;
-        }
-
-        private void OnDisable()
-        {
-            if (!m_networkManager) return;
-            m_networkManager.ServerManager.OnServerConnectionState -= ServerManager_OnServerConnectionState;
-        }
-
-        private void ServerManager_OnServerConnectionState(ServerConnectionStateArgs obj)
-        {
-            if (obj.ConnectionState != LocalConnectionState.Started) return;
-            SceneLoadData sld = new SceneLoadData(initialSceneName)
-            {
-                ReplaceScenes = ReplaceOption.All
-            };
-            InstanceFinder.SceneManager.LoadGlobalScenes(sld);
         }
 
         private void Start()

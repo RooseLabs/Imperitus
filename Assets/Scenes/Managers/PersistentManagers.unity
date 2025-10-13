@@ -263,6 +263,7 @@ GameObject:
   - component: {fileID: 7443408886480396088}
   - component: {fileID: 7443408886480396087}
   - component: {fileID: 7443408886480396086}
+  - component: {fileID: 7443408886480396089}
   m_Layer: 0
   m_Name: NetworkManager
   m_TagString: Untagged
@@ -373,6 +374,23 @@ MonoBehaviour:
   _transports:
   - {fileID: 7443408886480396087}
   - {fileID: 7443408886480396086}
+--- !u!114 &7443408886480396089
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7443408886480396081}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 57ce8bbb58966cb45a7140f32da5327a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FishNet.Runtime::FishNet.Component.Scenes.DefaultScene
+  _enableGlobalScenes: 1
+  _startInOffline: 1
+  _offlineScene: Assets/Scenes/Menus/MainMenu.unity
+  _onlineScene: Assets/Scenes/Levels/DevelopmentScene1.unity
+  _replaceScenes: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
