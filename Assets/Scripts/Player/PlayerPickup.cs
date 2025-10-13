@@ -58,15 +58,15 @@ namespace RooseLabs.Player
 
             if (m_player.Input.interactWasPressed)
             {
-                Debug.Log("[PlayerPickup] Interact input detected.");
+                // Debug.Log("[PlayerPickup] Interact input detected.");
                 if (m_bookInHand != null)
                 {
-                    Debug.Log("[PlayerPickup] Interacting with book in hand.");
+                    // Debug.Log("[PlayerPickup] Interacting with book in hand.");
                     m_bookInHand.OnInteract(m_player, this);
                 }
                 else
                 {
-                    Debug.Log("[PlayerPickup] No book in hand, attempting pickup.");
+                    // Debug.Log("[PlayerPickup] No book in hand, attempting pickup.");
                     Pickup();
                 }
             }
@@ -176,7 +176,7 @@ namespace RooseLabs.Player
             else
             {
                 obj.transform.parent = null; // fallback
-                Debug.LogWarning("[PlayerPickup] Could not find WorldObjects holder, defaulting to root.");
+                // Debug.LogWarning("[PlayerPickup] Could not find WorldObjects holder, defaulting to root.");
             }
 
             var rb = obj.GetComponent<Rigidbody>();

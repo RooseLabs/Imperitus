@@ -33,7 +33,7 @@ namespace RooseLabs.Player
         {
             if (m_player.Input.interactWasPressed)
             {
-                //Debug.Log("[PlayerPickup] Interact input detected.");
+                // Debug.Log("[PlayerDoor] Interact input detected.");
                 TryInteract();
             }
         }

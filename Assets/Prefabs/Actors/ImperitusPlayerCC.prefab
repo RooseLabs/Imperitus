@@ -1535,6 +1535,7 @@ MonoBehaviour:
   isRunning: 0
   isCrouching: 0
   isCrawling: 0
+  currentSpeed: 0
 --- !u!114 &3951473333928839116
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1692,7 +1693,7 @@ MonoBehaviour:
   _spectatorInterpolation: 2
   _enableTeleport: 0
   _teleportThreshold: 1
-  <PrefabId>k__BackingField: 3
+  <PrefabId>k__BackingField: 2
   <SpawnableCollectionId>k__BackingField: 0
   <AssetPathHash>k__BackingField: 9744371173834180385
   <SceneId>k__BackingField: 0
