@@ -246,7 +246,7 @@ MonoBehaviour:
   _dontDestroyOnLoad: 0
   _objectPool: {fileID: 0}
   _persistence: 0
-  _logging: {fileID: 0}
+  _logging: {fileID: 11400000, guid: 0d99e802f49030b42a10f68d8c3e7c05, type: 2}
   _spawnablePrefabs: {fileID: 11400000, guid: 94d4899cf8929394086d2e402205fedb, type: 2}
 --- !u!1 &7443408886480396081
 GameObject:
@@ -263,6 +263,7 @@ GameObject:
   - component: {fileID: 7443408886480396088}
   - component: {fileID: 7443408886480396087}
   - component: {fileID: 7443408886480396086}
+  - component: {fileID: 7443408886480396090}
   - component: {fileID: 7443408886480396089}
   m_Layer: 0
   m_Name: NetworkManager
@@ -391,6 +392,22 @@ MonoBehaviour:
   _offlineScene: Assets/Scenes/Menus/MainMenu.unity
   _onlineScene: Assets/Scenes/Levels/DevelopmentScene1.unity
   _replaceScenes: 0
+--- !u!114 &7443408886480396090
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7443408886480396081}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15895a51081447d46bda466e7e830c08, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FishNet.Runtime::FishNet.Managing.Scened.SceneManager
+  _sceneProcessor: {fileID: 0}
+  _lightProbeUpdating: 0
+  _moveClientObjects: 1
+  _setActiveScene: 1
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

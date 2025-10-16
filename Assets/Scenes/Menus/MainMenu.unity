@@ -178,7 +178,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 1
-  m_AdditionalShaderChannelsFlag: 25
+  m_AdditionalShaderChannelsFlag: 1
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
   m_SortingOrder: 0
@@ -239,7 +239,6 @@ MonoBehaviour:
   usernamePanel: {fileID: 976067795}
   currentUsernameGO: {fileID: 423182679}
   joinCodeInputField: {fileID: 1130297187}
-  initialSceneName: DevelopmentScene1
 --- !u!1 &53638930
 GameObject:
   m_ObjectHideFlags: 0
