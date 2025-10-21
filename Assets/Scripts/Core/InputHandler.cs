@@ -57,12 +57,15 @@ namespace RooseLabs.Core
             UIActions.Disable();
             GameplayActions.Enable();
             Cursor.visible = false;
+            Cursor.lockState = CursorLockMode.Locked;
         }
 
         public void EnableMenuInput()
         {
             GameplayActions.Disable();
             UIActions.Enable();
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
         }
 
         public void DisableAllInput()

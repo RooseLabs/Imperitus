@@ -1,4 +1,5 @@
 using FishNet.Object;
+using RooseLabs.Gameplay.Interactions;
 using UnityEngine;
 
 namespace RooseLabs.Player
@@ -12,7 +13,7 @@ namespace RooseLabs.Player
         public Vector3 standingPickupPosition;
         private bool lastCrouchState;
 
-        private Player m_player;
+        private PlayerCharacter m_character;
         private Book m_bookInHand;
 
         private bool m_hasObjectInHand;
@@ -20,14 +21,14 @@ namespace RooseLabs.Player
 
         private void Awake()
         {
-            m_player = GetComponent<Player>();
+            m_character = GetComponent<PlayerCharacter>();
         }
 
         private void Start()
         {
             //Debug.Log("[PlayerPickup] Start called.");
 
-            if (m_player == null)
+            if (m_character == null)
             {
                 //Debug.LogWarning("[PlayerPickup] No Player component found on the GameObject.");
             }
@@ -53,16 +54,16 @@ namespace RooseLabs.Player
         private void Update()
         {
             // Prevent pickup if crawling
-            if (m_player.Data.isCrawling)
+            if (m_character.Data.isCrawling)
                 return;
 
-            if (m_player.Input.interactWasPressed)
+            if (m_character.Input.interactWasPressed)
             {
                 // Debug.Log("[PlayerPickup] Interact input detected.");
                 if (m_bookInHand != null)
                 {
                     // Debug.Log("[PlayerPickup] Interacting with book in hand.");
-                    m_bookInHand.OnInteract(m_player, this);
+                    m_bookInHand.OnInteract(m_character, this);
                 }
                 else
                 {
@@ -71,7 +72,7 @@ namespace RooseLabs.Player
                 }
             }
 
-            if (m_player.Input.dropWasPressed)
+            if (m_character.Input.dropWasPressed)
             {
                 //Debug.Log("[PlayerPickup] Drop input detected.");
                 Drop();
@@ -83,7 +84,7 @@ namespace RooseLabs.Player
             if (m_hasObjectInHand) return;
 
             //Debug.Log("[PlayerPickup] Attempting pickup raycast.");
-            if (Physics.Raycast(m_player.Camera.transform.position, m_player.Camera.transform.forward, out RaycastHit hit, raycastDistance, pickupLayer))
+            if (Physics.Raycast(m_character.Camera.transform.position, m_character.Camera.transform.forward, out RaycastHit hit, raycastDistance, pickupLayer))
             {
                 //Debug.Log($"[PlayerPickup] Raycast hit: {hit.transform.gameObject.name}");
                 //Debug.Log("[PlayerPickup] No object in hand, picking up new object.");
@@ -93,7 +94,7 @@ namespace RooseLabs.Player
                 m_bookInHand = m_objInHand.GetComponent<Book>();
                 if (m_bookInHand != null)
                 {
-                    m_bookInHand.OnPickup(m_player, this);
+                    m_bookInHand.OnPickup(m_character, this);
                 }
 
                 m_hasObjectInHand = true;

@@ -108,7 +108,7 @@ namespace RooseLabs.Enemies
                 //Debug.Log($"[EnemyDetection] Target detected: {best.name}");
             }
 
-#if UNITY_EDITOR
+            #if UNITY_EDITOR
             if (best != null)
             {
                 // Draw green line to the detected target
@@ -116,7 +116,7 @@ namespace RooseLabs.Enemies
             }
             else
             {
-                // Debug rays to all potential targets to visualize what’s blocking view
+                // Debug rays to all potential targets to visualize whatï¿½s blocking view
                 foreach (Collider col in targetsInViewRadius)
                 {
                     Vector3 dirToTarget = (col.transform.position - transform.position).normalized;
@@ -134,7 +134,7 @@ namespace RooseLabs.Enemies
                     }
                 }
             }
-#endif
+            #endif
         }
 
         #region Debug - FOV Mesh/Gizmo
@@ -219,7 +219,7 @@ namespace RooseLabs.Enemies
             return new Vector3(Mathf.Sin(rad), 0, Mathf.Cos(rad));
         }
 
-#if UNITY_EDITOR
+        #if UNITY_EDITOR
         private void OnDrawGizmos()
         {
             if (!drawFOV) return;
@@ -250,7 +250,7 @@ namespace RooseLabs.Enemies
             Gizmos.DrawWireSphere(transform.position + topDir * viewRadius, 0.1f);
             Gizmos.DrawWireSphere(transform.position + bottomDir * viewRadius, 0.1f);
         }
-#endif
+        #endif
 
         #endregion
     }

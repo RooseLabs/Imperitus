@@ -1,19 +1,28 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using FishNet.Managing.Scened;
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
+using GameKit.Dependencies.Utilities.Types;
+using RooseLabs.Network;
 using RooseLabs.ScriptableObjects;
 using RooseLabs.UI;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace RooseLabs.Gameplay
 {
     [DefaultExecutionOrder(-99)]
-    public class GameHandler : NetworkBehaviour
+    public class GameManager : NetworkBehaviour
     {
-        public static GameHandler Instance { get; private set; }
+        public static GameManager Instance { get; private set; }
 
+        #region Serialized
+        [SerializeField] GUIManager guiManager;
+        [SerializeField][Scene] private string[] libraryScenes;
         [field: SerializeField] public RuneSO[] AllRunes { get; private set; }
+        #endregion
 
         private readonly SyncList<int> m_collectedRunes = new();
         public List<int> CollectedRunes => m_collectedRunes.Collection;
@@ -22,6 +31,18 @@ namespace RooseLabs.Gameplay
         {
             Instance = this;
             m_collectedRunes.OnChange += CollectedRunes_OnChange;
+        }
+
+        public void StartHeist()
+        {
+            int randomIndex = Random.Range(0, libraryScenes.Length);
+            string selectedSceneName = GetSceneName(libraryScenes[randomIndex]);
+            SceneLoadData sld = new(selectedSceneName)
+            {
+                ReplaceScenes = ReplaceOption.All,
+                MovedNetworkObjects = PlayerHandler.CharacterNetworkObjects
+            };
+            SceneManager.LoadGlobalScenes(sld);
         }
 
         public void AddRune(RuneSO rune)
@@ -35,6 +56,11 @@ namespace RooseLabs.Gameplay
         {
             GUIManager.Instance.UpdateRuneCounter(m_collectedRunes.Count);
             Debug.Log($"Rune collection changed: Operation={op}, Index={index}, OldItem={oldItem}, NewItem={newItem}, AsServer={asServer}");
+        }
+
+        private static string GetSceneName(string fullPath)
+        {
+            return Path.GetFileNameWithoutExtension(fullPath);
         }
     }
 }

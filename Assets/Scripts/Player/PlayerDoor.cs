@@ -11,19 +11,19 @@ namespace RooseLabs.Player
 
         private Camera m_camera;
 
-        private Player m_player;
+        private PlayerCharacter m_character;
 
         private void Awake()
         {
-            m_player = GetComponent<Player>();
+            m_character = GetComponent<PlayerCharacter>();
         }
 
         private void Start()
         {
             // Assumes your player has a Camera tagged as MainCamera
-            m_camera = m_player.Camera;
+            m_camera = m_character.Camera;
 
-            if (m_player == null)
+            if (m_character == null)
             {
                 //Debug.LogWarning("[PlayerPickup] No Player component found on the GameObject.");
             }
@@ -31,7 +31,7 @@ namespace RooseLabs.Player
 
         private void Update()
         {
-            if (m_player.Input.interactWasPressed)
+            if (m_character.Input.interactWasPressed)
             {
                 // Debug.Log("[PlayerDoor] Interact input detected.");
                 TryInteract();

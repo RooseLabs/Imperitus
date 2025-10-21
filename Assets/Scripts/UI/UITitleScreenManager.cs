@@ -1,5 +1,6 @@
 using RooseLabs.Core;
 using RooseLabs.Network;
+using RooseLabs.Player;
 using TMPro;
 using UnityEngine;
 
@@ -16,25 +17,6 @@ namespace RooseLabs.UI
         // TODO: This should be moved to a JoinGamePanel script
         [SerializeField] private TMP_InputField joinCodeInputField;
 
-        private void Awake()
-        {
-            CheckIfValidUsername();
-        }
-
-        private void CheckIfValidUsername()
-        {
-            if (string.IsNullOrWhiteSpace(NetworkConnector.Instance.PlayerName))
-            {
-                SetDefaultPlayerName();
-            }
-        }
-
-        private void SetDefaultPlayerName()
-        {
-            NetworkConnector.Instance.PlayerName = "Player" + Random.Range(1000, 9999);
-            currentUsernameGO.text = NetworkConnector.Instance.PlayerName;
-        }
-
         private void Start()
         {
             InputHandler.Instance.EnableMenuInput();
@@ -47,6 +29,17 @@ namespace RooseLabs.UI
             mainMenuPanel.UsernameButtonAction += OpenUsernameScreen;
             mainMenuPanel.CloseUsernameAction += CloseUsernameScreen;
             mainMenuPanel.SaveUsernameAction += SaveUsername;
+
+            SetPlayerName();
+        }
+
+        private void SetPlayerName()
+        {
+            if (string.IsNullOrWhiteSpace(PlayerConnection.Nickname))
+            {
+                PlayerConnection.Nickname = "Player" + Random.Range(1000, 9999);
+            }
+            currentUsernameGO.text = PlayerConnection.Nickname;
         }
 
         private void HostLocalGameButtonClicked()
@@ -107,9 +100,8 @@ namespace RooseLabs.UI
 
         private void SaveUsername()
         {
-            string newUsername = usernamePanel.GetComponentInChildren<TMP_InputField>().text;
-            currentUsernameGO.text = newUsername;
-            NetworkConnector.Instance.PlayerName = newUsername;
+            PlayerConnection.Nickname = usernamePanel.GetComponentInChildren<TMP_InputField>().text;
+            currentUsernameGO.text = PlayerConnection.Nickname;
             CloseUsernameScreen();
         }
 

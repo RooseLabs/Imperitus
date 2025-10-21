@@ -18,17 +18,17 @@ namespace RooseLabs.Player
 
         private void LateUpdate()
         {
-            Player player = Player.LocalPlayer;
+            PlayerCharacter character = PlayerCharacter.LocalCharacter;
 
-            Vector3 desiredPosition = player.Data.isRunning ? runPosition.position
-                : player.Data.isCrouching ? crouchPosition.position
-                : player.Data.isCrawling ? crawlPosition.position
+            Vector3 desiredPosition = character.Data.isRunning ? runPosition.position
+                : character.Data.isCrouching ? crouchPosition.position
+                : character.Data.isCrawling ? crawlPosition.position
                 : standPosition.position;
             if (transform.position != desiredPosition)
             {
-                transform.position = Vector3.Lerp(transform.position, desiredPosition, Time.deltaTime * 10f);
+                transform.position = Vector3.MoveTowards(transform.position, desiredPosition, Time.deltaTime * 2.5f);
             }
-            transform.rotation = Quaternion.LookRotation(player.Data.lookDirection);
+            transform.rotation = Quaternion.LookRotation(character.Data.lookDirection);
         }
     }
 }

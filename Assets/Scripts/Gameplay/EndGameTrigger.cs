@@ -29,7 +29,7 @@ namespace RooseLabs.Gameplay
             if (!other.CompareTag("Player"))
                 return;
 
-            if (GameHandler.Instance.CollectedRunes.Count == 3)
+            if (GameManager.Instance.CollectedRunes.Count == 3)
             {
                 Debug.Log("Game Ended! Player entered the area with all runes.");
                 RpcEndGame();

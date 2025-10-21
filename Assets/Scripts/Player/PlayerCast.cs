@@ -6,7 +6,7 @@ namespace RooseLabs.Player
 {
     public class PlayerCast : NetworkBehaviour
     {
-        private Player m_player;
+        private PlayerCharacter m_character;
 
         [SerializeField] private Transform castPoint;
         [SerializeField] private GameObject projectilePrefab;
@@ -27,7 +27,7 @@ namespace RooseLabs.Player
                 enabled = false;
                 return;
             }
-            m_player = GetComponent<Player>();
+            m_character = GetComponent<PlayerCharacter>();
         }
 
         public override void OnStartClient()
@@ -37,10 +37,10 @@ namespace RooseLabs.Player
 
         private void Update()
         {
-            if (!m_player.Input.aimIsPressed || !m_player.Input.attackWasPressed) return;
-            if (GameHandler.Instance.CollectedRunes.Count < 3) return;
+            if (!m_character.Input.aimIsPressed || !m_character.Input.attackWasPressed) return;
+            if (GameManager.Instance.CollectedRunes.Count < 3) return;
             // Create a ray from the camera's position in the direction it is facing
-            Ray ray = new Ray(m_player.Camera.transform.position, m_player.Camera.transform.forward);
+            Ray ray = new Ray(m_character.Camera.transform.position, m_character.Camera.transform.forward);
 
             // Try to find the first object hit by the ray within 100 units, ignoring the Projectile layer
             Vector3 targetPoint = Physics.Raycast(ray, out RaycastHit hit, 100f, s_layerMask)
@@ -73,9 +73,9 @@ namespace RooseLabs.Player
         #if UNITY_EDITOR
         private void OnDrawGizmos()
         {
-            if (m_player == null || !m_player.Input.aimIsPressed) return;
+            if (m_character == null || !m_character.Input.aimIsPressed) return;
             Gizmos.color = Color.red;
-            Ray ray = new Ray(m_player.Camera.transform.position, m_player.Camera.transform.forward);
+            Ray ray = new Ray(m_character.Camera.transform.position, m_character.Camera.transform.forward);
             Vector3 hitPoint;
             if (Physics.Raycast(ray, out RaycastHit hit, 100f, s_layerMask))
             {

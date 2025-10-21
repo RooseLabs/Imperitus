@@ -39,12 +39,29 @@ namespace RooseLabs.Network
 
         private void SpawnPlayer(NetworkConnection connection)
         {
+            Vector3 position;
+            Quaternion rotation;
+
+            // Check if player has already been spawned for this connection
+            // If that's the case we're probably transitioning scenes, try to set new position for existing character
+            if (PlayerHandler.GetPlayer(connection) != null)
+            {
+                var playerCharacter = PlayerHandler.GetCharacter(connection);
+                if (playerCharacter != null)
+                {
+                    SetSpawn(playerCharacter.transform, out position, out rotation);
+                    playerCharacter.SetPositionAndRotation(connection, position, rotation);
+                }
+                return;
+            }
+
             if (playerPrefab == null)
             {
                 Debug.LogWarning($"Player prefab is empty and cannot be spawned for connection {connection.ClientId}.");
                 return;
             }
-            SetSpawn(playerPrefab.transform, out Vector3 position, out Quaternion rotation);
+
+            SetSpawn(playerPrefab.transform, out position, out rotation);
             NetworkObject playerObject = NetworkManager.GetPooledInstantiated(playerPrefab, position, rotation, asServer: true);
             Spawn(playerObject, connection, gameObject.scene);
         }

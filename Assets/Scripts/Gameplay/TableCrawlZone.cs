@@ -7,13 +7,13 @@ namespace RooseLabs.Gameplay
     {
         private void OnTriggerEnter(Collider other)
         {
-            if (other.TryGetComponent<PlayerMovementCC>(out var player))
+            if (other.TryGetComponent(out PlayerMovement player))
                 player.SetNearTable(true);
         }
 
         private void OnTriggerExit(Collider other)
         {
-            if (other.TryGetComponent<PlayerMovementCC>(out var player))
+            if (other.TryGetComponent(out PlayerMovement player))
                 player.SetNearTable(false);
         }
     }

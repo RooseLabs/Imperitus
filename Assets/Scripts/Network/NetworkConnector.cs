@@ -72,7 +72,6 @@ namespace RooseLabs.Network
         private Tugboat m_tugboat;
         private UnityTransport m_unityTransport;
 
-        public string PlayerName { get; set; }
         public string CurrentSessionJoinCode { get; private set; }
 
         private void Awake()
