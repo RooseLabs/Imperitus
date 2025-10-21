@@ -20,9 +20,9 @@ namespace RooseLabs.Player
             bool hit = false;
             RaycastHit hitInfo;
             if (thickness <= 0f) hit = Physics.Raycast(origin, -up, out hitInfo,
-                    maxDistance: distance, layerMask: _groundLayerMask);
+                    maxDistance: distance, layerMask: _groundLayerMask, QueryTriggerInteraction.Ignore);
             else hit = Physics.SphereCast(origin, thickness / 2f, -up, out hitInfo,
-                    maxDistance: distance, layerMask: _groundLayerMask);
+                    maxDistance: distance, layerMask: _groundLayerMask, QueryTriggerInteraction.Ignore);
 
             if (hit)
             {
@@ -160,7 +160,7 @@ namespace RooseLabs.Player
             {
                 Vector3 proxyOrigin = origin + (step * ((float)i + 1f) * direction);
                 bool hit = Physics.Raycast(proxyOrigin, -up, out RaycastHit hitInfo,
-                    maxDistance: groundProbeDistance, layerMask: _groundLayerMask);
+                    maxDistance: groundProbeDistance, layerMask: _groundLayerMask, QueryTriggerInteraction.Ignore);
                 #if UNITY_EDITOR
                 if (debug)
                 {
