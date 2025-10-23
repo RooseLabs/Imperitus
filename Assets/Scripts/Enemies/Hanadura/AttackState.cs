@@ -4,9 +4,9 @@ namespace RooseLabs.Enemies
 {
     public class AttackState : IEnemyState
     {
-        private EnemyAI ai;
+        private HanaduraAI ai;
 
-        public AttackState(EnemyAI ai)
+        public AttackState(HanaduraAI ai)
         {
             this.ai = ai;
         }

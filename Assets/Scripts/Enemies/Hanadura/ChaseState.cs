@@ -4,11 +4,11 @@ namespace RooseLabs.Enemies
 {
     public class ChaseState : IEnemyState
     {
-        private EnemyAI ai;
+        private HanaduraAI ai;
         private float updateInterval = 0.2f;
         private float timer = 0f;
 
-        public ChaseState(EnemyAI ai)
+        public ChaseState(HanaduraAI ai)
         {
             this.ai = ai;
         }

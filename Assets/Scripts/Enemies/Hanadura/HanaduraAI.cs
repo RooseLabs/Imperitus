@@ -10,7 +10,7 @@ namespace RooseLabs.Enemies
 {
     [RequireComponent(typeof(NavMeshAgent))]
     [RequireComponent(typeof(NetworkObject))]
-    public class EnemyAI : NetworkBehaviour
+    public class HanaduraAI : NetworkBehaviour
     {
         [Header("References")]
         public NavMeshAgent navAgent;
@@ -31,6 +31,7 @@ namespace RooseLabs.Enemies
         [Header("Chase")]
         public float forgetTargetTime = 3f; // time to forget target after losing sight
         private float forgetTimer = 0f;
+
         public Vector3? LastKnownTargetPosition { get; set; }
 
         // FSM states
@@ -38,17 +39,21 @@ namespace RooseLabs.Enemies
         private PatrolState patrolState;
         private ChaseState chaseState;
         private AttackState attackState;
+        private InvestigateState investigateState;
+
         public IEnemyState CurrentState => currentState;
         public PatrolState PatrolState => patrolState;
         public ChaseState ChaseState => chaseState;
         public AttackState AttackState => attackState;
-
+        public InvestigateState InvestigateState => investigateState;
 
         // Server-controlled target reference (only used server-side)
         public Transform CurrentTarget { get; private set; }
 
         // for attack cooldown
         private float attackTimer = 0f;
+
+        private bool isInvestigating = false;
 
         private void Reset()
         {
@@ -67,6 +72,7 @@ namespace RooseLabs.Enemies
             patrolState = new PatrolState(this, patrolRoute, loopPatrol, startWaypointIndex);
             chaseState = new ChaseState(this);
             attackState = new AttackState(this);
+            investigateState = new InvestigateState(this);
 
             EnterState(patrolState);
         }
@@ -122,8 +128,8 @@ namespace RooseLabs.Enemies
             }
             else
             {
-                // No target at all -> patrol
-                if (!(currentState is PatrolState))
+                // Only revert to patrol if not investigating
+                if (!isInvestigating && !(currentState is PatrolState))
                     EnterState(patrolState);
             }
         }
@@ -137,9 +143,64 @@ namespace RooseLabs.Enemies
 
             if (currentState != null)
             {
-                Debug.Log($"[EnemyAI] Entered state: {currentState.GetType().Name}");
+                Debug.Log($"[HanaduraAI] Entered state: {currentState.GetType().Name}");
                 currentState.Enter();
             }
+        }
+
+        /// <summary>
+        /// Called by Sentient Grimoire to alert this Hanadura
+        /// </summary>
+        public void AlertToPosition(Vector3 position, Transform target = null)
+        {
+            if (!base.IsServerInitialized) return;
+
+            Debug.Log("[HanaduraAI] Received alert from Grimoire.");
+
+            if (target != null)
+            {
+                // Direct player reference -> chase right away
+                CurrentTarget = target;
+                LastKnownTargetPosition = target.position;
+                forgetTimer = forgetTargetTime;
+                isInvestigating = false;
+
+                if (!(currentState is ChaseState))
+                    EnterState(chaseState);
+
+                Debug.Log($"[HanaduraAI] Alerted by Grimoire! Direct chase: {target.name}");
+            }
+            else
+            {
+                // No direct target, just a suspicious area -> investigate
+                CurrentTarget = null;
+                LastKnownTargetPosition = position;
+                forgetTimer = forgetTargetTime;
+                isInvestigating = true;
+
+                if (!(currentState is InvestigateState))
+                    EnterState(investigateState);
+
+                Debug.Log($"[HanaduraAI] Alerted by Grimoire! Investigating area: {position}");
+            }
+
+            Debug.Log("[HanaduraAI] Alert processing complete.");
+        }
+
+
+        public void SetCurrentTarget(Transform target)
+        {
+            CurrentTarget = target;
+            if (target != null)
+            {
+                LastKnownTargetPosition = target.position;
+                forgetTimer = forgetTargetTime;
+            }
+        }
+        public void SetIsInvestigatingFlag()
+        {
+            isInvestigating = !isInvestigating;
+            Debug.Log("[HanaduraAI] isInvestigating set to: " + isInvestigating);
         }
 
         #region Movement & Attack APIs (Server-side)

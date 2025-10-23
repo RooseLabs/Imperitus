@@ -4,12 +4,12 @@ namespace RooseLabs.Enemies
 {
     public class PatrolState : IEnemyState
     {
-        private EnemyAI ai;
+        private HanaduraAI ai;
         private PatrolRoute route;
         private int currentIndex;
         private bool loop;
 
-        public PatrolState(EnemyAI ai, PatrolRoute route, bool loop, int startIndex = 0)
+        public PatrolState(HanaduraAI ai, PatrolRoute route, bool loop, int startIndex = 0)
         {
             this.ai = ai;
             this.route = route;
