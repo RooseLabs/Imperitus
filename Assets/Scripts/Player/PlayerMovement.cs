@@ -12,6 +12,8 @@ namespace RooseLabs.Player
         private Rigidbody m_rigidbody;
         private Animator m_animator;
         private InputHandler m_inputHandler;
+        private SoundEmitter m_soundEmitter;
+        private float m_nextFootstepTime;
 
         [Header("Movement Settings")]
         [SerializeField] private float walkSpeed   = 1.50f; // Average speed from animation: 1.20f;
@@ -39,6 +41,10 @@ namespace RooseLabs.Player
 
         private bool m_isNearTable;
 
+        private int footstepIndex = -1;
+        private int runningIndex = -1;
+        private int crouchingIndex = -1;
+
         private void Start()
         {
             m_character = GetComponent<PlayerCharacter>();
@@ -46,6 +52,11 @@ namespace RooseLabs.Player
             m_rigidbody = GetComponent<Rigidbody>();
             m_animator = m_character.Animations.Animator;
             m_inputHandler = InputHandler.Instance;
+            m_soundEmitter = GetComponent<SoundEmitter>();
+
+            footstepIndex = m_soundEmitter.availableSounds.FindIndex(s => s.type != null && s.type.key == "Footstep");
+            runningIndex = m_soundEmitter.availableSounds.FindIndex(s => s.type != null && s.type.key == "Running");
+            crouchingIndex = m_soundEmitter.availableSounds.FindIndex(s => s.type != null && s.type.key == "Crouching");
         }
 
         private void Update()
@@ -83,6 +94,25 @@ namespace RooseLabs.Player
             }
 
             m_avatarMover.Move(deltaMovement);
+
+            int soundIndex = -1;
+            if (m_character.Data.isRunning)
+                soundIndex = runningIndex;
+            else if (m_character.Data.isCrouching)
+                soundIndex = crouchingIndex;
+            else
+                soundIndex = footstepIndex;
+
+            bool isMoving = m_character.Data.currentSpeed > 0.01f && m_movementValue != 0f && !m_character.Data.isCrawling;
+
+            if (isMoving && soundIndex >= 0 && Time.time >= m_nextFootstepTime)
+            {
+                m_soundEmitter.RequestEmitFromClient(soundIndex);
+
+                float interval = m_character.Data.isRunning ? 0.1f :
+                                 m_character.Data.isCrouching ? 0.5f : 0.4f;
+                m_nextFootstepTime = Time.time + interval;
+            }
         }
 
         private void HandleMovementAndRotation()

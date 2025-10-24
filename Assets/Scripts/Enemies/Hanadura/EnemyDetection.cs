@@ -105,7 +105,7 @@ namespace RooseLabs.Enemies
             if (best != null)
             {
                 DetectedTarget = best;
-                Debug.Log($"[EnemyDetection] Target detected: {best.name}");
+                //Debug.Log($"[EnemyDetection] Target detected: {best.name}");
             }
 
             #if UNITY_EDITOR

@@ -130,9 +130,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8cac635f24954048aad3a6ff9110beb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: FishNet.Runtime::FishNet.Component.Animating.NetworkAnimator
-  _componentIndexCache: 255
+  _componentIndexCache: 2
   _addedNetworkObject: {fileID: 7954330056381621737}
-  _networkObjectCache: {fileID: 0}
+  _networkObjectCache: {fileID: 7954330056381621737}
   IgnoredParameters: []
   _animator: {fileID: 837466252685479144}
   _synchronizeWhenDisabled: 0
@@ -154,6 +154,7 @@ GameObject:
   - component: {fileID: 7954330056381621737}
   - component: {fileID: 240534035624338073}
   - component: {fileID: 3741978011984959302}
+  - component: {fileID: -4626044084707365502}
   m_Layer: 8
   m_Name: BookRoot
   m_TagString: Untagged
@@ -244,7 +245,9 @@ MonoBehaviour:
   <PredictedSpawn>k__BackingField: {fileID: 0}
   <PredictedOwner>k__BackingField: {fileID: 0}
   NetworkBehaviours:
-  - {fileID: 0}
+  - {fileID: 240534035624338073}
+  - {fileID: 3741978011984959302}
+  - {fileID: 8637104491120377896}
   InitializedParentNetworkBehaviour: {fileID: 0}
   InitializedNestedNetworkObjects: []
   RuntimeParentNetworkBehaviour: {fileID: 0}
@@ -269,14 +272,14 @@ MonoBehaviour:
   _spectatorInterpolation: 2
   _enableTeleport: 0
   _teleportThreshold: 1
-  <PrefabId>k__BackingField: 2
+  <PrefabId>k__BackingField: 0
   <SpawnableCollectionId>k__BackingField: 0
   <AssetPathHash>k__BackingField: 4384590100837346145
   <SceneId>k__BackingField: 0
   SerializedTransformProperties:
-    Position: {x: 0, y: 0, z: 0}
+    Position: {x: 0, y: 1, z: 0}
     Rotation: {x: -0.5, y: -0.5, z: 0.5, w: 0.5}
-    Scale: {x: 0.2, y: 0.2, z: 0.2}
+    Scale: {x: 1, y: 1, z: 1}
     IsValid: 1
 --- !u!114 &240534035624338073
 MonoBehaviour:
@@ -292,7 +295,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: FishNet.Runtime::FishNet.Component.Transforming.NetworkTransform
   _componentIndexCache: 0
   _addedNetworkObject: {fileID: 7954330056381621737}
-  _networkObjectCache: {fileID: 0}
+  _networkObjectCache: {fileID: 7954330056381621737}
   _componentConfiguration: 2
   _synchronizeParent: 0
   _packing:
@@ -336,7 +339,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c731ba3656773f34996ae52fef517ec1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Book
+  _componentIndexCache: 1
+  _addedNetworkObject: {fileID: 7954330056381621737}
+  _networkObjectCache: {fileID: 7954330056381621737}
+  rune: {fileID: 0}
+  animator: {fileID: 837466252685479144}
+--- !u!114 &-4626044084707365502
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7882887988042570973}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e1040ac50946b64f99d84e6c7f1ab8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.SoundEmitter
   _componentIndexCache: 255
   _addedNetworkObject: {fileID: 7954330056381621737}
   _networkObjectCache: {fileID: 0}
-  animator: {fileID: 837466252685479144}
+  availableSounds:
+  - type: {fileID: 11400000, guid: 4c9c40f51a13a7249a98a753346b8743, type: 2}
+  soundOriginOffset: {x: 0, y: 0, z: 0}

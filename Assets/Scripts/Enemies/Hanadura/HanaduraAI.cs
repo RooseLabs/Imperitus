@@ -10,7 +10,7 @@ namespace RooseLabs.Enemies
 {
     [RequireComponent(typeof(NavMeshAgent))]
     [RequireComponent(typeof(NetworkObject))]
-    public class HanaduraAI : NetworkBehaviour
+    public class HanaduraAI : NetworkBehaviour, ISoundListener
     {
         [Header("References")]
         public NavMeshAgent navAgent;
@@ -155,7 +155,7 @@ namespace RooseLabs.Enemies
         {
             if (!base.IsServerInitialized) return;
 
-            Debug.Log("[HanaduraAI] Received alert from Grimoire.");
+            //Debug.Log("[HanaduraAI] Received alert from Grimoire.");
 
             if (target != null)
             {
@@ -184,7 +184,7 @@ namespace RooseLabs.Enemies
                 Debug.Log($"[HanaduraAI] Alerted by Grimoire! Investigating area: {position}");
             }
 
-            Debug.Log("[HanaduraAI] Alert processing complete.");
+            //Debug.Log("[HanaduraAI] Alert processing complete.");
         }
 
 
@@ -201,6 +201,37 @@ namespace RooseLabs.Enemies
         {
             isInvestigating = !isInvestigating;
             Debug.Log("[HanaduraAI] isInvestigating set to: " + isInvestigating);
+        }
+
+        /// <summary>
+        /// Called server-side by the sound system when a sound is detected nearby.
+        /// </summary>
+        public void OnSoundHeard(Vector3 position, SoundType type, float intensity)
+        {
+            //Debug.Log("Before Server check");
+
+            if (!base.IsServerInitialized) return;
+
+            //Debug.Log("[HanaduraAI] OnSoundHeard called.");
+
+            // If enemy is already chasing or attacking, ignore sound
+            if (currentState is ChaseState || currentState is AttackState)
+                return;
+
+            // Only react to sufficiently strong sounds
+            if (intensity < 0.1f)
+                return;
+
+            // Set investigation data
+            LastKnownTargetPosition = position;
+            CurrentTarget = null;
+            isInvestigating = true;
+
+            Debug.Log($"[HanaduraAI] Heard sound '{type.name}' with intensity {intensity:F2}. Investigating at {position}");
+
+            // Enter investigation state if not already investigating
+            if (!(currentState is InvestigateState))
+                EnterState(investigateState);
         }
 
         #region Movement & Attack APIs (Server-side)

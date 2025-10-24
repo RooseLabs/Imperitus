@@ -637,9 +637,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f1117dd79caed3949abdf12674fe3b7f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MetaVoiceChat.NetProviders.FishNet.FishNetNetProvider
-  _componentIndexCache: 255
+  _componentIndexCache: 11
   _addedNetworkObject: {fileID: 7652611172026813195}
-  _networkObjectCache: {fileID: 0}
+  _networkObjectCache: {fileID: 7652611172026813195}
 --- !u!1 &2343043851098449688
 GameObject:
   m_ObjectHideFlags: 0
@@ -684,7 +684,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2836e36774ca1c4bbbee976e17b649c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: FishNet.Runtime::FishNet.Component.Transforming.NetworkTransform
-  _componentIndexCache: 4
+  _componentIndexCache: 9
   _addedNetworkObject: {fileID: 7652611172026813195}
   _networkObjectCache: {fileID: 7652611172026813195}
   _componentConfiguration: 0
@@ -1253,6 +1253,7 @@ GameObject:
   - component: {fileID: 3755028746274937716}
   - component: {fileID: 7652611172026813195}
   - component: {fileID: 2911172595631321588}
+  - component: {fileID: -675073606576501584}
   m_Layer: 6
   m_Name: PlayerCharacter
   m_TagString: Player
@@ -1477,9 +1478,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9dd1f9693821a9a47b400501c874822a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Player.PlayerPickup
-  _componentIndexCache: 3
+  _componentIndexCache: 2
   _addedNetworkObject: {fileID: 7652611172026813195}
-  _networkObjectCache: {fileID: 1206081003454913984, guid: d11dc0a3bf2149e45b1cf072fb36cf92, type: 3}
+  _networkObjectCache: {fileID: 7652611172026813195}
   raycastDistance: 3
   pickupLayer:
     serializedVersion: 2
@@ -1515,9 +1516,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d9d478c9daf84c5b88cf2fc46ca7b2d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Player.PlayerCast
-  _componentIndexCache: 2
+  _componentIndexCache: 3
   _addedNetworkObject: {fileID: 7652611172026813195}
-  _networkObjectCache: {fileID: 0}
+  _networkObjectCache: {fileID: 7652611172026813195}
   castPoint: {fileID: 7084882734756081741}
   projectilePrefab: {fileID: 4420710090149408639, guid: ebd0073e4eff6ac4ca6de6e83db93f84, type: 3}
   projectileSpeed: 10
@@ -1542,9 +1543,16 @@ MonoBehaviour:
   NetworkBehaviours:
   - {fileID: 2298069713334961550}
   - {fileID: 5099047441057018779}
+  - {fileID: 2204474689255533059}
+  - {fileID: 3755028746274937716}
   - {fileID: 2911172595631321588}
+  - {fileID: -675073606576501584}
   - {fileID: 7226749917790494997}
+  - {fileID: 8021978832323892062}
+  - {fileID: 8664526776978465645}
   - {fileID: 7047589884357707370}
+  - {fileID: 1046755158235027733}
+  - {fileID: 2954016431569174323}
   InitializedParentNetworkBehaviour: {fileID: 0}
   InitializedNestedNetworkObjects: []
   RuntimeParentNetworkBehaviour: {fileID: 0}
@@ -1569,7 +1577,7 @@ MonoBehaviour:
   _spectatorInterpolation: 2
   _enableTeleport: 0
   _teleportThreshold: 1
-  <PrefabId>k__BackingField: 6
+  <PrefabId>k__BackingField: 3
   <SpawnableCollectionId>k__BackingField: 0
   <AssetPathHash>k__BackingField: 9876715584152176679
   <SceneId>k__BackingField: 0
@@ -1590,7 +1598,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2836e36774ca1c4bbbee976e17b649c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: FishNet.Runtime::FishNet.Component.Transforming.NetworkTransform
-  _componentIndexCache: 2
+  _componentIndexCache: 4
   _addedNetworkObject: {fileID: 7652611172026813195}
   _networkObjectCache: {fileID: 7652611172026813195}
   _componentConfiguration: 2
@@ -1624,6 +1632,26 @@ MonoBehaviour:
     X: 0
     Y: 0
     Z: 0
+--- !u!114 &-675073606576501584
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6907876458342397342}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e1040ac50946b64f99d84e6c7f1ab8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.SoundEmitter
+  _componentIndexCache: 5
+  _addedNetworkObject: {fileID: 7652611172026813195}
+  _networkObjectCache: {fileID: 7652611172026813195}
+  availableSounds:
+  - type: {fileID: 11400000, guid: 64fc0e7fe7c7e8440aca02ddc5dec609, type: 2}
+  - type: {fileID: 11400000, guid: ba721dd56b8fcb54a86a42331ad37b18, type: 2}
+  - type: {fileID: 11400000, guid: 33e38525bf72b9c47906476556cf6b11, type: 2}
+  soundOriginOffset: {x: 0, y: 0, z: 0}
 --- !u!1 &6922205013769619118
 GameObject:
   m_ObjectHideFlags: 0
@@ -1669,9 +1697,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3871d1eb27411a14d9e60351a20c9e78, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.NameTag
-  _componentIndexCache: 255
+  _componentIndexCache: 8
   _addedNetworkObject: {fileID: 7652611172026813195}
-  _networkObjectCache: {fileID: 0}
+  _networkObjectCache: {fileID: 7652611172026813195}
   nameTagText: {fileID: 4344187390115432}
 --- !u!1 &8341259078320434640
 GameObject:
@@ -1739,9 +1767,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2836e36774ca1c4bbbee976e17b649c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: FishNet.Runtime::FishNet.Component.Transforming.NetworkTransform
-  _componentIndexCache: 255
+  _componentIndexCache: 10
   _addedNetworkObject: {fileID: 7652611172026813195}
-  _networkObjectCache: {fileID: 0}
+  _networkObjectCache: {fileID: 7652611172026813195}
   _componentConfiguration: 0
   _synchronizeParent: 0
   _packing:
@@ -1878,7 +1906,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 2039
+    m_Bits: 6135
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -2336,7 +2364,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8cac635f24954048aad3a6ff9110beb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: FishNet.Runtime::FishNet.Component.Animating.NetworkAnimator
-  _componentIndexCache: 3
+  _componentIndexCache: 6
   _addedNetworkObject: {fileID: 7652611172026813195}
   _networkObjectCache: {fileID: 7652611172026813195}
   IgnoredParameters: []
@@ -2358,9 +2386,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2836e36774ca1c4bbbee976e17b649c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: FishNet.Runtime::FishNet.Component.Transforming.NetworkTransform
-  _componentIndexCache: 255
+  _componentIndexCache: 7
   _addedNetworkObject: {fileID: 7652611172026813195}
-  _networkObjectCache: {fileID: 0}
+  _networkObjectCache: {fileID: 7652611172026813195}
   _componentConfiguration: 0
   _synchronizeParent: 0
   _packing:

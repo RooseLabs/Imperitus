@@ -9,10 +9,12 @@ namespace RooseLabs.Gameplay.Interactions
     {
         [SerializeField] private RuneSO rune;
         [SerializeField] private Animator animator;
+        private bool hasDropped = false;
 
         public void OnPickup(PlayerCharacter character, PlayerPickup playerPickup)
         {
             Debug.Log("Book picked up by " + character.name);
+            hasDropped = false;
         }
 
         public void OnInteract(Player.PlayerCharacter character, PlayerPickup playerPickup)
@@ -46,6 +48,20 @@ namespace RooseLabs.Gameplay.Interactions
                 // Closing
                 playerPickup.SetObjectPositionAndOrRotation(gameObject, new Vector3(-0.11f, 0f, 0f));
             }
+        }
+
+        private void OnCollisionEnter(Collision collision)
+        {
+            if (hasDropped) return; // Only emit once per drop
+
+            // Emit "ItemDropped" sound
+            var soundEmitter = GetComponent<SoundEmitter>();
+            if (soundEmitter != null)
+            {
+                soundEmitter.RequestEmitFromClient("ItemDropped");
+            }
+
+            hasDropped = true;
         }
     }
 }

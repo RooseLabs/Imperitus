@@ -34,7 +34,7 @@ namespace RooseLabs.Enemies
             FindNearestWaypoint();
             MoveToWaypoint(currentWaypointIndex);
 
-            Debug.Log("[GrimoirePatrolState] Entered - starting patrol");
+            //Debug.Log("[GrimoirePatrolState] Entered - starting patrol");
         }
 
         public void Exit()
@@ -78,7 +78,7 @@ namespace RooseLabs.Enemies
             {
                 ai.navAgent.isStopped = false;
                 ai.navAgent.SetDestination(waypoint.position);
-                Debug.Log($"[GrimoirePatrolState] Moving to waypoint {index}");
+                //Debug.Log($"[GrimoirePatrolState] Moving to waypoint {index}");
             }
         }
 

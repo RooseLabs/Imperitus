@@ -98,7 +98,7 @@ namespace RooseLabs.Enemies
             // Start in patrol state
             EnterState(patrolState);
 
-            Debug.Log("[GrimoireAI] OnStartServer complete - beginning patrol");
+            //Debug.Log("[GrimoireAI] OnStartServer complete - beginning patrol");
         }
 
         public override void OnStartClient()
@@ -118,7 +118,7 @@ namespace RooseLabs.Enemies
                 if (spotlightTransform != null)
                     spotlightTransform.rotation = syncedSpotlightRotation.Value;
 
-                Debug.Log("[GrimoireAI] OnStartClient - applied initial spotlight state");
+                //Debug.Log("[GrimoireAI] OnStartClient - applied initial spotlight state");
             }
         }
 
@@ -178,7 +178,7 @@ namespace RooseLabs.Enemies
 
             if (currentState != null)
             {
-                Debug.Log($"[GrimoireAI] Entered state: {currentState.GetType().Name}");
+                //Debug.Log($"[GrimoireAI] Entered state: {currentState.GetType().Name}");
                 currentState.Enter();
             }
         }
@@ -304,7 +304,7 @@ namespace RooseLabs.Enemies
         {
             if (!base.IsServerInitialized)
             {
-                Debug.LogWarning("[GrimoireAI] Tried to call reinforcements on client - ignored");
+                //Debug.LogWarning("[GrimoireAI] Tried to call reinforcements on client - ignored");
                 return;
             }
 
@@ -323,7 +323,7 @@ namespace RooseLabs.Enemies
 
             if (availableHanaduras.Count == 0)
             {
-                Debug.Log("[GrimoireAI] No Hanadura reinforcements found nearby");
+                //Debug.Log("[GrimoireAI] No Hanadura reinforcements found nearby");
                 return;
             }
 
@@ -427,7 +427,7 @@ namespace RooseLabs.Enemies
                 animator.SetTrigger("Alert");
             }
 
-            Debug.Log("[GrimoireAI] Alert RPC received");
+            //Debug.Log("[GrimoireAI] Alert RPC received");
         }
 
         [ObserversRpc]
@@ -435,7 +435,7 @@ namespace RooseLabs.Enemies
         {
             // Play special effect when reinforcements are called
             // e.g., magic circle, sound effect, screen shake, etc.
-            Debug.Log("[GrimoireAI] Reinforcement call effect RPC received");
+            //Debug.Log("[GrimoireAI] Reinforcement call effect RPC received");
         }
 
         #endregion

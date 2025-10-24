@@ -185,6 +185,13 @@ namespace RooseLabs.Player
             {
                 rb.isKinematic = false;
             }
+
+            var soundEmitter = obj.GetComponent<SoundEmitter>();
+            if (soundEmitter != null)
+            {
+                // Emit the "ItemDropped" sound on the server
+                soundEmitter.RequestEmitFromClient("ItemDropped");
+            }
         }
 
         public bool HasItemInHand()
