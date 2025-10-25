@@ -161,13 +161,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 470248563823148144}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071067}
+  m_LocalPosition: {x: 0, y: -0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 89259278162756099}
-  m_Father: {fileID: 6279997357253256316}
+  m_Father: {fileID: 1828219258038447194}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &351352792987427549
 MonoBehaviour:
@@ -204,7 +204,7 @@ MonoBehaviour:
         _propertyType: UnityEngine.Vector3, UnityEngine.CoreModule, Version=0.0.0.0,
           Culture=neutral, PublicKeyToken=null
         Value0: {x: 0, y: 0, z: 0}
-        Value1: {x: 15, y: 15, z: 15}
+        Value1: {x: 30, y: 30, z: 30}
 --- !u!1 &491824444870455113
 GameObject:
   m_ObjectHideFlags: 0
@@ -1712,6 +1712,7 @@ GameObject:
   - component: {fileID: 89259278162756099}
   - component: {fileID: 3574256741998889856}
   - component: {fileID: 1046755158235027733}
+  - component: {fileID: 1010724697875662599}
   m_Layer: 0
   m_Name: RangeCollider
   m_TagString: Untagged
@@ -1801,6 +1802,19 @@ MonoBehaviour:
     X: 0
     Y: 0
     Z: 0
+--- !u!114 &1010724697875662599
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8341259078320434640}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15dfad9b6b4bbd642b043a949297cd5b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.VoiceSoundEmitter
+  emissionInterval: 0.15
 --- !u!1 &8875991787814822123
 GameObject:
   m_ObjectHideFlags: 0
@@ -2099,15 +2113,15 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: c7d48a079d40bd94a9483826266718bb, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2686493946043972781}
-    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: c7d48a079d40bd94a9483826266718bb, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 6407669742524559458}
     - targetCorrespondingSourceObject: {fileID: -4195922850535999852, guid: c7d48a079d40bd94a9483826266718bb, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8410013104245767782}
     - targetCorrespondingSourceObject: {fileID: -4195922850535999852, guid: c7d48a079d40bd94a9483826266718bb, type: 3}
       insertIndex: -1
       addedObject: {fileID: 5482559786938808560}
+    - targetCorrespondingSourceObject: {fileID: 5328482478806888397, guid: c7d48a079d40bd94a9483826266718bb, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6407669742524559458}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: c7d48a079d40bd94a9483826266718bb, type: 3}
       insertIndex: -1
@@ -2215,6 +2229,11 @@ Transform:
 --- !u!4 &1791485328257285081 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5219974633274275918, guid: c7d48a079d40bd94a9483826266718bb, type: 3}
+  m_PrefabInstance: {fileID: 5813497512308605847}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1828219258038447194 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5328482478806888397, guid: c7d48a079d40bd94a9483826266718bb, type: 3}
   m_PrefabInstance: {fileID: 5813497512308605847}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &1847682448625857175 stripped

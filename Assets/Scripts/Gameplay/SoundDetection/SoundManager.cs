@@ -14,10 +14,6 @@ namespace RooseLabs
         [Tooltip("Optional layer mask for occluders (walls, environment). Raycast hits in this mask will count as blocking.")]
         public LayerMask occlusionMask;
 
-        [Tooltip("Minimum intensity threshold to notify a listener (0..1).")]
-        [Range(0f, 1f)]
-        public float minIntensityToNotify = 0.05f;
-
         // Debug visualization
         private readonly List<ActiveSound> _activeSounds = new List<ActiveSound>();
 
@@ -46,27 +42,27 @@ namespace RooseLabs
         {
             if (soundType == null) return;
 
-            // Register for debug visualization
             _activeSounds.Add(new ActiveSound()
             {
                 position = position,
-                radius = soundType.radius * Mathf.Max(0.0001f, soundType.volume),
+                radius = soundType.radius,
                 startTime = Time.time,
                 duration = soundType.duration,
                 type = soundType
             });
 
-            float effectiveRadius = soundType.radius * soundType.volume;
+            float effectiveRadius = Mathf.Max(0.01f, soundType.radius);
             Collider[] hits = Physics.OverlapSphere(position, effectiveRadius, listenerOverlapMask, QueryTriggerInteraction.Collide);
+
+            bool isItemDrop = soundType.key == "ItemDropped";
 
             foreach (Collider c in hits)
             {
                 if (c == null) continue;
 
-                ISoundListener listener = c.GetComponentInParent<ISoundListener>() as ISoundListener;
+                ISoundListener listener = c.GetComponentInParent<ISoundListener>();
                 if (listener == null) continue;
 
-                // Sample multiple points along the collider to improve detection
                 Vector3[] sampleOffsets = { Vector3.up * 0.5f, Vector3.zero, Vector3.down * 0.5f };
                 float maxIntensity = 0f;
 
@@ -74,54 +70,79 @@ namespace RooseLabs
                 {
                     Vector3 samplePoint = c.ClosestPoint(position) + offset;
                     float distance = Vector3.Distance(position, samplePoint);
-                    float normalizedDistance = Mathf.Clamp01(distance / Mathf.Max(0.0001f, effectiveRadius));
-                    float intensity = 1f - (normalizedDistance * normalizedDistance); // quadratic falloff
 
-                    // Occlusion check
-                    if (occlusionMask != 0)
+                    float intensity = 1f;
+
+                    if (!isItemDrop && occlusionMask != 0)
                     {
                         Vector3 dir = (samplePoint - position).normalized;
                         float rayDist = distance - 0.05f;
 
-                        if (rayDist > 0f && Physics.Raycast(position, dir, out RaycastHit hitInfo, rayDist, occlusionMask, QueryTriggerInteraction.Ignore))
+                        if (rayDist > 0f && Physics.Raycast(position, dir, out RaycastHit hitInfo, rayDist, occlusionMask, QueryTriggerInteraction.Collide))
                         {
-                            // Soft occlusion: reduce intensity instead of zeroing
-                            intensity *= 0.2f;
-                            Debug.DrawLine(position, hitInfo.point, Color.red, 0.1f);
+                            // soft occlusion: reduce intensity
+                            intensity *= 0.5f;
+                            Debug.DrawLine(position, hitInfo.point, Color.red, 1.5f);
                         }
                         else
                         {
-                            Debug.DrawLine(position, samplePoint, Color.green, 0.1f);
+                            Debug.DrawLine(position, samplePoint, Color.green, 1.5f);
                         }
                     }
 
                     maxIntensity = Mathf.Max(maxIntensity, intensity);
                 }
 
-                if (maxIntensity >= minIntensityToNotify)
+                try
                 {
-                    try
-                    {
-                        listener.OnSoundHeard(position, soundType, maxIntensity);
-                        Debug.Log($"[SoundManager] Notifying '{c.name}' with intensity {maxIntensity}");
-                    }
-                    catch (System.Exception ex)
-                    {
-                        Debug.LogError($"Exception when notifying listener '{c.name}': {ex}");
-                    }
+                    listener.OnSoundHeard(position, soundType, maxIntensity);
+                    Debug.Log($"[SoundManager] Notifying '{c.name}' with intensity {maxIntensity} (isItemDrop: {isItemDrop})");
                 }
-                else
+                catch (System.Exception ex)
                 {
-                    Debug.Log($"[SoundManager] Listener '{c.name}' ignored, max intensity {maxIntensity} below threshold {minIntensityToNotify}");
+                    Debug.LogError($"Exception when notifying listener '{c.name}': {ex}");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Emit voice sound detection. Called by VoiceSoundEmitter.
+        /// </summary>
+        public void EmitVoiceSound(Vector3 position, float radius, MonoBehaviour sourceEmitter = null)
+        {
+            float effectiveRadius = Mathf.Max(0.01f, radius);
+            Collider[] hits = Physics.OverlapSphere(position, effectiveRadius, listenerOverlapMask, QueryTriggerInteraction.Collide);
+
+            foreach (Collider c in hits)
+            {
+                if (c == null) continue;
+
+                ISoundListener listener = c.GetComponentInParent<ISoundListener>();
+                if (listener == null) continue;
+
+                try
+                {
+                    // Create a temporary SoundType for voice
+                    SoundType voiceType = ScriptableObject.CreateInstance<SoundType>();
+                    voiceType.key = "Voice";
+                    voiceType.radius = radius;
+
+                    listener.OnSoundHeard(position, voiceType, 1.0f);
+                    Debug.Log($"[SoundManager] Voice detected by '{c.name}' at radius {radius:F2}");
+
+                    // Clean up temporary object
+                    Destroy(voiceType);
+                }
+                catch (System.Exception ex)
+                {
+                    Debug.LogError($"Exception when notifying listener '{c.name}' about voice: {ex}");
                 }
             }
         }
 
 
-
         private void Update()
         {
-            // Clean up expired active sounds
             if (_activeSounds.Count == 0) return;
 
             float now = Time.time;
@@ -133,7 +154,6 @@ namespace RooseLabs
         }
 
 #if UNITY_EDITOR
-        // Editor/debug-only. Draw spheres for active sounds with fade-out alpha.
         private void OnDrawGizmos()
         {
             if (_activeSounds == null || _activeSounds.Count == 0) return;
@@ -148,7 +168,6 @@ namespace RooseLabs
                 Gizmos.color = col;
                 Gizmos.DrawWireSphere(s.position, s.radius);
 
-                // small filled sphere at origin for visibility
                 Color c2 = Color.red;
                 c2.a = alpha;
                 Gizmos.color = c2;

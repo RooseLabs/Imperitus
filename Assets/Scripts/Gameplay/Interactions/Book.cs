@@ -58,6 +58,7 @@ namespace RooseLabs.Gameplay.Interactions
             var soundEmitter = GetComponent<SoundEmitter>();
             if (soundEmitter != null)
             {
+                Debug.Log("[Book] Emitting ItemDropped sound.");
                 soundEmitter.RequestEmitFromClient("ItemDropped");
             }
 
