@@ -249,6 +249,32 @@ namespace RooseLabs.Enemies
             navAgent.isStopped = true;
         }
 
+        //public bool TryPerformAttack()
+        //{
+        //    if (!base.IsServerInitialized) return false;
+        //    if (attackTimer > 0f) return false;
+        //    if (CurrentTarget == null) return false;
+
+        //    float dist = Vector3.Distance(transform.position, CurrentTarget.position);
+        //    if (dist > attackRange) return false;
+
+        //    // perform attack: call damage on the target if it has IDamageable
+        //    //IDamageable dmg = CurrentTarget.GetComponent<IDamageable>();
+        //    //if (dmg != null)
+        //    //{
+        //    //    dmg.ApplyDamage(attackDamage);
+        //    //}
+        //    attackTimer = attackCooldown;
+
+        //    NetworkObject nobTarget = CurrentTarget.GetComponent<NetworkBehaviour>();
+        //    FlashVignette_TargetRPC(nobTarget.LocalConnection);
+
+        //    // notify clients to play attack animation (ObserversRpc will run on observing clients)
+        //    //Rpc_PlayAttackAnimation();
+
+        //    return true;
+        //}
+
         public bool TryPerformAttack()
         {
             if (!base.IsServerInitialized) return false;
@@ -258,18 +284,36 @@ namespace RooseLabs.Enemies
             float dist = Vector3.Distance(transform.position, CurrentTarget.position);
             if (dist > attackRange) return false;
 
-            // perform attack: call damage on the target if it has IDamageable
-            //IDamageable dmg = CurrentTarget.GetComponent<IDamageable>();
-            //if (dmg != null)
-            //{
-            //    dmg.ApplyDamage(attackDamage);
-            //}
+            // Create damage info
+            DamageInfo damage = new DamageInfo(
+                attackDamage,
+                DamageType.Melee,
+                this.transform,
+                CurrentTarget.position
+            );
+
+            // Try to apply damage
+            IDamageable damageable = CurrentTarget.GetComponent<IDamageable>();
+            bool hitSuccessful = false;
+            if (damageable != null)
+            {
+                hitSuccessful = damageable.ApplyDamage(damage);
+            }
+
+            if (!hitSuccessful)
+            {
+                // no damage applied, skip effects
+                attackTimer = attackCooldown;
+                return false;
+            }
+
+            // Damage applied successfully -> trigger feedback
             attackTimer = attackCooldown;
 
             NetworkObject nobTarget = CurrentTarget.GetComponent<NetworkBehaviour>();
             FlashVignette_TargetRPC(nobTarget.LocalConnection);
 
-            // notify clients to play attack animation (ObserversRpc will run on observing clients)
+            // notify clients to play attack animation
             //Rpc_PlayAttackAnimation();
 
             return true;

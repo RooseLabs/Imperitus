@@ -1,5 +1,7 @@
+using RooseLabs.Player;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace RooseLabs.UI
 {
@@ -9,6 +11,13 @@ namespace RooseLabs.UI
 
         [SerializeField] private GameObject guiRootCanvas;
         [SerializeField] private TMP_Text runeCounterText;
+
+        [SerializeField] private Slider healthSlider;
+        [SerializeField] private Slider staminaSlider;
+
+        public Slider HealthSlider => healthSlider;
+        public Slider StaminaSlider => staminaSlider;
+
 
         private void Awake()
         {
@@ -24,5 +33,13 @@ namespace RooseLabs.UI
         {
             runeCounterText.text = $"{count} Runes Discovered";
         }
+
+        public void UpdateSliders(PlayerData data)
+        {
+            if (data == null) return;
+
+            data.SetSliders(healthSlider, staminaSlider);
+        }
+
     }
 }

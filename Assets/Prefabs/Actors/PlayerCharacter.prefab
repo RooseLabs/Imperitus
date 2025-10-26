@@ -1254,6 +1254,7 @@ GameObject:
   - component: {fileID: 7652611172026813195}
   - component: {fileID: 2911172595631321588}
   - component: {fileID: -675073606576501584}
+  - component: {fileID: 7124299719138700}
   m_Layer: 6
   m_Name: PlayerCharacter
   m_TagString: Player
@@ -1652,6 +1653,18 @@ MonoBehaviour:
   - type: {fileID: 11400000, guid: ba721dd56b8fcb54a86a42331ad37b18, type: 2}
   - type: {fileID: 11400000, guid: 33e38525bf72b9c47906476556cf6b11, type: 2}
   soundOriginOffset: {x: 0, y: 0, z: 0}
+--- !u!114 &7124299719138700
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6907876458342397342}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4db8a5112aba40a44a9a26e8d9c81c44, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.PlayerStats
 --- !u!1 &6922205013769619118
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,4 +1,5 @@
 ﻿using RooseLabs.Core;
+using System.Xml;
 using UnityEngine;
 
 namespace RooseLabs.Player
@@ -21,6 +22,11 @@ namespace RooseLabs.Player
         [SerializeField] private float crouchSpeed = 0.75f; // Average speed from animation: 0.67f;
         [SerializeField] private float crawlSpeed  = 0.50f; // Average speed from animation: 0.25f;
         [SerializeField] private float jumpHeight  = 0.50f;
+
+        [Header("Stamina Settings")]
+        [SerializeField] private float staminaRegenRate = 10f; // per second
+        [SerializeField] private float staminaSpendRate = 15f; // per second
+        [SerializeField] private float minStaminaToRun = 0f;
 
         public float CurrentStateSpeed
         {
@@ -66,6 +72,7 @@ namespace RooseLabs.Player
             HandleLookInput();
             HandleMovementAndRotation();
             UpdateColliderHeight();
+            HandleStamina();
         }
 
         private void FixedUpdate()
@@ -114,6 +121,28 @@ namespace RooseLabs.Player
                 m_nextFootstepTime = Time.time + interval;
             }
         }
+
+        private void HandleStamina()
+        {
+            if (!m_character.IsOwner) return;
+
+            if (m_character.Data.isRunning)
+            {
+                // Spend stamina while running
+                m_character.Data.UpdateStamina(-staminaSpendRate * Time.deltaTime);
+
+                // If stamina depleted, stop running
+                if (m_character.Data.Stamina <= 0f)
+                    m_character.Data.isRunning = false;
+            }
+            else
+            {
+                // Regenerate stamina when not running
+                if (m_character.Data.Stamina < m_character.Data.MaxStamina)
+                    m_character.Data.UpdateStamina(staminaRegenRate * Time.deltaTime);
+            }
+        }
+
 
         private void HandleMovementAndRotation()
         {

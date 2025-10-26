@@ -51,6 +51,7 @@ namespace RooseLabs.Player
                 LocalPlayer = this;
                 SetPlayerName(Nickname);
                 GUIManager.Instance.SetGUIActive(true);
+                GUIManager.Instance.UpdateSliders(Character.Data);
             }
         }
 
