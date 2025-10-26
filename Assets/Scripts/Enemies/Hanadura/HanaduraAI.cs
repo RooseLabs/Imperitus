@@ -227,7 +227,7 @@ namespace RooseLabs.Enemies
             CurrentTarget = null;
             isInvestigating = true;
 
-            Debug.Log($"[HanaduraAI] Heard sound '{type.name}' with intensity {intensity:F2}. Investigating at {position}");
+            Debug.Log($"[HanaduraAI] Heard sound '{type.key}' with intensity {intensity:F2}. Investigating at {position}");
 
             // Enter investigation state if not already investigating
             if (!(currentState is InvestigateState))

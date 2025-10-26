@@ -39,7 +39,7 @@ namespace RooseLabs
         private void Update()
         {
             if (SoundManager.Instance == null) return;
-            if (Time.time < nextEmissionTime) return;
+            //if (Time.time < nextEmissionTime) return;
 
             nextEmissionTime = Time.time + emissionInterval;
 

@@ -18,7 +18,7 @@ GameObject:
   - component: {fileID: 1893647666911745326}
   - component: {fileID: 2150974059427533083}
   - component: {fileID: 2867664428356011016}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: EnemyPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -34,7 +34,7 @@ Transform:
   m_GameObject: {fileID: 2033980410573692278}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -18.93321, y: 1.376, z: 10.02101}
+  m_LocalPosition: {x: -1.136, y: 6.083332, z: 1.15}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -158,9 +158,9 @@ MonoBehaviour:
   _enableStateForwarding: 1
   _networkTransform: {fileID: 0}
   _ownerInterpolation: 1
-  _ownerSmoothedProperties: 255
+  _ownerSmoothedProperties: 4294967295
   _adaptiveInterpolation: 3
-  _spectatorSmoothedProperties: 255
+  _spectatorSmoothedProperties: 4294967295
   _spectatorInterpolation: 2
   _enableTeleport: 0
   _teleportThreshold: 1
@@ -260,11 +260,13 @@ MonoBehaviour:
   detection: {fileID: 2150974059427533083}
   patrolRoute: {fileID: 0}
   animator: {fileID: 0}
+  volume: {fileID: 0}
   attackRange: 2
-  attackCooldown: 1.2
+  attackCooldown: 2
   attackDamage: 10
   startWaypointIndex: 0
   loopPatrol: 1
+  forgetTargetTime: 3
 --- !u!114 &2150974059427533083
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -277,21 +279,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13cbb35eb5c493f4f843c3d657154686, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.EnemyDetection
-  viewRadius: 20
-  viewAngle: 90
+  viewRadius: 8
+  viewAngle: 120
+  verticalViewAngle: 90
   targetMask:
     serializedVersion: 2
-    m_Bits: 2048
+    m_Bits: 64
   obstructionMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 1153
   checkInterval: 0.2
   drawFOV: 1
   meshResolution: 30
   edgeResolveIterations: 4
   edgeDstThreshold: 0.5
-  fovMaterial: {fileID: 2100000, guid: 3fd7ef667b06b9a4589061f31f20d859, type: 2}
-  fovAlpha: 0.05
+  fovMaterial: {fileID: 2100000, guid: 96f5d440b5f093044bf135016bfee8ee, type: 2}
+  fovAlpha: 0.3
 --- !u!54 &2867664428356011016
 Rigidbody:
   m_ObjectHideFlags: 0

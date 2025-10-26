@@ -120,6 +120,8 @@ namespace RooseLabs
                 ISoundListener listener = c.GetComponentInParent<ISoundListener>();
                 if (listener == null) continue;
 
+                Debug.Log("[SoundManager] Voice sound overlap detected with " + c.name);
+
                 try
                 {
                     // Create a temporary SoundType for voice
