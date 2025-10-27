@@ -20,6 +20,7 @@ namespace RooseLabs.Player
         private InputAction m_actionPrevious;
         private InputAction m_actionNext;
         private InputAction m_actionPushToTalk;
+        private InputAction m_actionOpenNotebook;
 
         public bool pauseWasPressed;
         public Vector2 movementInput;
@@ -37,6 +38,7 @@ namespace RooseLabs.Player
         public bool previousWasPressed;
         public bool nextWasPressed;
         public bool pushToTalkIsPressed;
+        public bool openNotebookWasPressed;
 
         private void Awake()
         {
@@ -54,6 +56,7 @@ namespace RooseLabs.Player
             m_actionPrevious = m_gameplayActionMap.FindAction("Previous");
             m_actionNext = m_gameplayActionMap.FindAction("Next");
             m_actionPushToTalk = m_gameplayActionMap.FindAction("PushToTalk");
+            m_actionOpenNotebook = m_gameplayActionMap.FindAction("OpenNotebook");
         }
 
         public void Sample()
@@ -75,6 +78,7 @@ namespace RooseLabs.Player
             previousWasPressed = m_actionPrevious.WasPressedThisFrame();
             nextWasPressed = m_actionNext.WasPressedThisFrame();
             pushToTalkIsPressed = m_actionPushToTalk.IsPressed();
+            openNotebookWasPressed = m_actionOpenNotebook.WasPressedThisFrame();
         }
 
         private void ResetInput()
@@ -95,6 +99,7 @@ namespace RooseLabs.Player
             previousWasPressed = false;
             nextWasPressed = false;
             pushToTalkIsPressed = false;
+            openNotebookWasPressed = false;
         }
     }
 }
