@@ -3,12 +3,17 @@ using UnityEngine.UI;
 
 namespace RooseLabs.Player
 {
+    [DefaultExecutionOrder(1)]
     public class PlayerData : MonoBehaviour, IDamageable
     {
         private float m_maxHealth = 100f;
         private float m_health = 100f;
         private float m_maxStamina = 100f;
         private float m_stamina = 100f;
+
+        // References
+        public Slider m_healthSlider;
+        public Slider m_staminaSlider;
 
         public float MaxHealth
         {
@@ -37,15 +42,79 @@ namespace RooseLabs.Player
         public Vector3 lookDirection;
         public Vector3 lookDirection_Flat;
 
-        public bool isRunning = false;
-        public bool isCrouching = false;
-        public bool isCrawling = false;
+        private bool m_isRunning = false;
+        public bool IsRunning
+        {
+            get => m_isRunning;
+            set
+            {
+                if (m_isRunning == value) return;
+                m_isRunning = value;
+                stateChangedThisFrame = true;
+            }
+        }
 
-        public float currentSpeed;
+        private bool m_isCrouching = false;
+        public bool IsCrouching
+        {
+            get => m_isCrouching;
+            set
+            {
+                if (m_isCrouching == value) return;
+                m_isCrouching = value;
+                stateChangedThisFrame = true;
+            }
+        }
 
-        // References
-        public Slider m_healthSlider;
-        public Slider m_staminaSlider;
+        private bool m_isCrawling = false;
+        public bool IsCrawling
+        {
+            get => m_isCrawling;
+            set
+            {
+                if (m_isCrawling == value) return;
+                m_isCrawling = value;
+                stateChangedThisFrame = true;
+            }
+        }
+
+        private bool m_isRagdollActive = false;
+        public bool IsRagdollActive
+        {
+            get => m_isRagdollActive;
+            set
+            {
+                if (m_isRagdollActive == value) return;
+                m_isRagdollActive = value;
+                if (value)
+                {
+                    m_isCrawling = false;
+                    m_isCrouching = false;
+                    m_isRunning = false;
+                }
+                stateChangedThisFrame = true;
+            }
+        }
+
+        private float m_currentSpeed;
+        public float CurrentSpeed
+        {
+            get => m_currentSpeed;
+            set
+            {
+                m_currentSpeed = value;
+                speedChangedThisFrame = !Mathf.Approximately(m_currentSpeed, value);
+            }
+        }
+
+        public bool stateChangedThisFrame = false;
+        public bool speedChangedThisFrame = false;
+
+        private void LateUpdate()
+        {
+            stateChangedThisFrame = false;
+            speedChangedThisFrame = false;
+        }
 
         public void UpdateHealth(float amount)
         {
@@ -70,7 +139,6 @@ namespace RooseLabs.Player
                 );
             }
         }
-
 
         public bool ApplyDamage(DamageInfo damage)
         {

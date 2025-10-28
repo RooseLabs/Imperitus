@@ -788,10 +788,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.SoundManager
   listenerOverlapMask:
     serializedVersion: 2
-    m_Bits: 4096
+    m_Bits: 8192
   occlusionMask:
     serializedVersion: 2
-    m_Bits: 1152
+    m_Bits: 128
 --- !u!1 &1686085365
 GameObject:
   m_ObjectHideFlags: 0

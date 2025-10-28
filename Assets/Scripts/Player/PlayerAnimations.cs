@@ -1,3 +1,4 @@
+using FishNet.Component.Animating;
 using FishNet.Object;
 using UnityEngine;
 
@@ -5,14 +6,24 @@ namespace RooseLabs.Player
 {
     public class PlayerAnimations : NetworkBehaviour
     {
+        #region Animation Clips
+        public const string C_StandUpFaceUp   = "BaseRigPlayer|StandUpFront";
+        public const string C_StandUpFaceDown = "BaseRigPlayer|StandUpBack";
+        #endregion
+
+        #region Animation States
+        public static readonly int S_StandUpFaceUp   = Animator.StringToHash("FaceUpStandUp");
+        public static readonly int S_StandUpFaceDown = Animator.StringToHash("FaceDownStandUp");
+        #endregion
+
         #region Float Parameters
         public static readonly int F_Movement = Animator.StringToHash("Movement");
         #endregion
 
         #region Bool Parameters
-        public static readonly int B_IsRunning = Animator.StringToHash("IsRunning");
+        public static readonly int B_IsRunning   = Animator.StringToHash("IsRunning");
         public static readonly int B_IsCrouching = Animator.StringToHash("IsCrouching");
-        public static readonly int B_IsCrawling = Animator.StringToHash("IsCrawling");
+        public static readonly int B_IsCrawling  = Animator.StringToHash("IsCrawling");
         #endregion
 
         #region Default Average Movement Speeds
@@ -26,6 +37,7 @@ namespace RooseLabs.Player
         #endregion
 
         [field: SerializeField] public Animator Animator { get; private set; }
+        [field: SerializeField] public NetworkAnimator NetworkAnimator { get; private set; }
         [SerializeField] private Transform headLookTarget;
 
         private PlayerCharacter m_character;
@@ -43,7 +55,8 @@ namespace RooseLabs.Player
         private void LateUpdate()
         {
             UpdateAnimatorParameters();
-            AdjustAnimationSpeed();
+            if (m_character.Data.speedChangedThisFrame)
+                AdjustAnimationSpeed();
             RecalculateHeadLookTarget();
         }
 
@@ -52,9 +65,10 @@ namespace RooseLabs.Player
         /// </summary>
         private void UpdateAnimatorParameters()
         {
-            Animator.SetBool(B_IsRunning, m_character.Data.isRunning);
-            Animator.SetBool(B_IsCrouching, m_character.Data.isCrouching);
-            Animator.SetBool(B_IsCrawling, m_character.Data.isCrawling);
+            if (!m_character.Data.stateChangedThisFrame) return;
+            Animator.SetBool(B_IsRunning, m_character.Data.IsRunning);
+            Animator.SetBool(B_IsCrouching, m_character.Data.IsCrouching);
+            Animator.SetBool(B_IsCrawling, m_character.Data.IsCrawling);
         }
 
         /// <summary>
@@ -64,11 +78,12 @@ namespace RooseLabs.Player
         private void AdjustAnimationSpeed()
         {
             float speed;
-            if (m_character.Data.isCrawling) speed = m_character.Data.currentSpeed / AnimCrawlSpeed;
-            else if (m_character.Data.isCrouching) speed = m_character.Data.currentSpeed / AnimCrouchSpeed;
-            else if (m_character.Data.isRunning) speed = m_character.Data.currentSpeed / AnimRunSpeed;
-            else speed = m_character.Data.currentSpeed / AnimWalkSpeed;
-            Animator.speed = Mathf.Clamp(speed, 1f, 2f);
+            if (m_character.Data.IsRagdollActive) speed = 1.0f;
+            else if (m_character.Data.IsCrawling) speed = m_character.Data.CurrentSpeed / AnimCrawlSpeed;
+            else if (m_character.Data.IsCrouching) speed = m_character.Data.CurrentSpeed / AnimCrouchSpeed;
+            else if (m_character.Data.IsRunning) speed = m_character.Data.CurrentSpeed / AnimRunSpeed;
+            else speed = m_character.Data.CurrentSpeed / AnimWalkSpeed;
+            Animator.speed = Mathf.Clamp(speed, 1.0f, 2.0f);
         }
 
         /// <summary>
@@ -83,8 +98,8 @@ namespace RooseLabs.Player
             const float minAngleCrawling  = 115f;
             const float maxAngleCrawling  = 160f;
 
-            float minAngle = m_character.Data.isCrawling ? minAngleCrawling : (m_character.Data.isCrouching ? minAngleCrouching : minAngleStanding);
-            float maxAngle = m_character.Data.isCrawling ? maxAngleCrawling : (m_character.Data.isCrouching ? maxAngleCrouching : maxAngleStanding);
+            float minAngle = m_character.Data.IsCrawling ? minAngleCrawling : (m_character.Data.IsCrouching ? minAngleCrouching : minAngleStanding);
+            float maxAngle = m_character.Data.IsCrawling ? maxAngleCrawling : (m_character.Data.IsCrouching ? maxAngleCrouching : maxAngleStanding);
 
             Vector3 lookDirection = m_character.Data.lookDirection;
             Vector3 upRef = Vector3.up;
@@ -105,6 +120,11 @@ namespace RooseLabs.Player
             }
 
             headLookTarget.position = m_character.Camera.transform.position + lookDirection * 2.5f;
+        }
+
+        public void Play(int stateHash)
+        {
+            NetworkAnimator.Play(stateHash);
         }
     }
 }

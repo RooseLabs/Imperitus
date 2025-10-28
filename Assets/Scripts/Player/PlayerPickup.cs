@@ -54,7 +54,7 @@ namespace RooseLabs.Player
         private void Update()
         {
             // Prevent pickup if crawling
-            if (m_character.Data.isCrawling)
+            if (m_character.Data.IsCrawling)
                 return;
 
             if (m_character.Input.interactWasPressed)

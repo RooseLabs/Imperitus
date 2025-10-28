@@ -137,7 +137,7 @@ namespace RooseLabs.Player
         /// Finds the farthest ground point in the specified direction from origin.
         /// <para>For each iteration, moves a step towards the specified direction,
         /// creates a proxy origin, then probes downwards for ground from that proxy origin.</para>
-        /// <para>If the probe is succesful, update the ground point and continue;
+        /// <para>If the probe is successful, update the ground point and continue;
         /// Otherwise, directly return false.</para>
         /// </summary>
         /// <param name="groundPoint">Output ground point. Should be initialized with a fallback value.</param>

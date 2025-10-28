@@ -25,6 +25,7 @@ namespace RooseLabs.Player
         public PlayerData Data { get; private set; }
         public PlayerMovement Movement { get; private set; }
         public PlayerAnimations Animations { get; private set; }
+        public PlayerRagdoll Ragdoll { get; private set; }
 
         private Rigidbody m_rigidbody;
 
@@ -34,6 +35,7 @@ namespace RooseLabs.Player
             Data = GetComponent<PlayerData>();
             Movement = GetComponent<PlayerMovement>();
             Animations = GetComponent<PlayerAnimations>();
+            Ragdoll = GetComponent<PlayerRagdoll>();
 
             m_rigidbody = GetComponent<Rigidbody>();
         }
@@ -46,13 +48,12 @@ namespace RooseLabs.Player
         // Called on each client when this object becomes visible to them.
         public override void OnStartClient()
         {
-            // Initialize look values based on spawn rotation
-            Data.lookValues.x = transform.eulerAngles.y;
-            transform.rotation = Quaternion.identity;
-
             if (!IsOwner) return;
             LocalCharacter = this;
 
+            // Initialize look values based on spawn rotation
+            Data.lookValues.x = transform.eulerAngles.y;
+            m_rigidbody.rotation = Quaternion.identity;
             UpdateLookDirection();
 
             // Hide renderers for local player
@@ -87,5 +88,7 @@ namespace RooseLabs.Player
             Data.lookValues.x = rotation.eulerAngles.y;
             UpdateLookDirection();
         }
+
+        public Transform GetBodypart(HumanBodyBones bone) => Ragdoll.partDict[bone];
     }
 }

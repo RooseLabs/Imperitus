@@ -154,9 +154,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 877eab5e33f3c3f4c95aa02831f1484c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  _componentIndexCache: 255
+  _componentIndexCache: 0
   _addedNetworkObject: {fileID: 7222605408862266557}
-  _networkObjectCache: {fileID: 0}
+  _networkObjectCache: {fileID: 7222605408862266557}
   lifetime: 10
 --- !u!114 &7222605408862266557
 MonoBehaviour:
@@ -176,7 +176,9 @@ MonoBehaviour:
   <ComponentIndex>k__BackingField: 0
   <PredictedSpawn>k__BackingField: {fileID: 0}
   <PredictedOwner>k__BackingField: {fileID: 0}
-  NetworkBehaviours: []
+  NetworkBehaviours:
+  - {fileID: 118801190720559807}
+  - {fileID: 150424909162226680}
   InitializedParentNetworkBehaviour: {fileID: 0}
   InitializedNestedNetworkObjects: []
   RuntimeParentNetworkBehaviour: {fileID: 0}
@@ -201,15 +203,15 @@ MonoBehaviour:
   _spectatorInterpolation: 2
   _enableTeleport: 0
   _teleportThreshold: 1
-  <PrefabId>k__BackingField: 65535
+  <PrefabId>k__BackingField: 6
   <SpawnableCollectionId>k__BackingField: 0
   <AssetPathHash>k__BackingField: 18368428925128282455
   <SceneId>k__BackingField: 0
   SerializedTransformProperties:
     Position: {x: 0, y: 0, z: 0}
-    Rotation: {x: 0, y: 0, z: 0, w: 0}
-    Scale: {x: 0, y: 0, z: 0}
-    IsValid: 0
+    Rotation: {x: 0, y: 0, z: 0, w: 1}
+    Scale: {x: 0.3, y: 0.3, z: 0.3}
+    IsValid: 1
 --- !u!114 &150424909162226680
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -222,9 +224,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2836e36774ca1c4bbbee976e17b649c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: FishNet.Runtime::FishNet.Component.Transforming.NetworkTransform
-  _componentIndexCache: 255
+  _componentIndexCache: 1
   _addedNetworkObject: {fileID: 7222605408862266557}
-  _networkObjectCache: {fileID: 0}
+  _networkObjectCache: {fileID: 7222605408862266557}
   _componentConfiguration: 2
   _synchronizeParent: 0
   _packing:

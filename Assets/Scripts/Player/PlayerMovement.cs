@@ -1,9 +1,9 @@
 ﻿using RooseLabs.Core;
-using System.Xml;
 using UnityEngine;
 
 namespace RooseLabs.Player
 {
+    [DefaultExecutionOrder(-97)]
     public class PlayerMovement : MonoBehaviour
     {
         [SerializeField] private Transform modelTransform;
@@ -11,7 +11,7 @@ namespace RooseLabs.Player
         private PlayerCharacter m_character;
         private AvatarMover m_avatarMover;
         private Rigidbody m_rigidbody;
-        private Animator m_animator;
+        private Animator Animator => m_character.Animations.Animator;
         private InputHandler m_inputHandler;
         private SoundEmitter m_soundEmitter;
         private float m_nextFootstepTime;
@@ -28,13 +28,18 @@ namespace RooseLabs.Player
         [SerializeField] private float staminaSpendRate = 15f; // per second
         [SerializeField] private float minStaminaToRun = 0f;
 
+        [Header("Object Colliders")]
+        [SerializeField] private Collider standingCollider;
+        [SerializeField] private Collider crouchingCollider;
+        [SerializeField] private Collider crawlingCollider;
+
         public float CurrentStateSpeed
         {
             get
             {
-                if (m_character.Data.isCrawling) return crawlSpeed;
-                if (m_character.Data.isCrouching) return crouchSpeed;
-                if (m_character.Data.isRunning) return runSpeed;
+                if (m_character.Data.IsCrawling) return crawlSpeed;
+                if (m_character.Data.IsCrouching) return crouchSpeed;
+                if (m_character.Data.IsRunning) return runSpeed;
                 return walkSpeed;
             }
         }
@@ -56,7 +61,6 @@ namespace RooseLabs.Player
             m_character = GetComponent<PlayerCharacter>();
             m_avatarMover = GetComponent<AvatarMover>();
             m_rigidbody = GetComponent<Rigidbody>();
-            m_animator = m_character.Animations.Animator;
             m_inputHandler = InputHandler.Instance;
             m_soundEmitter = GetComponent<SoundEmitter>();
 
@@ -71,20 +75,31 @@ namespace RooseLabs.Player
 
             HandleLookInput();
             HandleMovementAndRotation();
-            UpdateColliderHeight();
-            HandleStamina();
+            UpdateColliders();
+            UpdateStamina();
         }
 
         private void FixedUpdate()
         {
             if (!m_character.IsOwner) return;
 
+            if (m_character.Data.IsRagdollActive)
+            {
+                m_character.Data.CurrentSpeed = 0.0f;
+                if (m_isJumping)
+                {
+                    m_avatarMover.EndLeaveGround();
+                    m_isJumping = false;
+                }
+                return;
+            }
+
             Vector2 moveInput = m_character.Input.movementInput;
-            m_character.Data.currentSpeed = moveInput.sqrMagnitude <= 0.01f ? 0.0f : CurrentStateSpeed;
+            m_character.Data.CurrentSpeed = moveInput.sqrMagnitude <= 0.01f ? 0.0f : CurrentStateSpeed;
             Vector3 lookForward = m_character.Data.lookDirection_Flat;
             Vector3 lookRight = Vector3.Cross(Vector3.up, lookForward).normalized;
             Vector3 moveDirection = (lookRight * moveInput.x + lookForward * moveInput.y).normalized;
-            Vector3 deltaMovement = moveDirection * m_character.Data.currentSpeed;
+            Vector3 deltaMovement = moveDirection * m_character.Data.CurrentSpeed;
 
             if (m_isJumping)
             {
@@ -103,37 +118,37 @@ namespace RooseLabs.Player
             m_avatarMover.Move(deltaMovement);
 
             int soundIndex = -1;
-            if (m_character.Data.isRunning)
+            if (m_character.Data.IsRunning)
                 soundIndex = runningIndex;
-            else if (m_character.Data.isCrouching)
+            else if (m_character.Data.IsCrouching)
                 soundIndex = crouchingIndex;
             else
                 soundIndex = footstepIndex;
 
-            bool isMoving = m_character.Data.currentSpeed > 0.01f && m_movementValue != 0f && !m_character.Data.isCrawling;
+            bool isMoving = m_character.Data.CurrentSpeed > 0.01f && m_movementValue != 0f && !m_character.Data.IsCrawling;
 
             if (isMoving && soundIndex >= 0 && Time.time >= m_nextFootstepTime)
             {
                 m_soundEmitter.RequestEmitFromClient(soundIndex);
 
-                float interval = m_character.Data.isRunning ? 0.1f :
-                                 m_character.Data.isCrouching ? 0.5f : 0.4f;
+                float interval = m_character.Data.IsRunning ? 0.1f :
+                                 m_character.Data.IsCrouching ? 0.5f : 0.4f;
                 m_nextFootstepTime = Time.time + interval;
             }
         }
 
-        private void HandleStamina()
+        private void UpdateStamina()
         {
             if (!m_character.IsOwner) return;
 
-            if (m_character.Data.isRunning)
+            if (m_character.Data.IsRunning)
             {
                 // Spend stamina while running
                 m_character.Data.UpdateStamina(-staminaSpendRate * Time.deltaTime);
 
                 // If stamina depleted, stop running
                 if (m_character.Data.Stamina <= 0f)
-                    m_character.Data.isRunning = false;
+                    m_character.Data.IsRunning = false;
             }
             else
             {
@@ -143,9 +158,9 @@ namespace RooseLabs.Player
             }
         }
 
-
         private void HandleMovementAndRotation()
         {
+            if (m_character.Data.IsRagdollActive) return;
             Vector2 moveInput = m_character.Input.movementInput;
 
             // Note: The deadzone and m_lastVerticalInputSignal related code here is an attempt to reduce a "flipping"
@@ -174,56 +189,56 @@ namespace RooseLabs.Player
                 m_movementValue = 0.0f;
             }
 
-            if (moveInput == Vector2.zero && Mathf.Abs(m_animator.GetFloat(PlayerAnimations.F_Movement)) <= 0.01f)
+            if (moveInput == Vector2.zero && Mathf.Abs(Animator.GetFloat(PlayerAnimations.F_Movement)) <= 0.01f)
             {
-                m_animator.SetFloat(PlayerAnimations.F_Movement, 0.0f);
+                Animator.SetFloat(PlayerAnimations.F_Movement, 0.0f);
             }
             else
             {
-                m_animator.SetFloat(PlayerAnimations.F_Movement, m_movementValue, 0.1f, Time.deltaTime);
+                Animator.SetFloat(PlayerAnimations.F_Movement, m_movementValue, 0.1f, Time.deltaTime);
             }
 
             #region Crawl Logic
-            if (m_character.Data.isCrouching && m_isNearTable && !m_character.Data.isCrawling)
+            if (m_character.Data.IsCrouching && m_isNearTable && !m_character.Data.IsCrawling)
             {
                 // Drop any held item
                 // if (m_pickup != null && m_pickup.HasItemInHand())
                 // {
                 //     m_pickup.Drop();
                 // }
-                m_character.Data.isCrawling = true;
-                m_character.Data.isCrouching = false;
+                m_character.Data.IsCrawling = true;
+                m_character.Data.IsCrouching = false;
             }
-            else if (m_character.Data.isCrawling && !m_isNearTable)
+            else if (m_character.Data.IsCrawling && !m_isNearTable)
             {
-                m_character.Data.isCrawling = false;
-                m_character.Data.isCrouching = true;
+                m_character.Data.IsCrawling = false;
+                m_character.Data.IsCrouching = true;
             }
             #endregion
 
             #region Crouch Logic
-            if (m_character.Input.crouchWasPressed && !m_character.Data.isCrawling)
+            if (m_character.Input.crouchWasPressed && !m_character.Data.IsCrawling)
             {
-                m_character.Data.isCrouching = !m_character.Data.isCrouching;
+                m_character.Data.IsCrouching = !m_character.Data.IsCrouching;
                 // Move pickup spot for crouching
                 // if (m_pickup != null)
-                //     m_pickup.SetPickupPositionForCrouch(m_character.Data.isCrouching);
+                //     m_pickup.SetPickupPositionForCrouch(m_character.Data.IsCrouching);
             }
             #endregion
 
             #region Run Logic
-            bool canRun = m_movementValue > 0.0f && !m_character.Data.isCrouching && !m_character.Data.isCrawling;
+            bool canRun = m_movementValue > 0.0f && !m_character.Data.IsCrouching && !m_character.Data.IsCrawling;
             if (!canRun)
             {
-                m_character.Data.isRunning = false;
+                m_character.Data.IsRunning = false;
             }
             else if (m_inputHandler.IsCurrentDeviceKBM())
             {
-                m_character.Data.isRunning = m_character.Input.sprintIsPressed;
+                m_character.Data.IsRunning = m_character.Input.sprintIsPressed;
             }
             else if (m_character.Input.sprintWasPressed)
             {
-                m_character.Data.isRunning = !m_character.Data.isRunning;
+                m_character.Data.IsRunning = !m_character.Data.IsRunning;
             }
             #endregion
 
@@ -284,20 +299,36 @@ namespace RooseLabs.Player
             m_character.UpdateLookDirection();
         }
 
-        private void UpdateColliderHeight()
+        private void UpdateColliders()
         {
             const float standingHeight = 1.70f;
             const float crouchHeight   = 1.10f;
             const float crawlHeight    = 0.85f;
 
-            float colliderHeight = m_character.Data.isCrawling ? crawlHeight :
-                                   m_character.Data.isCrouching ? crouchHeight :
-                                   standingHeight;
-
-            m_avatarMover.SetColliderHeight(colliderHeight);
+            if (m_character.Data.IsCrawling)
+            {
+                standingCollider.enabled = false;
+                crouchingCollider.enabled = false;
+                crawlingCollider.enabled = true;
+                m_avatarMover.SetColliderHeight(crawlHeight);
+            }
+            else if (m_character.Data.IsCrouching)
+            {
+                standingCollider.enabled = false;
+                crouchingCollider.enabled = true;
+                crawlingCollider.enabled = false;
+                m_avatarMover.SetColliderHeight(crouchHeight);
+            }
+            else
+            {
+                standingCollider.enabled = true;
+                crouchingCollider.enabled = false;
+                crawlingCollider.enabled = false;
+                m_avatarMover.SetColliderHeight(standingHeight);
+            }
         }
 
-        private bool CanJump() => m_avatarMover.IsOnGround && !m_character.Data.isCrouching && !m_character.Data.isCrawling;
+        private bool CanJump() => m_avatarMover.IsOnGround && !m_character.Data.IsCrouching && !m_character.Data.IsCrawling;
 
         public void SetNearTable(bool value)
         {
