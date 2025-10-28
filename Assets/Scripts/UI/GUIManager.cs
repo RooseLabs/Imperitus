@@ -15,14 +15,24 @@ namespace RooseLabs.UI
         [SerializeField] private Slider healthSlider;
         [SerializeField] private Slider staminaSlider;
 
+        [SerializeField] private TMP_Text timerText;
+
         public Slider HealthSlider => healthSlider;
         public Slider StaminaSlider => staminaSlider;
 
+        private HeistTimer m_heistTimer;
 
         private void Awake()
         {
             Instance = this;
+
+            m_heistTimer = GetComponentInChildren<HeistTimer>();
         }
+
+        //private void Start()
+        //{
+        //    m_heistTimer = GetComponentInChildren<HeistTimer>();
+        //}
 
         public void SetGUIActive(bool isActive)
         {
@@ -41,5 +51,20 @@ namespace RooseLabs.UI
             data.SetSliders(healthSlider, staminaSlider);
         }
 
+        internal void ToggleTimerText(bool isActive)
+        {
+            if (timerText != null)
+                timerText.gameObject.SetActive(isActive);
+        }
+
+        /// <summary>
+        /// Formats the time as MM:SS and updates the timer TMP_Text.
+        /// </summary>
+        internal void UpdateTimerText(float time)
+        {
+            int minutes = Mathf.FloorToInt(time / 60f);
+            int seconds = Mathf.FloorToInt(time % 60f);
+            timerText.text = $"{minutes:00}:{seconds:00}";
+        }
     }
 }

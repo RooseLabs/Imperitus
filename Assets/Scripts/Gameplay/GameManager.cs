@@ -27,10 +27,14 @@ namespace RooseLabs.Gameplay
         private readonly SyncList<int> m_collectedRunes = new();
         public List<int> CollectedRunes => m_collectedRunes.Collection;
 
+        private HeistTimer m_heistTimer;
+
         private void Awake()
         {
             Instance = this;
             m_collectedRunes.OnChange += CollectedRunes_OnChange;
+
+            m_heistTimer = GetComponent<HeistTimer>();
         }
 
         public void StartHeist()
@@ -43,6 +47,8 @@ namespace RooseLabs.Gameplay
                 MovedNetworkObjects = PlayerHandler.CharacterNetworkObjects
             };
             SceneManager.LoadGlobalScenes(sld);
+
+            m_heistTimer.StartTimer(m_heistTimer.defaultTime);
         }
 
         public void AddRune(RuneSO rune)
