@@ -699,7 +699,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f1117dd79caed3949abdf12674fe3b7f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MetaVoiceChat.NetProviders.FishNet.FishNetNetProvider
-  _componentIndexCache: 8
+  _componentIndexCache: 9
   _addedNetworkObject: {fileID: 7652611172026813195}
   _networkObjectCache: {fileID: 7652611172026813195}
 --- !u!1 &2343043851098449688
@@ -746,7 +746,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2836e36774ca1c4bbbee976e17b649c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: FishNet.Runtime::FishNet.Component.Transforming.NetworkTransform
-  _componentIndexCache: 10
+  _componentIndexCache: 11
   _addedNetworkObject: {fileID: 7652611172026813195}
   _networkObjectCache: {fileID: 7652611172026813195}
   _componentConfiguration: 0
@@ -1557,6 +1557,7 @@ GameObject:
   - component: {fileID: 5099047441057018779}
   - component: {fileID: 3755028746274937716}
   - component: {fileID: 5869650621947341771}
+  - component: {fileID: 6121780074039715582}
   - component: {fileID: 7652611172026813195}
   - component: {fileID: 2911172595631321588}
   m_Layer: 8
@@ -1817,6 +1818,26 @@ MonoBehaviour:
   _componentIndexCache: 3
   _addedNetworkObject: {fileID: 7652611172026813195}
   _networkObjectCache: {fileID: 7652611172026813195}
+--- !u!114 &6121780074039715582
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6907876458342397342}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e1040ac50946b64f99d84e6c7f1ab8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.SoundEmitter
+  _componentIndexCache: 4
+  _addedNetworkObject: {fileID: 7652611172026813195}
+  _networkObjectCache: {fileID: 7652611172026813195}
+  availableSounds:
+  - type: {fileID: 11400000, guid: 64fc0e7fe7c7e8440aca02ddc5dec609, type: 2}
+  - type: {fileID: 11400000, guid: ba721dd56b8fcb54a86a42331ad37b18, type: 2}
+  - type: {fileID: 11400000, guid: 33e38525bf72b9c47906476556cf6b11, type: 2}
+  soundOriginOffset: {x: 0, y: 0, z: 0}
 --- !u!114 &7652611172026813195
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1840,6 +1861,7 @@ MonoBehaviour:
   - {fileID: 5099047441057018779}
   - {fileID: 3755028746274937716}
   - {fileID: 5869650621947341771}
+  - {fileID: 6121780074039715582}
   - {fileID: 2911172595631321588}
   - {fileID: 7226749917790494997}
   - {fileID: 8021978832323892062}
@@ -1892,7 +1914,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2836e36774ca1c4bbbee976e17b649c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: FishNet.Runtime::FishNet.Component.Transforming.NetworkTransform
-  _componentIndexCache: 4
+  _componentIndexCache: 5
   _addedNetworkObject: {fileID: 7652611172026813195}
   _networkObjectCache: {fileID: 7652611172026813195}
   _componentConfiguration: 2
@@ -1972,7 +1994,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3871d1eb27411a14d9e60351a20c9e78, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.NameTag
-  _componentIndexCache: 7
+  _componentIndexCache: 8
   _addedNetworkObject: {fileID: 7652611172026813195}
   _networkObjectCache: {fileID: 7652611172026813195}
   nameTagText: {fileID: 4344187390115432}
@@ -2116,7 +2138,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2836e36774ca1c4bbbee976e17b649c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: FishNet.Runtime::FishNet.Component.Transforming.NetworkTransform
-  _componentIndexCache: 9
+  _componentIndexCache: 10
   _addedNetworkObject: {fileID: 7652611172026813195}
   _networkObjectCache: {fileID: 7652611172026813195}
   _componentConfiguration: 0
@@ -2469,12 +2491,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5866666021909216657, guid: c7d48a079d40bd94a9483826266718bb, type: 3}
       propertyPath: m_WarningMessage
-      value: "\nBinding warning: Some generic clip(s) animate transforms that are
-        already bound by a Humanoid avatar. These transforms can only be changed
-        by Humanoid clips.\n\tTransform 'Def_Arm.R'\n\tTransform 'Def_Arm.R.001'\n\tTransform
-        'Def_Hand.R.002'\n\tTransform 'Def:Neck'\n\tTransform 'Def_Torso.003'\n\tTransform
-        'Def_Head'\n\tTransform 'Def_Arm.R'\n\tTransform 'Def_Arm.R.001'\n\tTransform
-        'Def_Hand.R.002'\n\tTransform 'Def:Neck'\n\tand more ..."
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 5866666021909216657, guid: c7d48a079d40bd94a9483826266718bb, type: 3}
       propertyPath: m_ApplyRootMotion
@@ -3401,7 +3418,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8cac635f24954048aad3a6ff9110beb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: FishNet.Runtime::FishNet.Component.Animating.NetworkAnimator
-  _componentIndexCache: 5
+  _componentIndexCache: 6
   _addedNetworkObject: {fileID: 7652611172026813195}
   _networkObjectCache: {fileID: 7652611172026813195}
   IgnoredParameters: []
@@ -3423,7 +3440,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2836e36774ca1c4bbbee976e17b649c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: FishNet.Runtime::FishNet.Component.Transforming.NetworkTransform
-  _componentIndexCache: 6
+  _componentIndexCache: 7
   _addedNetworkObject: {fileID: 7652611172026813195}
   _networkObjectCache: {fileID: 7652611172026813195}
   _componentConfiguration: 0

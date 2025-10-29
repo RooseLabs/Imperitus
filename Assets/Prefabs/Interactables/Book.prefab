@@ -130,7 +130,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8cac635f24954048aad3a6ff9110beb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: FishNet.Runtime::FishNet.Component.Animating.NetworkAnimator
-  _componentIndexCache: 2
+  _componentIndexCache: 3
   _addedNetworkObject: {fileID: 7954330056381621737}
   _networkObjectCache: {fileID: 7954330056381621737}
   IgnoredParameters: []
@@ -155,7 +155,7 @@ GameObject:
   - component: {fileID: -4626044084707365502}
   - component: {fileID: 7954330056381621737}
   - component: {fileID: 240534035624338073}
-  m_Layer: 8
+  m_Layer: 11
   m_Name: Book
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -238,7 +238,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c731ba3656773f34996ae52fef517ec1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Book
-  _componentIndexCache: 1
+  _componentIndexCache: 0
   _addedNetworkObject: {fileID: 7954330056381621737}
   _networkObjectCache: {fileID: 7954330056381621737}
   rune: {fileID: 0}
@@ -255,9 +255,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e1040ac50946b64f99d84e6c7f1ab8d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.SoundEmitter
-  _componentIndexCache: 255
+  _componentIndexCache: 1
   _addedNetworkObject: {fileID: 7954330056381621737}
-  _networkObjectCache: {fileID: 0}
+  _networkObjectCache: {fileID: 7954330056381621737}
   availableSounds:
   - type: {fileID: 11400000, guid: 4c9c40f51a13a7249a98a753346b8743, type: 2}
   soundOriginOffset: {x: 0, y: 0, z: 0}
@@ -280,8 +280,9 @@ MonoBehaviour:
   <PredictedSpawn>k__BackingField: {fileID: 0}
   <PredictedOwner>k__BackingField: {fileID: 0}
   NetworkBehaviours:
-  - {fileID: 240534035624338073}
   - {fileID: 3741978011984959302}
+  - {fileID: -4626044084707365502}
+  - {fileID: 240534035624338073}
   - {fileID: 8637104491120377896}
   InitializedParentNetworkBehaviour: {fileID: 0}
   InitializedNestedNetworkObjects: []
@@ -307,7 +308,7 @@ MonoBehaviour:
   _spectatorInterpolation: 2
   _enableTeleport: 0
   _teleportThreshold: 1
-  <PrefabId>k__BackingField: 0
+  <PrefabId>k__BackingField: 2
   <SpawnableCollectionId>k__BackingField: 0
   <AssetPathHash>k__BackingField: 7442062767153942986
   <SceneId>k__BackingField: 0
@@ -328,7 +329,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2836e36774ca1c4bbbee976e17b649c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: FishNet.Runtime::FishNet.Component.Transforming.NetworkTransform
-  _componentIndexCache: 0
+  _componentIndexCache: 2
   _addedNetworkObject: {fileID: 7954330056381621737}
   _networkObjectCache: {fileID: 7954330056381621737}
   _componentConfiguration: 2

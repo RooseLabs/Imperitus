@@ -52,6 +52,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: NormalChair
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 47d853e28abb74d42bf87c46ac9147d9, type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -74,6 +78,15 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 47d853e28abb74d42bf87c46ac9147d9, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2146428604045226023}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 47d853e28abb74d42bf87c46ac9147d9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3532988908304795696}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 47d853e28abb74d42bf87c46ac9147d9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4993005949665077779}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 47d853e28abb74d42bf87c46ac9147d9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3030200440481046367}
   m_SourcePrefab: {fileID: 100100000, guid: 47d853e28abb74d42bf87c46ac9147d9, type: 3}
 --- !u!1 &7025719902179816423 stripped
 GameObject:
@@ -141,8 +154,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.12196934, y: 0.4772264, z: 0.08405715}
-  m_Center: {x: 0.31609643, y: 0.23464279, z: -0.31131932}
+  m_Size: {x: 0.089324206, y: 0.4772264, z: 0.08405715}
+  m_Center: {x: 0.33241898, y: 0.23464279, z: -0.31131932}
 --- !u!65 &859352853164362540
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -183,8 +196,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.12196934, y: 0.4772264, z: 0.08405715}
-  m_Center: {x: -0.316, y: 0.23464279, z: -0.31131932}
+  m_Size: {x: 0.08937016, y: 0.4772264, z: 0.08405715}
+  m_Center: {x: -0.33229965, y: 0.23464279, z: -0.31131932}
 --- !u!65 &2146428604045226023
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -206,3 +219,100 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.7136931, y: 0.7687094, z: 0.11286175}
   m_Center: {x: -0.0004401505, y: 0.9397415, z: 0.2585228}
+--- !u!54 &3532988908304795696
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7025719902179816423}
+  serializedVersion: 5
+  m_Mass: 15
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 1
+  m_Constraints: 0
+  m_CollisionDetection: 2
+--- !u!114 &4993005949665077779
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7025719902179816423}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da91c4017f824228bf35754de03c6ead, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Gameplay.Draggable
+  _componentIndexCache: 255
+  _addedNetworkObject: {fileID: 3030200440481046367}
+  _networkObjectCache: {fileID: 0}
+  force: 600
+  damping: 6
+  distance: 15
+--- !u!114 &3030200440481046367
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7025719902179816423}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26b716c41e9b56b4baafaf13a523ba2e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FishNet.Runtime::FishNet.Object.NetworkObject
+  <IsNested>k__BackingField: 0
+  WasActiveDuringEdit: 0
+  WasActiveDuringEdit_Set1: 1
+  <ComponentIndex>k__BackingField: 0
+  <PredictedSpawn>k__BackingField: {fileID: 0}
+  <PredictedOwner>k__BackingField: {fileID: 0}
+  NetworkBehaviours: []
+  InitializedParentNetworkBehaviour: {fileID: 0}
+  InitializedNestedNetworkObjects: []
+  RuntimeParentNetworkBehaviour: {fileID: 0}
+  RuntimeChildNetworkBehaviours: []
+  _isNetworked: 1
+  _isSpawnable: 0
+  _isGlobal: 0
+  _initializeOrder: 0
+  _preventDespawnOnDisconnect: 1
+  _defaultDespawnType: 0
+  NetworkObserver: {fileID: 0}
+  _enablePrediction: 0
+  _predictionType: 0
+  _graphicalObject: {fileID: 0}
+  _detachGraphicalObject: 0
+  _enableStateForwarding: 1
+  _networkTransform: {fileID: 0}
+  _ownerInterpolation: 1
+  _ownerSmoothedProperties: 255
+  _adaptiveInterpolation: 3
+  _spectatorSmoothedProperties: 255
+  _spectatorInterpolation: 2
+  _enableTeleport: 0
+  _teleportThreshold: 1
+  <PrefabId>k__BackingField: 65535
+  <SpawnableCollectionId>k__BackingField: 0
+  <AssetPathHash>k__BackingField: 15229803383168752391
+  <SceneId>k__BackingField: 0
+  SerializedTransformProperties:
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0, w: 0}
+    Scale: {x: 0, y: 0, z: 0}
+    IsValid: 0
