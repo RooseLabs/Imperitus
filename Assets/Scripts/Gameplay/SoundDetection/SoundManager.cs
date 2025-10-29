@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using DebugManager = RooseLabs.Utils.DebugManager;
 
 namespace RooseLabs
 {
@@ -71,22 +72,31 @@ namespace RooseLabs
                     Vector3 samplePoint = c.ClosestPoint(position) + offset;
                     float distance = Vector3.Distance(position, samplePoint);
 
-                    float intensity = 1f;
+                    // Exponential falloff
+                    float intensity = Mathf.Exp(-distance / soundType.radius);
 
                     if (!isItemDrop && occlusionMask != 0)
                     {
                         Vector3 dir = (samplePoint - position).normalized;
                         float rayDist = distance - 0.05f;
 
-                        if (rayDist > 0f && Physics.Raycast(position, dir, out RaycastHit hitInfo, rayDist, occlusionMask, QueryTriggerInteraction.Collide))
+                        if (rayDist > 0f)
                         {
-                            // soft occlusion: reduce intensity
-                            intensity *= 0.5f;
-                            Debug.DrawLine(position, hitInfo.point, Color.red, 1.5f);
-                        }
-                        else
-                        {
-                            Debug.DrawLine(position, samplePoint, Color.green, 1.5f);
+                            RaycastHit[] hitsInfo = Physics.RaycastAll(position, dir, rayDist, occlusionMask, QueryTriggerInteraction.Collide);
+                            float blockedDistance = 0f;
+
+                            foreach (var hit in hitsInfo)
+                                blockedDistance += hit.distance;
+
+                            // Reduce intensity based on total distance through obstacles
+                            float occlusionFactor = Mathf.Exp(-blockedDistance / (soundType.radius * 0.5f));
+                            intensity *= occlusionFactor;
+
+                            // Debug lines
+                            if (hitsInfo.Length > 0)
+                                Debug.DrawLine(position, hitsInfo[hitsInfo.Length - 1].point, Color.red, 1.5f);
+                            else
+                                Debug.DrawLine(position, samplePoint, Color.green, 1.5f);
                         }
                     }
 
@@ -96,11 +106,11 @@ namespace RooseLabs
                 try
                 {
                     listener.OnSoundHeard(position, soundType, maxIntensity);
-                    Debug.Log($"[SoundManager] Notifying '{c.name}' with intensity {maxIntensity} (isItemDrop: {isItemDrop})");
+                    DebugManager.Log($"[SoundManager] Notifying '{c.name}' with intensity {maxIntensity:F2} (isItemDrop: {isItemDrop})");
                 }
                 catch (System.Exception ex)
                 {
-                    Debug.LogError($"Exception when notifying listener '{c.name}': {ex}");
+                    DebugManager.LogError($"Exception when notifying listener '{c.name}': {ex}");
                 }
             }
         }
@@ -120,24 +130,43 @@ namespace RooseLabs
                 ISoundListener listener = c.GetComponentInParent<ISoundListener>();
                 if (listener == null) continue;
 
-                Debug.Log("[SoundManager] Voice sound overlap detected with " + c.name);
+                Vector3 samplePoint = c.ClosestPoint(position);
+                float distance = Vector3.Distance(position, samplePoint);
+
+                // Exponential falloff
+                float intensity = Mathf.Exp(-distance / radius);
+
+                if (occlusionMask != 0)
+                {
+                    Vector3 dir = (samplePoint - position).normalized;
+                    float rayDist = distance - 0.05f;
+
+                    if (rayDist > 0f)
+                    {
+                        RaycastHit[] hitsInfo = Physics.RaycastAll(position, dir, rayDist, occlusionMask, QueryTriggerInteraction.Collide);
+                        float blockedDistance = 0f;
+
+                        foreach (var hit in hitsInfo)
+                            blockedDistance += hit.distance;
+
+                        float occlusionFactor = Mathf.Exp(-blockedDistance / (radius * 0.5f));
+                        intensity *= occlusionFactor;
+                    }
+                }
 
                 try
                 {
-                    // Create a temporary SoundType for voice
                     SoundType voiceType = ScriptableObject.CreateInstance<SoundType>();
                     voiceType.key = "Voice";
                     voiceType.radius = radius;
 
-                    listener.OnSoundHeard(position, voiceType, 1.0f);
-                    Debug.Log($"[SoundManager] Voice detected by '{c.name}' at radius {radius:F2}");
+                    listener.OnSoundHeard(position, voiceType, intensity);
 
-                    // Clean up temporary object
                     Destroy(voiceType);
                 }
                 catch (System.Exception ex)
                 {
-                    Debug.LogError($"Exception when notifying listener '{c.name}' about voice: {ex}");
+                    DebugManager.LogError($"Exception when notifying listener '{c.name}' about voice: {ex}");
                 }
             }
         }

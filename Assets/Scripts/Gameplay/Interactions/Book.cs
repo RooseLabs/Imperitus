@@ -2,6 +2,7 @@ using FishNet.Object;
 using RooseLabs.Player;
 using RooseLabs.ScriptableObjects;
 using UnityEngine;
+using DebugManager = RooseLabs.Utils.DebugManager;
 
 namespace RooseLabs.Gameplay.Interactions
 {
@@ -13,7 +14,7 @@ namespace RooseLabs.Gameplay.Interactions
 
         public void OnPickup(PlayerCharacter character, PlayerPickup playerPickup)
         {
-            Debug.Log("Book picked up by " + character.name);
+            DebugManager.Log("Book picked up by " + character.name);
             hasDropped = false;
         }
 
@@ -58,7 +59,7 @@ namespace RooseLabs.Gameplay.Interactions
             var soundEmitter = GetComponent<SoundEmitter>();
             if (soundEmitter != null)
             {
-                Debug.Log("[Book] Emitting ItemDropped sound.");
+                DebugManager.Log("[Book] Emitting ItemDropped sound.");
                 soundEmitter.RequestEmitFromClient("ItemDropped");
             }
 

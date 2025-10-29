@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
+using DebugManager = RooseLabs.Utils.DebugManager;
 
 namespace RooseLabs.Enemies
 {
@@ -28,11 +29,12 @@ namespace RooseLabs.Enemies
         public int startWaypointIndex = 0;
         public bool loopPatrol = true;
 
-        [Header("Chase")]
-        public float forgetTargetTime = 3f; // time to forget target after losing sight
-        private float forgetTimer = 0f;
+        [Header("Detection")]
+        public float detectionExpiryTime = 6f;
+        public float minSoundIntensity = 0.1f;
+        public float visualLostSightGracePeriod = 6f; // NEW
 
-        public Vector3? LastKnownTargetPosition { get; set; }
+        private float visualLostSightTimer = 0f; // NEW
 
         // FSM states
         private IEnemyState currentState;
@@ -49,11 +51,120 @@ namespace RooseLabs.Enemies
 
         // Server-controlled target reference (only used server-side)
         public Transform CurrentTarget { get; private set; }
+        public Vector3? LastKnownTargetPosition { get; set; }
+
+        // Priority-based detection system
+        private DetectionInfo currentDetection = null;
 
         // for attack cooldown
         private float attackTimer = 0f;
 
-        private bool isInvestigating = false;
+        #region Detection Priority System
+
+        public enum DetectionPriority
+        {
+            None = 0,
+            Patrol = 1,
+            SoundOther = 2,      // Footsteps, items, etc.
+            AlertFromAI = 3,     // Another AI reported something
+            SoundVoice = 4,      // Player voice chat
+            Visual = 5           // Direct line of sight
+        }
+
+        public class DetectionInfo
+        {
+            public DetectionPriority priority;
+            public Vector3 position;
+            public Transform target;        // null for sounds/alerts without direct target
+            public float metric;            // intensity for sounds, distance for visual/alerts
+            public float timestamp;
+
+            public DetectionInfo(DetectionPriority priority, Vector3 position, Transform target = null, float metric = 0f)
+            {
+                this.priority = priority;
+                this.position = position;
+                this.target = target;
+                this.metric = metric;
+                this.timestamp = Time.time;
+            }
+        }
+
+        private bool ShouldSwitchToNewDetection(DetectionInfo newDetection)
+        {
+            // No current detection, always switch
+            if (currentDetection == null)
+                return true;
+
+            // Check if current detection has expired
+            if (IsDetectionStale(currentDetection))
+            {
+                DebugManager.Log("[HanaduraAI] Current detection expired, switching to new detection.");
+                return true;
+            }
+
+            // Higher priority always wins
+            if (newDetection.priority > currentDetection.priority)
+            {
+                DebugManager.Log($"[HanaduraAI] New detection priority ({newDetection.priority}) > current ({currentDetection.priority}), switching.");
+                return true;
+            }
+
+            if (newDetection.priority < currentDetection.priority)
+                return false;
+
+            // Same priority - use tie-breaker
+            if (newDetection.priority == DetectionPriority.Visual ||
+                newDetection.priority == DetectionPriority.AlertFromAI)
+            {
+                // Use distance for visual/alerts (lower distance wins)
+                float currentDist = Vector3.Distance(transform.position, currentDetection.position);
+                float newDist = Vector3.Distance(transform.position, newDetection.position);
+
+                if (newDist < currentDist)
+                {
+                    DebugManager.Log($"[HanaduraAI] Same priority, new detection closer ({newDist:F2}m vs {currentDist:F2}m), switching.");
+                    return true;
+                }
+                return false;
+            }
+            else if (newDetection.priority == DetectionPriority.SoundVoice ||
+                     newDetection.priority == DetectionPriority.SoundOther)
+            {
+                // Use intensity for sounds (higher intensity wins)
+                if (newDetection.metric > currentDetection.metric)
+                {
+                    DebugManager.Log($"[HanaduraAI] Same priority, new sound louder ({newDetection.metric:F2} vs {currentDetection.metric:F2}), switching.");
+                    return true;
+                }
+                return false;
+            }
+
+            return false; // Default: don't switch
+        }
+
+        private bool IsDetectionStale(DetectionInfo detection)
+        {
+            if (detection == null) return true;
+
+            // Visual detections don't go stale if we still see the target
+            if (detection.priority == DetectionPriority.Visual && detection.target != null)
+            {
+                // Don't check staleness here, let ProcessVisualDetection() handle it
+                return false;
+            }
+
+            return Time.time - detection.timestamp > detectionExpiryTime;
+        }
+
+        private void ClearCurrentDetection()
+        {
+            currentDetection = null;
+            CurrentTarget = null;
+            LastKnownTargetPosition = null;
+            DebugManager.Log("[HanaduraAI] Cleared current detection.");
+        }
+
+        #endregion
 
         private void Reset()
         {
@@ -83,17 +194,123 @@ namespace RooseLabs.Enemies
                 return;
 
             currentState?.Tick();
-
             attackTimer -= Time.deltaTime;
 
+            // Process visual detection
+            ProcessVisualDetection();
+
+            // Check if current detection is still valid
+            if (currentDetection != null && IsDetectionStale(currentDetection))
+            {
+                DebugManager.Log("[HanaduraAI] Current detection became stale.");
+                ClearCurrentDetection();
+            }
+
+            // Update state based on current detection
+            UpdateStateFromDetection();
+        }
+
+        private void ProcessVisualDetection()
+        {
             Transform detected = detection.DetectedTarget;
 
             if (detected != null)
             {
-                // Player detected
-                CurrentTarget = detected;
-                LastKnownTargetPosition = CurrentTarget.position;
-                forgetTimer = forgetTargetTime;
+                // Reset lost sight timer
+                visualLostSightTimer = visualLostSightGracePeriod;
+                DebugManager.Log("[HanaduraAI] Target in sight, resetting lost sight timer.");
+
+                float dist = Vector3.Distance(transform.position, detected.position);
+                DetectionInfo visualDetection = new DetectionInfo(
+                    DetectionPriority.Visual,
+                    detected.position,
+                    detected,
+                    dist  // Store distance as metric for tie-breaking
+                );
+
+                if (ShouldSwitchToNewDetection(visualDetection))
+                {
+                    currentDetection = visualDetection;
+                    CurrentTarget = detected;
+                    LastKnownTargetPosition = detected.position;
+                    DebugManager.Log($"[HanaduraAI] Visual detection: {detected.name} at {dist:F2}m");
+                }
+                else if (currentDetection?.priority == DetectionPriority.Visual && currentDetection.target == detected)
+                {
+                    // Refresh existing visual detection
+                    currentDetection.timestamp = Time.time;
+                    currentDetection.position = detected.position;
+                    currentDetection.metric = dist;
+                    CurrentTarget = detected;
+                    LastKnownTargetPosition = detected.position;
+                }
+            }
+            else if (currentDetection?.priority == DetectionPriority.Visual)
+            {
+                // Lost sight but still have a grace period
+                visualLostSightTimer -= Time.deltaTime;
+                DebugManager.Log($"[HanaduraAI] Lost sight of target, grace period remaining: {visualLostSightTimer:F2}s");
+
+                if (visualLostSightTimer <= 0f)
+                {
+                    // Grace period expired, mark as stale
+                    ClearCurrentDetection();
+                }
+            }
+        }
+
+        private void UpdateStateFromDetection()
+        {
+            if (currentDetection == null)
+            {
+                // No detection, return to patrol
+                if (!(currentState is PatrolState))
+                {
+                    EnterState(patrolState);
+                }
+                return;
+            }
+
+            // Handle based on detection priority
+            switch (currentDetection.priority)
+            {
+                case DetectionPriority.Visual:
+                    HandleVisualDetection();
+                    break;
+
+                case DetectionPriority.SoundVoice:
+                case DetectionPriority.SoundOther:
+                case DetectionPriority.AlertFromAI:
+                    HandleInvestigationDetection();
+                    break;
+            }
+        }
+
+        private void HandleVisualDetection()
+        {
+            if (CurrentTarget == null) return;
+
+            float dist = Vector3.Distance(transform.position, CurrentTarget.position);
+
+            if (dist <= attackRange)
+            {
+                if (!(currentState is AttackState))
+                    EnterState(attackState);
+            }
+            else
+            {
+                if (!(currentState is ChaseState))
+                    EnterState(chaseState);
+            }
+        }
+
+        private void HandleInvestigationDetection()
+        {
+            // If we have a direct target from alert, chase it
+            if (currentDetection.target != null)
+            {
+                CurrentTarget = currentDetection.target;
+                LastKnownTargetPosition = currentDetection.target.position;
 
                 float dist = Vector3.Distance(transform.position, CurrentTarget.position);
                 if (dist <= attackRange)
@@ -107,30 +324,14 @@ namespace RooseLabs.Enemies
                         EnterState(chaseState);
                 }
             }
-            else if (CurrentTarget != null)
-            {
-                // Lost sight but still have a last known position
-                forgetTimer -= Time.deltaTime;
-                if (forgetTimer > 0f && LastKnownTargetPosition.HasValue)
-                {
-                    // Keep chasing to last known position
-                    if (!(currentState is ChaseState))
-                        EnterState(chaseState);
-                }
-                else
-                {
-                    // Forget the target
-                    CurrentTarget = null;
-                    LastKnownTargetPosition = null;
-                    if (!(currentState is PatrolState))
-                        EnterState(patrolState);
-                }
-            }
             else
             {
-                // Only revert to patrol if not investigating
-                if (!isInvestigating && !(currentState is PatrolState))
-                    EnterState(patrolState);
+                // No direct target, investigate the position
+                CurrentTarget = null;
+                LastKnownTargetPosition = currentDetection.position;
+
+                if (!(currentState is InvestigateState))
+                    EnterState(investigateState);
             }
         }
 
@@ -143,7 +344,7 @@ namespace RooseLabs.Enemies
 
             if (currentState != null)
             {
-                Debug.Log($"[HanaduraAI] Entered state: {currentState.GetType().Name}");
+                DebugManager.Log($"[HanaduraAI] Entered state: {currentState.GetType().Name}");
                 currentState.Enter();
             }
         }
@@ -155,38 +356,32 @@ namespace RooseLabs.Enemies
         {
             if (!base.IsServerInitialized) return;
 
-            //Debug.Log("[HanaduraAI] Received alert from Grimoire.");
+            float dist = Vector3.Distance(transform.position, position);
+            DetectionInfo alertDetection = new DetectionInfo(
+                DetectionPriority.AlertFromAI,
+                position,
+                target,
+                dist  // Use distance as metric for tie-breaking
+            );
 
-            if (target != null)
+            if (ShouldSwitchToNewDetection(alertDetection))
             {
-                // Direct player reference -> chase right away
-                CurrentTarget = target;
-                LastKnownTargetPosition = target.position;
-                forgetTimer = forgetTargetTime;
-                isInvestigating = false;
+                currentDetection = alertDetection;
 
-                if (!(currentState is ChaseState))
-                    EnterState(chaseState);
-
-                Debug.Log($"[HanaduraAI] Alerted by Grimoire! Direct chase: {target.name}");
+                if (target != null)
+                {
+                    DebugManager.Log($"[HanaduraAI] AI Alert with target: {target.name} at {position}");
+                }
+                else
+                {
+                    DebugManager.Log($"[HanaduraAI] AI Alert to investigate: {position}");
+                }
             }
             else
             {
-                // No direct target, just a suspicious area -> investigate
-                CurrentTarget = null;
-                LastKnownTargetPosition = position;
-                forgetTimer = forgetTargetTime;
-                isInvestigating = true;
-
-                if (!(currentState is InvestigateState))
-                    EnterState(investigateState);
-
-                Debug.Log($"[HanaduraAI] Alerted by Grimoire! Investigating area: {position}");
+                DebugManager.Log($"[HanaduraAI] AI Alert ignored (current priority: {currentDetection?.priority})");
             }
-
-            //Debug.Log("[HanaduraAI] Alert processing complete.");
         }
-
 
         public void SetCurrentTarget(Transform target)
         {
@@ -194,13 +389,7 @@ namespace RooseLabs.Enemies
             if (target != null)
             {
                 LastKnownTargetPosition = target.position;
-                forgetTimer = forgetTargetTime;
             }
-        }
-        public void SetIsInvestigatingFlag()
-        {
-            isInvestigating = !isInvestigating;
-            Debug.Log("[HanaduraAI] isInvestigating set to: " + isInvestigating);
         }
 
         /// <summary>
@@ -208,39 +397,42 @@ namespace RooseLabs.Enemies
         /// </summary>
         public void OnSoundHeard(Vector3 position, SoundType type, float intensity)
         {
-            //Debug.Log("Before Server check");
-
             if (!base.IsServerInitialized) return;
 
-            //Debug.Log("[HanaduraAI] OnSoundHeard called.");
-
-            // If enemy is already chasing or attacking, ignore sound
-            if (currentState is ChaseState || currentState is AttackState)
-                return;
-
             // Only react to sufficiently strong sounds
-            if (intensity < 0.1f)
+            if (intensity < minSoundIntensity)
                 return;
 
-            // Set investigation data
-            LastKnownTargetPosition = position;
-            CurrentTarget = null;
-            isInvestigating = true;
+            // Determine priority based on sound type
+            DetectionPriority priority = type.key == "Voice"
+                ? DetectionPriority.SoundVoice
+                : DetectionPriority.SoundOther;
 
-            Debug.Log($"[HanaduraAI] Heard sound '{type.key}' with intensity {intensity:F2}. Investigating at {position}");
+            DetectionInfo soundDetection = new DetectionInfo(
+                priority,
+                position,
+                null,  // Sounds don't have direct targets
+                intensity  // Use intensity as metric for tie-breaking
+            );
 
-            // Enter investigation state if not already investigating
-            if (!(currentState is InvestigateState))
-                EnterState(investigateState);
+            if (ShouldSwitchToNewDetection(soundDetection))
+            {
+                currentDetection = soundDetection;
+                DebugManager.Log($"[HanaduraAI] Sound detected: '{type.key}' ({priority}) with intensity {intensity:F2} at {position}");
+            }
+            else
+            {
+                DebugManager.Log($"[HanaduraAI] Sound '{type.key}' ignored (current priority: {currentDetection?.priority}, intensity: {intensity:F2})");
+            }
         }
 
         #region Movement & Attack APIs (Server-side)
+
         public void MoveTo(Vector3 position)
         {
             if (!base.IsServerInitialized) return;
             navAgent.isStopped = false;
             navAgent.SetDestination(position);
-            //Debug.Log($"[EnemyAI] MoveTo called. Destination: {position}, PathStatus: {navAgent.pathStatus}");
         }
 
         public void StopMovement()
@@ -248,32 +440,6 @@ namespace RooseLabs.Enemies
             if (!base.IsServerInitialized) return;
             navAgent.isStopped = true;
         }
-
-        //public bool TryPerformAttack()
-        //{
-        //    if (!base.IsServerInitialized) return false;
-        //    if (attackTimer > 0f) return false;
-        //    if (CurrentTarget == null) return false;
-
-        //    float dist = Vector3.Distance(transform.position, CurrentTarget.position);
-        //    if (dist > attackRange) return false;
-
-        //    // perform attack: call damage on the target if it has IDamageable
-        //    //IDamageable dmg = CurrentTarget.GetComponent<IDamageable>();
-        //    //if (dmg != null)
-        //    //{
-        //    //    dmg.ApplyDamage(attackDamage);
-        //    //}
-        //    attackTimer = attackCooldown;
-
-        //    NetworkObject nobTarget = CurrentTarget.GetComponent<NetworkBehaviour>();
-        //    FlashVignette_TargetRPC(nobTarget.LocalConnection);
-
-        //    // notify clients to play attack animation (ObserversRpc will run on observing clients)
-        //    //Rpc_PlayAttackAnimation();
-
-        //    return true;
-        //}
 
         public bool TryPerformAttack()
         {
@@ -312,9 +478,6 @@ namespace RooseLabs.Enemies
 
             NetworkObject nobTarget = CurrentTarget.GetComponent<NetworkBehaviour>();
             FlashVignette_TargetRPC(nobTarget.LocalConnection);
-
-            // notify clients to play attack animation
-            //Rpc_PlayAttackAnimation();
 
             return true;
         }
