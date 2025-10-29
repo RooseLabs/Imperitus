@@ -1735,6 +1735,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b553be8b7a44a7a4f80de3445f1aeef2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Player.PlayerData
+  m_healthSlider: {fileID: 0}
+  m_staminaSlider: {fileID: 0}
   lookValues: {x: 0, y: 0}
   lookDirection: {x: 0, y: 0, z: 0}
   lookDirection_Flat: {x: 0, y: 0, z: 0}
@@ -1758,6 +1760,9 @@ MonoBehaviour:
   crouchSpeed: 0.75
   crawlSpeed: 0.5
   jumpHeight: 0.5
+  staminaRegenRate: 10
+  staminaSpendRate: 15
+  minStaminaToRun: 0
   standingCollider: {fileID: 910997788957776308}
   crouchingCollider: {fileID: 1079084056669295952}
   crawlingCollider: {fileID: 5542213905719861265}
