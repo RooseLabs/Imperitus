@@ -204,7 +204,7 @@ MonoBehaviour:
         _propertyType: UnityEngine.Vector3, UnityEngine.CoreModule, Version=0.0.0.0,
           Culture=neutral, PublicKeyToken=null
         Value0: {x: 0, y: 0, z: 0}
-        Value1: {x: 15, y: 15, z: 15}
+        Value1: {x: 30, y: 30, z: 30}
 --- !u!1 &491824444870455113
 GameObject:
   m_ObjectHideFlags: 0
@@ -1792,8 +1792,8 @@ MonoBehaviour:
   crouchSpeed: 0.75
   crawlSpeed: 0.5
   jumpHeight: 0.5
-  staminaRegenRate: 10
-  staminaSpendRate: 15
+  staminaRegenRate: 20
+  staminaSpendRate: 10
   minStaminaToRun: 0
   standingCollider: {fileID: 910997788957776308}
   crouchingCollider: {fileID: 1079084056669295952}
@@ -2155,6 +2155,7 @@ GameObject:
   - component: {fileID: 3574256741998889856}
   - component: {fileID: 8131720751928638370}
   - component: {fileID: 1046755158235027733}
+  - component: {fileID: 6628742010028553836}
   m_Layer: 0
   m_Name: RangeCollider
   m_TagString: Untagged
@@ -2264,6 +2265,19 @@ MonoBehaviour:
     X: 0
     Y: 0
     Z: 0
+--- !u!114 &6628742010028553836
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8341259078320434640}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15dfad9b6b4bbd642b043a949297cd5b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.VoiceSoundEmitter
+  emissionInterval: 0.15
 --- !u!1 &8875991787814822123
 GameObject:
   m_ObjectHideFlags: 0

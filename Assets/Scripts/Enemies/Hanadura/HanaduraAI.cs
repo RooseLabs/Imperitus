@@ -30,11 +30,11 @@ namespace RooseLabs.Enemies
         public bool loopPatrol = true;
 
         [Header("Detection")]
-        public float detectionExpiryTime = 6f;
+        public float detectionExpiryTime = 10f;
         public float minSoundIntensity = 0.1f;
-        public float visualLostSightGracePeriod = 6f; // NEW
+        public float visualLostSightGracePeriod = 6f;
 
-        private float visualLostSightTimer = 0f; // NEW
+        private float visualLostSightTimer = 0f;
 
         // FSM states
         private IEnemyState currentState;
