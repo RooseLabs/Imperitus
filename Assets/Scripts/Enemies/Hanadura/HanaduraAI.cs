@@ -235,10 +235,14 @@ namespace RooseLabs.Enemies
 
             ProcessVisualDetection();
 
-            if (currentDetection != null && IsDetectionStale(currentDetection))
+            // Only check for stale detections if NOT currently investigating
+            if (!(currentState is InvestigateState))
             {
-                DebugManager.Log("[HanaduraAI] Current detection became stale.");
-                ClearCurrentDetection();
+                if (currentDetection != null && IsDetectionStale(currentDetection))
+                {
+                    DebugManager.Log("[HanaduraAI] Current detection became stale.");
+                    ClearCurrentDetection();
+                }
             }
 
             // Only update state if not playing detected animation

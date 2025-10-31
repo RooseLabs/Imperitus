@@ -9,7 +9,6 @@ namespace RooseLabs.Enemies
         private float investigateTimer;
         private readonly float investigateDuration = 6f;
         private readonly float stopDistance = 1.5f;
-        private readonly float rotationSpeed = 45f;
         private Vector3 investigatePoint;
         private bool hasReachedPoint = false;
         private bool investigationComplete = false;
@@ -39,6 +38,7 @@ namespace RooseLabs.Enemies
             // Start moving to the investigation point
             owner.navAgent.isStopped = false;
             owner.navAgent.SetDestination(investigatePoint);
+
             DebugManager.Log($"[InvestigateState] Starting investigation at {investigatePoint}");
         }
 
@@ -63,9 +63,8 @@ namespace RooseLabs.Enemies
             }
             else
             {
-                // Look around at the investigation point
+                // Wait at the investigation point
                 investigateTimer -= Time.deltaTime;
-                owner.transform.Rotate(Vector3.up, rotationSpeed * Time.deltaTime);
 
                 if (investigateTimer <= 0f && !investigationComplete)
                 {
