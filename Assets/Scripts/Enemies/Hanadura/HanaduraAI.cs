@@ -60,6 +60,7 @@ namespace RooseLabs.Enemies
         private float attackTimer = 0f;
 
         private bool hasTriggeredDetectedAnimation = false;
+        private bool isPlayingDetectedAnimation = false;
 
         #region Detection Priority System
 
@@ -169,6 +170,7 @@ namespace RooseLabs.Enemies
             CurrentTarget = null;
             LastKnownTargetPosition = null;
             hasTriggeredDetectedAnimation = false;
+            isPlayingDetectedAnimation = false;
             DebugManager.Log("[HanaduraAI] Cleared current detection.");
         }
 
@@ -209,7 +211,26 @@ namespace RooseLabs.Enemies
                                 $"IsLookingAround: {animator?.GetBool("IsLookingAround")}");
             }
 
-            currentState?.Tick();
+            // Check if Detected animation finished
+            if (isPlayingDetectedAnimation)
+            {
+                // Check if animation finished playing
+                AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
+
+                // Check if we're no longer in the Detected state (animation finished)
+                if (!stateInfo.IsName("Detected"))
+                {
+                    isPlayingDetectedAnimation = false;
+                    DebugManager.Log("[HanaduraAI] Detected animation finished");
+                }
+            }
+
+            // Only tick state and update if not playing detected animation
+            if (!isPlayingDetectedAnimation)
+            {
+                currentState?.Tick();
+            }
+
             attackTimer -= Time.deltaTime;
 
             ProcessVisualDetection();
@@ -220,7 +241,11 @@ namespace RooseLabs.Enemies
                 ClearCurrentDetection();
             }
 
-            UpdateStateFromDetection();
+            // Only update state if not playing detected animation
+            if (!isPlayingDetectedAnimation)
+            {
+                UpdateStateFromDetection();
+            }
         }
 
         private void ProcessVisualDetection()
@@ -233,12 +258,13 @@ namespace RooseLabs.Enemies
                 {
                     SetAnimatorTrigger("Detected");
                     hasTriggeredDetectedAnimation = true;
+                    isPlayingDetectedAnimation = true;
+                    StopMovement(); // Stop the enemy
                     DebugManager.Log("[HanaduraAI] First visual detection - playing Detected animation");
                 }
 
                 // Reset lost sight timer
                 visualLostSightTimer = visualLostSightGracePeriod;
-                //DebugManager.Log("[HanaduraAI] Target in sight, resetting lost sight timer.");
 
                 float dist = Vector3.Distance(transform.position, detected.position);
                 DetectionInfo visualDetection = new DetectionInfo(
@@ -253,7 +279,6 @@ namespace RooseLabs.Enemies
                     currentDetection = visualDetection;
                     CurrentTarget = detected;
                     LastKnownTargetPosition = detected.position;
-                    //DebugManager.Log($"[HanaduraAI] Visual detection: {detected.name} at {dist:F2}m");
                 }
                 else if (currentDetection?.priority == DetectionPriority.Visual && currentDetection.target == detected)
                 {
@@ -269,7 +294,6 @@ namespace RooseLabs.Enemies
             {
                 // Lost sight but still have a grace period
                 visualLostSightTimer -= Time.deltaTime;
-                //DebugManager.Log($"[HanaduraAI] Lost sight of target, grace period remaining: {visualLostSightTimer:F2}s");
 
                 if (visualLostSightTimer <= 0f)
                 {
