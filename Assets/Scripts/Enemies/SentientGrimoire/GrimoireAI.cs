@@ -21,6 +21,7 @@ namespace RooseLabs.Enemies
         public Light spotlight;
         public Transform spotlightTransform;
         private Quaternion defaultSpotlightRotation;
+        private Collider detectedPlayerCollider;
 
         [Header("Patrol")]
         public int startWaypointIndex = 0;
@@ -199,25 +200,37 @@ namespace RooseLabs.Enemies
 
             Transform closestPlayer = null;
             float closestDist = float.MaxValue;
+            Collider closestPlayerCollider = null;
 
             foreach (Collider col in potentialTargets)
             {
                 Transform target = col.transform;
-                Vector3 dirToTarget = (target.position - spotlightPos).normalized;
+                Vector3 targetPoint = col.bounds.center;
+                Vector3 dirToTarget = (targetPoint - spotlightPos).normalized;
                 float angleToTarget = Vector3.Angle(spotlightDir, dirToTarget);
 
                 // Check if within spotlight cone
                 if (angleToTarget <= spotlightAngle * 0.5f)
                 {
-                    float dist = Vector3.Distance(spotlightPos, target.position);
+                    float dist = Vector3.Distance(spotlightPos, targetPoint);
 
                     // Raycast to check line of sight
-                    if (!Physics.Raycast(spotlightPos, dirToTarget, dist, obstructionMask))
+                    RaycastHit hit;
+                    if (Physics.Raycast(spotlightPos, dirToTarget, out hit, dist, obstructionMask))
                     {
+                        Debug.Log($"[GrimoireAI] Line of sight BLOCKED by: {hit.collider.name}, Layer: {LayerMask.LayerToName(hit.collider.gameObject.layer)}, Distance: {hit.distance}");
+                        Debug.DrawRay(spotlightPos, dirToTarget * hit.distance, Color.red, 0.5f);
+                    }
+                    else
+                    {
+                        Debug.Log("[GrimoireAI] Line of sight CLEAR!");
+                        Debug.DrawRay(spotlightPos, dirToTarget * dist, Color.green, 0.5f);
+
                         if (dist < closestDist)
                         {
                             closestDist = dist;
                             closestPlayer = target;
+                            closestPlayerCollider = col;
                         }
                     }
                 }
@@ -226,7 +239,7 @@ namespace RooseLabs.Enemies
             // If player detected
             if (closestPlayer != null)
             {
-                OnPlayerDetected(closestPlayer);
+                OnPlayerDetected(closestPlayer, closestPlayerCollider);
             }
             else if (detectedPlayer != null && !(currentState is GrimoirePatrolState))
             {
@@ -235,10 +248,13 @@ namespace RooseLabs.Enemies
             }
         }
 
-        private void OnPlayerDetected(Transform player)
+        private void OnPlayerDetected(Transform player, Collider playerCollider)
         {
             bool wasNewDetection = (detectedPlayer == null);
             detectedPlayer = player;
+            detectedPlayerCollider = playerCollider;
+
+            Debug.Log("[GrimoireAI] Player detected!");
 
             // Transition to alert state if currently patrolling
             if (currentState is GrimoirePatrolState)
@@ -266,7 +282,11 @@ namespace RooseLabs.Enemies
             if (!base.IsServerInitialized) return;
             if (target == null || spotlightTransform == null) return;
 
-            Vector3 dirToTarget = (target.position - spotlightTransform.position).normalized;
+            Vector3 targetPoint = detectedPlayerCollider != null
+                ? detectedPlayerCollider.bounds.center
+                : target.position + Vector3.up * 1f;
+
+            Vector3 dirToTarget = (targetPoint - spotlightTransform.position).normalized;
             Quaternion targetRot = Quaternion.LookRotation(dirToTarget);
             spotlightTransform.rotation = Quaternion.Slerp(
                 spotlightTransform.rotation,
@@ -274,7 +294,6 @@ namespace RooseLabs.Enemies
                 Time.deltaTime * speed
             );
 
-            // Update synced rotation
             syncedSpotlightRotation.Value = spotlightTransform.rotation;
         }
 
