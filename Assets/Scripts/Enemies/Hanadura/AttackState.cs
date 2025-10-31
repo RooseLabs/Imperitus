@@ -1,10 +1,10 @@
 using UnityEngine;
-
 namespace RooseLabs.Enemies
 {
     public class AttackState : IEnemyState
     {
         private HanaduraAI ai;
+        private bool hasAttacked = false;
 
         public AttackState(HanaduraAI ai)
         {
@@ -14,6 +14,9 @@ namespace RooseLabs.Enemies
         public void Enter()
         {
             ai.StopMovement();
+            ai.SetAnimatorBool("IsChasing", false);
+            ai.SetAnimatorBool("IsLookingAround", false);
+            hasAttacked = false;
         }
 
         public void Exit()
@@ -32,7 +35,19 @@ namespace RooseLabs.Enemies
                 ai.transform.rotation = Quaternion.Slerp(ai.transform.rotation, look, Time.deltaTime * 10f);
             }
 
-            ai.TryPerformAttack();
+            if (ai.TryPerformAttack())
+            {
+                if (!hasAttacked)
+                {
+                    ai.SetAnimatorTrigger("Attack");
+                    hasAttacked = true;
+                }
+            }
+            else
+            {
+                // Reset flag when attack cooldown ends so we can trigger again
+                hasAttacked = false;
+            }
         }
     }
 }

@@ -17,11 +17,13 @@ namespace RooseLabs.Enemies
         public void Enter()
         {
             updateTimer = 0f;
+            ai.SetAnimatorBool("IsChasing", true);
+            ai.SetAnimatorBool("IsLookingAround", false);
         }
 
         public void Exit()
         {
-            // Nothing to clean up
+            ai.SetAnimatorBool("IsChasing", false);
         }
 
         public void Tick()

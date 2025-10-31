@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 5016868397172176932}
   - component: {fileID: 8806621658639097980}
   - component: {fileID: 912312794422129550}
+  - component: {fileID: 6587192327317228320}
   m_Layer: 13
   m_Name: Hanadura
   m_TagString: Untagged
@@ -36,7 +37,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 7410293440408094810}
+  - {fileID: 3113313506219617764}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!54 &5395019011824454120
@@ -267,7 +268,29 @@ MonoBehaviour:
     X: 0
     Y: 0
     Z: 0
---- !u!1001 &7015517375501168561
+--- !u!95 &6587192327317228320
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3774049500881470253}
+  m_Enabled: 1
+  m_Avatar: {fileID: 9000000, guid: 838e27f98c34b1b4d86bc0ee8841247b, type: 3}
+  m_Controller: {fileID: 9100000, guid: 716216096869c7046b04ca227edeb8aa, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!1001 &3224031283706857999
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -275,57 +298,61 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 3679536469295908050}
     m_Modifications:
-    - target: {fileID: -8679921383154817045, guid: ab9f59b9069285f45b2eec5fdce463cf, type: 3}
+    - target: {fileID: -8679921383154817045, guid: 838e27f98c34b1b4d86bc0ee8841247b, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: ab9f59b9069285f45b2eec5fdce463cf, type: 3}
+    - target: {fileID: -8679921383154817045, guid: 838e27f98c34b1b4d86bc0ee8841247b, type: 3}
       propertyPath: m_LocalPosition.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: ab9f59b9069285f45b2eec5fdce463cf, type: 3}
+    - target: {fileID: -8679921383154817045, guid: 838e27f98c34b1b4d86bc0ee8841247b, type: 3}
       propertyPath: m_LocalPosition.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: ab9f59b9069285f45b2eec5fdce463cf, type: 3}
+    - target: {fileID: -8679921383154817045, guid: 838e27f98c34b1b4d86bc0ee8841247b, type: 3}
       propertyPath: m_LocalRotation.w
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: ab9f59b9069285f45b2eec5fdce463cf, type: 3}
+    - target: {fileID: -8679921383154817045, guid: 838e27f98c34b1b4d86bc0ee8841247b, type: 3}
       propertyPath: m_LocalRotation.x
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: ab9f59b9069285f45b2eec5fdce463cf, type: 3}
+    - target: {fileID: -8679921383154817045, guid: 838e27f98c34b1b4d86bc0ee8841247b, type: 3}
       propertyPath: m_LocalRotation.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: ab9f59b9069285f45b2eec5fdce463cf, type: 3}
+    - target: {fileID: -8679921383154817045, guid: 838e27f98c34b1b4d86bc0ee8841247b, type: 3}
       propertyPath: m_LocalRotation.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: ab9f59b9069285f45b2eec5fdce463cf, type: 3}
+    - target: {fileID: -8679921383154817045, guid: 838e27f98c34b1b4d86bc0ee8841247b, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: ab9f59b9069285f45b2eec5fdce463cf, type: 3}
+    - target: {fileID: -8679921383154817045, guid: 838e27f98c34b1b4d86bc0ee8841247b, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: ab9f59b9069285f45b2eec5fdce463cf, type: 3}
+    - target: {fileID: -8679921383154817045, guid: 838e27f98c34b1b4d86bc0ee8841247b, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 919132149155446097, guid: ab9f59b9069285f45b2eec5fdce463cf, type: 3}
+    - target: {fileID: 919132149155446097, guid: 838e27f98c34b1b4d86bc0ee8841247b, type: 3}
       propertyPath: m_Name
-      value: HanaduraModel
+      value: Hanadura
+      objectReference: {fileID: 0}
+    - target: {fileID: 9173981161121506934, guid: 838e27f98c34b1b4d86bc0ee8841247b, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: ab9f59b9069285f45b2eec5fdce463cf, type: 3}
---- !u!4 &7410293440408094810 stripped
+  m_SourcePrefab: {fileID: 100100000, guid: 838e27f98c34b1b4d86bc0ee8841247b, type: 3}
+--- !u!4 &3113313506219617764 stripped
 Transform:
-  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: ab9f59b9069285f45b2eec5fdce463cf, type: 3}
-  m_PrefabInstance: {fileID: 7015517375501168561}
+  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 838e27f98c34b1b4d86bc0ee8841247b, type: 3}
+  m_PrefabInstance: {fileID: 3224031283706857999}
   m_PrefabAsset: {fileID: 0}

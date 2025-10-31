@@ -19,6 +19,9 @@ namespace RooseLabs.Enemies
 
         public void Enter()
         {
+            ai.SetAnimatorBool("IsChasing", false);
+            ai.SetAnimatorBool("IsLookingAround", false);
+
             if (route == null || route.Count == 0)
             {
                 ai.StopMovement();
@@ -34,6 +37,7 @@ namespace RooseLabs.Enemies
             {
                 Transform wp = route.GetWaypoint(i);
                 if (wp == null) continue;
+
                 float dist = Vector3.Distance(enemyPos, wp.position);
                 if (dist < minDist)
                 {
@@ -58,7 +62,6 @@ namespace RooseLabs.Enemies
             if (wp == null) return;
 
             float dist = Vector3.Distance(ai.transform.position, wp.position);
-            //Debug.Log($"[PatrolState] CurrentIndex: {currentIndex}, WaypointPos: {wp.position}, AgentPos: {ai.transform.position}, Dist: {dist}");
 
             if (dist <= ai.navAgent.stoppingDistance + 1.2f)
             {

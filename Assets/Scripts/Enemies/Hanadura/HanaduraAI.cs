@@ -59,6 +59,8 @@ namespace RooseLabs.Enemies
         // for attack cooldown
         private float attackTimer = 0f;
 
+        private bool hasTriggeredDetectedAnimation = false;
+
         #region Detection Priority System
 
         public enum DetectionPriority
@@ -87,6 +89,11 @@ namespace RooseLabs.Enemies
                 this.metric = metric;
                 this.timestamp = Time.time;
             }
+        }
+
+        private void Start()
+        {
+            animator = GetComponent<Animator>();
         }
 
         private bool ShouldSwitchToNewDetection(DetectionInfo newDetection)
@@ -161,6 +168,7 @@ namespace RooseLabs.Enemies
             currentDetection = null;
             CurrentTarget = null;
             LastKnownTargetPosition = null;
+            hasTriggeredDetectedAnimation = false;
             DebugManager.Log("[HanaduraAI] Cleared current detection.");
         }
 
@@ -193,20 +201,25 @@ namespace RooseLabs.Enemies
             if (!base.IsServerInitialized)
                 return;
 
+            // Temporary debug - remove after fixing
+            if (Time.frameCount % 60 == 0)
+            {
+                DebugManager.Log($"[HanaduraAI] State: {currentState?.GetType().Name}, " +
+                                $"IsChasing: {animator?.GetBool("IsChasing")}, " +
+                                $"IsLookingAround: {animator?.GetBool("IsLookingAround")}");
+            }
+
             currentState?.Tick();
             attackTimer -= Time.deltaTime;
 
-            // Process visual detection
             ProcessVisualDetection();
 
-            // Check if current detection is still valid
             if (currentDetection != null && IsDetectionStale(currentDetection))
             {
                 DebugManager.Log("[HanaduraAI] Current detection became stale.");
                 ClearCurrentDetection();
             }
 
-            // Update state based on current detection
             UpdateStateFromDetection();
         }
 
@@ -216,16 +229,23 @@ namespace RooseLabs.Enemies
 
             if (detected != null)
             {
+                if (!hasTriggeredDetectedAnimation && currentState is PatrolState)
+                {
+                    SetAnimatorTrigger("Detected");
+                    hasTriggeredDetectedAnimation = true;
+                    DebugManager.Log("[HanaduraAI] First visual detection - playing Detected animation");
+                }
+
                 // Reset lost sight timer
                 visualLostSightTimer = visualLostSightGracePeriod;
-                DebugManager.Log("[HanaduraAI] Target in sight, resetting lost sight timer.");
+                //DebugManager.Log("[HanaduraAI] Target in sight, resetting lost sight timer.");
 
                 float dist = Vector3.Distance(transform.position, detected.position);
                 DetectionInfo visualDetection = new DetectionInfo(
                     DetectionPriority.Visual,
                     detected.position,
                     detected,
-                    dist  // Store distance as metric for tie-breaking
+                    dist
                 );
 
                 if (ShouldSwitchToNewDetection(visualDetection))
@@ -233,7 +253,7 @@ namespace RooseLabs.Enemies
                     currentDetection = visualDetection;
                     CurrentTarget = detected;
                     LastKnownTargetPosition = detected.position;
-                    DebugManager.Log($"[HanaduraAI] Visual detection: {detected.name} at {dist:F2}m");
+                    //DebugManager.Log($"[HanaduraAI] Visual detection: {detected.name} at {dist:F2}m");
                 }
                 else if (currentDetection?.priority == DetectionPriority.Visual && currentDetection.target == detected)
                 {
@@ -249,7 +269,7 @@ namespace RooseLabs.Enemies
             {
                 // Lost sight but still have a grace period
                 visualLostSightTimer -= Time.deltaTime;
-                DebugManager.Log($"[HanaduraAI] Lost sight of target, grace period remaining: {visualLostSightTimer:F2}s");
+                //DebugManager.Log($"[HanaduraAI] Lost sight of target, grace period remaining: {visualLostSightTimer:F2}s");
 
                 if (visualLostSightTimer <= 0f)
                 {
@@ -330,8 +350,17 @@ namespace RooseLabs.Enemies
                 CurrentTarget = null;
                 LastKnownTargetPosition = currentDetection.position;
 
+                // Only transition to investigate if not already investigating, 
+                // or if already investigating and it's complete
                 if (!(currentState is InvestigateState))
+                {
                     EnterState(investigateState);
+                }
+                else if (investigateState.IsInvestigationComplete)
+                {
+                    // Investigation complete, clear detection to return to patrol
+                    ClearCurrentDetection();
+                }
             }
         }
 
@@ -370,16 +399,16 @@ namespace RooseLabs.Enemies
 
                 if (target != null)
                 {
-                    DebugManager.Log($"[HanaduraAI] AI Alert with target: {target.name} at {position}");
+                    //DebugManager.Log($"[HanaduraAI] AI Alert with target: {target.name} at {position}");
                 }
                 else
                 {
-                    DebugManager.Log($"[HanaduraAI] AI Alert to investigate: {position}");
+                    //DebugManager.Log($"[HanaduraAI] AI Alert to investigate: {position}");
                 }
             }
             else
             {
-                DebugManager.Log($"[HanaduraAI] AI Alert ignored (current priority: {currentDetection?.priority})");
+                //DebugManager.Log($"[HanaduraAI] AI Alert ignored (current priority: {currentDetection?.priority})");
             }
         }
 
@@ -422,7 +451,7 @@ namespace RooseLabs.Enemies
             }
             else
             {
-                DebugManager.Log($"[HanaduraAI] Sound '{type.key}' ignored (current priority: {currentDetection?.priority}, intensity: {intensity:F2})");
+                //DebugManager.Log($"[HanaduraAI] Sound '{type.key}' ignored (current priority: {currentDetection?.priority}, intensity: {intensity:F2})");
             }
         }
 
@@ -524,5 +553,53 @@ namespace RooseLabs.Enemies
         }
 
         #endregion
+
+        public void SetAnimatorBool(string paramName, bool value)
+        {
+            if (animator != null)
+            {
+                animator.SetBool(paramName, value);
+                DebugManager.Log($"[HanaduraAI] Set animator bool '{paramName}' to {value}");
+            }
+
+            // Sync to all clients
+            if (IsServerInitialized)
+            {
+                Rpc_SetAnimatorBool(paramName, value);
+            }
+        }
+
+        public void SetAnimatorTrigger(string paramName)
+        {
+            if (animator != null)
+            {
+                animator.SetTrigger(paramName);
+                DebugManager.Log($"[HanaduraAI] Triggered animator '{paramName}'");
+            }
+
+            // Sync to all clients
+            if (IsServerInitialized)
+            {
+                Rpc_SetAnimatorTrigger(paramName);
+            }
+        }
+
+        [ObserversRpc]
+        private void Rpc_SetAnimatorBool(string paramName, bool value)
+        {
+            if (animator != null && !base.IsServerInitialized) // Only clients execute this
+            {
+                animator.SetBool(paramName, value);
+            }
+        }
+
+        [ObserversRpc]
+        private void Rpc_SetAnimatorTrigger(string paramName)
+        {
+            if (animator != null && !base.IsServerInitialized) // Only clients execute this
+            {
+                animator.SetTrigger(paramName);
+            }
+        }
     }
 }
