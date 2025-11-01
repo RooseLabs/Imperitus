@@ -19,6 +19,8 @@ namespace RooseLabs.Enemies
         public PatrolRoute patrolRoute;
         public Animator animator;
         public Volume volume;
+        public WeaponCollider weaponCollider;
+        public Transform RaycastOrigin;
 
         [Header("Combat")]
         public float attackRange = 2f;
@@ -95,6 +97,7 @@ namespace RooseLabs.Enemies
         private void Start()
         {
             animator = GetComponent<Animator>();
+            weaponCollider = GetComponentInChildren<WeaponCollider>();
         }
 
         private bool ShouldSwitchToNewDetection(DetectionInfo newDetection)
@@ -106,14 +109,14 @@ namespace RooseLabs.Enemies
             // Check if current detection has expired
             if (IsDetectionStale(currentDetection))
             {
-                DebugManager.Log("[HanaduraAI] Current detection expired, switching to new detection.");
+                //DebugManager.Log("[HanaduraAI] Current detection expired, switching to new detection.");
                 return true;
             }
 
             // Higher priority always wins
             if (newDetection.priority > currentDetection.priority)
             {
-                DebugManager.Log($"[HanaduraAI] New detection priority ({newDetection.priority}) > current ({currentDetection.priority}), switching.");
+                //DebugManager.Log($"[HanaduraAI] New detection priority ({newDetection.priority}) > current ({currentDetection.priority}), switching.");
                 return true;
             }
 
@@ -130,7 +133,7 @@ namespace RooseLabs.Enemies
 
                 if (newDist < currentDist)
                 {
-                    DebugManager.Log($"[HanaduraAI] Same priority, new detection closer ({newDist:F2}m vs {currentDist:F2}m), switching.");
+                    //DebugManager.Log($"[HanaduraAI] Same priority, new detection closer ({newDist:F2}m vs {currentDist:F2}m), switching.");
                     return true;
                 }
                 return false;
@@ -141,7 +144,7 @@ namespace RooseLabs.Enemies
                 // Use intensity for sounds (higher intensity wins)
                 if (newDetection.metric > currentDetection.metric)
                 {
-                    DebugManager.Log($"[HanaduraAI] Same priority, new sound louder ({newDetection.metric:F2} vs {currentDetection.metric:F2}), switching.");
+                    //DebugManager.Log($"[HanaduraAI] Same priority, new sound louder ({newDetection.metric:F2} vs {currentDetection.metric:F2}), switching.");
                     return true;
                 }
                 return false;
@@ -171,7 +174,7 @@ namespace RooseLabs.Enemies
             LastKnownTargetPosition = null;
             hasTriggeredDetectedAnimation = false;
             isPlayingDetectedAnimation = false;
-            DebugManager.Log("[HanaduraAI] Cleared current detection.");
+            //DebugManager.Log("[HanaduraAI] Cleared current detection.");
         }
 
         #endregion
@@ -206,9 +209,9 @@ namespace RooseLabs.Enemies
             // Temporary debug - remove after fixing
             if (Time.frameCount % 60 == 0)
             {
-                DebugManager.Log($"[HanaduraAI] State: {currentState?.GetType().Name}, " +
-                                $"IsChasing: {animator?.GetBool("IsChasing")}, " +
-                                $"IsLookingAround: {animator?.GetBool("IsLookingAround")}");
+                //DebugManager.Log($"[HanaduraAI] State: {currentState?.GetType().Name}, " +
+                                //$"IsChasing: {animator?.GetBool("IsChasing")}, " +
+                                //$"IsLookingAround: {animator?.GetBool("IsLookingAround")}");
             }
 
             // Check if Detected animation finished
@@ -221,7 +224,7 @@ namespace RooseLabs.Enemies
                 if (!stateInfo.IsName("Detected"))
                 {
                     isPlayingDetectedAnimation = false;
-                    DebugManager.Log("[HanaduraAI] Detected animation finished");
+                    //DebugManager.Log("[HanaduraAI] Detected animation finished");
                 }
             }
 
@@ -240,7 +243,7 @@ namespace RooseLabs.Enemies
             {
                 if (currentDetection != null && IsDetectionStale(currentDetection))
                 {
-                    DebugManager.Log("[HanaduraAI] Current detection became stale.");
+                    //DebugManager.Log("[HanaduraAI] Current detection became stale.");
                     ClearCurrentDetection();
                 }
             }
@@ -475,7 +478,7 @@ namespace RooseLabs.Enemies
             if (ShouldSwitchToNewDetection(soundDetection))
             {
                 currentDetection = soundDetection;
-                DebugManager.Log($"[HanaduraAI] Sound detected: '{type.key}' ({priority}) with intensity {intensity:F2} at {position}");
+                //DebugManager.Log($"[HanaduraAI] Sound detected: '{type.key}' ({priority}) with intensity {intensity:F2} at {position}");
             }
             else
             {
@@ -498,6 +501,47 @@ namespace RooseLabs.Enemies
             navAgent.isStopped = true;
         }
 
+        //public bool TryPerformAttack()
+        //{
+        //    if (!base.IsServerInitialized) return false;
+        //    if (attackTimer > 0f) return false;
+        //    if (CurrentTarget == null) return false;
+
+        //    float dist = Vector3.Distance(transform.position, CurrentTarget.position);
+        //    if (dist > attackRange) return false;
+
+        //    // Create damage info
+        //    DamageInfo damage = new DamageInfo(
+        //        attackDamage,
+        //        DamageType.Melee,
+        //        this.transform,
+        //        CurrentTarget.position
+        //    );
+
+        //    // Try to apply damage
+        //    IDamageable damageable = CurrentTarget.GetComponent<IDamageable>();
+        //    bool hitSuccessful = false;
+        //    if (damageable != null)
+        //    {
+        //        hitSuccessful = damageable.ApplyDamage(damage);
+        //    }
+
+        //    if (!hitSuccessful)
+        //    {
+        //        // no damage applied, skip effects
+        //        attackTimer = attackCooldown;
+        //        return false;
+        //    }
+
+        //    // Damage applied successfully -> trigger feedback
+        //    attackTimer = attackCooldown;
+
+        //    NetworkObject nobTarget = CurrentTarget.GetComponent<NetworkBehaviour>();
+        //    FlashVignette_TargetRPC(nobTarget.LocalConnection);
+
+        //    return true;
+        //}
+
         public bool TryPerformAttack()
         {
             if (!base.IsServerInitialized) return false;
@@ -507,36 +551,32 @@ namespace RooseLabs.Enemies
             float dist = Vector3.Distance(transform.position, CurrentTarget.position);
             if (dist > attackRange) return false;
 
-            // Create damage info
-            DamageInfo damage = new DamageInfo(
-                attackDamage,
-                DamageType.Melee,
-                this.transform,
-                CurrentTarget.position
-            );
-
-            // Try to apply damage
-            IDamageable damageable = CurrentTarget.GetComponent<IDamageable>();
-            bool hitSuccessful = false;
-            if (damageable != null)
+            if (!detection.HasLineOfSightOfHitbox(CurrentTarget, RaycastOrigin))
             {
-                hitSuccessful = damageable.ApplyDamage(damage);
-            }
-
-            if (!hitSuccessful)
-            {
-                // no damage applied, skip effects
-                attackTimer = attackCooldown;
+                //Debug.Log("[HanaduraAI] Cannot attack - no current line of sight to target hitbox");
                 return false;
             }
 
-            // Damage applied successfully -> trigger feedback
+            // Start attack cooldown
             attackTimer = attackCooldown;
 
-            NetworkObject nobTarget = CurrentTarget.GetComponent<NetworkBehaviour>();
-            FlashVignette_TargetRPC(nobTarget.LocalConnection);
+            // Enable weapon collider for this attack
+            if (weaponCollider != null)
+            {
+                weaponCollider.EnableWeapon();
+            }
+            else
+            {
+                Debug.LogWarning("[HanaduraAI] WeaponCollider reference is missing!");
+            }
 
             return true;
+        }
+
+        public void TriggerVignetteFlash(FishNet.Connection.NetworkConnection connection)
+        {
+            if (!base.IsServerInitialized) return;
+            FlashVignette_TargetRPC(connection);
         }
 
         [TargetRpc]
@@ -587,7 +627,7 @@ namespace RooseLabs.Enemies
             if (animator != null)
             {
                 animator.SetBool(paramName, value);
-                DebugManager.Log($"[HanaduraAI] Set animator bool '{paramName}' to {value}");
+                //DebugManager.Log($"[HanaduraAI] Set animator bool '{paramName}' to {value}");
             }
 
             // Sync to all clients
@@ -602,7 +642,7 @@ namespace RooseLabs.Enemies
             if (animator != null)
             {
                 animator.SetTrigger(paramName);
-                DebugManager.Log($"[HanaduraAI] Triggered animator '{paramName}'");
+                //DebugManager.Log($"[HanaduraAI] Triggered animator '{paramName}'");
             }
 
             // Sync to all clients

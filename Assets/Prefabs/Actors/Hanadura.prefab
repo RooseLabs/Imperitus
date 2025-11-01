@@ -14,8 +14,10 @@ GameObject:
   - component: {fileID: 3200562120539995110}
   - component: {fileID: 3025078776930143745}
   - component: {fileID: 5016868397172176932}
+  - component: {fileID: 1005745351957962536}
   - component: {fileID: 8806621658639097980}
   - component: {fileID: 912312794422129550}
+  - component: {fileID: 6208631941009141882}
   - component: {fileID: 6587192327317228320}
   m_Layer: 13
   m_Name: Hanadura
@@ -132,7 +134,9 @@ MonoBehaviour:
   patrolRoute: {fileID: 0}
   animator: {fileID: 0}
   volume: {fileID: 0}
-  attackRange: 2
+  weaponCollider: {fileID: 0}
+  RaycastOrigin: {fileID: 286549264654445459}
+  attackRange: 4
   attackCooldown: 2
   attackDamage: 10
   startWaypointIndex: 0
@@ -162,12 +166,36 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 2177
   checkInterval: 0.2
+  playerHitboxMask:
+    serializedVersion: 2
+    m_Bits: 0
   drawFOV: 0
   meshResolution: 30
   edgeResolveIterations: 4
   edgeDstThreshold: 0.5
   fovMaterial: {fileID: 2100000, guid: 96f5d440b5f093044bf135016bfee8ee, type: 2}
   fovAlpha: 0.3
+--- !u!114 &1005745351957962536
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3774049500881470253}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8f8b5c4170b9b941abe2febb99a913f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Enemies.WeaponCollider
+  _componentIndexCache: 255
+  _addedNetworkObject: {fileID: 8806621658639097980}
+  _networkObjectCache: {fileID: 0}
+  ownerAI: {fileID: 3025078776930143745}
+  weaponTipObject: {fileID: 9211336466830289412}
+  damageCooldown: 0.5
+  playerLayer:
+    serializedVersion: 2
+    m_Bits: 512
 --- !u!114 &8806621658639097980
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -268,6 +296,28 @@ MonoBehaviour:
     X: 0
     Y: 0
     Z: 0
+--- !u!114 &6208631941009141882
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3774049500881470253}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8cac635f24954048aad3a6ff9110beb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FishNet.Runtime::FishNet.Component.Animating.NetworkAnimator
+  _componentIndexCache: 255
+  _addedNetworkObject: {fileID: 8806621658639097980}
+  _networkObjectCache: {fileID: 0}
+  IgnoredParameters: []
+  _animator: {fileID: 6587192327317228320}
+  _synchronizeWhenDisabled: 0
+  _smoothFloats: 1
+  _interpolation: 2
+  _clientAuthoritative: 1
+  _sendToOwner: 0
 --- !u!95 &6587192327317228320
 Animator:
   serializedVersion: 7
@@ -290,6 +340,37 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!1 &5795615496227046880
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 286549264654445459}
+  m_Layer: 0
+  m_Name: RaycastOrigin
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &286549264654445459
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5795615496227046880}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.59168863, y: 1.0048593e-14, z: 1.00485916e-14, w: 0.80616665}
+  m_LocalPosition: {x: 0, y: 2.2217453, z: 0.25799274}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3943088723915446607}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &3544916957539696292
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -348,11 +429,45 @@ PrefabInstance:
       objectReference: {fileID: 9100000, guid: 716216096869c7046b04ca227edeb8aa, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 40a8f7565f3902043897dd549a7663b9, type: 3}
+      insertIndex: 0
+      addedObject: {fileID: 286549264654445459}
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5685564210062038176, guid: 40a8f7565f3902043897dd549a7663b9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6333691782400092406}
   m_SourcePrefab: {fileID: 100100000, guid: 40a8f7565f3902043897dd549a7663b9, type: 3}
 --- !u!4 &3943088723915446607 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 40a8f7565f3902043897dd549a7663b9, type: 3}
   m_PrefabInstance: {fileID: 3544916957539696292}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &9211336466830289412 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5685564210062038176, guid: 40a8f7565f3902043897dd549a7663b9, type: 3}
+  m_PrefabInstance: {fileID: 3544916957539696292}
+  m_PrefabAsset: {fileID: 0}
+--- !u!136 &6333691782400092406
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9211336466830289412}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.2870448
+  m_Height: 0.85964173
+  m_Direction: 1
+  m_Center: {x: 0.0092844125, y: 0.57377744, z: 0.019999998}

@@ -1,4 +1,5 @@
 using UnityEngine;
+
 namespace RooseLabs.Enemies
 {
     public class AttackState : IEnemyState
@@ -21,12 +22,24 @@ namespace RooseLabs.Enemies
 
         public void Exit()
         {
+            // MODIFIED: Disable weapon collider when leaving attack state
+            if (ai.weaponCollider != null)
+            {
+                ai.weaponCollider.DisableWeapon();
+            }
         }
 
         public void Tick()
         {
             if (ai.CurrentTarget == null) return;
 
+            // Ensure NavMeshAgent stays stopped during attack
+            if (!ai.navAgent.isStopped)
+            {
+                ai.StopMovement();
+            }
+
+            // Rotate to face target
             Vector3 dir = (ai.CurrentTarget.position - ai.transform.position);
             dir.y = 0f;
             if (dir.sqrMagnitude > 0.001f)
@@ -35,6 +48,7 @@ namespace RooseLabs.Enemies
                 ai.transform.rotation = Quaternion.Slerp(ai.transform.rotation, look, Time.deltaTime * 10f);
             }
 
+            // Try to perform attack
             if (ai.TryPerformAttack())
             {
                 if (!hasAttacked)

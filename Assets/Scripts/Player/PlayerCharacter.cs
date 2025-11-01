@@ -22,6 +22,8 @@ namespace RooseLabs.Player
 
         [Tooltip("Meshes to hide from the local player (e.g. body, head, accessories)")]
         [SerializeField] private GameObject[] meshesToHide = Array.Empty<GameObject>();
+
+        [field: SerializeField] public Transform RaycastTarget { get; private set; }
         #endregion
 
         #region References

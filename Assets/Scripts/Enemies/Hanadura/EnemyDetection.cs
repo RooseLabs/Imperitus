@@ -1,3 +1,4 @@
+using RooseLabs.Player;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -17,6 +18,9 @@ namespace RooseLabs.Enemies
         public LayerMask targetMask;
         public LayerMask obstructionMask;
         public float checkInterval = 0.2f;
+
+        [Header("Hitbox Line of Sight")]
+        public LayerMask playerHitboxMask;
 
         [Header("Debug")]
         public bool drawFOV = true;
@@ -80,7 +84,12 @@ namespace RooseLabs.Enemies
 
             foreach (Collider col in targetsInViewRadius)
             {
-                Transform target = col.transform;
+                //Transform target = col.transform;
+                Transform target = col.GetComponentInParent<PlayerCharacter>().RaycastTarget;
+                if (target == null)
+                {
+                    Debug.LogWarning("[EnemyDetection] Target has no RaycastTarget assigned!");
+                }
                 Vector3 dirToTarget = (target.position - transform.position).normalized;
 
                 // Horizontal angle
@@ -112,7 +121,7 @@ namespace RooseLabs.Enemies
             if (best != null)
             {
                 // Draw green line to the detected target
-                Debug.DrawLine(transform.position + Vector3.up * 0.5f, best.position, Color.green, checkInterval);
+                //Debug.DrawLine(transform.position + Vector3.up * 0.5f, best.position, Color.green, checkInterval);
             }
             else
             {
@@ -125,16 +134,45 @@ namespace RooseLabs.Enemies
                     if (Physics.Raycast(transform.position + Vector3.up * 0.5f, dirToTarget, out RaycastHit hit, dstToTarget, obstructionMask))
                     {
                         // Red: something blocks the view (like a table)
-                        Debug.DrawLine(transform.position + Vector3.up * 0.5f, hit.point, Color.red, checkInterval);
+                        //Debug.DrawLine(transform.position + Vector3.up * 0.5f, hit.point, Color.red, checkInterval);
                     }
                     else
                     {
                         // Yellow: line of sight is clear but outside FOV angles
-                        Debug.DrawLine(transform.position + Vector3.up * 0.5f, col.transform.position, Color.yellow, checkInterval);
+                        //Debug.DrawLine(transform.position + Vector3.up * 0.5f, col.transform.position, Color.yellow, checkInterval);
                     }
                 }
             }
             #endif
+        }
+
+        public bool HasLineOfSightOfHitbox(Transform target, Transform origin)
+        {
+            if (target == null) return false;
+
+            Vector3 direction = (target.position - origin.position).normalized;
+            float distance = Vector3.Distance(origin.position, target.position);
+
+            // Perform a single raycast to check the first thing hit
+            if (Physics.Raycast(origin.position, direction, out RaycastHit hit, distance, playerHitboxMask | obstructionMask))
+            {
+                // If what we hit is on the playerHitboxMask, we have clear sight
+                if (((1 << hit.transform.gameObject.layer) & playerHitboxMask) != 0)
+                {
+                    Debug.DrawRay(origin.position, direction * hit.distance, Color.yellow, 0.1f);
+                    // Debug.Log($"[AI] LOS clear - hit {hit.transform.name}");
+                    return true;
+                }
+
+                // Otherwise, it hit an obstacle first
+                Debug.DrawRay(origin.position, direction * hit.distance, Color.red, 0.1f);
+                // Debug.Log($"[AI] LOS blocked by {hit.transform.name}");
+                return false;
+            }
+
+            // If no hit at all, assume line of sight is clear
+            Debug.DrawRay(origin.position, direction * distance, Color.green, 0.1f);
+            return true;
         }
 
         #region Debug - FOV Mesh/Gizmo
