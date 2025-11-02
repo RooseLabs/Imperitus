@@ -352,7 +352,7 @@ namespace RooseLabs.Player
             foreach (var rb in m_ragdollRigidbodies)
                 rb.isKinematic = !active;
             foreach (var col in m_ragdollColliders)
-                col.enabled = active;
+                col.isTrigger = !active;
         }
 
         private IEnumerator WaitForRagdollToSettle()

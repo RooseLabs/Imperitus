@@ -1579,7 +1579,6 @@ GameObject:
   - component: {fileID: 8138562761348339283}
   - component: {fileID: 2052681945483115521}
   - component: {fileID: 5099047441057018779}
-  - component: {fileID: 8082557181930606809}
   - component: {fileID: 5869650621947341771}
   - component: {fileID: 6121780074039715582}
   - component: {fileID: 7652611172026813195}
@@ -1714,12 +1713,12 @@ MonoBehaviour:
   _componentIndexCache: 0
   _addedNetworkObject: {fileID: 7652611172026813195}
   _networkObjectCache: {fileID: 7652611172026813195}
-  <RaycastTarget>k__BackingField: {fileID: 4398373416247838343}
   <Camera>k__BackingField: {fileID: 5566422381978464674}
   meshesToHide:
   - {fileID: 8917651978639278741}
   - {fileID: 976147575388911505}
   - {fileID: 7550373485487701070}
+  <RaycastTarget>k__BackingField: {fileID: 4398373416247838343}
   <Wand>k__BackingField: {fileID: 5193497287144287733}
 --- !u!114 &2194619057779025337
 MonoBehaviour:
@@ -1823,22 +1822,6 @@ MonoBehaviour:
   handViewportPos: {x: 0.8, y: 0.2}
   handTargetOffsetRotation: {x: 0, y: 0.14349262, z: 0, w: 0.9896514}
   handDistance: 0.45
---- !u!114 &8082557181930606809
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6907876458342397342}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bcd9716f358ec8941ae060bffac6645d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.PlayerHitbox
-  hitboxLayer:
-    serializedVersion: 2
-    m_Bits: 512
-  makeTriggersByDefault: 1
 --- !u!114 &5869650621947341771
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1906,7 +1889,8 @@ MonoBehaviour:
   - {fileID: 7047589884357707370}
   - {fileID: 0}
   InitializedParentNetworkBehaviour: {fileID: 0}
-  InitializedNestedNetworkObjects: [{fileID: 2479056876829966756}]
+  InitializedNestedNetworkObjects:
+  - {fileID: 2479056876829966756}
   RuntimeParentNetworkBehaviour: {fileID: 0}
   RuntimeChildNetworkBehaviours: []
   _isNetworked: 1
@@ -2862,9 +2846,9 @@ CapsuleCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.0512563
   m_Height: 0.40492284
@@ -3033,9 +3017,9 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 0.3009432, y: 0.38858613, z: 0.23308837}
   m_Center: {x: -1.21408925e-14, y: 0.19429253, z: -0.006186285}
@@ -3142,9 +3126,9 @@ CapsuleCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.07925472
   m_Height: 0.31759688
@@ -3263,9 +3247,9 @@ CapsuleCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.051793937
   m_Height: 0.4049231
@@ -3394,9 +3378,9 @@ SphereCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 3
   m_Radius: 0.16023552
   m_Center: {x: -1.1358384e-14, y: 0.16889058, z: -0.013263728}
@@ -3508,9 +3492,9 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 0.3009432, y: 0.13412723, z: 0.2244761}
   m_Center: {x: -0.00000001490117, y: 0.055630725, z: -0.0117575675}
@@ -3814,9 +3798,9 @@ CapsuleCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.08088978
   m_Height: 0.31759682
@@ -3930,9 +3914,9 @@ CapsuleCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.05560763
   m_Height: 0.1958148
@@ -4036,9 +4020,9 @@ CapsuleCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.06714859
   m_Height: 0.35641122
@@ -4157,9 +4141,9 @@ CapsuleCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.056946844
   m_Height: 0.19581458
@@ -4288,9 +4272,9 @@ CapsuleCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.06880149
   m_Height: 0.35641134
