@@ -1,10 +1,12 @@
 using UnityEngine;
-using DebugManager = RooseLabs.Utils.DebugManager;
+using Logger = RooseLabs.Core.Logger;
 
 namespace RooseLabs.Enemies
 {
     public class InvestigateState : IEnemyState
     {
+        private Logger Logger => Logger.GetLogger("Hanadura");
+
         private readonly HanaduraAI owner;
         private float investigateTimer;
         private readonly float investigateDuration = 6f;
@@ -39,13 +41,13 @@ namespace RooseLabs.Enemies
             owner.navAgent.isStopped = false;
             owner.navAgent.SetDestination(investigatePoint);
 
-            DebugManager.Log($"[InvestigateState] Starting investigation at {investigatePoint}");
+            Logger.Info($"[InvestigateState] Starting investigation at {investigatePoint}");
         }
 
         public void Exit()
         {
             owner.SetAnimatorBool("IsLookingAround", false);
-            DebugManager.Log("[InvestigateState] Finished investigating.");
+            Logger.Info("[InvestigateState] Finished investigating.");
         }
 
         public void Tick()
@@ -58,7 +60,7 @@ namespace RooseLabs.Enemies
                     hasReachedPoint = true;
                     owner.StopMovement();
                     owner.SetAnimatorBool("IsLookingAround", true);
-                    DebugManager.Log("[InvestigateState] Reached investigation point, looking around...");
+                    Logger.Info("[InvestigateState] Reached investigation point, looking around...");
                 }
             }
             else
@@ -69,7 +71,7 @@ namespace RooseLabs.Enemies
                 if (investigateTimer <= 0f && !investigationComplete)
                 {
                     investigationComplete = true;
-                    DebugManager.Log("[InvestigateState] Investigation timer expired - ready to transition.");
+                    Logger.Info("[InvestigateState] Investigation timer expired - ready to transition.");
                 }
             }
         }

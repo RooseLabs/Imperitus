@@ -1,11 +1,13 @@
 using System.Collections.Generic;
 using UnityEngine;
-using DebugManager = RooseLabs.Utils.DebugManager;
+using Logger = RooseLabs.Core.Logger;
 
 namespace RooseLabs
 {
     public class SoundManager : MonoBehaviour
     {
+        private Logger Logger => Logger.GetLogger("SoundManager");
+
         public static SoundManager Instance { get; private set; }
 
         [Header("Detection")]
@@ -106,11 +108,11 @@ namespace RooseLabs
                 try
                 {
                     listener.OnSoundHeard(position, soundType, maxIntensity);
-                    DebugManager.Log($"[SoundManager] Notifying '{c.name}' with intensity {maxIntensity:F2} (isItemDrop: {isItemDrop})");
+                    Logger.Info($"Notifying '{c.name}' with intensity {maxIntensity:F2} (isItemDrop: {isItemDrop})");
                 }
                 catch (System.Exception ex)
                 {
-                    DebugManager.LogError($"Exception when notifying listener '{c.name}': {ex}");
+                    Logger.Error($"Exception when notifying listener '{c.name}': {ex}");
                 }
             }
         }
@@ -166,7 +168,7 @@ namespace RooseLabs
                 }
                 catch (System.Exception ex)
                 {
-                    DebugManager.LogError($"Exception when notifying listener '{c.name}' about voice: {ex}");
+                    Logger.Error($"Exception when notifying listener '{c.name}' about voice: {ex}");
                 }
             }
         }

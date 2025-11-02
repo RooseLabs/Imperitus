@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
-using DebugManager = RooseLabs.Utils.DebugManager;
+using Logger = RooseLabs.Core.Logger;
 
 namespace RooseLabs.Enemies
 {
@@ -13,6 +13,8 @@ namespace RooseLabs.Enemies
     [RequireComponent(typeof(NetworkObject))]
     public class HanaduraAI : NetworkBehaviour, ISoundListener
     {
+        private Logger Logger => Logger.GetLogger("Hanadura");
+
         [Header("References")]
         public NavMeshAgent navAgent;
         public EnemyDetection detection;
@@ -267,7 +269,7 @@ namespace RooseLabs.Enemies
                     hasTriggeredDetectedAnimation = true;
                     isPlayingDetectedAnimation = true;
                     StopMovement(); // Stop the enemy
-                    DebugManager.Log("[HanaduraAI] First visual detection - playing Detected animation");
+                    Logger.Info("[HanaduraAI] First visual detection - playing Detected animation");
                 }
 
                 // Reset lost sight timer
@@ -404,7 +406,7 @@ namespace RooseLabs.Enemies
 
             if (currentState != null)
             {
-                DebugManager.Log($"[HanaduraAI] Entered state: {currentState.GetType().Name}");
+                Logger.Info($"[HanaduraAI] Entered state: {currentState.GetType().Name}");
                 currentState.Enter();
             }
         }

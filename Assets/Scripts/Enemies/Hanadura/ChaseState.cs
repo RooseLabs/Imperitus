@@ -1,10 +1,12 @@
 using UnityEngine;
-using DebugManager = RooseLabs.Utils.DebugManager;
+using Logger = RooseLabs.Core.Logger;
 
 namespace RooseLabs.Enemies
 {
     public class ChaseState : IEnemyState
     {
+        private Logger Logger => Logger.GetLogger("Hanadura");
+
         private HanaduraAI ai;
         private float updateInterval = 0.2f;
         private float updateTimer = 0f;
@@ -35,7 +37,7 @@ namespace RooseLabs.Enemies
 
             if (!targetPos.HasValue)
             {
-                DebugManager.LogWarning("[ChaseState] No target position available!");
+                Logger.Warning("[ChaseState] No target position available!");
                 return;
             }
 
@@ -55,7 +57,7 @@ namespace RooseLabs.Enemies
                 {
                     // Reached last known position, let the priority system decide next action
                     // (Could transition to investigate or patrol automatically)
-                    DebugManager.Log("[ChaseState] Reached last known position.");
+                    Logger.Info("[ChaseState] Reached last known position.");
                 }
             }
         }
