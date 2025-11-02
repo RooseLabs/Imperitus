@@ -1,6 +1,8 @@
 using FishNet.Component.Animating;
 using FishNet.Object;
+using RooseLabs.Utils;
 using UnityEngine;
+using UnityEngine.Animations.Rigging;
 
 namespace RooseLabs.Player
 {
@@ -36,15 +38,33 @@ namespace RooseLabs.Player
         private const float AnimCrawlSpeed  = 0.25f;
         #endregion
 
+        #region Serialized
         [field: SerializeField] public Animator Animator { get; private set; }
         [field: SerializeField] public NetworkAnimator NetworkAnimator { get; private set; }
+
+        [Header("Head IK")]
         [SerializeField] private Transform headLookTarget;
 
+        [Header("Hand IK")]
+        [SerializeField] private Rig armRig;
+        [SerializeField] private Transform handTarget;
+        [SerializeField] private Vector2 handViewportPos = new(0.8f, 0.2f);
+        [SerializeField] private Quaternion handTargetOffsetRotation = Quaternion.identity;
+        [SerializeField][Range(0.4f, 0.5f)] private float handDistance = 0.45f;
+        #endregion
+
         private PlayerCharacter m_character;
+
+        private Transform m_rightShoulder;
+        private Transform m_rightLowerArm;
+        private float m_armRigWeightVelocity = 0f;
 
         private void Start()
         {
             m_character = GetComponent<PlayerCharacter>();
+
+            m_rightShoulder = Animator.GetBoneTransform(HumanBodyBones.RightShoulder);
+            m_rightLowerArm = Animator.GetBoneTransform(HumanBodyBones.RightLowerArm);
         }
 
         public override void OnStartClient()
@@ -55,8 +75,9 @@ namespace RooseLabs.Player
         private void LateUpdate()
         {
             UpdateAnimatorParameters();
-            if (m_character.Data.speedChangedThisFrame)
+            if (m_character.Data.SpeedChangedThisFrame)
                 AdjustAnimationSpeed();
+            UpdateArmIK();
             RecalculateHeadLookTarget();
         }
 
@@ -65,7 +86,7 @@ namespace RooseLabs.Player
         /// </summary>
         private void UpdateAnimatorParameters()
         {
-            if (!m_character.Data.stateChangedThisFrame) return;
+            if (!m_character.Data.StateChangedThisFrame) return;
             Animator.SetBool(B_IsRunning, m_character.Data.IsRunning);
             Animator.SetBool(B_IsCrouching, m_character.Data.IsCrouching);
             Animator.SetBool(B_IsCrawling, m_character.Data.IsCrawling);
@@ -120,6 +141,62 @@ namespace RooseLabs.Player
             }
 
             headLookTarget.position = m_character.Camera.transform.position + lookDirection * 2.5f;
+        }
+
+        private void UpdateArmIK()
+        {
+            const float minAngleStandingHand  = 75f;
+            const float maxAngleStandingHand  = 140f;
+            const float minAngleCrouchingHand = 120f;
+            const float maxAngleCrouchingHand = 140f;
+
+            if (m_character.Data.IsAiming)
+            {
+                armRig.weight = Mathf.SmoothDamp(armRig.weight, 1f, ref m_armRigWeightVelocity, 0.1f);
+            }
+            else
+            {
+                armRig.weight = Mathf.SmoothDamp(armRig.weight, 0f, ref m_armRigWeightVelocity, 0.1f);
+                return;
+            }
+
+            Vector2 viewAngles = CameraPlaneUtils.ViewportToViewAngles(m_character.Camera, handViewportPos);
+            float yawOffset = viewAngles.x * Mathf.Rad2Deg;
+            float pitchOffset = viewAngles.y * Mathf.Rad2Deg;
+
+            Vector3 centerDir = m_character.Camera.transform.forward;
+            float centerY = centerDir.y;
+            float centerHorizMag = Mathf.Sqrt(centerDir.x * centerDir.x + centerDir.z * centerDir.z);
+            float centerPitch = Mathf.Atan2(centerY, centerHorizMag) * Mathf.Rad2Deg;
+            float centerYaw = Mathf.Atan2(centerDir.x, centerDir.z) * Mathf.Rad2Deg;
+
+            float desiredPitch = centerPitch + pitchOffset;
+            float desiredYaw = centerYaw + yawOffset;
+
+            float minAngle = m_character.Data.IsCrouching ? minAngleCrouchingHand : minAngleStandingHand;
+            float maxAngle = m_character.Data.IsCrouching ? maxAngleCrouchingHand : maxAngleStandingHand;
+
+            float minPitch = 90f - maxAngle;
+            float maxPitch = 90f - minAngle;
+
+            float clampedPitch = Mathf.Clamp(desiredPitch, minPitch, maxPitch);
+
+            float pitchRad = clampedPitch * Mathf.Deg2Rad;
+            float yawRad = desiredYaw * Mathf.Deg2Rad;
+
+            Vector3 direction = new Vector3(
+                Mathf.Sin(yawRad) * Mathf.Cos(pitchRad),
+                Mathf.Sin(pitchRad),
+                Mathf.Cos(yawRad) * Mathf.Cos(pitchRad)
+            );
+
+            Vector3 shoulderPosition = m_rightShoulder.position;
+            Vector3 viewTargetPosition = m_character.Camera.transform.position + direction * 0.5f;
+            Vector3 directionToViewTarget = (viewTargetPosition - shoulderPosition).normalized;
+            float distToViewTarget = Vector3.Distance(shoulderPosition, viewTargetPosition);
+
+            handTarget.position = shoulderPosition + directionToViewTarget * Mathf.Min(handDistance, distToViewTarget);
+            handTarget.rotation = m_rightLowerArm.rotation * handTargetOffsetRotation;
         }
 
         public void Play(int stateHash)

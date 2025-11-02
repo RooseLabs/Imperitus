@@ -96,7 +96,7 @@ namespace RooseLabs.Player
 
             Vector2 moveInput = m_character.Input.movementInput;
             m_character.Data.CurrentSpeed = moveInput.sqrMagnitude <= 0.01f ? 0.0f : CurrentStateSpeed;
-            Vector3 lookForward = m_character.Data.lookDirection_Flat;
+            Vector3 lookForward = m_character.Data.lookDirectionFlat;
             Vector3 lookRight = Vector3.Cross(Vector3.up, lookForward).normalized;
             Vector3 moveDirection = (lookRight * moveInput.x + lookForward * moveInput.y).normalized;
             Vector3 deltaMovement = moveDirection * m_character.Data.CurrentSpeed;
@@ -248,15 +248,20 @@ namespace RooseLabs.Player
             }
 
             // Handle rotation
-            if (moveInput.sqrMagnitude <= 0.01f)
+            if (m_character.Data.IsAiming)
+            {
+                // While aiming, rotation should always face look direction
+                modelTransform.rotation = Quaternion.LookRotation(m_character.Data.lookDirectionFlat);
+            }
+            else if (moveInput.sqrMagnitude <= 0.01f)
             {
                 // Not moving, rotate when look direction is above a certain threshold
-                float angle = Vector3.Angle(modelTransform.forward, m_character.Data.lookDirection_Flat);
+                float angle = Vector3.Angle(modelTransform.forward, m_character.Data.lookDirectionFlat);
                 if (angle > 45f)
                 {
                     modelTransform.rotation = Quaternion.Slerp(
                         modelTransform.rotation,
-                        Quaternion.LookRotation(m_character.Data.lookDirection_Flat),
+                        Quaternion.LookRotation(m_character.Data.lookDirectionFlat),
                         Mathf.InverseLerp(45f, 80f, angle) * 10f * Time.deltaTime
                     );
                 }
@@ -264,7 +269,7 @@ namespace RooseLabs.Player
             else
             {
                 // Moving, rotate based on movement direction and look direction
-                Vector3 lookDirection = m_character.Data.lookDirection_Flat;
+                Vector3 lookDirection = m_character.Data.lookDirectionFlat;
 
                 float forwardAmount = hasVertical ? Mathf.Abs(verticalInput) : 0.0f;
                 float sideAmount = Mathf.Abs(moveInput.x);

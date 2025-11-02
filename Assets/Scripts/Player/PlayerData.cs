@@ -15,6 +15,9 @@ namespace RooseLabs.Player
         public Slider m_healthSlider;
         public Slider m_staminaSlider;
 
+        public bool StateChangedThisFrame { get; private set; }
+        public bool SpeedChangedThisFrame { get; private set; }
+
         public float MaxHealth
         {
             get => m_maxHealth;
@@ -26,6 +29,7 @@ namespace RooseLabs.Player
             get => m_health;
             set => m_health = Mathf.Clamp(value, 0f, m_maxHealth);
         }
+
         public float MaxStamina
         {
             get => m_maxStamina;
@@ -38,10 +42,6 @@ namespace RooseLabs.Player
             set => m_stamina = Mathf.Clamp(value, 0f, m_maxStamina);
         }
 
-        public Vector2 lookValues;
-        public Vector3 lookDirection;
-        public Vector3 lookDirection_Flat;
-
         private bool m_isRunning = false;
         public bool IsRunning
         {
@@ -50,7 +50,7 @@ namespace RooseLabs.Player
             {
                 if (m_isRunning == value) return;
                 m_isRunning = value;
-                stateChangedThisFrame = true;
+                StateChangedThisFrame = true;
             }
         }
 
@@ -62,7 +62,7 @@ namespace RooseLabs.Player
             {
                 if (m_isCrouching == value) return;
                 m_isCrouching = value;
-                stateChangedThisFrame = true;
+                StateChangedThisFrame = true;
             }
         }
 
@@ -74,7 +74,7 @@ namespace RooseLabs.Player
             {
                 if (m_isCrawling == value) return;
                 m_isCrawling = value;
-                stateChangedThisFrame = true;
+                StateChangedThisFrame = true;
             }
         }
 
@@ -92,7 +92,7 @@ namespace RooseLabs.Player
                     m_isCrouching = false;
                     m_isRunning = false;
                 }
-                stateChangedThisFrame = true;
+                StateChangedThisFrame = true;
             }
         }
 
@@ -103,17 +103,21 @@ namespace RooseLabs.Player
             set
             {
                 m_currentSpeed = value;
-                speedChangedThisFrame = !Mathf.Approximately(m_currentSpeed, value);
+                SpeedChangedThisFrame = !Mathf.Approximately(m_currentSpeed, value);
             }
         }
 
-        public bool stateChangedThisFrame = false;
-        public bool speedChangedThisFrame = false;
+        public bool IsAiming { get; set; }
+        public bool IsCasting { get; set; }
+
+        public Vector2 lookValues;
+        public Vector3 lookDirection;
+        public Vector3 lookDirectionFlat;
 
         private void LateUpdate()
         {
-            stateChangedThisFrame = false;
-            speedChangedThisFrame = false;
+            StateChangedThisFrame = false;
+            SpeedChangedThisFrame = false;
         }
 
         public void UpdateHealth(float amount)

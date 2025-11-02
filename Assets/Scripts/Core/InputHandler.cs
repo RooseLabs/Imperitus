@@ -92,5 +92,10 @@ namespace RooseLabs.Core
         {
             return m_currentDevice is Keyboard or Pointer;
         }
+
+        public bool IsCurrentDeviceGamepad()
+        {
+            return m_currentDevice is Gamepad;
+        }
     }
 }

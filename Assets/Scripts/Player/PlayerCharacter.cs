@@ -17,17 +17,23 @@ namespace RooseLabs.Player
 
         public PlayerConnection Player => PlayerHandler.GetPlayer(Owner);
 
+        #region Serialized
         [field: SerializeField] public Camera Camera { get; private set; }
+
         [Tooltip("Meshes to hide from the local player (e.g. body, head, accessories)")]
         [SerializeField] private GameObject[] meshesToHide = Array.Empty<GameObject>();
+        #endregion
 
+        #region References
         public PlayerInput Input { get; private set; }
         public PlayerData Data { get; private set; }
         public PlayerMovement Movement { get; private set; }
+        [field: SerializeField]  public PlayerWand Wand { get; private set; }
         public PlayerAnimations Animations { get; private set; }
         public PlayerRagdoll Ragdoll { get; private set; }
 
         private Rigidbody m_rigidbody;
+        #endregion
 
         private void Awake()
         {
@@ -78,7 +84,7 @@ namespace RooseLabs.Player
             Data.lookDirection = normalized;
             normalized.y = 0.0f;
             normalized.Normalize();
-            Data.lookDirection_Flat = normalized;
+            Data.lookDirectionFlat = normalized;
         }
 
         [TargetRpc]

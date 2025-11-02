@@ -43,7 +43,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Attack",
+                    "name": "Cast",
                     "type": "Button",
                     "id": "6c2ab1b8-8984-453a-af3d-a3c78ae1679a",
                     "expectedControlType": "",
@@ -118,6 +118,42 @@
                     "name": "PushToTalk",
                     "type": "Button",
                     "id": "65820083-317f-41d3-ab8b-4c6bf47fd551",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Scroll",
+                    "type": "Value",
+                    "id": "ef1a2dde-22d0-4d89-a9da-c4f244873e4a",
+                    "expectedControlType": "Axis",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "ScrollButton",
+                    "type": "Button",
+                    "id": "7e57cfd4-aeb3-4a5e-8afb-197d269ef443",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "ScrollBackward",
+                    "type": "Button",
+                    "id": "33c76159-a327-4a63-aa68-f6493667a886",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "ScrollForward",
+                    "type": "Button",
+                    "id": "2a60d014-3dea-4851-9abf-cca773263b9e",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -262,7 +298,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Gamepad",
-                    "action": "Attack",
+                    "action": "Cast",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -273,7 +309,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
-                    "action": "Attack",
+                    "action": "Cast",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -284,7 +320,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Touch",
-                    "action": "Attack",
+                    "action": "Cast",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -295,7 +331,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Joystick",
-                    "action": "Attack",
+                    "action": "Cast",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -306,7 +342,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "XR",
-                    "action": "Attack",
+                    "action": "Cast",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -317,7 +353,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
-                    "action": "Attack",
+                    "action": "Cast",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -334,8 +370,19 @@
                 },
                 {
                     "name": "",
+                    "id": "9bf3a7c7-7fe2-4a22-9063-d5c278263c61",
+                    "path": "<Gamepad>/rightShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "Next",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "cbac6039-9c09-46a1-b5f2-4e5124ccb5ed",
-                    "path": "<Keyboard>/2",
+                    "path": "<Mouse>/forwardButton",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
@@ -422,8 +469,19 @@
                 },
                 {
                     "name": "",
+                    "id": "1c2ea619-4044-4cfa-9dcb-32370fabae0e",
+                    "path": "<Gamepad>/leftShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "Previous",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "1534dc16-a6aa-499d-9c3a-22b47347b52a",
-                    "path": "<Keyboard>/1",
+                    "path": "<Mouse>/backButton",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
@@ -544,7 +602,7 @@
                 {
                     "name": "",
                     "id": "27a3db1b-ec38-46fc-bfd4-c7d443c09912",
-                    "path": "<Gamepad>/select",
+                    "path": "<Gamepad>/rightStickPress",
                     "interactions": "",
                     "processors": "",
                     "groups": ";Gamepad",
@@ -593,6 +651,50 @@
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
                     "action": "OpenNotebook",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "ead14b27-2197-4cc3-89e5-6c273d2742e5",
+                    "path": "<Mouse>/scroll/y",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "Scroll",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "33e06482-736c-49e4-a33d-e39e31c4237d",
+                    "path": "<Mouse>/middleButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "ScrollButton",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "8c712293-6c80-4267-8948-4b5ab524e891",
+                    "path": "<Gamepad>/dpad/down",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Gamepad",
+                    "action": "ScrollBackward",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "7b1dab0b-b5b5-451f-b798-7ec331771054",
+                    "path": "<Gamepad>/dpad/up",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Gamepad",
+                    "action": "ScrollForward",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
