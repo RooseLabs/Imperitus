@@ -22,7 +22,8 @@ namespace RooseLabs.Player
         private SpellBase m_currentSpellInstance;
         private bool m_currentSpellInstanceDirty = true; // Start dirty to ensure initial setup
 
-        private readonly List<int> m_availableSpells = new() { 0 };
+        // TODO: Either add public methods to add/remove spells from this list or make it public.
+        private readonly List<int> m_availableSpells = new() { 0, 1 };
 
         private int m_currentSpellIndex = 0;
         private int CurrentSpellIndex
@@ -32,7 +33,7 @@ namespace RooseLabs.Player
             {
                 if (m_availableSpells.Count == 0) return;
                 int previousValue = m_currentSpellIndex;
-                m_currentSpellIndex = value % m_availableSpells.Count;
+                m_currentSpellIndex = (value % m_availableSpells.Count + m_availableSpells.Count) % m_availableSpells.Count;
                 if (previousValue != m_currentSpellIndex)
                 {
                     m_currentSpellInstanceDirty = true;
@@ -59,10 +60,12 @@ namespace RooseLabs.Player
             {
                 if (m_currentSpellInstance)
                 {
-                    // TODO: Implement the scrolling during casting.
-                    // TODO: Some spells may need to allow the player to let go of the cast button while still
-                    //   maintaining the spell effect. This is especially true for spells that have scrolling behavior.
-                    if (character.Input.castWasPressed)
+                    if (m_currentSpellInstance.CanAimToSustain && m_currentSpellInstance.IsBeingSustained)
+                    {
+                        m_currentSpellInstance.ContinueCast();
+                        character.Data.IsCasting = true;
+                    }
+                    else if (character.Input.castWasPressed)
                     {
                         m_currentSpellInstance.StartCast();
                         character.Data.IsCasting = true;
@@ -77,21 +80,29 @@ namespace RooseLabs.Player
                         m_currentSpellInstance.CancelCast();
                         character.Data.IsCasting = false;
                     }
-                    else if (character.Data.IsCasting)
-                        Debug.LogWarning("[PlayerWand] Inconsistent casting state detected.");
+                    if (m_currentSpellInstance.IsBeingSustained)
+                    {
+                        if (character.Input.scrollBackwardIsPressed && character.Input.scrollForwardIsPressed) { /* noop */ }
+                        else if (character.Input.scrollForwardWasPressed) m_currentSpellInstance.ScrollForwardPressed();
+                        else if (character.Input.scrollForwardIsPressed) m_currentSpellInstance.ScrollForwardHeld();
+                        else if (character.Input.scrollBackwardWasPressed) m_currentSpellInstance.ScrollBackwardPressed();
+                        else if (character.Input.scrollBackwardIsPressed) m_currentSpellInstance.ScrollBackwardHeld();
+                        else if (character.Input.scrollInput != 0f) m_currentSpellInstance.Scroll(character.Input.scrollInput);
+                    }
                 }
                 if (character.Data.IsCasting) return;
-                if (character.Input.nextWasPressed || character.Input.scrollInput >= 1f)
+                // TODO: Switching spells needs a small cooldown (<= 1 second).
+                if (character.Input.scrollButtonWasPressed || (m_inputHandler.IsCurrentDeviceGamepad() && character.Input.nextIsPressed && character.Input.previousIsPressed))
+                {
+                    CurrentSpellIndex = 0;
+                }
+                else if (character.Input.nextWasPressed || character.Input.scrollInput >= 1f)
                 {
                     CurrentSpellIndex++;
                 }
                 else if (character.Input.previousWasPressed || character.Input.scrollInput <= -1f)
                 {
                     CurrentSpellIndex--;
-                }
-                else if (character.Input.scrollButtonWasPressed || (m_inputHandler.IsCurrentDeviceGamepad() && character.Input.nextIsPressed && character.Input.previousIsPressed))
-                {
-                    CurrentSpellIndex = 0;
                 }
                 if (m_currentSpellInstanceDirty)
                     UpdateCurrentSpellInstance();

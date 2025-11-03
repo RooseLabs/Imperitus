@@ -8,28 +8,36 @@ using UnityEngine;
 
 namespace RooseLabs.Gameplay.Spells
 {
+    [System.Serializable]
+    public enum SpellCastType
+    {
+        OneShot,       // After cast completes, effect happens immediately
+        CastToSustain, // After cast completes, effect persists while cast button is held (aim button must also be held)
+        AimToSustain   // After cast completes, effect persists while aim button is held (cast button can be released)
+    }
+
+    [System.Serializable]
+    public enum StaminaConsumptionType
+    {
+        OnCastStart,        // Stamina cost applied immediately when casting starts
+        LinearlyDuringCast, // Stamina cost applied gradually over the cast time
+        OnCastFinish        // Stamina cost applied when the cast finishes
+    }
+
     [RequireComponent(typeof(PredictedSpawn))]
     public abstract class SpellBase : NetworkBehaviour
     {
-        [System.Serializable]
-        protected enum StaminaConsumptionType
-        {
-            OnCastStart,
-            LinearlyDuringCast,
-            OnCastFinish
-        }
-
         #region Serialized
         [SerializeField] private SpellSO spellInfo;
-        [Tooltip("Whether the cast button should be held down after the spell finishes casting to maintain its effect.")]
-        [SerializeField] private bool heldSpell = false;
+        [Tooltip("Type of spell casting behavior.")]
+        [SerializeField] private SpellCastType castType = SpellCastType.OneShot;
         [Tooltip("Time in seconds required to cast the spell.")]
         [SerializeField] private float castTime = 0f;
         [Tooltip("Stamina cost for casting the spell.")]
         [SerializeField] private float staminaCost = 0f;
         [Tooltip("When and how the stamina cost is applied.")]
         [SerializeField] private StaminaConsumptionType staminaConsumptionType = StaminaConsumptionType.LinearlyDuringCast;
-        [Tooltip("For held spells: extra stamina cost per second while the spell is held.")]
+        [Tooltip("For sustained spells: extra stamina cost per second while the spell is being sustained.")]
         [SerializeField] private float staminaCostPerSecond = 0f;
         #endregion
 
@@ -47,6 +55,9 @@ namespace RooseLabs.Gameplay.Spells
         }
 
         #region Public API
+        public bool CanAimToSustain => castType == SpellCastType.AimToSustain;
+        public bool IsBeingSustained { get; protected set; } = false;
+
         public void StartCast()
         {
             OnStartCast();
@@ -138,23 +149,24 @@ namespace RooseLabs.Gameplay.Spells
         }
 
         /// <summary>
-        /// Called when the spell cast is finished and the cast button is held down. Used for held spells.
+        /// Called when the spell cast is finished and the cast button is held down. Used for sustained spells.
         /// </summary>
-        protected virtual void OnContinueCastHeld()
+        protected virtual void OnContinueCastSustained()
         {
             Debug.Log($"Spell {spellInfo.Name} Cast Held Continued");
         }
 
         /// <summary>
-        /// Called when the spell cast is finished and the cast button is released. Used for held spells.
+        /// Called when the spell cast is finished and the cast button is released. Used for sustained spells.
         /// </summary>
-        protected virtual void OnCancelCastHeld()
+        protected virtual void OnCancelCastSustained()
         {
             Debug.Log($"Spell {spellInfo.Name} Cancel Held");
         }
 
         /// <summary>
         /// Called when a backward scroll input is pressed.
+        /// This is only possible on sustained spells.
         /// </summary>
         protected virtual void OnScrollBackwardPressed()
         {
@@ -163,6 +175,7 @@ namespace RooseLabs.Gameplay.Spells
 
         /// <summary>
         /// Called when a forward scroll input is pressed.
+        /// This is only possible on sustained spells.
         /// </summary>
         protected virtual void OnScrollForwardPressed()
         {
@@ -171,6 +184,7 @@ namespace RooseLabs.Gameplay.Spells
 
         /// <summary>
         /// Called when a backward scroll input is held.
+        /// This is only possible on sustained spells.
         /// </summary>
         protected virtual void OnScrollBackwardHeld()
         {
@@ -179,6 +193,7 @@ namespace RooseLabs.Gameplay.Spells
 
         /// <summary>
         /// Called when a forward scroll input is held.
+        /// This is only possible on sustained spells.
         /// </summary>
         protected virtual void OnScrollForwardHeld()
         {
@@ -187,6 +202,7 @@ namespace RooseLabs.Gameplay.Spells
 
         /// <summary>
         /// Called with the scroll delta/value (e.g. mouse wheel delta or axis value).
+        /// This is only possible on sustained spells.
         /// </summary>
         protected virtual void OnScroll(float value)
         {

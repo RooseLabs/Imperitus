@@ -1,6 +1,6 @@
 namespace RooseLabs.Gameplay.Spells
 {
-    public class Impero : SpellBase
+    public class Fireball : SpellBase
     {
         protected override void OnStartCast()
         {

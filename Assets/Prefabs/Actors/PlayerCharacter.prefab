@@ -286,9 +286,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2836e36774ca1c4bbbee976e17b649c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: FishNet.Runtime::FishNet.Component.Transforming.NetworkTransform
-  _componentIndexCache: 255
+  _componentIndexCache: 11
   _addedNetworkObject: {fileID: 7652611172026813195}
-  _networkObjectCache: {fileID: 0}
+  _networkObjectCache: {fileID: 7652611172026813195}
   _componentConfiguration: 0
   _synchronizeParent: 0
   _packing:
@@ -1719,7 +1719,7 @@ MonoBehaviour:
   - {fileID: 976147575388911505}
   - {fileID: 7550373485487701070}
   <RaycastTarget>k__BackingField: {fileID: 4398373416247838343}
-  <Wand>k__BackingField: {fileID: 5193497287144287733}
+  <Wand>k__BackingField: {fileID: 2178509645408755102}
 --- !u!114 &2194619057779025337
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1887,10 +1887,11 @@ MonoBehaviour:
   - {fileID: 2954016431569174323}
   - {fileID: 1046755158235027733}
   - {fileID: 7047589884357707370}
+  - {fileID: 3292224452197708559}
   - {fileID: 0}
   InitializedParentNetworkBehaviour: {fileID: 0}
   InitializedNestedNetworkObjects:
-  - {fileID: 2479056876829966756}
+  - {fileID: 0}
   RuntimeParentNetworkBehaviour: {fileID: 0}
   RuntimeChildNetworkBehaviours: []
   _isNetworked: 1
@@ -1913,7 +1914,7 @@ MonoBehaviour:
   _spectatorInterpolation: 2
   _enableTeleport: 0
   _teleportThreshold: 1
-  <PrefabId>k__BackingField: 4
+  <PrefabId>k__BackingField: 5
   <SpawnableCollectionId>k__BackingField: 0
   <AssetPathHash>k__BackingField: 9876715584152176679
   <SceneId>k__BackingField: 0
@@ -2047,8 +2048,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5785227541569650551}
-  - component: {fileID: 5193497287144287733}
-  - component: {fileID: 2479056876829966756}
+  - component: {fileID: 2178509645408755102}
   m_Layer: 0
   m_Name: Wand
   m_TagString: Untagged
@@ -2073,7 +2073,7 @@ Transform:
   - {fileID: 7084882734756081741}
   m_Father: {fileID: 5991676322209319926}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5193497287144287733
+--- !u!114 &2178509645408755102
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2086,64 +2086,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Player.PlayerWand
   _componentIndexCache: 0
-  _addedNetworkObject: {fileID: 2479056876829966756}
-  _networkObjectCache: {fileID: 2479056876829966756}
+  _addedNetworkObject: {fileID: 7652611172026813195}
+  _networkObjectCache: {fileID: 0}
   character: {fileID: 2298069713334961550}
   spellDatabase: {fileID: 11400000, guid: 9989f6ae5baf9cf40a61f0ef300f97fe, type: 2}
   <SpellCastPoint>k__BackingField: {fileID: 7084882734756081741}
---- !u!114 &2479056876829966756
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7425303649177833177}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 26b716c41e9b56b4baafaf13a523ba2e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: FishNet.Runtime::FishNet.Object.NetworkObject
-  <IsNested>k__BackingField: 1
-  WasActiveDuringEdit: 1
-  WasActiveDuringEdit_Set1: 1
-  <ComponentIndex>k__BackingField: 1
-  <PredictedSpawn>k__BackingField: {fileID: 0}
-  <PredictedOwner>k__BackingField: {fileID: 0}
-  NetworkBehaviours:
-  - {fileID: 5193497287144287733}
-  InitializedParentNetworkBehaviour: {fileID: 0}
-  InitializedNestedNetworkObjects: []
-  RuntimeParentNetworkBehaviour: {fileID: 0}
-  RuntimeChildNetworkBehaviours: []
-  _isNetworked: 1
-  _isSpawnable: 1
-  _isGlobal: 0
-  _initializeOrder: 0
-  _preventDespawnOnDisconnect: 0
-  _defaultDespawnType: 0
-  NetworkObserver: {fileID: 0}
-  _enablePrediction: 0
-  _predictionType: 0
-  _graphicalObject: {fileID: 0}
-  _detachGraphicalObject: 0
-  _enableStateForwarding: 1
-  _networkTransform: {fileID: 0}
-  _ownerInterpolation: 1
-  _ownerSmoothedProperties: 255
-  _adaptiveInterpolation: 3
-  _spectatorSmoothedProperties: 255
-  _spectatorInterpolation: 2
-  _enableTeleport: 0
-  _teleportThreshold: 1
-  <PrefabId>k__BackingField: 65535
-  <SpawnableCollectionId>k__BackingField: 0
-  <AssetPathHash>k__BackingField: 0
-  <SceneId>k__BackingField: 0
-  SerializedTransformProperties:
-    Position: {x: 0, y: 0, z: 0}
-    Rotation: {x: 0, y: 0, z: 0, w: 1}
-    Scale: {x: 1, y: 1, z: 1}
-    IsValid: 1
 --- !u!1 &8341259078320434640
 GameObject:
   m_ObjectHideFlags: 0

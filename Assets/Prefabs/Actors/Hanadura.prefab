@@ -187,9 +187,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f8f8b5c4170b9b941abe2febb99a913f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Enemies.WeaponCollider
-  _componentIndexCache: 255
+  _componentIndexCache: 1
   _addedNetworkObject: {fileID: 8806621658639097980}
-  _networkObjectCache: {fileID: 0}
+  _networkObjectCache: {fileID: 8806621658639097980}
   ownerAI: {fileID: 3025078776930143745}
   weaponTipObject: {fileID: 9211336466830289412}
   damageCooldown: 0.5
@@ -216,7 +216,9 @@ MonoBehaviour:
   <PredictedOwner>k__BackingField: {fileID: 0}
   NetworkBehaviours:
   - {fileID: 3025078776930143745}
+  - {fileID: 1005745351957962536}
   - {fileID: 912312794422129550}
+  - {fileID: 6208631941009141882}
   InitializedParentNetworkBehaviour: {fileID: 0}
   InitializedNestedNetworkObjects: []
   RuntimeParentNetworkBehaviour: {fileID: 0}
@@ -241,7 +243,7 @@ MonoBehaviour:
   _spectatorInterpolation: 2
   _enableTeleport: 0
   _teleportThreshold: 1
-  <PrefabId>k__BackingField: 1
+  <PrefabId>k__BackingField: 2
   <SpawnableCollectionId>k__BackingField: 0
   <AssetPathHash>k__BackingField: 5580580094153033759
   <SceneId>k__BackingField: 0
@@ -262,7 +264,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2836e36774ca1c4bbbee976e17b649c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: FishNet.Runtime::FishNet.Component.Transforming.NetworkTransform
-  _componentIndexCache: 1
+  _componentIndexCache: 2
   _addedNetworkObject: {fileID: 8806621658639097980}
   _networkObjectCache: {fileID: 8806621658639097980}
   _componentConfiguration: 0
@@ -308,9 +310,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8cac635f24954048aad3a6ff9110beb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: FishNet.Runtime::FishNet.Component.Animating.NetworkAnimator
-  _componentIndexCache: 255
+  _componentIndexCache: 3
   _addedNetworkObject: {fileID: 8806621658639097980}
-  _networkObjectCache: {fileID: 0}
+  _networkObjectCache: {fileID: 8806621658639097980}
   IgnoredParameters: []
   _animator: {fileID: 6587192327317228320}
   _synchronizeWhenDisabled: 0

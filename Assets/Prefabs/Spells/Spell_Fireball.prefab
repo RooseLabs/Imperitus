@@ -66,7 +66,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 5b43a397d217bee489a51acfd16ee8c0, type: 2}
+  - {fileID: 2100000, guid: 3fd7ef667b06b9a4589061f31f20d859, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -100,9 +100,9 @@ GameObject:
   - component: {fileID: 2331371864075574400}
   - component: {fileID: 222979764584488480}
   - component: {fileID: 7572028257010240170}
-  - component: {fileID: 1908893149917123781}
+  - component: {fileID: 1312397102469176154}
   m_Layer: 0
-  m_Name: Spell_Impero
+  m_Name: Spell_Fireball
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -161,7 +161,7 @@ MonoBehaviour:
   <PredictedOwner>k__BackingField: {fileID: 0}
   NetworkBehaviours:
   - {fileID: 222979764584488480}
-  - {fileID: 1908893149917123781}
+  - {fileID: 1312397102469176154}
   InitializedParentNetworkBehaviour: {fileID: 0}
   InitializedNestedNetworkObjects: []
   RuntimeParentNetworkBehaviour: {fileID: 0}
@@ -186,16 +186,16 @@ MonoBehaviour:
   _spectatorInterpolation: 2
   _enableTeleport: 0
   _teleportThreshold: 1
-  <PrefabId>k__BackingField: 6
+  <PrefabId>k__BackingField: 1
   <SpawnableCollectionId>k__BackingField: 0
-  <AssetPathHash>k__BackingField: 13531082050072313092
+  <AssetPathHash>k__BackingField: 1632768594968009558
   <SceneId>k__BackingField: 0
   SerializedTransformProperties:
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0, w: 1}
     Scale: {x: 1, y: 1, z: 1}
     IsValid: 1
---- !u!114 &1908893149917123781
+--- !u!114 &1312397102469176154
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -204,15 +204,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 8568110119652573094}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8375c752abad4329914d655bb4d1f63a, type: 3}
+  m_Script: {fileID: 11500000, guid: abe6071dd28840368d4e441a9a6df2bb, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Gameplay.Spells.Impero
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Gameplay.Spells.Fireball
   _componentIndexCache: 1
   _addedNetworkObject: {fileID: 7572028257010240170}
   _networkObjectCache: {fileID: 7572028257010240170}
-  spellInfo: {fileID: 11400000, guid: 74d21139607205c4893af88737549570, type: 2}
-  castType: 2
+  spellInfo: {fileID: 11400000, guid: 63e2e96185be7354bb00c0564c373325, type: 2}
+  castType: 0
   castTime: 0
-  staminaCost: 0
-  staminaConsumptionType: 1
-  staminaCostPerSecond: 1
+  staminaCost: 10
+  staminaConsumptionType: 0
+  staminaCostPerSecond: 0
