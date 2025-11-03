@@ -1,7 +1,8 @@
-using System.Collections.Generic;
 using RooseLabs.ScriptableObjects;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 namespace RooseLabs.UI
@@ -10,16 +11,10 @@ namespace RooseLabs.UI
     /// Controls the Notebook UI display.
     /// Subscribes to NotebookManager events and updates UI elements accordingly.
     /// Separated from data logic for clean architecture.
-    /// Input handling should be done externally (e.g., via GUIManager).
+    /// Opening/closing is handled by GUIManager.
     /// </summary>
     public class NotebookUIController : MonoBehaviour
     {
-        [Header("Notebook Canvas")]
-        [SerializeField] private Canvas notebookCanvas;
-
-        [Header("Notebook UI Root")]
-        [SerializeField] private GameObject notebookPanel;
-
         [Header("Tab Buttons")]
         [SerializeField] private Button questTabButton;
         [SerializeField] private Button runesTabButton;
@@ -52,35 +47,91 @@ namespace RooseLabs.UI
         }
 
         private NotebookTab m_currentTab = NotebookTab.Quest;
-        private bool m_isOpen = false;
-        private bool m_isEnabled = true; // Tracks if notebook is allowed to be opened
 
-        private void Start()
+        private void OnEnable()
         {
-            // Initial setup
-            if (notebookCanvas != null)
-                notebookCanvas.enabled = false;
-            notebookPanel.SetActive(false);
+            Debug.Log("[NotebookUI] OnEnable called!");
 
-            // Subscribe to tab button clicks
-            questTabButton?.onClick.AddListener(() => SwitchTab(NotebookTab.Quest));
-            runesTabButton?.onClick.AddListener(() => SwitchTab(NotebookTab.Runes));
-            spellsTabButton?.onClick.AddListener(() => SwitchTab(NotebookTab.Spells));
-
-            // Subscribe to data changes
-            if (Gameplay.NotebookManager.Instance != null)
+            try
             {
-                Gameplay.NotebookManager.Instance.OnQuestDataChanged += RefreshQuestPage;
-                Gameplay.NotebookManager.Instance.OnRuneCollectionChanged += RefreshRunesPage;
-                Gameplay.NotebookManager.Instance.OnObjectiveCompleted += OnObjectiveCompleted;
-            }
+                // Fix raycast blocking on button texts
+                FixButtonRaycastTargets();
 
-            // Initial page display
-            SwitchTab(NotebookTab.Quest);
+                // Subscribe to tab button clicks with debug logging
+                if (questTabButton != null)
+                {
+                    Debug.Log($"[NotebookUI] Quest button found: {questTabButton.name}, Interactable: {questTabButton.interactable}");
+                    Debug.Log($"[NotebookUI] Quest button enabled: {questTabButton.enabled}, gameObject active: {questTabButton.gameObject.activeInHierarchy}");
+                    Debug.Log($"[NotebookUI] Quest button onClick listener count before: {questTabButton.onClick.GetPersistentEventCount()}");
+
+                    questTabButton.onClick.AddListener(() => {
+                        Debug.Log("[NotebookUI] Quest tab button clicked");
+                        SwitchTab(NotebookTab.Quest);
+                    });
+
+                    Debug.Log($"[NotebookUI] Quest button onClick listener count after: {questTabButton.onClick.GetPersistentEventCount()}");
+                }
+                else
+                {
+                    Debug.LogWarning("[NotebookUI] Quest tab button is null!");
+                }
+
+                if (runesTabButton != null)
+                {
+                    Debug.Log($"[NotebookUI] Runes button found: {runesTabButton.name}, Interactable: {runesTabButton.interactable}");
+                    runesTabButton.onClick.AddListener(() => {
+                        Debug.Log("[NotebookUI] Runes tab button clicked");
+                        SwitchTab(NotebookTab.Runes);
+                    });
+                }
+                else
+                {
+                    Debug.LogWarning("[NotebookUI] Runes tab button is null!");
+                }
+
+                if (spellsTabButton != null)
+                {
+                    Debug.Log($"[NotebookUI] Spells button found: {spellsTabButton.name}, Interactable: {spellsTabButton.interactable}");
+                    spellsTabButton.onClick.AddListener(() => {
+                        Debug.Log("[NotebookUI] Spells tab button clicked");
+                        SwitchTab(NotebookTab.Spells);
+                    });
+                }
+                else
+                {
+                    Debug.LogWarning("[NotebookUI] Spells tab button is null!");
+                }
+
+                Debug.Log("[NotebookUI] About to subscribe to data changes...");
+
+                // Subscribe to data changes
+                if (Gameplay.NotebookManager.Instance != null)
+                {
+                    Debug.Log("[NotebookUI] NotebookManager found, subscribing to events...");
+                    Gameplay.NotebookManager.Instance.OnQuestDataChanged += RefreshQuestPage;
+                    Gameplay.NotebookManager.Instance.OnRuneCollectionChanged += RefreshRunesPage;
+                    Gameplay.NotebookManager.Instance.OnObjectiveCompleted += OnObjectiveCompleted;
+                }
+                else
+                {
+                    Debug.LogWarning("[NotebookUI] NotebookManager.Instance is null!");
+                }
+
+                Debug.Log("[NotebookUI] About to call SwitchTab...");
+                // Refresh current tab when enabled
+                SwitchTab(m_currentTab);
+                Debug.Log("[NotebookUI] OnEnable completed successfully!");
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"[NotebookUI] Exception in OnEnable: {e.Message}\n{e.StackTrace}");
+            }
         }
 
-        private void OnDestroy()
+        private void OnDisable()
         {
+            Debug.Log("[NotebookUI] OnDisable called!");
+
             // Unsubscribe from events
             if (Gameplay.NotebookManager.Instance != null)
             {
@@ -89,96 +140,21 @@ namespace RooseLabs.UI
                 Gameplay.NotebookManager.Instance.OnObjectiveCompleted -= OnObjectiveCompleted;
             }
 
-            questTabButton?.onClick.RemoveAllListeners();
-            runesTabButton?.onClick.RemoveAllListeners();
-            spellsTabButton?.onClick.RemoveAllListeners();
+            if (questTabButton != null)
+                questTabButton.onClick.RemoveAllListeners();
+            if (runesTabButton != null)
+                runesTabButton.onClick.RemoveAllListeners();
+            if (spellsTabButton != null)
+                spellsTabButton.onClick.RemoveAllListeners();
         }
 
-        #region Notebook Control
+        #region Public Methods
 
         /// <summary>
-        /// Enables or disables the notebook canvas.
-        /// Use this to control whether the notebook can be opened (e.g., disable in menus).
+        /// Refreshes the currently displayed tab.
+        /// Called by GUIManager when notebook is opened.
         /// </summary>
-        public void SetNotebookEnabled(bool enabled)
-        {
-            m_isEnabled = enabled;
-
-            if (notebookCanvas != null)
-                notebookCanvas.enabled = enabled;
-
-            // If disabling while open, close it
-            if (!enabled && m_isOpen)
-            {
-                CloseNotebook();
-            }
-        }
-
-        public void ToggleNotebook()
-        {
-            if (!m_isEnabled)
-                return;
-
-            if (m_isOpen)
-                CloseNotebook();
-            else
-                OpenNotebook();
-        }
-
-        public void OpenNotebook()
-        {
-            if (!m_isEnabled)
-                return;
-
-            m_isOpen = true;
-
-            if (notebookCanvas != null)
-                notebookCanvas.enabled = true;
-            notebookPanel.SetActive(true);
-
-            // Refresh the current tab's content
-            RefreshCurrentTab();
-        }
-
-        public void CloseNotebook()
-        {
-            m_isOpen = false;
-            //notebookPanel.SetActive(false);
-
-            // Keep canvas enabled but hide panel, or disable canvas entirely
-            // Disabling canvas prevents any interaction
-            if (notebookCanvas != null && !m_isEnabled)
-                notebookCanvas.enabled = false;
-        }
-
-        private void SwitchTab(NotebookTab tab)
-        {
-            m_currentTab = tab;
-
-            // Hide all pages
-            questPage.SetActive(false);
-            runesPage.SetActive(false);
-            spellsPage.SetActive(false);
-
-            // Show selected page and refresh its content
-            switch (tab)
-            {
-                case NotebookTab.Quest:
-                    questPage.SetActive(true);
-                    RefreshQuestPage();
-                    break;
-                case NotebookTab.Runes:
-                    runesPage.SetActive(true);
-                    RefreshRunesPage();
-                    break;
-                case NotebookTab.Spells:
-                    spellsPage.SetActive(true);
-                    RefreshSpellsPage();
-                    break;
-            }
-        }
-
-        private void RefreshCurrentTab()
+        public void RefreshCurrentTab()
         {
             switch (m_currentTab)
             {
@@ -196,6 +172,88 @@ namespace RooseLabs.UI
 
         #endregion
 
+        #region Tab Control
+
+        private void SwitchTab(NotebookTab tab)
+        {
+            Debug.Log($"[NotebookUI] Switching to tab: {tab}");
+            m_currentTab = tab;
+
+            // Hide all pages
+            if (questPage != null) questPage.SetActive(false);
+            if (runesPage != null) runesPage.SetActive(false);
+            if (spellsPage != null) spellsPage.SetActive(false);
+
+            // Show selected page and refresh its content
+            switch (tab)
+            {
+                case NotebookTab.Quest:
+                    if (questPage != null) questPage.SetActive(true);
+                    RefreshQuestPage();
+                    break;
+                case NotebookTab.Runes:
+                    if (runesPage != null) runesPage.SetActive(true);
+                    RefreshRunesPage();
+                    break;
+                case NotebookTab.Spells:
+                    if (spellsPage != null) spellsPage.SetActive(true);
+                    RefreshSpellsPage();
+                    break;
+            }
+        }
+
+        #endregion
+
+        #region Helper Methods
+
+        /// <summary>
+        /// Disables raycast target on all text elements inside buttons.
+        /// This prevents text from blocking button clicks.
+        /// </summary>
+        private void FixButtonRaycastTargets()
+        {
+            Button[] allButtons = new Button[] { questTabButton, runesTabButton, spellsTabButton };
+
+            foreach (Button button in allButtons)
+            {
+                if (button == null) continue;
+
+                // Get all TextMeshProUGUI components in the button and its children
+                TextMeshProUGUI[] texts = button.GetComponentsInChildren<TextMeshProUGUI>();
+                foreach (TextMeshProUGUI text in texts)
+                {
+                    if (text.raycastTarget)
+                    {
+                        text.raycastTarget = false;
+                        Debug.Log($"[NotebookUI] Disabled raycast target on text in button: {button.name}");
+                    }
+                }
+            }
+        }
+
+        // Temporary debug method - remove after fixing
+        private void Update()
+        {
+            // Test if pressing 1/2/3 keys manually triggers the tabs
+            if (Keyboard.current.digit1Key.wasPressedThisFrame)
+            {
+                Debug.Log("[NotebookUI] Manual test: Invoking Quest button");
+                questTabButton?.onClick.Invoke();
+            }
+            if (Keyboard.current.digit2Key.wasPressedThisFrame)
+            {
+                Debug.Log("[NotebookUI] Manual test: Invoking Runes button");
+                runesTabButton?.onClick.Invoke();
+            }
+            if (Keyboard.current.digit3Key.wasPressedThisFrame)
+            {
+                Debug.Log("[NotebookUI] Manual test: Invoking Spells button");
+                spellsTabButton?.onClick.Invoke();
+            }
+        }
+
+        #endregion
+
         #region Quest Page
 
         private void RefreshQuestPage()
@@ -204,8 +262,10 @@ namespace RooseLabs.UI
                 return;
 
             // Update quest title and description
-            questTitleText.text = Gameplay.NotebookManager.Instance.QuestTitle;
-            questDescriptionText.text = Gameplay.NotebookManager.Instance.QuestDescription;
+            if (questTitleText != null)
+                questTitleText.text = Gameplay.NotebookManager.Instance.QuestTitle;
+            if (questDescriptionText != null)
+                questDescriptionText.text = Gameplay.NotebookManager.Instance.QuestDescription;
 
             // Clear existing objectives
             //foreach (Transform child in objectivesContainer)
@@ -251,7 +311,7 @@ namespace RooseLabs.UI
             Debug.Log($"[NotebookUI] Objective {objectiveIndex} completed!");
 
             // Refresh the quest page to show updated status
-            if (m_currentTab == NotebookTab.Quest && m_isOpen)
+            if (m_currentTab == NotebookTab.Quest && gameObject.activeInHierarchy)
             {
                 RefreshQuestPage();
             }
@@ -263,7 +323,7 @@ namespace RooseLabs.UI
 
         private void RefreshRunesPage()
         {
-            if (Gameplay.GameManager.Instance == null)
+            if (Gameplay.GameManager.Instance == null || runesContainer == null)
                 return;
 
             // Clear existing rune slots
@@ -302,6 +362,9 @@ namespace RooseLabs.UI
 
         private void RefreshSpellsPage()
         {
+            if (spellsContainer == null)
+                return;
+
             // Clear existing spell slots
             foreach (Transform child in spellsContainer)
             {
