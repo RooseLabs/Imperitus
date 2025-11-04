@@ -22,6 +22,13 @@ namespace RooseLabs.UI
         private void Start()
         {
             InputHandler.Instance.EnableMenuInput();
+            SubscribeToEvents();
+
+            SetPlayerName();
+        }
+
+        private void SubscribeToEvents()
+        {
             mainMenuPanel.HostLocalGameButtonAction += HostLocalGameButtonClicked;
             mainMenuPanel.HostOnlineGameButtonAction += HostOnlineGameButtonClicked;
             mainMenuPanel.JoinGameButtonAction += OpenJoinGameScreen;
@@ -31,8 +38,19 @@ namespace RooseLabs.UI
             mainMenuPanel.UsernameButtonAction += OpenUsernameScreen;
             mainMenuPanel.CloseUsernameAction += CloseUsernameScreen;
             mainMenuPanel.SaveUsernameAction += SaveUsername;
+        }
 
-            SetPlayerName();
+        private void UnsubscribeFromEvents()
+        {
+            mainMenuPanel.HostLocalGameButtonAction -= HostLocalGameButtonClicked;
+            mainMenuPanel.HostOnlineGameButtonAction -= HostOnlineGameButtonClicked;
+            mainMenuPanel.JoinGameButtonAction -= OpenJoinGameScreen;
+            mainMenuPanel.SettingsButtonAction -= OpenSettingsScreen;
+            mainMenuPanel.CreditsButtonAction -= OpenCreditsScreen;
+            mainMenuPanel.QuitGameButtonAction -= QuitGame;
+            mainMenuPanel.UsernameButtonAction -= OpenUsernameScreen;
+            mainMenuPanel.CloseUsernameAction -= CloseUsernameScreen;
+            mainMenuPanel.SaveUsernameAction -= SaveUsername;
         }
 
         private void SetPlayerName()
@@ -52,22 +70,27 @@ namespace RooseLabs.UI
 
         private void HostLocalGameButtonClicked()
         {
+            UnsubscribeFromEvents();
             NetworkConnector.Instance.StartHostLocally();
         }
 
-        private void HostOnlineGameButtonClicked()
+        private async void HostOnlineGameButtonClicked()
         {
-            _ = NetworkConnector.Instance.StartHostWithRelay();
+            UnsubscribeFromEvents();
+            var result = await NetworkConnector.Instance.StartHostWithRelay();
+            if (result == null) SubscribeToEvents();
         }
 
-        private void OpenJoinGameScreen()
+        private async void OpenJoinGameScreen()
         {
+            UnsubscribeFromEvents();
             if (string.IsNullOrWhiteSpace(joinCodeInputField.text))
             {
                 NetworkConnector.Instance.StartClientLocally();
                 return;
             }
-            _ = NetworkConnector.Instance.StartClientWithRelay(joinCodeInputField.text);
+            var result = await NetworkConnector.Instance.StartClientWithRelay(joinCodeInputField.text);
+            if (!result) SubscribeToEvents();
         }
 
         private void OpenUsernameScreen()
