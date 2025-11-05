@@ -72,13 +72,19 @@ namespace RooseLabs.Player
             enabled = IsOwner;
         }
 
-        private void LateUpdate()
+        private void Update()
         {
             UpdateAnimatorParameters();
             if (m_character.Data.SpeedChangedThisFrame)
                 AdjustAnimationSpeed();
-            UpdateArmIK();
             RecalculateHeadLookTarget();
+        }
+
+        private void LateUpdate()
+        {
+            // Needs to be done in LateUpdate because it uses bone transforms,
+            // which would be from the previous frame in Update.
+            UpdateArmIK();
         }
 
         /// <summary>
@@ -164,7 +170,7 @@ namespace RooseLabs.Player
             float yawOffset = viewAngles.x * Mathf.Rad2Deg;
             float pitchOffset = viewAngles.y * Mathf.Rad2Deg;
 
-            Vector3 centerDir = m_character.Camera.transform.forward;
+            Vector3 centerDir = m_character.Data.lookDirection;
             float centerY = centerDir.y;
             float centerHorizMag = Mathf.Sqrt(centerDir.x * centerDir.x + centerDir.z * centerDir.z);
             float centerPitch = Mathf.Atan2(centerY, centerHorizMag) * Mathf.Rad2Deg;

@@ -1422,7 +1422,7 @@ Transform:
   m_GameObject: {fileID: 6072650737034366055}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0, y: 0.2615, z: -0}
+  m_LocalPosition: {x: 0, y: 0.295, z: -0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -1888,10 +1888,9 @@ MonoBehaviour:
   - {fileID: 1046755158235027733}
   - {fileID: 7047589884357707370}
   - {fileID: 3292224452197708559}
-  - {fileID: 0}
+  - {fileID: 2178509645408755102}
   InitializedParentNetworkBehaviour: {fileID: 0}
-  InitializedNestedNetworkObjects:
-  - {fileID: 0}
+  InitializedNestedNetworkObjects: []
   RuntimeParentNetworkBehaviour: {fileID: 0}
   RuntimeChildNetworkBehaviours: []
   _isNetworked: 1
@@ -2085,12 +2084,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c48457362dd48029ae037fb79ca33d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Player.PlayerWand
-  _componentIndexCache: 0
+  _componentIndexCache: 12
   _addedNetworkObject: {fileID: 7652611172026813195}
-  _networkObjectCache: {fileID: 0}
+  _networkObjectCache: {fileID: 7652611172026813195}
   character: {fileID: 2298069713334961550}
   spellDatabase: {fileID: 11400000, guid: 9989f6ae5baf9cf40a61f0ef300f97fe, type: 2}
-  <SpellCastPoint>k__BackingField: {fileID: 7084882734756081741}
+  spellCastPoint: {fileID: 7084882734756081741}
 --- !u!1 &8341259078320434640
 GameObject:
   m_ObjectHideFlags: 0

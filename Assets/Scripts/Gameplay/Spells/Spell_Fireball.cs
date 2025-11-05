@@ -17,9 +17,9 @@ namespace RooseLabs.Gameplay.Spells
             base.OnContinueCast();
         }
 
-        protected override void OnCastFinished()
+        protected override bool OnCastFinished()
         {
-            base.OnCastFinished();
+            return base.OnCastFinished();
         }
 
         protected override void OnContinueCastSustained()

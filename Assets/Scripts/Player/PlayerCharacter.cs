@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using FishNet.Connection;
 using FishNet.Object;
 using RooseLabs.Core;
@@ -37,6 +38,8 @@ namespace RooseLabs.Player
         private Rigidbody m_rigidbody;
         #endregion
 
+        private readonly Dictionary<Collider, int> m_characterColliders = new();
+
         private void Awake()
         {
             Input = GetComponent<PlayerInput>();
@@ -70,6 +73,14 @@ namespace RooseLabs.Player
             {
                 m.layer = layer;
             }
+
+            // Populate character colliders dictionary, storing their original layers
+            Collider[] colliders = GetComponentsInChildren<Collider>(true);
+            foreach (var col in colliders)
+            {
+                m_characterColliders[col] = col.gameObject.layer;
+            }
+
             Camera.gameObject.SetActive(true);
             InputHandler.Instance.EnableGameplayInput();
         }
@@ -98,5 +109,26 @@ namespace RooseLabs.Player
         }
 
         public Transform GetBodypart(HumanBodyBones bone) => Ragdoll.partDict[bone];
+
+        public bool RaycastIgnoreSelf(Ray ray, out RaycastHit hitInfo, float maxDistance = Mathf.Infinity, int layerMask = Physics.DefaultRaycastLayers, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
+        {
+            return RaycastIgnoreSelf(ray.origin, ray.direction, out hitInfo, maxDistance, layerMask, queryTriggerInteraction);
+        }
+
+        public bool RaycastIgnoreSelf(Vector3 position, Vector3 direction, out RaycastHit hitInfo, float maxDistance = Mathf.Infinity, int layerMask = Physics.DefaultRaycastLayers, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
+        {
+            // Set all character colliders to the Ignore Raycast layer
+            foreach (var col in m_characterColliders.Keys)
+            {
+                col.gameObject.layer = 2; // Ignore Raycast layer
+            }
+            bool hit = Physics.Raycast(position, direction, out hitInfo, maxDistance, layerMask, queryTriggerInteraction);
+            // Restore original layers
+            foreach (var (col, layer) in m_characterColliders)
+            {
+                col.gameObject.layer = layer;
+            }
+            return hit;
+        }
     }
 }

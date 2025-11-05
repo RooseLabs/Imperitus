@@ -5,6 +5,7 @@ using RooseLabs.Network;
 using RooseLabs.Player;
 using RooseLabs.ScriptableObjects;
 using UnityEngine;
+using Logger = RooseLabs.Core.Logger;
 
 namespace RooseLabs.Gameplay.Spells
 {
@@ -27,6 +28,8 @@ namespace RooseLabs.Gameplay.Spells
     [RequireComponent(typeof(PredictedSpawn))]
     public abstract class SpellBase : NetworkBehaviour
     {
+        protected Logger Logger => Logger.GetLogger("SpellCasting");
+
         #region Serialized
         [SerializeField] private SpellSO spellInfo;
         [Tooltip("Type of spell casting behavior.")]
@@ -41,6 +44,11 @@ namespace RooseLabs.Gameplay.Spells
         [SerializeField] private float staminaCostPerSecond = 0f;
         #endregion
 
+        #region Private Fields
+        private float castProgress = 0f;
+        private bool isCasting = false;
+        #endregion
+
         public override void OnStartClient()
         {
             if (!IsOwner)
@@ -49,28 +57,114 @@ namespace RooseLabs.Gameplay.Spells
                 PlayerCharacter ownerCharacter = PlayerHandler.GetCharacter(Owner);
                 Debug.Assert(ownerCharacter != null, "[SpellBase] Spell has no owner.");
                 transform.SetParent(ownerCharacter.Wand.transform, false);
-                transform.position = ownerCharacter.Wand.SpellCastPoint.position;
+                transform.position = ownerCharacter.Wand.SpellCastPointPosition;
                 transform.rotation = Quaternion.identity;
             }
         }
 
+        private void OnEnable()
+        {
+            ResetData();
+        }
+
         #region Public API
         public bool CanAimToSustain => castType == SpellCastType.AimToSustain;
-        public bool IsBeingSustained { get; protected set; } = false;
+        public bool IsBeingSustained { get; private set; } = false;
 
         public void StartCast()
         {
+            if (PlayerCharacter.LocalCharacter.Data.Stamina < staminaCost) return;
+
+            isCasting = true;
+            castProgress = 0f;
+
+            if (staminaConsumptionType == StaminaConsumptionType.OnCastStart)
+            {
+                ConsumeStamina(staminaCost);
+            }
+
             OnStartCast();
         }
 
         public void CancelCast()
         {
-            OnCancelCast();
+            if (!isCasting) return;
+
+            isCasting = false;
+            castProgress = 0f;
+            if (IsBeingSustained)
+            {
+                IsBeingSustained = false;
+                OnCancelCastSustained();
+            }
+            else
+            {
+                OnCancelCast();
+            }
         }
 
         public void ContinueCast()
         {
-            OnContinueCast();
+            if (!isCasting) return;
+
+            if (castProgress < castTime)
+            {
+                castProgress += Time.deltaTime;
+
+                if (castTime > 0f && staminaCost > 0f && staminaConsumptionType == StaminaConsumptionType.LinearlyDuringCast)
+                {
+                    float staminaThisFrame = (staminaCost / castTime) * Time.deltaTime;
+                    ConsumeStamina(staminaThisFrame);
+                }
+
+                OnContinueCast();
+            }
+            else
+            {
+                if (IsBeingSustained)
+                {
+                    float staminaThisFrame = staminaCostPerSecond * Time.deltaTime;
+                    if (PlayerCharacter.LocalCharacter.Data.Stamina < staminaThisFrame)
+                    {
+                        // Not enough stamina to continue sustaining
+                        IsBeingSustained = false;
+                        OnCancelCastSustained();
+                        return;
+                    }
+                    ConsumeStamina(staminaThisFrame);
+                    OnContinueCastSustained();
+                }
+                else
+                {
+                    CompleteCast();
+                }
+            }
+        }
+
+        private void CompleteCast()
+        {
+            if (staminaConsumptionType == StaminaConsumptionType.OnCastFinish)
+            {
+                ConsumeStamina(staminaCost);
+            }
+
+            bool successfulCast = OnCastFinished();
+
+            if (successfulCast && castType != SpellCastType.OneShot)
+            {
+                IsBeingSustained = true;
+            }
+            else
+            {
+                isCasting = false;
+                castProgress = 0f;
+            }
+        }
+
+        private void ConsumeStamina(float amount)
+        {
+            if (amount <= 0f) return;
+            PlayerCharacter.LocalCharacter.Data.UpdateStamina(amount);
         }
 
         public void ScrollBackwardPressed()
@@ -121,7 +215,7 @@ namespace RooseLabs.Gameplay.Spells
         /// </summary>
         protected virtual void OnStartCast()
         {
-            Debug.Log($"Spell {spellInfo.Name} Started Casting");
+            Logger.Info($"Spell {spellInfo.Name} Started Casting");
         }
 
         /// <summary>
@@ -129,7 +223,7 @@ namespace RooseLabs.Gameplay.Spells
         /// </summary>
         protected virtual void OnCancelCast()
         {
-            Debug.Log($"Spell {spellInfo.Name} Cancelled Casting");
+            Logger.Info($"Spell {spellInfo.Name} Cancelled Casting");
         }
 
         /// <summary>
@@ -137,15 +231,17 @@ namespace RooseLabs.Gameplay.Spells
         /// </summary>
         protected virtual void OnContinueCast()
         {
-            Debug.Log($"Spell {spellInfo.Name} Continuing Casting");
+            Logger.Info($"Spell {spellInfo.Name} Continuing Casting");
         }
 
         /// <summary>
         /// Called when the spell cast is finished.
         /// </summary>
-        protected virtual void OnCastFinished()
+        /// <returns>True if the spell was successfully cast, false otherwise.</returns>
+        protected virtual bool OnCastFinished()
         {
-            Debug.Log($"Spell {spellInfo.Name} Cast Finished");
+            Logger.Info($"Spell {spellInfo.Name} Cast Finished");
+            return true;
         }
 
         /// <summary>
@@ -153,7 +249,7 @@ namespace RooseLabs.Gameplay.Spells
         /// </summary>
         protected virtual void OnContinueCastSustained()
         {
-            Debug.Log($"Spell {spellInfo.Name} Cast Held Continued");
+            Logger.Info($"Spell {spellInfo.Name} Cast Held Continued");
         }
 
         /// <summary>
@@ -161,7 +257,7 @@ namespace RooseLabs.Gameplay.Spells
         /// </summary>
         protected virtual void OnCancelCastSustained()
         {
-            Debug.Log($"Spell {spellInfo.Name} Cancel Held");
+            Logger.Info($"Spell {spellInfo.Name} Cancel Held");
         }
 
         /// <summary>
@@ -170,7 +266,7 @@ namespace RooseLabs.Gameplay.Spells
         /// </summary>
         protected virtual void OnScrollBackwardPressed()
         {
-            Debug.Log($"Spell {spellInfo.Name} Scroll Backward Pressed");
+            Logger.Info($"Spell {spellInfo.Name} Scroll Backward Pressed");
         }
 
         /// <summary>
@@ -179,7 +275,7 @@ namespace RooseLabs.Gameplay.Spells
         /// </summary>
         protected virtual void OnScrollForwardPressed()
         {
-            Debug.Log($"Spell {spellInfo.Name} Scroll Forward Pressed");
+            Logger.Info($"Spell {spellInfo.Name} Scroll Forward Pressed");
         }
 
         /// <summary>
@@ -188,7 +284,7 @@ namespace RooseLabs.Gameplay.Spells
         /// </summary>
         protected virtual void OnScrollBackwardHeld()
         {
-            Debug.Log($"Spell {spellInfo.Name} Scroll Backward Held");
+            Logger.Info($"Spell {spellInfo.Name} Scroll Backward Held");
         }
 
         /// <summary>
@@ -197,7 +293,7 @@ namespace RooseLabs.Gameplay.Spells
         /// </summary>
         protected virtual void OnScrollForwardHeld()
         {
-            Debug.Log($"Spell {spellInfo.Name} Scroll Forward Held");
+            Logger.Info($"Spell {spellInfo.Name} Scroll Forward Held");
         }
 
         /// <summary>
@@ -206,7 +302,14 @@ namespace RooseLabs.Gameplay.Spells
         /// </summary>
         protected virtual void OnScroll(float value)
         {
-            Debug.Log($"Spell {spellInfo.Name} Scrolled: {value}");
+            Logger.Info($"Spell {spellInfo.Name} Scrolled: {value}");
+        }
+
+        protected virtual void ResetData()
+        {
+            isCasting = false;
+            castProgress = 0f;
+            IsBeingSustained = false;
         }
     }
 }

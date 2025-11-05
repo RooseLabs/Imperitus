@@ -14,15 +14,16 @@ namespace RooseLabs.Player
         [SerializeField] private SpellDatabaseSO spellDatabase;
 
         [Tooltip("Point from which spells are cast. This should be at the tip of the wand.")]
-        [field: SerializeField] public Transform SpellCastPoint { get; private set; }
+        [SerializeField] private Transform spellCastPoint;
         #endregion
 
-        private InputHandler m_inputHandler;
+        public Vector3 SpellCastPointPosition { get; private set; }
 
         private SpellBase m_currentSpellInstance;
         private bool m_currentSpellInstanceDirty = true; // Start dirty to ensure initial setup
 
         // TODO: Either add public methods to add/remove spells from this list or make it public.
+        //   We'll probably listen to some events from the player's notebook to manage this list.
         private readonly List<int> m_availableSpells = new() { 0, 1 };
 
         private int m_currentSpellIndex = 0;
@@ -42,18 +43,9 @@ namespace RooseLabs.Player
             }
         }
 
-        private void Start()
-        {
-            m_inputHandler = InputHandler.Instance;
-        }
-
-        public override void OnStartClient()
-        {
-            enabled = IsOwner;
-        }
-
         private void Update()
         {
+            if (!IsOwner) return;
             bool wasAiming = character.Data.IsAiming;
             character.Data.IsAiming = CanUseWand && character.Input.aimIsPressed;
             if (character.Data.IsAiming)
@@ -92,7 +84,7 @@ namespace RooseLabs.Player
                 }
                 if (character.Data.IsCasting) return;
                 // TODO: Switching spells needs a small cooldown (<= 1 second).
-                if (character.Input.scrollButtonWasPressed || (m_inputHandler.IsCurrentDeviceGamepad() && character.Input.nextIsPressed && character.Input.previousIsPressed))
+                if (character.Input.scrollButtonWasPressed || (InputHandler.Instance.IsCurrentDeviceGamepad() && character.Input.nextIsPressed && character.Input.previousIsPressed))
                 {
                     CurrentSpellIndex = 0;
                 }
@@ -126,7 +118,7 @@ namespace RooseLabs.Player
             GameObject spellPrefab = spellDatabase[spellID];
             if (spellPrefab)
             {
-                m_currentSpellInstance = SpellBase.Instantiate(spellPrefab, SpellCastPoint.position);
+                m_currentSpellInstance = SpellBase.Instantiate(spellPrefab, spellCastPoint.position);
                 Debug.Log($"[PlayerWand] Instantiated spell ID {spellID} ({spellPrefab.name})");
             }
             else
@@ -134,6 +126,14 @@ namespace RooseLabs.Player
                 Debug.LogWarning($"[PlayerWand] Spell ID {spellID} not found in database.");
             }
             m_currentSpellInstanceDirty = false;
+        }
+
+        private void LateUpdate()
+        {
+            // We need to update this position in LateUpdate because its position is based on the wand attachment bone
+            // which, in Update, would not have been evaluated by the Animator yet. This would be fine at normal FPS
+            // but at low FPS it behaves unpredictably, reporting nonsensical positions. Unity shenanigans. ¯\_(ツ)_/¯
+            SpellCastPointPosition = spellCastPoint.position;
         }
 
         // TODO: We probably also want to prevent using the wand when there's no active heist.
