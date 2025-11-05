@@ -96,8 +96,6 @@ namespace RooseLabs.Player
                 {
                     CurrentSpellIndex--;
                 }
-                if (m_currentSpellInstanceDirty)
-                    UpdateCurrentSpellInstance();
             }
             else if (character.Data.IsCasting)
             {
@@ -118,7 +116,7 @@ namespace RooseLabs.Player
             GameObject spellPrefab = spellDatabase[spellID];
             if (spellPrefab)
             {
-                m_currentSpellInstance = SpellBase.Instantiate(spellPrefab, spellCastPoint.position);
+                m_currentSpellInstance = SpellBase.Instantiate(spellPrefab, SpellCastPointPosition);
                 Debug.Log($"[PlayerWand] Instantiated spell ID {spellID} ({spellPrefab.name})");
             }
             else
@@ -134,6 +132,12 @@ namespace RooseLabs.Player
             // which, in Update, would not have been evaluated by the Animator yet. This would be fine at normal FPS
             // but at low FPS it behaves unpredictably, reporting nonsensical positions. Unity shenanigans. ¯\_(ツ)_/¯
             SpellCastPointPosition = spellCastPoint.position;
+
+            if (!IsOwner) return;
+            if (m_currentSpellInstanceDirty)
+            {
+                UpdateCurrentSpellInstance();
+            }
         }
 
         // TODO: We probably also want to prevent using the wand when there's no active heist.
