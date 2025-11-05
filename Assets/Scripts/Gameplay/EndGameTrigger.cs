@@ -1,6 +1,7 @@
-using System.Collections;
 using FishNet.Object;
 using RooseLabs.Core;
+using RooseLabs.Player;
+using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -15,6 +16,9 @@ namespace RooseLabs.Gameplay
         [SerializeField] private TMP_Text endText;
         [SerializeField] private float fadeDuration = 2f;
 
+        [Header("Rune Requirements")]
+        [SerializeField] private int requiredRuneCount = 3;
+
         private void Awake()
         {
             if (endGameCanvas != null)
@@ -23,21 +27,40 @@ namespace RooseLabs.Gameplay
 
         private void OnTriggerEnter(Collider other)
         {
-            // if (!IsServerInitialized)
-            //     return;
-            //
-            // if (!other.CompareTag("Player"))
-            //     return;
-            //
-            // if (GameManager.Instance.CollectedRunes.Count == 3)
-            // {
-            //     Debug.Log("Game Ended! Player entered the area with all runes.");
-            //     RpcEndGame();
-            // }
-            // else
-            // {
-            //     Debug.Log("Player entered the area but does not have all runes.");
-            // }
+            if (!IsServerInitialized)
+                return;
+
+            if (!other.CompareTag("Player"))
+                return;
+
+            // Get the PlayerCharacter component from the colliding player
+            PlayerCharacter playerCharacter = other.GetComponent<PlayerCharacter>();
+            if (playerCharacter == null)
+            {
+                Debug.LogWarning("[EndGameTrigger] Player entered but has no PlayerCharacter component!");
+                return;
+            }
+
+            // Get the player's notebook
+            PlayerNotebook notebook = playerCharacter.Notebook;
+            if (notebook == null)
+            {
+                Debug.LogWarning("[EndGameTrigger] Player entered but has no PlayerNotebook component!");
+                return;
+            }
+
+            // Check if this player has collected enough runes
+            int runeCount = notebook.GetCollectedRunes().Count;
+
+            if (runeCount >= requiredRuneCount)
+            {
+                Debug.Log($"[EndGameTrigger] Game Ended! Player {playerCharacter.Owner} entered with {runeCount} runes.");
+                RpcEndGame();
+            }
+            else
+            {
+                Debug.Log($"[EndGameTrigger] Player {playerCharacter.Owner} entered but only has {runeCount}/{requiredRuneCount} runes.");
+            }
         }
 
         [ObserversRpc]

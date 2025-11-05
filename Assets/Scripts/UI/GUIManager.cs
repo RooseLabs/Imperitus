@@ -1,3 +1,4 @@
+using RooseLabs.Core;
 using RooseLabs.Player;
 using TMPro;
 using UnityEngine;
@@ -41,10 +42,25 @@ namespace RooseLabs.UI
 
         private void Update()
         {
-            // Handle notebook toggle input
-            if (m_playerInput != null && m_playerInput.openNotebookWasPressed)
+            if (m_playerInput == null)
+                return;
+
+            // Handle notebook toggle input based on current state
+            if (m_isNotebookOpen)
             {
-                ToggleNotebook();
+                // When notebook is open, check for close action from UI action map
+                if (m_playerInput.closeNotebookWasPressed)
+                {
+                    ToggleNotebook();
+                }
+            }
+            else
+            {
+                // When notebook is closed, check for open action from gameplay action map
+                if (m_playerInput.openNotebookWasPressed)
+                {
+                    ToggleNotebook();
+                }
             }
         }
 
@@ -66,9 +82,15 @@ namespace RooseLabs.UI
                 return;
 
             if (m_isNotebookOpen)
+            {
+                InputHandler.Instance.EnableGameplayInput();
                 CloseNotebook();
+            }
             else
+            {
+                InputHandler.Instance.EnableMenuInput();
                 OpenNotebook();
+            }
         }
 
         /// <summary>
@@ -96,14 +118,6 @@ namespace RooseLabs.UI
             if (notebookUIController != null)
                 notebookUIController.RefreshCurrentTab();
 
-            // Show cursor and unlock it
-            Cursor.visible = true;
-            Cursor.lockState = CursorLockMode.None;
-
-            // Block player movement and camera
-            if (m_playerInput != null)
-                m_playerInput.SetNotebookOpen(true);
-
             // Debug check for EventSystem
             var eventSystem = UnityEngine.EventSystems.EventSystem.current;
             if (eventSystem == null)
@@ -128,14 +142,6 @@ namespace RooseLabs.UI
             // Disable the notebook canvas GameObject
             if (notebookCanvasObject != null)
                 notebookCanvasObject.SetActive(false);
-
-            // Hide cursor and lock it back
-            Cursor.visible = false;
-            Cursor.lockState = CursorLockMode.Locked;
-
-            // Re-enable player movement and camera
-            if (m_playerInput != null)
-                m_playerInput.SetNotebookOpen(false);
 
             Debug.Log("[GUIManager] Notebook closed");
         }

@@ -40,11 +40,11 @@ namespace RooseLabs.Gameplay.Interactions
             {
                 // Opening
                 playerPickup.SetObjectPositionAndOrRotation(gameObject, new Vector3(0f, 0.2f, -0.25f), Quaternion.Euler(-116f, -180f, 90f));
-                // if (rune != null)
-                // {
-                //     GameManager.Instance.AddRune(rune);
-                //     rune = null; // Ensure the rune can only be collected once
-                // }
+                if (rune != null)
+                {
+                    //GameManager.Instance.AddRune(rune);
+                    rune = null; // Ensure the rune can only be collected once
+                }
             }
             else
             {

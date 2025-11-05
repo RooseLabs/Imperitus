@@ -27,14 +27,17 @@ namespace RooseLabs
             syncTimer.OnChange -= OnTimerChanged;
         }
 
+        public void ShowTimer()
+        {
+            GUIManager.Instance.ToggleTimerText(true);
+        }
+
         /// <summary>
         /// Start the timer with a specified duration. Server only.
         /// </summary>
         [Server]
         public void StartTimer(float time)
         {
-            GUIManager.Instance.ToggleTimerText(true);
-
             syncTimer.StartTimer(time, true);
 
             finishedTriggered = false;

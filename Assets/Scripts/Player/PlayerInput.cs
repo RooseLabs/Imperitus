@@ -7,6 +7,7 @@ namespace RooseLabs.Player
     public class PlayerInput : MonoBehaviour
     {
         private InputActionMap m_gameplayActionMap;
+        private InputActionMap m_uiActionMap;
         private InputAction m_actionPause;
         private InputAction m_actionMove;
         private InputAction m_actionLook;
@@ -25,6 +26,8 @@ namespace RooseLabs.Player
         private InputAction m_actionScrollForward;
         private InputAction m_actionPushToTalk;
         private InputAction m_actionOpenNotebook;
+        private InputAction m_actionCloseNotebook;
+        private InputAction m_actionGetRune;
 
         public bool pauseWasPressed;
         public Vector2 movementInput;
@@ -52,12 +55,13 @@ namespace RooseLabs.Player
         public bool scrollForwardIsPressed;
         public bool pushToTalkIsPressed;
         public bool openNotebookWasPressed;
-
-        private bool m_isNotebookOpen = false;
+        public bool closeNotebookWasPressed;
+        public bool getRuneWasPressed;
 
         private void Awake()
         {
             m_gameplayActionMap = InputHandler.Instance.GameplayActions;
+            m_uiActionMap = InputHandler.Instance.UIActions;
             m_actionPause = m_gameplayActionMap.FindAction("Pause");
             m_actionMove = m_gameplayActionMap.FindAction("Move");
             m_actionLook = m_gameplayActionMap.FindAction("Look");
@@ -76,53 +80,40 @@ namespace RooseLabs.Player
             m_actionScrollForward = m_gameplayActionMap.FindAction("ScrollForward");
             m_actionPushToTalk = m_gameplayActionMap.FindAction("PushToTalk");
             m_actionOpenNotebook = m_gameplayActionMap.FindAction("OpenNotebook");
-        }
-
-        /// <summary>
-        /// Set whether the notebook is open. When open, movement and look inputs are blocked.
-        /// </summary>
-        public void SetNotebookOpen(bool isOpen)
-        {
-            m_isNotebookOpen = isOpen;
+            m_actionCloseNotebook = m_uiActionMap.FindAction("CloseNotebook");
+            m_actionGetRune = m_gameplayActionMap.FindAction("GetRune");
         }
 
         public void Sample()
         {
             ResetInput();
             pauseWasPressed = m_actionPause.WasPressedThisFrame();
-
-            // Always allow notebook toggle
+            movementInput = m_actionMove.ReadValue<Vector2>();
+            lookInput = m_actionLook.ReadValue<Vector2>();
+            aimIsPressed = m_actionAim.IsPressed();
+            castWasPressed = m_actionCast.WasPressedThisFrame();
+            castIsPressed = m_actionCast.IsPressed();
+            crouchWasPressed = m_actionCrouch.WasPressedThisFrame();
+            crouchIsPressed = m_actionCrouch.IsPressed();
+            sprintWasPressed = m_actionSprint.WasPressedThisFrame();
+            sprintIsPressed = m_actionSprint.IsPressed();
+            jumpWasPressed = m_actionJump.WasPressedThisFrame();
+            interactWasPressed = m_actionInteract.WasPressedThisFrame();
+            dropWasPressed = m_actionDrop.WasPressedThisFrame();
+            previousWasPressed = m_actionPrevious.WasPressedThisFrame();
+            previousIsPressed = m_actionPrevious.IsPressed();
+            nextWasPressed = m_actionNext.WasPressedThisFrame();
+            nextIsPressed = m_actionNext.IsPressed();
+            scrollInput = m_actionScroll.ReadValue<float>();
+            scrollButtonWasPressed = m_actionScrollButton.WasPressedThisFrame();
+            scrollBackwardWasPressed = m_actionScrollBackward.WasPressedThisFrame();
+            scrollBackwardIsPressed = m_actionScrollBackward.IsPressed();
+            scrollForwardWasPressed = m_actionScrollForward.WasPressedThisFrame();
+            scrollForwardIsPressed = m_actionScrollForward.IsPressed();
+            pushToTalkIsPressed = m_actionPushToTalk.IsPressed();
             openNotebookWasPressed = m_actionOpenNotebook.WasPressedThisFrame();
-
-            // Block gameplay inputs when notebook is open
-            if (!m_isNotebookOpen)
-            {
-                movementInput = m_actionMove.ReadValue<Vector2>();
-                lookInput = m_actionLook.ReadValue<Vector2>();
-                aimIsPressed = m_actionAim.IsPressed();
-                castWasPressed = m_actionCast.WasPressedThisFrame();
-                castIsPressed = m_actionCast.IsPressed();
-                castWasReleased = m_actionCast.WasReleasedThisFrame();
-                crouchWasPressed = m_actionCrouch.WasPressedThisFrame();
-                crouchIsPressed = m_actionCrouch.IsPressed();
-                sprintWasPressed = m_actionSprint.WasPressedThisFrame();
-                sprintIsPressed = m_actionSprint.IsPressed();
-                jumpWasPressed = m_actionJump.WasPressedThisFrame();
-                interactWasPressed = m_actionInteract.WasPressedThisFrame();
-                dropWasPressed = m_actionDrop.WasPressedThisFrame();
-                previousWasPressed = m_actionPrevious.WasPressedThisFrame();
-                previousIsPressed = m_actionPrevious.IsPressed();
-                nextWasPressed = m_actionNext.WasPressedThisFrame();
-                nextIsPressed = m_actionNext.IsPressed();
-                scrollInput = m_actionScroll.ReadValue<float>();
-                scrollButtonWasPressed = m_actionScrollButton.WasPressedThisFrame();
-                scrollBackwardWasPressed = m_actionScrollBackward.WasPressedThisFrame();
-                scrollBackwardIsPressed = m_actionScrollBackward.IsPressed();
-                scrollForwardWasPressed = m_actionScrollForward.WasPressedThisFrame();
-                scrollForwardIsPressed = m_actionScrollForward.IsPressed();
-                pushToTalkIsPressed = m_actionPushToTalk.IsPressed();
-                openNotebookWasPressed = m_actionOpenNotebook.WasPressedThisFrame();
-            }
+            closeNotebookWasPressed = m_actionCloseNotebook.WasPressedThisFrame();
+            getRuneWasPressed = m_actionGetRune.WasPressedThisFrame();
         }
 
         private void ResetInput()
@@ -153,6 +144,8 @@ namespace RooseLabs.Player
             scrollForwardIsPressed = false;
             pushToTalkIsPressed = false;
             openNotebookWasPressed = false;
+            closeNotebookWasPressed = false;
+            getRuneWasPressed = false;
         }
     }
 }

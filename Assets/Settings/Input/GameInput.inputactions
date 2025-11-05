@@ -167,6 +167,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "GetRune",
+                    "type": "Button",
+                    "id": "94e1dfc1-665b-406f-85ca-ac1ed8d63fd4",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -697,6 +706,17 @@
                     "action": "ScrollForward",
                     "isComposite": false,
                     "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "477bb050-c4f6-4082-9dda-7227321e507f",
+                    "path": "<Keyboard>/r",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "GetRune",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         },
@@ -704,15 +724,6 @@
             "name": "UI",
             "id": "272f6d14-89ba-496f-b7ff-215263d3219f",
             "actions": [
-                {
-                    "name": "CloseNotebook",
-                    "type": "Button",
-                    "id": "982f1c71-87e2-4912-8f47-eda223b2f549",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
                 {
                     "name": "Resume",
                     "type": "Button",
@@ -808,6 +819,15 @@
                     "type": "PassThrough",
                     "id": "9caa3d8a-6b2f-4e8e-8bad-6ede561bd9be",
                     "expectedControlType": "Quaternion",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "CloseNotebook",
+                    "type": "Button",
+                    "id": "982f1c71-87e2-4912-8f47-eda223b2f549",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false

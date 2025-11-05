@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 using FishNet.Object;
 using GameKit.Dependencies.Utilities.Types;
@@ -19,16 +20,11 @@ namespace RooseLabs.Gameplay
         [field: SerializeField] public SpellDatabase SpellDatabase { get; private set; }
         #endregion
 
-        private readonly SyncList<int> m_collectedRunes = new();
-        public List<int> CollectedRunes => m_collectedRunes.Collection;
-
         private HeistTimer m_heistTimer;
 
         private void Awake()
         {
             Instance = this;
-            m_collectedRunes.OnChange += CollectedRunes_OnChange;
-
             m_heistTimer = GetComponent<HeistTimer>();
         }
 
@@ -38,58 +34,47 @@ namespace RooseLabs.Gameplay
             string selectedSceneName = GetSceneName(libraryScenes[randomIndex]);
             SceneManagement.SceneManager.Instance.LoadScene(selectedSceneName, PlayerHandler.CharacterNetworkObjects);
 
+            m_heistTimer.ShowTimer();
             m_heistTimer.StartTimer(m_heistTimer.defaultTime);
 
-            var questData = new QuestData
+            AssignmentData assignment = new AssignmentData
             {
-                questTitle = "ODEIO UNITY",
-                questDescription = "Apanhar 3 runas magicas e ir embora por favor eu vou-me matar",
+                assignmentNumber = 1,
+                tasks = new List<AssignmentTask> {
+                    new AssignmentTask
+                    {
+                        description = "Collect all the ancient runes scattered around the library.",
+                           taskImage = CreateRandomSquareSprite()
+                    },
+                    new AssignmentTask
+                    {
+                        description = "Avoid the library guardians while collecting the runes.",
+                        taskImage = CreateRandomSquareSprite()
+                    },
+                    new AssignmentTask
+                    {
+                        description = "Return to the entrance once all runes are collected.",
+                        taskImage = CreateRandomSquareSprite()
+                    }
+                }
             };
 
-            NotebookManager.Instance.InitializeQuest(questData);
+            Debug.Log($"[GameManager] About to initialize assignment. NotebookManager.Instance is null? {NotebookManager.Instance == null}");
+            Debug.Log($"[GameManager] Assignment object created with {assignment.tasks.Count} tasks");
+
+            NotebookManager.Instance.InitializeAssignment(assignment);
+
+            Debug.Log($"[GameManager] Assignment initialized. Can retrieve from NotebookManager? {NotebookManager.Instance.GetCurrentAssignment() != null}");
         }
 
-        public void PreparePlayerForHeist(PlayerNotebook playerNotebook)
+        Sprite CreateRandomSquareSprite() => Sprite.Create(MakeColorTex(Random.ColorHSV()), new Rect(0, 0, 1, 1), Vector2.one * 0.5f);
+        Texture2D MakeColorTex(Color color)
         {
-            // This would typically be called from a heist preparation menu
-            // or loaded from player's save data
-
-            var spellIndices = new System.Collections.Generic.List<int>
-            {
-                0, // First spell from GameManager.AllSpells
-                2, // Third spell
-                5  // Sixth spell
-            };
-
-            playerNotebook.SetSpellLoadout(spellIndices);
+            var tex = new Texture2D(1, 1);
+            tex.SetPixel(0, 0, color);
+            tex.Apply();
+            return tex;
         }
-
-        public void AddRune(RuneSO rune)
-        {
-            int runeIndex = Array.IndexOf(AllRunes, rune);
-            if (m_collectedRunes.Contains(runeIndex)) return;
-            m_collectedRunes.Add(runeIndex);
-        }
-
-        //private void CollectedRunes_OnChange(SyncListOperation op, int index, int oldItem, int newItem, bool asServer)
-        //{
-        //    GUIManager.Instance.UpdateRuneCounter(m_collectedRunes.Count);
-        //    Debug.Log($"Rune collection changed: Operation={op}, Index={index}, OldItem={oldItem}, NewItem={newItem}, AsServer={asServer}");
-        //}
-
-        private void CollectedRunes_OnChange(SyncListOperation op, int index, int oldItem, int newItem, bool asServer)
-        {
-            GUIManager.Instance.UpdateRuneCounter(m_collectedRunes.Count);
-
-            // NEW: Notify notebook of rune collection
-            if (NotebookManager.Instance != null)
-            {
-                NotebookManager.Instance.NotifyRuneCollectionChanged();
-            }
-
-            Debug.Log($"Rune collection changed: Operation={op}, Index={index}, OldItem={oldItem}, NewItem={newItem}, AsServer={asServer}");
-        }
-
 
         private static string GetSceneName(string fullPath)
         {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using FishNet.Connection;
 using FishNet.Object;
 using RooseLabs.Core;
+using RooseLabs.Gameplay;
 using RooseLabs.Network;
 using RooseLabs.Utils;
 using UnityEngine;
@@ -34,6 +35,7 @@ namespace RooseLabs.Player
         [field: SerializeField]  public PlayerWand Wand { get; private set; }
         public PlayerAnimations Animations { get; private set; }
         public PlayerRagdoll Ragdoll { get; private set; }
+        public PlayerNotebook Notebook { get; private set; }
 
         private Rigidbody m_rigidbody;
         #endregion
@@ -47,6 +49,7 @@ namespace RooseLabs.Player
             Movement = GetComponent<PlayerMovement>();
             Animations = GetComponent<PlayerAnimations>();
             Ragdoll = GetComponent<PlayerRagdoll>();
+            Notebook = GetComponentInChildren<PlayerNotebook>();
 
             m_rigidbody = GetComponent<Rigidbody>();
         }
@@ -89,6 +92,11 @@ namespace RooseLabs.Player
         {
             if (!IsOwner) return;
             Input.Sample();
+
+            if (Input.getRuneWasPressed)
+            {
+                Notebook.AddRandomUncollectedRune();
+            }
         }
 
         public void UpdateLookDirection()
