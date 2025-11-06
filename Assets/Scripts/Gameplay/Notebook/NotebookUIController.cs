@@ -398,13 +398,13 @@ namespace RooseLabs.UI
             if (Gameplay.GameManager.Instance == null)
                 return;
 
-            if (newRuneIndex < 0 || newRuneIndex >= Gameplay.GameManager.Instance.AllRunes.Length)
+            if (newRuneIndex < 0 || newRuneIndex >= Gameplay.GameManager.Instance.RuneDatabase.Count)
             {
                 Debug.LogWarning($"[NotebookUI] Invalid rune index: {newRuneIndex}");
                 return;
             }
 
-            RuneSO rune = Gameplay.GameManager.Instance.AllRunes[newRuneIndex];
+            RuneSO rune = Gameplay.GameManager.Instance.RuneDatabase[newRuneIndex];
 
             // Pick a random available slot
             int randomIndex = Random.Range(0, m_availableRuneSlots.Count);

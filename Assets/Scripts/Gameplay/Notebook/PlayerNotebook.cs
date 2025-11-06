@@ -182,9 +182,9 @@ namespace RooseLabs.Gameplay
             m_spellLoadout.equippedSpellIndices.Clear();
 
             // Example: Player brings the first 3 learned spells
-            if (GameManager.Instance != null && GameManager.Instance.AllSpells.Length > 0)
+            if (GameManager.Instance != null && GameManager.Instance.SpellDatabase.Count > 0)
             {
-                int spellCount = Mathf.Min(3, GameManager.Instance.AllSpells.Length);
+                int spellCount = Mathf.Min(3, GameManager.Instance.SpellDatabase.Count);
                 for (int i = 0; i < spellCount; i++)
                 {
                     m_spellLoadout.equippedSpellIndices.Add(i);
@@ -228,9 +228,9 @@ namespace RooseLabs.Gameplay
 
             foreach (int spellIndex in m_spellLoadout.equippedSpellIndices)
             {
-                if (spellIndex >= 0 && spellIndex < GameManager.Instance.AllSpells.Length)
+                if (spellIndex >= 0 && spellIndex < GameManager.Instance.SpellDatabase.Count)
                 {
-                    spells.Add(GameManager.Instance.AllSpells[spellIndex]);
+                    spells.Add(GameManager.Instance.SpellDatabase[spellIndex].SpellInfo);
                 }
                 else
                 {
@@ -249,7 +249,7 @@ namespace RooseLabs.Gameplay
             if (GameManager.Instance == null)
                 return false;
 
-            int spellIndex = System.Array.IndexOf(GameManager.Instance.AllSpells, spell);
+            int spellIndex = GameManager.Instance.SpellDatabase.IndexOf(spell);
             return m_spellLoadout.equippedSpellIndices.Contains(spellIndex);
         }
 
@@ -266,7 +266,7 @@ namespace RooseLabs.Gameplay
             if (GameManager.Instance == null)
                 return;
 
-            int runeIndex = Array.IndexOf(GameManager.Instance.AllRunes, rune);
+            int runeIndex = GameManager.Instance.RuneDatabase.IndexOf(rune);
 
             if (runeIndex == -1)
             {
@@ -289,7 +289,7 @@ namespace RooseLabs.Gameplay
             // Get list of uncollected rune indices
             List<int> uncollectedIndices = new List<int>();
 
-            for (int i = 0; i < GameManager.Instance.AllRunes.Length; i++)
+            for (int i = 0; i < GameManager.Instance.RuneDatabase.Count; i++)
             {
                 if (!m_runeCollection.collectedRuneIndices.Contains(i))
                 {
@@ -310,7 +310,7 @@ namespace RooseLabs.Gameplay
 
             CollectRune(runeIndexToAdd);
 
-            Debug.Log($"[PlayerNotebook] Added random rune: {GameManager.Instance.AllRunes[runeIndexToAdd].name}");
+            Debug.Log($"[PlayerNotebook] Added random rune: {GameManager.Instance.RuneDatabase[runeIndexToAdd].name}");
         }
 
         /// <summary>
@@ -352,9 +352,9 @@ namespace RooseLabs.Gameplay
 
             foreach (int runeIndex in m_runeCollection.collectedRuneIndices)
             {
-                if (runeIndex >= 0 && runeIndex < GameManager.Instance.AllRunes.Length)
+                if (runeIndex >= 0 && runeIndex < GameManager.Instance.RuneDatabase.Count)
                 {
-                    runes.Add(GameManager.Instance.AllRunes[runeIndex]);
+                    runes.Add(GameManager.Instance.RuneDatabase[runeIndex]);
                 }
                 else
                 {
@@ -381,7 +381,7 @@ namespace RooseLabs.Gameplay
             if (GameManager.Instance == null)
                 return false;
 
-            int runeIndex = System.Array.IndexOf(GameManager.Instance.AllRunes, rune);
+            int runeIndex = GameManager.Instance.RuneDatabase.IndexOf(rune);
             return HasRune(runeIndex);
         }
 
