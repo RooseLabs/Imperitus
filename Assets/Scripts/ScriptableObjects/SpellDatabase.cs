@@ -41,6 +41,8 @@ namespace RooseLabs.ScriptableObjects
             return spell;
         }
 
+        public int IndexOf(SpellSO spell) => System.Array.FindIndex(objects, s => s.SpellInfo == spell);
+
         #if UNITY_EDITOR
         public void OnValidate()
         {
