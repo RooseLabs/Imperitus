@@ -38,7 +38,7 @@ namespace RooseLabs.Player
         private void Update()
         {
             if (!m_character.Input.aimIsPressed || !m_character.Input.castWasPressed) return;
-            if (GameManager.Instance.CollectedRunes.Count < 3) return;
+            // if (GameManager.Instance.CollectedRunes.Count < 3) return;
             // Create a ray from the camera's position in the direction it is facing
             Ray ray = new Ray(m_character.Camera.transform.position, m_character.Camera.transform.forward);
 

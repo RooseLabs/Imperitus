@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnitySceneManager = UnityEngine.SceneManagement.SceneManager;
 
 namespace RooseLabs.SceneManagement
 {
@@ -13,7 +14,7 @@ namespace RooseLabs.SceneManagement
 
         private async Task Boot()
         {
-            await SceneManager.LoadSceneAsync("PersistentManagers", LoadSceneMode.Single);
+            await UnitySceneManager.LoadSceneAsync("PersistentManagers", LoadSceneMode.Single);
         }
     }
 }

@@ -1,11 +1,10 @@
 using System;
+using FishNet.Connection;
+using FishNet.Object;
+using UnityEngine;
 
 namespace RooseLabs.Network
 {
-    using FishNet.Connection;
-    using FishNet.Object;
-    using UnityEngine;
-
     public class PlayerSpawner : NetworkBehaviour
     {
         [SerializeField] private NetworkObject playerPrefab;

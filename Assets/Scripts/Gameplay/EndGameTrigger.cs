@@ -23,21 +23,21 @@ namespace RooseLabs.Gameplay
 
         private void OnTriggerEnter(Collider other)
         {
-            if (!IsServerInitialized)
-                return;
-
-            if (!other.CompareTag("Player"))
-                return;
-
-            if (GameManager.Instance.CollectedRunes.Count == 3)
-            {
-                Debug.Log("Game Ended! Player entered the area with all runes.");
-                RpcEndGame();
-            }
-            else
-            {
-                Debug.Log("Player entered the area but does not have all runes.");
-            }
+            // if (!IsServerInitialized)
+            //     return;
+            //
+            // if (!other.CompareTag("Player"))
+            //     return;
+            //
+            // if (GameManager.Instance.CollectedRunes.Count == 3)
+            // {
+            //     Debug.Log("Game Ended! Player entered the area with all runes.");
+            //     RpcEndGame();
+            // }
+            // else
+            // {
+            //     Debug.Log("Player entered the area but does not have all runes.");
+            // }
         }
 
         [ObserversRpc]
