@@ -6,7 +6,7 @@ namespace RooseLabs.ScriptableObjects
 {
     public class ObjectDatabase<T> : ScriptableObject, IReadOnlyList<T>
     {
-        [SerializeField] protected T[] objects;
+        [SerializeField] private T[] objects;
 
         public IEnumerator<T> GetEnumerator()
         {
@@ -25,6 +25,8 @@ namespace RooseLabs.ScriptableObjects
         public void CopyTo(T[] array, int arrayIndex) => objects.CopyTo(array, arrayIndex);
 
         public int IndexOf(T item) => System.Array.IndexOf(objects, item);
+
+        public int FindIndex(System.Predicate<T> match) => System.Array.FindIndex(objects, match);
 
         public int Count => objects.Length;
     }
