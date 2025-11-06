@@ -3,7 +3,7 @@ using UnityEngine;
 namespace RooseLabs.ScriptableObjects
 {
     [CreateAssetMenu(fileName = "Rune", menuName = "Imperitus/Rune")]
-    public class RuneSO : ScriptableObject
+    public class RuneSO : GuidScriptableObject
     {
         [SerializeField] private string runeName;
         [SerializeField] private Sprite runeIcon;

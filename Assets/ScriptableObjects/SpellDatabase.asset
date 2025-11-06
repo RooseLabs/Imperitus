@@ -12,6 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a5d0b3724c34665850dc57291ac9309, type: 3}
   m_Name: SpellDatabase
   m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.ScriptableObjects.SpellDatabaseSO
-  spells:
-  - {fileID: 8568110119652573094, guid: 745783e5b0cf15d488300e301ff0b244, type: 3}
-  - {fileID: 8568110119652573094, guid: 257635eb402ebfe42ae1b93b61a27b19, type: 3}
+  objects:
+  - {fileID: 1908893149917123781, guid: 745783e5b0cf15d488300e301ff0b244, type: 3}
+  - {fileID: 1312397102469176154, guid: 257635eb402ebfe42ae1b93b61a27b19, type: 3}
+  spellLookup:
+    m_keys: 000000001ef0c96f
+    m_values:
+    - {fileID: 1908893149917123781, guid: 745783e5b0cf15d488300e301ff0b244, type: 3}
+    - {fileID: 1312397102469176154, guid: 257635eb402ebfe42ae1b93b61a27b19, type: 3}

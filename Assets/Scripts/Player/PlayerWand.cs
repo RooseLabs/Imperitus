@@ -11,7 +11,7 @@ namespace RooseLabs.Player
     {
         #region Serialized
         [SerializeField] private PlayerCharacter character;
-        [SerializeField] private SpellDatabaseSO spellDatabase;
+        [SerializeField] private SpellDatabase spellDatabase;
 
         [Tooltip("Point from which spells are cast. This should be at the tip of the wand.")]
         [SerializeField] private Transform spellCastPoint;
@@ -24,6 +24,7 @@ namespace RooseLabs.Player
 
         // TODO: Either add public methods to add/remove spells from this list or make it public.
         //   We'll probably listen to some events from the player's notebook to manage this list.
+        //   Might change this to a List<SpellBase> or HashSet<SpellBase> later.
         private readonly List<int> m_availableSpells = new() { 0, 1 };
 
         private int m_currentSpellIndex = 0;
@@ -113,7 +114,7 @@ namespace RooseLabs.Player
                 m_currentSpellInstance = null;
             }
             int spellID = m_availableSpells[m_currentSpellIndex];
-            GameObject spellPrefab = spellDatabase[spellID];
+            SpellBase spellPrefab = spellDatabase[spellID];
             if (spellPrefab)
             {
                 m_currentSpellInstance = SpellBase.Instantiate(spellPrefab, SpellCastPointPosition);

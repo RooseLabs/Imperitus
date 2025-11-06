@@ -31,7 +31,7 @@ namespace RooseLabs.Gameplay.Spells
         protected Logger Logger => Logger.GetLogger("SpellCasting");
 
         #region Serialized
-        [SerializeField] private SpellSO spellInfo;
+        [field: SerializeField] public SpellSO SpellInfo { get; private set; }
         [Tooltip("Type of spell casting behavior.")]
         [SerializeField] private SpellCastType castType = SpellCastType.OneShot;
         [Tooltip("Time in seconds required to cast the spell.")]
@@ -141,6 +141,49 @@ namespace RooseLabs.Gameplay.Spells
             }
         }
 
+        public void ScrollBackwardPressed()
+        {
+            OnScrollBackwardPressed();
+        }
+
+        public void ScrollForwardPressed()
+        {
+            OnScrollForwardPressed();
+        }
+
+        public void ScrollBackwardHeld()
+        {
+            OnScrollBackwardHeld();
+        }
+
+        public void ScrollForwardHeld()
+        {
+            OnScrollForwardHeld();
+        }
+
+        public void Scroll(float value)
+        {
+            OnScroll(value);
+        }
+
+        public static SpellBase Instantiate(SpellBase spellPrefab, Vector3 position)
+        {
+            var nm = InstanceFinder.NetworkManager;
+            if (!nm) return null;
+            var localCharacter = PlayerCharacter.LocalCharacter;
+            if (!localCharacter) return null;
+            NetworkObject nob = nm.GetPooledInstantiated(spellPrefab.gameObject, position, Quaternion.identity, false);
+            nob.SetParent(localCharacter.Wand);
+            nm.ServerManager.Spawn(nob, localCharacter.Owner);
+            return nob.GetComponent<SpellBase>();
+        }
+
+        public void Destroy()
+        {
+            Despawn(NetworkObject, DespawnType.Pool);
+        }
+        #endregion
+
         private void CompleteCast()
         {
             if (staminaConsumptionType == StaminaConsumptionType.OnCastFinish)
@@ -167,55 +210,12 @@ namespace RooseLabs.Gameplay.Spells
             PlayerCharacter.LocalCharacter.Data.UpdateStamina(amount);
         }
 
-        public void ScrollBackwardPressed()
-        {
-            OnScrollBackwardPressed();
-        }
-
-        public void ScrollForwardPressed()
-        {
-            OnScrollForwardPressed();
-        }
-
-        public void ScrollBackwardHeld()
-        {
-            OnScrollBackwardHeld();
-        }
-
-        public void ScrollForwardHeld()
-        {
-            OnScrollForwardHeld();
-        }
-
-        public void Scroll(float value)
-        {
-            OnScroll(value);
-        }
-
-        public static SpellBase Instantiate(GameObject spellPrefab, Vector3 position)
-        {
-            var nm = InstanceFinder.NetworkManager;
-            if (!nm) return null;
-            var localCharacter = PlayerCharacter.LocalCharacter;
-            if (!localCharacter) return null;
-            NetworkObject nob = nm.GetPooledInstantiated(spellPrefab, position, Quaternion.identity, false);
-            nob.SetParent(localCharacter.Wand);
-            nm.ServerManager.Spawn(nob, localCharacter.Owner);
-            return nob.GetComponent<SpellBase>();
-        }
-
-        public void Destroy()
-        {
-            Despawn(NetworkObject, DespawnType.Pool);
-        }
-        #endregion
-
         /// <summary>
         /// Called on button press to start casting the spell.
         /// </summary>
         protected virtual void OnStartCast()
         {
-            Logger.Info($"Spell {spellInfo.Name} Started Casting");
+            Logger.Info($"Spell {SpellInfo.Name} Started Casting");
         }
 
         /// <summary>
@@ -223,7 +223,7 @@ namespace RooseLabs.Gameplay.Spells
         /// </summary>
         protected virtual void OnCancelCast()
         {
-            Logger.Info($"Spell {spellInfo.Name} Cancelled Casting");
+            Logger.Info($"Spell {SpellInfo.Name} Cancelled Casting");
         }
 
         /// <summary>
@@ -231,7 +231,7 @@ namespace RooseLabs.Gameplay.Spells
         /// </summary>
         protected virtual void OnContinueCast()
         {
-            Logger.Info($"Spell {spellInfo.Name} Continuing Casting");
+            Logger.Info($"Spell {SpellInfo.Name} Continuing Casting");
         }
 
         /// <summary>
@@ -240,7 +240,7 @@ namespace RooseLabs.Gameplay.Spells
         /// <returns>True if the spell was successfully cast, false otherwise.</returns>
         protected virtual bool OnCastFinished()
         {
-            Logger.Info($"Spell {spellInfo.Name} Cast Finished");
+            Logger.Info($"Spell {SpellInfo.Name} Cast Finished");
             return true;
         }
 
@@ -249,7 +249,7 @@ namespace RooseLabs.Gameplay.Spells
         /// </summary>
         protected virtual void OnContinueCastSustained()
         {
-            Logger.Info($"Spell {spellInfo.Name} Cast Held Continued");
+            Logger.Info($"Spell {SpellInfo.Name} Cast Held Continued");
         }
 
         /// <summary>
@@ -257,7 +257,7 @@ namespace RooseLabs.Gameplay.Spells
         /// </summary>
         protected virtual void OnCancelCastSustained()
         {
-            Logger.Info($"Spell {spellInfo.Name} Cancel Held");
+            Logger.Info($"Spell {SpellInfo.Name} Cancel Held");
         }
 
         /// <summary>
@@ -266,7 +266,7 @@ namespace RooseLabs.Gameplay.Spells
         /// </summary>
         protected virtual void OnScrollBackwardPressed()
         {
-            Logger.Info($"Spell {spellInfo.Name} Scroll Backward Pressed");
+            Logger.Info($"Spell {SpellInfo.Name} Scroll Backward Pressed");
         }
 
         /// <summary>
@@ -275,7 +275,7 @@ namespace RooseLabs.Gameplay.Spells
         /// </summary>
         protected virtual void OnScrollForwardPressed()
         {
-            Logger.Info($"Spell {spellInfo.Name} Scroll Forward Pressed");
+            Logger.Info($"Spell {SpellInfo.Name} Scroll Forward Pressed");
         }
 
         /// <summary>
@@ -284,7 +284,7 @@ namespace RooseLabs.Gameplay.Spells
         /// </summary>
         protected virtual void OnScrollBackwardHeld()
         {
-            Logger.Info($"Spell {spellInfo.Name} Scroll Backward Held");
+            Logger.Info($"Spell {SpellInfo.Name} Scroll Backward Held");
         }
 
         /// <summary>
@@ -293,7 +293,7 @@ namespace RooseLabs.Gameplay.Spells
         /// </summary>
         protected virtual void OnScrollForwardHeld()
         {
-            Logger.Info($"Spell {spellInfo.Name} Scroll Forward Held");
+            Logger.Info($"Spell {SpellInfo.Name} Scroll Forward Held");
         }
 
         /// <summary>
@@ -302,7 +302,7 @@ namespace RooseLabs.Gameplay.Spells
         /// </summary>
         protected virtual void OnScroll(float value)
         {
-            Logger.Info($"Spell {spellInfo.Name} Scrolled: {value}");
+            Logger.Info($"Spell {SpellInfo.Name} Scrolled: {value}");
         }
 
         protected virtual void ResetData()
