@@ -282,6 +282,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7e2498e7ab3af5c4c99e761ea3b73ce4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Gameplay.NotebookManager
+  _componentIndexCache: 255
+  _addedNetworkObject: {fileID: 1097472411}
+  _networkObjectCache: {fileID: 0}
+  taskImageDatabase: {fileID: 11400000, guid: 854fd49a1f67f214cb18633e649cb664, type: 2}
 --- !u!114 &1097472411
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -346,6 +350,10 @@ PrefabInstance:
       propertyPath: guiManager
       value: 
       objectReference: {fileID: 1013051009}
+    - target: {fileID: 51769672726437127, guid: 7140b76d12e111944af61aadcbdc70fa, type: 3}
+      propertyPath: taskImageDatabase
+      value: 
+      objectReference: {fileID: 11400000, guid: 854fd49a1f67f214cb18633e649cb664, type: 2}
     - target: {fileID: 51769672726437127, guid: 7140b76d12e111944af61aadcbdc70fa, type: 3}
       propertyPath: assignmentTaskSprites.Array.size
       value: 3

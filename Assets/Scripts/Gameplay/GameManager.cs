@@ -18,6 +18,7 @@ namespace RooseLabs.Gameplay
         [SerializeField][Scene] private string[] libraryScenes;
         [field: SerializeField] public RuneDatabase RuneDatabase { get; private set; }
         [field: SerializeField] public SpellDatabase SpellDatabase { get; private set; }
+        [SerializeField] private TaskImageDatabase taskImageDatabase;
         #endregion
 
         private HeistTimer m_heistTimer;
@@ -26,8 +27,19 @@ namespace RooseLabs.Gameplay
         {
             Instance = this;
             m_heistTimer = GetComponent<HeistTimer>();
+
+            // Initialize the task image database
+            if (taskImageDatabase != null)
+            {
+                taskImageDatabase.Initialize();
+            }
+            else
+            {
+                Debug.LogError("[GameManager] TaskImageDatabase is not assigned!", this);
+            }
         }
 
+        [Server]
         public void StartHeist()
         {
             int randomIndex = Random.Range(0, libraryScenes.Length);
@@ -37,43 +49,75 @@ namespace RooseLabs.Gameplay
             m_heistTimer.ShowTimer();
             m_heistTimer.StartTimer(m_heistTimer.defaultTime);
 
-            AssignmentData assignment = new AssignmentData
-            {
-                assignmentNumber = 1,
-                tasks = new List<AssignmentTask> {
-                    new AssignmentTask
-                    {
-                        description = "Collect all the ancient runes scattered around the library.",
-                           taskImage = CreateRandomSquareSprite()
-                    },
-                    new AssignmentTask
-                    {
-                        description = "Avoid the library guardians while collecting the runes.",
-                        taskImage = CreateRandomSquareSprite()
-                    },
-                    new AssignmentTask
-                    {
-                        description = "Return to the entrance once all runes are collected.",
-                        taskImage = CreateRandomSquareSprite()
-                    }
-                }
-            };
+            AssignmentData assignment = CreateAssignmentData();
 
-            Debug.Log($"[GameManager] About to initialize assignment. NotebookManager.Instance is null? {NotebookManager.Instance == null}");
-            Debug.Log($"[GameManager] Assignment object created with {assignment.tasks.Count} tasks");
+            Debug.Log($"[GameManager - SERVER] About to initialize assignment. NotebookManager.Instance is null? {NotebookManager.Instance == null}");
+            Debug.Log($"[GameManager - SERVER] Assignment object created with {assignment.tasks.Count} tasks");
 
             NotebookManager.Instance.InitializeAssignment(assignment);
 
-            Debug.Log($"[GameManager] Assignment initialized. Can retrieve from NotebookManager? {NotebookManager.Instance.GetCurrentAssignment() != null}");
+            Debug.Log($"[GameManager - SERVER] Assignment initialized. Can retrieve from NotebookManager? {NotebookManager.Instance.GetCurrentAssignment() != null}");
         }
 
-        Sprite CreateRandomSquareSprite() => Sprite.Create(MakeColorTex(Random.ColorHSV()), new Rect(0, 0, 1, 1), Vector2.one * 0.5f);
-        Texture2D MakeColorTex(Color color)
+        /// <summary>
+        /// Creates assignment data with proper image IDs from the TaskImageDatabase.
+        /// </summary>
+        private AssignmentData CreateAssignmentData()
         {
-            var tex = new Texture2D(1, 1);
-            tex.SetPixel(0, 0, color);
-            tex.Apply();
-            return tex;
+            if (taskImageDatabase == null)
+            {
+                Debug.LogError("[GameManager] Cannot create assignment - TaskImageDatabase is null!");
+                return null;
+            }
+
+            // Get available image IDs from the database
+            List<string> availableImageIds = taskImageDatabase.GetAllImageIds();
+
+            AssignmentData assignment = new AssignmentData
+            {
+                assignmentNumber = 1,
+                tasks = new List<AssignmentTask>()
+            };
+
+            string imageId1 = GetRandomImageId(availableImageIds);
+            assignment.tasks.Add(new AssignmentTask
+            {
+                description = "Collect all the ancient runes scattered around the library.",
+                imageId = imageId1,
+                taskImage = taskImageDatabase.GetSprite(imageId1)
+            });
+
+            string imageId2 = GetRandomImageId(availableImageIds);
+            assignment.tasks.Add(new AssignmentTask
+            {
+                description = "Avoid the library guardians while collecting the runes.",
+                imageId = imageId2,
+                taskImage = taskImageDatabase.GetSprite(imageId2)
+            });
+
+            string imageId3 = GetRandomImageId(availableImageIds);
+            assignment.tasks.Add(new AssignmentTask
+            {
+                description = "Return to the entrance once all runes are collected.",
+                imageId = imageId3,
+                taskImage = taskImageDatabase.GetSprite(imageId3)
+            });
+
+            return assignment;
+        }
+
+        /// <summary>
+        /// Gets a random image ID from the available list.
+        /// </summary>
+        private string GetRandomImageId(List<string> availableIds)
+        {
+            if (availableIds.Count == 0)
+            {
+                Debug.LogError("[GameManager] No available image IDs!");
+                return "default";
+            }
+
+            return availableIds[Random.Range(0, availableIds.Count)];
         }
 
         private static string GetSceneName(string fullPath)

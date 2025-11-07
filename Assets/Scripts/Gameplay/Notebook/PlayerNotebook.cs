@@ -317,7 +317,6 @@ namespace RooseLabs.Gameplay
         /// Adds a rune to this player's collection.
         /// Call this when the player picks up a rune in the world.
         /// </summary>
-        /// <param name="runeIndex">Index of the rune in GameManager.AllRunes</param>
         public void CollectRune(int runeIndex)
         {
             if (m_runeCollection.collectedRuneIndices.Contains(runeIndex))

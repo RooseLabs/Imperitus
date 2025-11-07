@@ -29,6 +29,15 @@ namespace RooseLabs
 
         public void ShowTimer()
         {
+            if (IsServerInitialized)
+            {
+                ShowTimerRPC();
+            }
+        }
+
+        [ObserversRpc]
+        private void ShowTimerRPC()
+        {
             GUIManager.Instance.ToggleTimerText(true);
         }
 
@@ -66,11 +75,8 @@ namespace RooseLabs
 
         private void Update()
         {
-            if (IsServerInitialized)
-            {
-                // Update SyncTimer every frame
-                syncTimer.Update();
-            }
+            // Update SyncTimer every frame
+            syncTimer.Update();
 
             // Update UI per second
             UpdateTimerUI();
@@ -105,7 +111,6 @@ namespace RooseLabs
         /// <summary>
         /// Handles logic when timer reaches zero
         /// </summary>
-        [Server]
         private void HandleTimerFinished()
         {
             // TODO: Implement end-game logic here

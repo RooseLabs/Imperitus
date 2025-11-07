@@ -6,8 +6,7 @@ namespace RooseLabs.Gameplay
 {
     /// <summary>
     /// Data container for assignment information.
-    /// Shared across all players but remains static during gameplay.
-    /// No need for network synchronization since it doesn't change.
+    /// Shared across all players
     /// </summary>
     [Serializable]
     public class AssignmentData
@@ -25,12 +24,33 @@ namespace RooseLabs.Gameplay
     {
         public string description;
         public Sprite taskImage;
+        public string imageId;
+    }
+
+    /// <summary>
+    /// Network-serializable version of assignment task data.
+    /// Uses string imageId instead of Sprite for network transmission.
+    /// </summary>
+    [Serializable]
+    public struct NetworkAssignmentTask
+    {
+        public string description;
+        public string imageId;
+    }
+
+    /// <summary>
+    /// Network-serializable version of assignment data.
+    /// </summary>
+    [Serializable]
+    public struct NetworkAssignmentData
+    {
+        public int assignmentNumber;
+        public NetworkAssignmentTask[] tasks;
     }
 
     /// <summary>
     /// Player-specific data about which runes they have collected.
     /// This is NOT synchronized - each player tracks their own runes locally.
-    /// Stores indices into GameManager.AllRunes array.
     /// </summary>
     [Serializable]
     public class PlayerRuneCollection
@@ -45,7 +65,6 @@ namespace RooseLabs.Gameplay
     /// <summary>
     /// Player-specific data about which spells they brought into this heist.
     /// This is NOT synchronized - each player has their own local list.
-    /// Stores indices into GameManager.AllSpells array.
     /// </summary>
     [Serializable]
     public class PlayerSpellLoadout
