@@ -36,9 +36,16 @@ namespace RooseLabs.Gameplay.Spells
             Logger.Info($"[Impero] Hit object: {hitInfo.collider.name}");
             if (!hitInfo.collider.TryGetComponent(out Draggable hitDraggable)) return false;
 
-            // Determine the minimum safe distance to avoid clipping with the object
-            Vector3 closestPoint = hitInfo.collider.ClosestPoint(character.Camera.transform.position);
-            m_minSafeDragDistance = MinDragDistanceBuffer + Vector3.Distance(hitInfo.point, closestPoint);
+            if (hitDraggable.IsDoor)
+            {
+                m_minSafeDragDistance = 1.0f;
+            }
+            else
+            {
+                // Determine the minimum safe distance to avoid clipping with the object
+                Vector3 closestPoint = hitInfo.collider.ClosestPoint(character.Camera.transform.position);
+                m_minSafeDragDistance = MinDragDistanceBuffer + Vector3.Distance(hitInfo.point, closestPoint);
+            }
 
             hitDraggable.HandleDragBegin(hitInfo.point);
             m_currentGrabbedObject = hitDraggable;
@@ -58,10 +65,13 @@ namespace RooseLabs.Gameplay.Spells
             var character = PlayerCharacter.LocalCharacter;
             Vector3 desiredPosition = character.Camera.transform.position + character.Data.lookDirection * m_currentDragDistance;
 
-            // Update the minimum safe drag distance to avoid clipping with the object
-            Vector3 closestPoint = m_currentGrabbedObject.Collider.ClosestPoint(character.Camera.transform.position);
-            m_minSafeDragDistance = MinDragDistanceBuffer + Vector3.Distance(desiredPosition, closestPoint);
-            m_targetDragDistance = Mathf.Clamp(m_targetDragDistance, m_minSafeDragDistance, maxDistance);
+            if (!m_currentGrabbedObject.IsDoor)
+            {
+                // Update the minimum safe drag distance to avoid clipping with the object
+                Vector3 closestPoint = m_currentGrabbedObject.Collider.ClosestPoint(character.Camera.transform.position);
+                m_minSafeDragDistance = MinDragDistanceBuffer + Vector3.Distance(desiredPosition, closestPoint);
+                m_targetDragDistance = Mathf.Clamp(m_targetDragDistance, m_minSafeDragDistance, maxDistance);
+            }
 
             m_currentGrabbedObject.HandleDrag(desiredPosition);
         }

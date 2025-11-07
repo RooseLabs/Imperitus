@@ -51,15 +51,10 @@ namespace RooseLabs.Gameplay.Spells
 
         public override void OnStartClient()
         {
-            if (!IsOwner)
-            {
-                // Ensure that the position is correct for non-owners.
-                PlayerCharacter ownerCharacter = PlayerHandler.GetCharacter(Owner);
-                Debug.Assert(ownerCharacter != null, "[SpellBase] Spell has no owner.");
-                transform.SetParent(ownerCharacter.Wand.transform, false);
-                transform.position = ownerCharacter.Wand.SpellCastPointPosition;
-                transform.rotation = Quaternion.identity;
-            }
+            PlayerCharacter ownerCharacter = PlayerHandler.GetCharacter(Owner);
+            Debug.Assert(ownerCharacter != null, "[SpellBase] No owner character found for spell.");
+            transform.SetParent(ownerCharacter.Wand.transform);
+            transform.localPosition = ownerCharacter.Wand.SpellCastPointLocalPosition;
         }
 
         private void OnEnable()
@@ -166,14 +161,13 @@ namespace RooseLabs.Gameplay.Spells
             OnScroll(value);
         }
 
-        public static SpellBase Instantiate(SpellBase spellPrefab, Vector3 position)
+        public static SpellBase Instantiate(SpellBase spellPrefab)
         {
             var nm = InstanceFinder.NetworkManager;
             if (!nm) return null;
             var localCharacter = PlayerCharacter.LocalCharacter;
             if (!localCharacter) return null;
-            NetworkObject nob = nm.GetPooledInstantiated(spellPrefab.gameObject, position, Quaternion.identity, false);
-            nob.SetParent(localCharacter.Wand);
+            NetworkObject nob = nm.GetPooledInstantiated(spellPrefab.gameObject, false);
             nm.ServerManager.Spawn(nob, localCharacter.Owner);
             return nob.GetComponent<SpellBase>();
         }

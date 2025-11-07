@@ -2,12 +2,12 @@ using FishNet.Component.Ownership;
 using FishNet.Component.Transforming;
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
-using RooseLabs.Player;
 using UnityEngine;
 
 namespace RooseLabs.Gameplay
 {
-    [RequireComponent(typeof(Rigidbody), typeof(PredictedOwner), typeof(NetworkTransform))]
+    [RequireComponent(typeof(Rigidbody), typeof(NetworkObject))]
+    [RequireComponent(typeof(NetworkTransform), typeof(PredictedOwner))]
     public class Draggable : NetworkBehaviour
     {
         #region Serialized
@@ -15,30 +15,32 @@ namespace RooseLabs.Gameplay
         [SerializeField] private float damping = 50;
         #endregion
 
-        private readonly SyncVar<bool> canOwnershipBeTakenByCollision = new(
+        public virtual bool IsDoor => false;
+
+        private readonly SyncVar<bool> m_canOwnershipBeTakenByCollision = new(true,
             new SyncTypeSettings(WritePermission.ClientUnsynchronized, ReadPermission.ExcludeOwner)
         );
 
-        private bool CanOwnershipBeTakenByCollision
+        protected bool CanOwnershipBeTakenByCollision
         {
-            get => canOwnershipBeTakenByCollision.Value;
+            get => m_canOwnershipBeTakenByCollision.Value;
             set {
-                if (canOwnershipBeTakenByCollision.Value != value)
+                if (m_canOwnershipBeTakenByCollision.Value != value)
                     SetCanOwnershipBeTakenByCollision(value);
             }
         }
 
-        private PredictedOwner m_predictedOwner;
-        private Rigidbody m_rigidbody;
         public Collider Collider { get; private set; }
+        protected Rigidbody m_rigidbody;
+        protected bool m_isDragging;
 
+        private PredictedOwner m_predictedOwner;
         private ConfigurableJoint m_joint;
         private Vector3 m_targetPosition;
         private float m_initialAngularDamping;
-        private bool m_isDragging;
         private bool m_wasLastInteractionDrag;
 
-        private void Awake()
+        protected virtual void Awake()
         {
             TryGetComponent(out m_predictedOwner);
             TryGetComponent(out m_rigidbody);
@@ -47,14 +49,13 @@ namespace RooseLabs.Gameplay
 
         public void HandleDragBegin(Vector3 hitPoint)
         {
+            m_predictedOwner.TakeOwnership(true);
             CanOwnershipBeTakenByCollision = false;
             AttachJoint(hitPoint);
             m_isDragging = true;
             m_wasLastInteractionDrag = true;
             m_targetPosition = hitPoint;
-            m_initialAngularDamping = m_rigidbody.angularDamping;
-            m_rigidbody.angularDamping = 25f;
-            m_predictedOwner.TakeOwnership(true);
+            HandleDragBegin_Internal();
         }
 
         public void HandleDrag(Vector3 position)
@@ -66,10 +67,21 @@ namespace RooseLabs.Gameplay
         public void HandleDragEnd()
         {
             m_isDragging = false;
-            m_rigidbody.angularDamping = m_initialAngularDamping;
+            HandleDragEnd_Internal();
             if (m_joint)
                 Destroy(m_joint.gameObject);
             CanOwnershipBeTakenByCollision = true;
+        }
+
+        protected virtual void HandleDragBegin_Internal()
+        {
+            m_initialAngularDamping = m_rigidbody.angularDamping;
+            m_rigidbody.angularDamping = 25f;
+        }
+
+        protected virtual void HandleDragEnd_Internal()
+        {
+            m_rigidbody.angularDamping = m_initialAngularDamping;
         }
 
         private void AttachJoint(Vector3 attachmentPosition)
@@ -119,7 +131,7 @@ namespace RooseLabs.Gameplay
             };
         }
 
-        private void FixedUpdate()
+        protected virtual void FixedUpdate()
         {
             if (!IsOwner) return;
 
@@ -130,25 +142,22 @@ namespace RooseLabs.Gameplay
 
             if (!m_wasLastInteractionDrag) return;
             bool moving = m_rigidbody.linearVelocity.sqrMagnitude > 0.01f || m_rigidbody.angularVelocity.sqrMagnitude > 0.01f;
-            if (moving && CanOwnershipBeTakenByCollision)
-            {
-                SetCanOwnershipBeTakenByCollision(false);
-            }
+            CanOwnershipBeTakenByCollision = !moving;
         }
 
-        private void OnCollisionEnter(Collision other)
+        protected virtual void OnCollisionEnter(Collision other)
         {
-            if (other.gameObject.TryGetComponent(out PlayerCharacter playerCharacter))
+            if (other.gameObject.TryGetComponent(out NetworkObject networkObject))
             {
                 if (m_isDragging) return;
                 if (!CanOwnershipBeTakenByCollision) return;
                 m_wasLastInteractionDrag = false;
-                if (playerCharacter != PlayerCharacter.LocalCharacter) return;
+                if (!networkObject.IsOwner) return;
                 m_predictedOwner.TakeOwnership(true);
             }
         }
 
         [ServerRpc(RunLocally = true)]
-        private void SetCanOwnershipBeTakenByCollision(bool value) => canOwnershipBeTakenByCollision.Value = value;
+        private void SetCanOwnershipBeTakenByCollision(bool value) => m_canOwnershipBeTakenByCollision.Value = value;
     }
 }

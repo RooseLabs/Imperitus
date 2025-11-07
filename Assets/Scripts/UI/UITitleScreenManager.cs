@@ -83,12 +83,12 @@ namespace RooseLabs.UI
 
         private async void OpenJoinGameScreen()
         {
-            UnsubscribeFromEvents();
             if (string.IsNullOrWhiteSpace(joinCodeInputField.text))
             {
                 NetworkConnector.Instance.StartClientLocally();
                 return;
             }
+            UnsubscribeFromEvents();
             var result = await NetworkConnector.Instance.StartClientWithRelay(joinCodeInputField.text);
             if (!result) SubscribeToEvents();
         }
