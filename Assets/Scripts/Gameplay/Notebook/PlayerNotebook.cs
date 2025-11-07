@@ -58,8 +58,20 @@ namespace RooseLabs.Gameplay
         #region Events
         /// <summary>Invoked when this player collects a new rune</summary>
         public event Action OnRuneCollected;
+
         /// <summary>Invoked when borrowed runes are updated</summary>
         public event Action OnBorrowedRunesChanged;
+
+        /// <summary>
+        /// Invoked when the set of toggled runes changes.
+        /// Provides the complete list of currently toggled rune indices.
+        /// </summary>
+        public event Action<List<int>> OnToggledRunesChanged;
+
+        /// <summary>
+        /// Invoked when toggled runes change, providing the actual RuneSO objects.
+        /// </summary>
+        public event Action<List<RuneSO>> OnToggledRuneObjectsChanged;
         #endregion
 
         #region Player-Specific Data
@@ -79,6 +91,11 @@ namespace RooseLabs.Gameplay
         /// Runes borrowed from nearby players.
         /// </summary>
         private List<BorrowedRune> m_borrowedRunes = new List<BorrowedRune>();
+
+        /// <summary>
+        /// Set of rune indices that are currently toggled/selected by the player.
+        /// </summary>
+        private HashSet<int> m_toggledRunes = new HashSet<int>();
         #endregion
 
         #region Coroutines
@@ -498,6 +515,123 @@ namespace RooseLabs.Gameplay
         public List<BorrowedRune> GetBorrowedRunes()
         {
             return new List<BorrowedRune>(m_borrowedRunes);
+        }
+
+        #endregion
+
+        #region Rune Toggle Management
+
+        /// <summary>
+        /// Toggles a rune's selection state.
+        /// </summary>
+        /// <param name="runeIndex">The index of the rune to toggle</param>
+        public void ToggleRune(int runeIndex)
+        {
+            if (m_toggledRunes.Contains(runeIndex))
+            {
+                m_toggledRunes.Remove(runeIndex);
+                Debug.Log($"[PlayerNotebook] Rune {runeIndex} deselected");
+            }
+            else
+            {
+                m_toggledRunes.Add(runeIndex);
+                Debug.Log($"[PlayerNotebook] Rune {runeIndex} selected");
+            }
+
+            // Broadcast the change (indices)
+            OnToggledRunesChanged?.Invoke(new List<int>(m_toggledRunes));
+
+            // Broadcast the change (RuneSO objects)
+            List<RuneSO> toggledRunes = GetToggledRuneObjects();
+            OnToggledRuneObjectsChanged?.Invoke(toggledRunes);
+
+            Debug.Log("[PlayerNotebook] Toggled Runes: " + string.Join(", ", toggledRunes.ConvertAll(r => r.Name)));
+        }
+
+        /// <summary>
+        /// Gets all currently toggled runes.
+        /// </summary>
+        public List<int> GetToggledRunes()
+        {
+            return new List<int>(m_toggledRunes);
+        }
+
+        /// <summary>
+        /// Checks if a specific rune is toggled.
+        /// </summary>
+        public bool IsRuneToggled(int runeIndex)
+        {
+            return m_toggledRunes.Contains(runeIndex);
+        }
+
+        /// <summary>
+        /// Clears all toggled runes.
+        /// </summary>
+        public void ClearToggledRunes()
+        {
+            m_toggledRunes.Clear();
+            OnToggledRunesChanged?.Invoke(new List<int>());
+            Debug.Log("[PlayerNotebook] All runes deselected");
+        }
+
+        /// <summary>
+        /// Gets all currently toggled runes as RuneSO objects.
+        /// </summary>
+        public List<RuneSO> GetToggledRuneObjects()
+        {
+            var toggledRunes = new List<RuneSO>();
+
+            if (GameManager.Instance == null)
+            {
+                Debug.LogWarning("[PlayerNotebook] GameManager.Instance is null, cannot get toggled runes");
+                return toggledRunes;
+            }
+
+            foreach (int runeIndex in m_toggledRunes)
+            {
+                if (runeIndex >= 0 && runeIndex < GameManager.Instance.RuneDatabase.Count)
+                {
+                    toggledRunes.Add(GameManager.Instance.RuneDatabase[runeIndex]);
+                }
+                else
+                {
+                    Debug.LogWarning($"[PlayerNotebook] Invalid toggled rune index: {runeIndex}");
+                }
+            }
+
+            return toggledRunes;
+        }
+
+        /// <summary>
+        /// Gets a specific toggled rune by index as a RuneSO object.
+        /// Returns null if the rune is not toggled or index is invalid.
+        /// </summary>
+        public RuneSO GetToggledRuneObject(int runeIndex)
+        {
+            if (!m_toggledRunes.Contains(runeIndex))
+                return null;
+
+            if (GameManager.Instance == null)
+                return null;
+
+            if (runeIndex >= 0 && runeIndex < GameManager.Instance.RuneDatabase.Count)
+            {
+                return GameManager.Instance.RuneDatabase[runeIndex];
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Checks if a specific RuneSO is toggled.
+        /// </summary>
+        public bool IsRuneToggled(RuneSO rune)
+        {
+            if (GameManager.Instance == null)
+                return false;
+
+            int runeIndex = GameManager.Instance.RuneDatabase.IndexOf(rune);
+            return IsRuneToggled(runeIndex);
         }
 
         #endregion

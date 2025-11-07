@@ -367,6 +367,23 @@ namespace RooseLabs.UI
                     slotImage.sprite = rune.Sprite;
                     slotImage.enabled = true;
 
+                    // Add Button component if it doesn't exist
+                    Button runeButton = slotImage.gameObject.GetComponent<Button>();
+                    if (runeButton == null)
+                    {
+                        runeButton = slotImage.gameObject.AddComponent<Button>();
+                    }
+
+                    // Store the rune index for the click handler
+                    int capturedRuneIndex = runeIndex; // Capture for closure
+
+                    // Remove old listeners and add new one
+                    runeButton.onClick.RemoveAllListeners();
+                    runeButton.onClick.AddListener(() => OnRuneClicked(capturedRuneIndex));
+
+                    // Update visual state based on toggle status
+                    UpdateRuneToggleVisual(slotImage.gameObject, m_localPlayerNotebook.IsRuneToggled(runeIndex));
+
                     // If this was a borrowed rune that we now own, remove the label
                     if (m_borrowedRuneSlots.ContainsKey(slotIndex))
                     {
@@ -384,6 +401,42 @@ namespace RooseLabs.UI
             DisplayBorrowedRunes();
 
             Debug.Log($"[NotebookUI] Runes page refreshed with {collectedRunes.Count} collected runes");
+        }
+
+        /// <summary>
+        /// Called when a rune is clicked.
+        /// </summary>
+        private void OnRuneClicked(int runeIndex)
+        {
+            if (m_localPlayerNotebook == null)
+                return;
+
+            // Toggle the rune
+            m_localPlayerNotebook.ToggleRune(runeIndex);
+
+            // Update the visual state
+            if (m_runeIndexToSlotIndex.TryGetValue(runeIndex, out int slotIndex))
+            {
+                GameObject slotObject = runesContainer.GetChild(slotIndex).gameObject;
+                UpdateRuneToggleVisual(slotObject, m_localPlayerNotebook.IsRuneToggled(runeIndex));
+            }
+
+            Debug.Log($"[NotebookUI] Rune {runeIndex} clicked");
+        }
+
+        /// <summary>
+        /// Updates the visual state of a rune to show if it's toggled.
+        /// </summary>
+        private void UpdateRuneToggleVisual(GameObject runeSlot, bool isToggled)
+        {
+            Image slotImage = runeSlot.GetComponent<Image>();
+            if (slotImage == null)
+                return;
+
+            // Reduce alpha by half when toggled, full alpha when not toggled
+            Color currentColor = slotImage.color;
+            currentColor.a = isToggled ? 0.5f : 1f;
+            slotImage.color = currentColor;
         }
 
         /// <summary>
@@ -441,7 +494,24 @@ namespace RooseLabs.UI
                 if (slotImage != null)
                 {
                     slotImage.sprite = rune.Sprite;
-                    slotImage.enabled = true; // Re-enable even if it was disabled by RefreshRunesPage
+                    slotImage.enabled = true;
+
+                    // Add Button component if it doesn't exist
+                    Button runeButton = slotImage.gameObject.GetComponent<Button>();
+                    if (runeButton == null)
+                    {
+                        runeButton = slotImage.gameObject.AddComponent<Button>();
+                    }
+
+                    // Store the rune index for the click handler
+                    int capturedRuneIndex = borrowedRune.runeIndex; // Capture for closure
+
+                    // Remove old listeners and add new one
+                    runeButton.onClick.RemoveAllListeners();
+                    runeButton.onClick.AddListener(() => OnRuneClicked(capturedRuneIndex));
+
+                    // Update visual state based on toggle status
+                    UpdateRuneToggleVisual(slotImage.gameObject, m_localPlayerNotebook.IsRuneToggled(borrowedRune.runeIndex));
 
                     // Remove old label if it exists
                     TextMeshProUGUI existingLabel = slotImage.GetComponentInChildren<TextMeshProUGUI>();
@@ -675,6 +745,23 @@ namespace RooseLabs.UI
                 {
                     slotImage.sprite = rune.Sprite;
                     slotImage.enabled = true;
+
+                    // Add Button component if it doesn't exist
+                    Button runeButton = slotImage.gameObject.GetComponent<Button>();
+                    if (runeButton == null)
+                    {
+                        runeButton = slotImage.gameObject.AddComponent<Button>();
+                    }
+
+                    // Store the rune index for the click handler
+                    int capturedRuneIndex = borrowedRune.runeIndex; // Capture for closure
+
+                    // Remove old listeners and add new one
+                    runeButton.onClick.RemoveAllListeners();
+                    runeButton.onClick.AddListener(() => OnRuneClicked(capturedRuneIndex));
+
+                    // Update visual state based on toggle status
+                    UpdateRuneToggleVisual(slotImage.gameObject, m_localPlayerNotebook.IsRuneToggled(borrowedRune.runeIndex));
 
                     // Create the owner name label
                     GameObject nameLabel = new GameObject("OwnerNameLabel");
