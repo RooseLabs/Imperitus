@@ -61,9 +61,9 @@ namespace RooseLabs.Gameplay
                 if (IsServerInitialized && !Owner.IsValid)
                 {
                     // This should only run on the server when there's no owner (the clientHost isn't the owner either)
-                    // This makes the clientHost also wait for 1 second of no movement before removing ownership,
+                    // This makes the clientHost also wait for 2 seconds of no movement before removing ownership,
                     // making a total of 3 seconds of wait before starting the coroutine to return to rest position.
-                    if (m_notMovingTimer < 2f) return;
+                    if (m_notMovingTimer < 1f) return;
                     bool isAtRestPosition = Vector3.Distance(m_rigidbody.position, m_initialPosition) < 0.01f &&
                                             Quaternion.Angle( m_rigidbody.rotation, m_initialRotation) < 0.1f;
                     if (!isAtRestPosition)
@@ -71,7 +71,11 @@ namespace RooseLabs.Gameplay
                 }
                 else
                 {
-                    if (m_notMovingTimer < 1f) return;
+                    // For normal Draggable objects ownership is only removed when the object is either dragged by
+                    // another player or collided with an object owned by another player. However, for doors we want
+                    // the server to be able to return them to their rest position after some time of inactivity,
+                    // so we need to automatically remove ownership after some time.
+                    if (m_notMovingTimer < 2f) return;
                     RemoveOwnership_ServerRpc();
                     m_notMovingTimer = 0f;
                 }
