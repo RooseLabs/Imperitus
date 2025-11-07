@@ -1,9 +1,11 @@
-using System.Collections.Generic;
-using System.IO;
+using FishNet;
+using FishNet.Managing.Scened;
 using FishNet.Object;
 using GameKit.Dependencies.Utilities.Types;
 using RooseLabs.Network;
 using RooseLabs.ScriptableObjects;
+using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -39,15 +41,22 @@ namespace RooseLabs.Gameplay
             }
         }
 
-        [Server]
-        public void StartHeist()
+        private void OnDestroy()
         {
-            int randomIndex = Random.Range(0, libraryScenes.Length);
-            string selectedSceneName = GetSceneName(libraryScenes[randomIndex]);
-            SceneManagement.SceneManager.Instance.LoadScene(selectedSceneName, PlayerHandler.CharacterNetworkObjects);
+            if (InstanceFinder.SceneManager != null)
+                InstanceFinder.SceneManager.OnLoadEnd -= HandleSceneLoaded;
+        }
 
-            m_heistTimer.ShowTimer();
-            m_heistTimer.StartTimer(m_heistTimer.defaultTime);
+        public override void OnStartServer()
+        {
+            base.OnStartServer();
+
+            InstanceFinder.SceneManager.OnLoadEnd += HandleSceneLoaded;
+        }
+
+        private void HandleSceneLoaded(SceneLoadEndEventArgs args)
+        {
+            if (!IsServerInitialized) return;
 
             AssignmentData assignment = CreateAssignmentData();
 
@@ -57,6 +66,18 @@ namespace RooseLabs.Gameplay
             NotebookManager.Instance.InitializeAssignment(assignment);
 
             Debug.Log($"[GameManager - SERVER] Assignment initialized. Can retrieve from NotebookManager? {NotebookManager.Instance.GetCurrentAssignment() != null}");
+        }
+
+
+        [Server]
+        public void StartHeist()
+        {
+            int randomIndex = Random.Range(0, libraryScenes.Length);
+            string selectedSceneName = GetSceneName(libraryScenes[randomIndex]);
+            SceneManagement.SceneManager.Instance.LoadScene(selectedSceneName, PlayerHandler.CharacterNetworkObjects);
+
+            m_heistTimer.ShowTimer();
+            m_heistTimer.StartTimer(m_heistTimer.defaultTime);
         }
 
         /// <summary>

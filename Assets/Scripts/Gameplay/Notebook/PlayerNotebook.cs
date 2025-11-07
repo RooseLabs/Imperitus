@@ -5,9 +5,42 @@ using FishNet.Object;
 using FishNet.Connection;
 using RooseLabs.ScriptableObjects;
 using UnityEngine;
+using RooseLabs.Player;
 
 namespace RooseLabs.Gameplay
 {
+    /// <summary>
+    /// Data structure for transmitting borrowed rune information over the network.
+    /// </summary>
+    [System.Serializable]
+    public struct BorrowedRuneData
+    {
+        public int runeIndex;
+        public int ownerClientId;
+    }
+
+    /// <summary>
+    /// Tracks a borrowed rune with its owner information.
+    /// </summary>
+    [System.Serializable]
+    public class BorrowedRune
+    {
+        public int runeIndex;
+        public string ownerName;
+
+        public BorrowedRune(int runeIndex, string ownerName)
+        {
+            this.runeIndex = runeIndex;
+            this.ownerName = ownerName;
+        }
+    }
+
+    public enum RuneDetectionMode
+    {
+        OnDemand,      // Check only when runes page is opened
+        Continuous     // Periodic automatic checks
+    }
+
     /// <summary>
     /// Player-specific notebook component that exists on each player's character.
     /// Manages the player's spell loadout and rune collection for the current heist.
@@ -15,15 +48,18 @@ namespace RooseLabs.Gameplay
     /// </summary>
     public class PlayerNotebook : NetworkBehaviour
     {
-        #region Configuration
-        [Header("Rune Sharing Settings")]
-        [SerializeField] private float runeShareRadius = 5f;
-        [SerializeField] private float runeShareCheckInterval = 0.5f;
+        #region Serialized Fields
+        [Header("Rune Proximity Settings")]
+        [SerializeField] private RuneDetectionMode detectionMode = RuneDetectionMode.OnDemand;
+        [SerializeField] private float proximityRange = 5f;
+        [SerializeField] private float continuousCheckPeriod = 0.5f;
         #endregion
 
         #region Events
         /// <summary>Invoked when this player collects a new rune</summary>
         public event Action OnRuneCollected;
+        /// <summary>Invoked when borrowed runes are updated</summary>
+        public event Action OnBorrowedRunesChanged;
         #endregion
 
         #region Player-Specific Data
@@ -38,9 +74,16 @@ namespace RooseLabs.Gameplay
         /// Each player tracks their own runes independently.
         /// </summary>
         private PlayerRuneCollection m_runeCollection;
+
+        /// <summary>
+        /// Runes borrowed from nearby players.
+        /// </summary>
+        private List<BorrowedRune> m_borrowedRunes = new List<BorrowedRune>();
         #endregion
 
-        private Coroutine m_sharingCoroutine;
+        #region Coroutines
+        private Coroutine m_continuousCheckCoroutine;
+        #endregion
 
         #region Initialization
 
@@ -61,114 +104,25 @@ namespace RooseLabs.Gameplay
             // Load the player's spell loadout for this heist
             InitializeSpellLoadout();
 
-            // Start the proximity sharing system
-            m_sharingCoroutine = StartCoroutine(RuneSharingLoop());
-        }
-
-        private void OnDestroy()
-        {
-            if (m_sharingCoroutine != null)
+            // Start continuous checking if that mode is selected
+            if (detectionMode == RuneDetectionMode.Continuous)
             {
-                StopCoroutine(m_sharingCoroutine);
+                StartContinuousProximityCheck();
             }
         }
 
-        #endregion
-
-        #region Proximity Rune Sharing
-
-        private IEnumerator RuneSharingLoop()
+        public override void OnStopClient()
         {
-            while (true)
+            base.OnStopClient();
+
+            if (m_continuousCheckCoroutine != null)
             {
-                yield return new WaitForSeconds(runeShareCheckInterval);
-                CheckAndShareRunesWithNearbyPlayers();
+                StopCoroutine(m_continuousCheckCoroutine);
+                m_continuousCheckCoroutine = null;
             }
         }
 
-        private void CheckAndShareRunesWithNearbyPlayers()
-        {
-            if (!base.IsOwner)
-                return;
-
-            // Find all other player notebooks
-            var allNotebooks = FindObjectsByType<PlayerNotebook>(FindObjectsSortMode.None);
-
-            foreach (var otherNotebook in allNotebooks)
-            {
-                // Skip self
-                if (otherNotebook == this)
-                    continue;
-
-                // Check distance
-                float distance = Vector3.Distance(transform.position, otherNotebook.transform.position);
-
-                if (distance <= runeShareRadius)
-                {
-                    RequestRuneShare(otherNotebook);
-                }
-            }
-        }
-
-        private void RequestRuneShare(PlayerNotebook otherNotebook)
-        {
-            RequestRuneShareServerRpc(otherNotebook, base.LocalConnection);
-        }
-
-        [ServerRpc(RequireOwnership = false)]
-        private void RequestRuneShareServerRpc(PlayerNotebook targetNotebook, NetworkConnection requester = null)
-        {
-            // Server forwards the request to the target player
-            TargetReceiveRuneShareRequest(targetNotebook.Owner, requester);
-        }
-
-        [TargetRpc]
-        private void TargetReceiveRuneShareRequest(NetworkConnection target, NetworkConnection requester)
-        {
-            // The target player sends their runes back to the requester
-            var myRunes = GetCollectedRunes();
-            TargetReceiveSharedRunes(requester, myRunes.ToArray());
-        }
-
-        [TargetRpc]
-        private void TargetReceiveSharedRunes(NetworkConnection target, int[] sharedRuneIndices)
-        {
-            // Add any runes we don't already have
-            bool anyNewRunes = false;
-
-            foreach (int runeIndex in sharedRuneIndices)
-            {
-                if (!m_runeCollection.collectedRuneIndices.Contains(runeIndex))
-                {
-                    m_runeCollection.collectedRuneIndices.Add(runeIndex);
-                    anyNewRunes = true;
-                    Debug.Log($"[PlayerNotebook] Received shared rune {runeIndex} from nearby player");
-                }
-            }
-
-            if (anyNewRunes)
-            {
-                OnRuneCollected?.Invoke();
-            }
-        }
-
-        /// <summary>
-        /// Sets the rune sharing radius. Useful for testing or dynamic difficulty.
-        /// </summary>
-        public void SetRuneShareRadius(float radius)
-        {
-            runeShareRadius = Mathf.Max(0f, radius);
-        }
-
-        /// <summary>
-        /// Gets the current rune sharing radius.
-        /// </summary>
-        public float GetRuneShareRadius()
-        {
-            return runeShareRadius;
-        }
-
-        #endregion
+        #endregion    
 
         #region Spell Loadout Management
 
@@ -326,9 +280,30 @@ namespace RooseLabs.Gameplay
             }
 
             m_runeCollection.collectedRuneIndices.Add(runeIndex);
+
+            // Notify server of the rune collection
+            if (IsOwner)
+            {
+                ServerNotifyRuneCollected(runeIndex);
+            }
+
             OnRuneCollected?.Invoke();
 
             Debug.Log($"[PlayerNotebook] Rune {runeIndex} collected. Total runes: {m_runeCollection.collectedRuneIndices.Count}");
+        }
+
+        /// <summary>
+        /// Notifies the server that this player collected a rune.
+        /// </summary>
+        [ServerRpc]
+        private void ServerNotifyRuneCollected(int runeIndex)
+        {
+            // Add the rune to the server's copy of this player's collection
+            if (!m_runeCollection.collectedRuneIndices.Contains(runeIndex))
+            {
+                m_runeCollection.collectedRuneIndices.Add(runeIndex);
+                Debug.Log($"[PlayerNotebook - SERVER] Player {Owner.ClientId} collected rune {runeIndex}");
+            }
         }
 
         /// <summary>
@@ -382,6 +357,147 @@ namespace RooseLabs.Gameplay
 
             int runeIndex = GameManager.Instance.RuneDatabase.IndexOf(rune);
             return HasRune(runeIndex);
+        }
+
+        #endregion
+
+        #region Rune Proximity Detection
+
+        /// <summary>
+        /// Requests a one-time proximity check from the server.
+        /// Used in OnDemand mode when the player opens the runes page.
+        /// </summary>
+        public void RequestProximityCheck()
+        {
+            if (!IsOwner)
+                return;
+
+            ServerCheckNearbyRunes(Owner);
+        }
+
+        /// <summary>
+        /// Starts continuous proximity checking.
+        /// Called automatically if detectionMode is Continuous.
+        /// </summary>
+        private void StartContinuousProximityCheck()
+        {
+            if (m_continuousCheckCoroutine != null)
+                StopCoroutine(m_continuousCheckCoroutine);
+
+            m_continuousCheckCoroutine = StartCoroutine(ContinuousProximityCheckCoroutine());
+        }
+
+        /// <summary>
+        /// Coroutine that periodically requests proximity checks from the server.
+        /// </summary>
+        private IEnumerator ContinuousProximityCheckCoroutine()
+        {
+            WaitForSeconds wait = new WaitForSeconds(continuousCheckPeriod);
+
+            while (true)
+            {
+                yield return wait;
+
+                if (IsOwner)
+                {
+                    ServerCheckNearbyRunes(Owner);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Server-side method that checks for nearby players and their runes.
+        /// </summary>
+        [ServerRpc(RequireOwnership = true)]
+        private void ServerCheckNearbyRunes(NetworkConnection conn)
+        {
+            if (!IsServerInitialized)
+                return;
+
+            // Get all PlayerNotebook instances
+            PlayerNotebook[] allNotebooks = FindObjectsByType<PlayerNotebook>(FindObjectsSortMode.None);
+
+            List<BorrowedRuneData> borrowedRuneDataList = new List<BorrowedRuneData>();
+
+            foreach (PlayerNotebook otherNotebook in allNotebooks)
+            {
+                // Skip self
+                if (otherNotebook.Owner == conn)
+                    continue;
+
+                // Check distance
+                float distance = Vector3.Distance(transform.position, otherNotebook.transform.position);
+                if (distance <= proximityRange)
+                {
+                    // Get the other player's collected runes
+                    List<int> otherRunes = otherNotebook.GetCollectedRunes();
+
+                    foreach (int runeIndex in otherRunes)
+                    {
+                        // Only add runes that this player doesn't already own
+                        if (!HasRune(runeIndex))
+                        {
+                            borrowedRuneDataList.Add(new BorrowedRuneData
+                            {
+                                runeIndex = runeIndex,
+                                ownerClientId = otherNotebook.Owner.ClientId
+                            });
+                        }
+                    }
+                }
+            }
+
+            // Send the borrowed runes data to the client
+            TargetUpdateBorrowedRunes(conn, borrowedRuneDataList.ToArray());
+        }
+
+        /// <summary>
+        /// Target RPC that updates the client's borrowed runes list.
+        /// </summary>
+        [TargetRpc]
+        private void TargetUpdateBorrowedRunes(NetworkConnection conn, BorrowedRuneData[] borrowedRuneData)
+        {
+            // Clear current borrowed runes
+            m_borrowedRunes.Clear();
+
+            // Convert borrowed rune data to BorrowedRune objects with player names
+            foreach (BorrowedRuneData data in borrowedRuneData)
+            {
+                string ownerName = GetPlayerNameByClientId(data.ownerClientId);
+                m_borrowedRunes.Add(new BorrowedRune(data.runeIndex, ownerName));
+            }
+
+            Debug.Log($"[PlayerNotebook] Updated borrowed runes: {m_borrowedRunes.Count} borrowed");
+
+            // Notify UI
+            OnBorrowedRunesChanged?.Invoke();
+        }
+
+        /// <summary>
+        /// Gets a player's name by their client ID.
+        /// </summary>
+        private string GetPlayerNameByClientId(int clientId)
+        {
+            // Try to find the PlayerConnection with this client ID
+            var allConnections = FindObjectsByType<RooseLabs.Player.PlayerConnection>(FindObjectsSortMode.None);
+
+            foreach (var connection in allConnections)
+            {
+                if (connection.Owner.ClientId == clientId)
+                {
+                    return connection.PlayerName;
+                }
+            }
+
+            return $"Player {clientId}";
+        }
+
+        /// <summary>
+        /// Gets all borrowed runes.
+        /// </summary>
+        public List<BorrowedRune> GetBorrowedRunes()
+        {
+            return new List<BorrowedRune>(m_borrowedRunes);
         }
 
         #endregion

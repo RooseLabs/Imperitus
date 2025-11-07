@@ -44,6 +44,7 @@ namespace RooseLabs.UI
         // Track which rune slots have been filled (indices of Image components in runesContainer)
         private List<int> m_availableRuneSlots = new List<int>();
         private Dictionary<int, int> m_runeIndexToSlotIndex = new Dictionary<int, int>(); // Maps rune index to slot index
+        private Dictionary<int, GameObject> m_borrowedRuneSlots = new Dictionary<int, GameObject>(); // Maps slot index to the Image GameObject for borrowed runes
 
         private void OnEnable()
         {
@@ -66,6 +67,7 @@ namespace RooseLabs.UI
             if (m_localPlayerNotebook != null)
             {
                 m_localPlayerNotebook.OnRuneCollected += OnRuneCollected;
+                m_localPlayerNotebook.OnBorrowedRunesChanged += OnBorrowedRunesChanged;
             }
 
             // Initialize rune slots tracking
@@ -88,6 +90,7 @@ namespace RooseLabs.UI
             if (m_localPlayerNotebook != null)
             {
                 m_localPlayerNotebook.OnRuneCollected -= OnRuneCollected;
+                m_localPlayerNotebook.OnBorrowedRunesChanged -= OnBorrowedRunesChanged;
             }
         }
 
@@ -108,6 +111,13 @@ namespace RooseLabs.UI
         public void ShowRunesTab()
         {
             Debug.Log("[NotebookUI] ShowRunesTab called via Unity Event");
+
+            // Request proximity check when opening runes page (for OnDemand mode)
+            if (m_localPlayerNotebook != null)
+            {
+                m_localPlayerNotebook.RequestProximityCheck();
+            }
+
             SwitchTab(NotebookTab.Runes);
         }
 
@@ -171,17 +181,6 @@ namespace RooseLabs.UI
                     break;
             }
         }
-
-        #endregion
-
-        #region Helper Methods
-
-        /// <summary>
-        /// Disables raycast target on all text elements inside buttons.
-        /// This prevents text from blocking button clicks.
-        /// Note: This is less critical when using Unity Events set up in Inspector,
-        /// but still good practice for consistency.
-        /// </summary>
 
         #endregion
 
@@ -272,6 +271,7 @@ namespace RooseLabs.UI
                 return;
 
             m_runeIndexToSlotIndex.Clear();
+            m_borrowedRuneSlots.Clear();
 
             // Assume the runesContainer has exactly 18 Image components as children
             int slotCount = runesContainer.childCount;
@@ -315,6 +315,16 @@ namespace RooseLabs.UI
                 if (slotImage != null)
                 {
                     slotImage.enabled = false;
+
+                    // Only remove labels for slots that aren't borrowed runes
+                    if (!m_borrowedRuneSlots.ContainsKey(i))
+                    {
+                        TextMeshProUGUI existingLabel = slotImage.GetComponentInChildren<TextMeshProUGUI>();
+                        if (existingLabel != null)
+                        {
+                            Destroy(existingLabel.gameObject);
+                        }
+                    }
                 }
             }
 
@@ -332,15 +342,12 @@ namespace RooseLabs.UI
 
                 int slotIndex;
 
-                // Check if this rune already has an assigned slot
                 if (m_runeIndexToSlotIndex.ContainsKey(runeIndex))
                 {
-                    // Use the existing slot
                     slotIndex = m_runeIndexToSlotIndex[runeIndex];
                 }
                 else
                 {
-                    // Assign a new random slot
                     if (m_availableRuneSlots.Count == 0)
                     {
                         Debug.LogWarning("[NotebookUI] No more available rune slots!");
@@ -351,20 +358,121 @@ namespace RooseLabs.UI
                     slotIndex = m_availableRuneSlots[randomIndex];
                     m_availableRuneSlots.RemoveAt(randomIndex);
 
-                    // Store the mapping for future use
                     m_runeIndexToSlotIndex[runeIndex] = slotIndex;
                 }
 
-                // Update the slot with the rune sprite
                 Image slotImage = runesContainer.GetChild(slotIndex).GetComponent<Image>();
                 if (slotImage != null)
                 {
                     slotImage.sprite = rune.Sprite;
                     slotImage.enabled = true;
+
+                    // If this was a borrowed rune that we now own, remove the label
+                    if (m_borrowedRuneSlots.ContainsKey(slotIndex))
+                    {
+                        TextMeshProUGUI label = slotImage.GetComponentInChildren<TextMeshProUGUI>();
+                        if (label != null)
+                        {
+                            Destroy(label.gameObject);
+                        }
+                        m_borrowedRuneSlots.Remove(slotIndex);
+                    }
                 }
             }
 
-            Debug.Log($"[NotebookUI] Runes page refreshed with {collectedRunes.Count} runes");
+            // Display borrowed runes (this will now re-enable slots that were disabled)
+            DisplayBorrowedRunes();
+
+            Debug.Log($"[NotebookUI] Runes page refreshed with {collectedRunes.Count} collected runes");
+        }
+
+        /// <summary>
+        /// Displays borrowed runes in available slots.
+        /// </summary>
+        private void DisplayBorrowedRunes()
+        {
+            if (m_localPlayerNotebook == null || runesContainer == null)
+                return;
+
+            m_borrowedRuneSlots.Clear();
+
+            List<Gameplay.BorrowedRune> borrowedRunes = m_localPlayerNotebook.GetBorrowedRunes();
+
+            foreach (var borrowedRune in borrowedRunes)
+            {
+                if (m_localPlayerNotebook.HasRune(borrowedRune.runeIndex))
+                    continue;
+
+                int slotIndex;
+
+                // Check if we've already placed this borrowed rune
+                if (m_runeIndexToSlotIndex.ContainsKey(borrowedRune.runeIndex))
+                {
+                    slotIndex = m_runeIndexToSlotIndex[borrowedRune.runeIndex];
+                }
+                else
+                {
+                    if (m_availableRuneSlots.Count == 0)
+                    {
+                        Debug.LogWarning("[NotebookUI] No more available slots for borrowed runes!");
+                        break;
+                    }
+
+                    if (Gameplay.GameManager.Instance == null)
+                        continue;
+
+                    if (borrowedRune.runeIndex < 0 || borrowedRune.runeIndex >= Gameplay.GameManager.Instance.RuneDatabase.Count)
+                    {
+                        Debug.LogWarning($"[NotebookUI] Invalid borrowed rune index: {borrowedRune.runeIndex}");
+                        continue;
+                    }
+
+                    int randomIndex = Random.Range(0, m_availableRuneSlots.Count);
+                    slotIndex = m_availableRuneSlots[randomIndex];
+                    m_availableRuneSlots.RemoveAt(randomIndex);
+
+                    m_runeIndexToSlotIndex[borrowedRune.runeIndex] = slotIndex;
+                }
+
+                RuneSO rune = Gameplay.GameManager.Instance.RuneDatabase[borrowedRune.runeIndex];
+
+                Transform slotTransform = runesContainer.GetChild(slotIndex);
+                Image slotImage = slotTransform.GetComponent<Image>();
+                if (slotImage != null)
+                {
+                    slotImage.sprite = rune.Sprite;
+                    slotImage.enabled = true; // Re-enable even if it was disabled by RefreshRunesPage
+
+                    // Remove old label if it exists
+                    TextMeshProUGUI existingLabel = slotImage.GetComponentInChildren<TextMeshProUGUI>();
+                    if (existingLabel != null)
+                    {
+                        Destroy(existingLabel.gameObject);
+                    }
+
+                    // Create the owner name label
+                    GameObject nameLabel = new GameObject("OwnerNameLabel");
+                    nameLabel.transform.SetParent(slotTransform, false);
+
+                    TextMeshProUGUI nameText = nameLabel.AddComponent<TextMeshProUGUI>();
+                    nameText.text = borrowedRune.ownerName;
+                    nameText.fontSize = 30;
+                    nameText.color = Color.white;
+                    nameText.alignment = TextAlignmentOptions.Center;
+                    nameText.horizontalAlignment = HorizontalAlignmentOptions.Center;
+                    nameText.verticalAlignment = VerticalAlignmentOptions.Middle;
+
+                    RectTransform nameRect = nameLabel.GetComponent<RectTransform>();
+                    nameRect.anchorMin = Vector2.zero;
+                    nameRect.anchorMax = Vector2.one;
+                    nameRect.sizeDelta = Vector2.zero;
+                    nameRect.anchoredPosition = Vector2.zero;
+
+                    m_borrowedRuneSlots[slotIndex] = slotImage.gameObject;
+                }
+            }
+
+            Debug.Log($"[NotebookUI] Displayed {borrowedRunes.Count} borrowed runes");
         }
 
         /// <summary>
@@ -383,9 +491,22 @@ namespace RooseLabs.UI
 
             int newRuneIndex = collectedIndices[collectedIndices.Count - 1];
 
-            // Check if we already placed this rune
+            // Check if we already placed this rune (either as collected or borrowed)
             if (m_runeIndexToSlotIndex.ContainsKey(newRuneIndex))
+            {
+                // If it was borrowed, we need to remove the owner name label
+                int existingSlotIndex = m_runeIndexToSlotIndex[newRuneIndex];
+                Transform slotTransform = runesContainer.GetChild(existingSlotIndex);
+                TextMeshProUGUI existingLabel = slotTransform.GetComponentInChildren<TextMeshProUGUI>();
+                if (existingLabel != null)
+                {
+                    Destroy(existingLabel.gameObject);
+                }
+
+                // Remove from borrowed tracking
+                m_borrowedRuneSlots.Remove(existingSlotIndex);
                 return;
+            }
 
             // Check if there are available slots
             if (m_availableRuneSlots.Count == 0)
@@ -423,6 +544,163 @@ namespace RooseLabs.UI
             }
 
             Debug.Log($"[NotebookUI] New rune collected and placed in slot {slotIndex}");
+        }
+
+        /// <summary>
+        /// Called when borrowed runes change.
+        /// Updates only the borrowed runes without affecting collected runes.
+        /// </summary>
+        private void OnBorrowedRunesChanged()
+        {
+            if (m_localPlayerNotebook == null || runesContainer == null)
+                return;
+
+            // Only update if we're currently viewing the runes page
+            if (m_currentTab != NotebookTab.Runes)
+                return;
+
+            // Get current borrowed runes
+            List<Gameplay.BorrowedRune> borrowedRunes = m_localPlayerNotebook.GetBorrowedRunes();
+            HashSet<int> currentBorrowedRuneIndices = new HashSet<int>();
+
+            foreach (var borrowedRune in borrowedRunes)
+            {
+                // Skip if player owns this rune
+                if (m_localPlayerNotebook.HasRune(borrowedRune.runeIndex))
+                    continue;
+
+                currentBorrowedRuneIndices.Add(borrowedRune.runeIndex);
+            }
+
+            // Remove borrowed runes that are no longer nearby
+            List<int> slotsToRemove = new List<int>();
+            foreach (var kvp in m_borrowedRuneSlots)
+            {
+                int slotIndex = kvp.Key;
+
+                // Find which rune is in this slot
+                int runeInSlot = -1;
+                foreach (var mapping in m_runeIndexToSlotIndex)
+                {
+                    if (mapping.Value == slotIndex)
+                    {
+                        runeInSlot = mapping.Key;
+                        break;
+                    }
+                }
+
+                // If this borrowed rune is no longer in the borrowed list, remove it
+                if (runeInSlot != -1 && !currentBorrowedRuneIndices.Contains(runeInSlot))
+                {
+                    slotsToRemove.Add(slotIndex);
+                }
+            }
+
+            // Remove slots
+            foreach (int slotIndex in slotsToRemove)
+            {
+                // Find the rune index for this slot
+                int runeIndexToRemove = -1;
+                foreach (var mapping in m_runeIndexToSlotIndex)
+                {
+                    if (mapping.Value == slotIndex)
+                    {
+                        runeIndexToRemove = mapping.Key;
+                        break;
+                    }
+                }
+
+                if (runeIndexToRemove != -1)
+                {
+                    // Clear the slot
+                    Image slotImage = runesContainer.GetChild(slotIndex).GetComponent<Image>();
+                    if (slotImage != null)
+                    {
+                        slotImage.enabled = false;
+
+                        // Remove owner name label
+                        TextMeshProUGUI label = slotImage.GetComponentInChildren<TextMeshProUGUI>();
+                        if (label != null)
+                        {
+                            Destroy(label.gameObject);
+                        }
+                    }
+
+                    // Make slot available again
+                    m_availableRuneSlots.Add(slotIndex);
+                    m_runeIndexToSlotIndex.Remove(runeIndexToRemove);
+                    m_borrowedRuneSlots.Remove(slotIndex);
+                }
+            }
+
+            // Add new borrowed runes
+            foreach (var borrowedRune in borrowedRunes)
+            {
+                // Skip if player owns this rune
+                if (m_localPlayerNotebook.HasRune(borrowedRune.runeIndex))
+                    continue;
+
+                // Skip if already displayed
+                if (m_runeIndexToSlotIndex.ContainsKey(borrowedRune.runeIndex))
+                    continue;
+
+                // Check if there are available slots
+                if (m_availableRuneSlots.Count == 0)
+                {
+                    Debug.LogWarning("[NotebookUI] No more available slots for borrowed runes!");
+                    break;
+                }
+
+                // Get the rune data
+                if (Gameplay.GameManager.Instance == null)
+                    continue;
+
+                if (borrowedRune.runeIndex < 0 || borrowedRune.runeIndex >= Gameplay.GameManager.Instance.RuneDatabase.Count)
+                    continue;
+
+                RuneSO rune = Gameplay.GameManager.Instance.RuneDatabase[borrowedRune.runeIndex];
+
+                // Pick a random available slot
+                int randomIndex = Random.Range(0, m_availableRuneSlots.Count);
+                int slotIndex = m_availableRuneSlots[randomIndex];
+                m_availableRuneSlots.RemoveAt(randomIndex);
+
+                // Store the mapping
+                m_runeIndexToSlotIndex[borrowedRune.runeIndex] = slotIndex;
+
+                // Update the slot with the rune sprite
+                Transform slotTransform = runesContainer.GetChild(slotIndex);
+                Image slotImage = slotTransform.GetComponent<Image>();
+                if (slotImage != null)
+                {
+                    slotImage.sprite = rune.Sprite;
+                    slotImage.enabled = true;
+
+                    // Create the owner name label
+                    GameObject nameLabel = new GameObject("OwnerNameLabel");
+                    nameLabel.transform.SetParent(slotTransform, false);
+
+                    TextMeshProUGUI nameText = nameLabel.AddComponent<TextMeshProUGUI>();
+                    nameText.text = borrowedRune.ownerName;
+                    nameText.fontSize = 30;
+                    nameText.color = Color.white;
+                    nameText.alignment = TextAlignmentOptions.Center;
+                    nameText.horizontalAlignment = HorizontalAlignmentOptions.Center;
+                    nameText.verticalAlignment = VerticalAlignmentOptions.Middle;
+
+                    // Set the RectTransform to fill the parent
+                    RectTransform nameRect = nameLabel.GetComponent<RectTransform>();
+                    nameRect.anchorMin = Vector2.zero;
+                    nameRect.anchorMax = Vector2.one;
+                    nameRect.sizeDelta = Vector2.zero;
+                    nameRect.anchoredPosition = Vector2.zero;
+
+                    // Track this borrowed rune slot
+                    m_borrowedRuneSlots[slotIndex] = slotImage.gameObject;
+                }
+            }
+
+            Debug.Log($"[NotebookUI] Borrowed runes updated incrementally");
         }
 
         #endregion

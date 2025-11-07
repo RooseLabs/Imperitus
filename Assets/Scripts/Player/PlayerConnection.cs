@@ -21,6 +21,8 @@ namespace RooseLabs.Player
             WritePermission.ClientUnsynchronized, ReadPermission.ExcludeOwner)
         );
 
+        public string PlayerName => m_playerName.Value;
+
         public event Action<string> OnNameChanged = delegate { };
 
         private void OnEnable()
