@@ -124,8 +124,7 @@ namespace RooseLabs.SceneManagement
             {
                 LoadStartingOnlineScene();
             }
-
-            if (currentOnlineSceneLoaded && !string.IsNullOrEmpty(m_pendingUnloadAfterLoad))
+            else if (currentOnlineSceneLoaded && !string.IsNullOrEmpty(m_pendingUnloadAfterLoad))
             {
                 Scene pendingScene = UnitySceneManager.GetSceneByName(m_pendingUnloadAfterLoad);
                 if (pendingScene.IsValid())

@@ -13,6 +13,7 @@ namespace RooseLabs.Gameplay.Spells
         private static int s_raycastMask;
 
         private Draggable m_currentGrabbedObject;
+        private Vector3 m_currentGrabbedLocalHitPoint;
         private float m_currentDragDistance;
         private float m_targetDragDistance;
         private float m_minSafeDragDistance;
@@ -27,7 +28,8 @@ namespace RooseLabs.Gameplay.Spells
         protected override bool OnCastFinished()
         {
             var character = PlayerCharacter.LocalCharacter;
-            if (!character.RaycastIgnoreSelf(character.Camera.transform.position, character.Data.lookDirection,
+            var cameraPosition = character.Camera.transform.position;
+            if (!character.RaycastIgnoreSelf(cameraPosition, character.Data.lookDirection,
                     out RaycastHit hitInfo, maxDistance, s_raycastMask))
             {
                 Logger.Info("[Impero] No hit detected.");
@@ -43,11 +45,13 @@ namespace RooseLabs.Gameplay.Spells
             else
             {
                 // Determine the minimum safe distance to avoid clipping with the object
-                Vector3 closestPoint = hitInfo.collider.ClosestPoint(character.Camera.transform.position);
-                m_minSafeDragDistance = MinDragDistanceBuffer + Vector3.Distance(hitInfo.point, closestPoint);
+                Vector3 closestPoint = hitInfo.collider.ClosestPoint(cameraPosition);
+                float closestDistance = Vector3.Distance(cameraPosition, closestPoint);
+                m_minSafeDragDistance = MinDragDistanceBuffer + (hitInfo.distance - closestDistance);
             }
 
             hitDraggable.HandleDragBegin(hitInfo.point);
+            m_currentGrabbedLocalHitPoint = hitDraggable.transform.InverseTransformPoint(hitInfo.point);
             m_currentGrabbedObject = hitDraggable;
             m_currentDragDistance = hitInfo.distance;
             m_targetDragDistance = Mathf.Clamp(m_currentDragDistance, m_minSafeDragDistance, maxDistance);
@@ -63,16 +67,30 @@ namespace RooseLabs.Gameplay.Spells
             }
 
             var character = PlayerCharacter.LocalCharacter;
-            Vector3 desiredPosition = character.Camera.transform.position + character.Data.lookDirection * m_currentDragDistance;
 
-            if (!m_currentGrabbedObject.IsDoor)
+            Vector3 cameraPosition = character.Camera.transform.position;
+            Vector3 grabbedWorldHitPoint = m_currentGrabbedObject.transform.TransformPoint(m_currentGrabbedLocalHitPoint);
+            float currentGrabDistance = Vector3.Distance(cameraPosition, grabbedWorldHitPoint);
+            if (m_currentGrabbedObject.IsDoor)
+            {
+                if (currentGrabDistance > maxDistance)
+                {
+                    // Door is out of range, cancel the cast
+                    CancelCast();
+                    return;
+                }
+            }
+            else
             {
                 // Update the minimum safe drag distance to avoid clipping with the object
-                Vector3 closestPoint = m_currentGrabbedObject.Collider.ClosestPoint(character.Camera.transform.position);
-                m_minSafeDragDistance = MinDragDistanceBuffer + Vector3.Distance(desiredPosition, closestPoint);
+                Vector3 closestPoint = m_currentGrabbedObject.Collider.ClosestPoint(cameraPosition);
+                float closestDistance = Vector3.Distance(closestPoint, cameraPosition);
+                m_minSafeDragDistance = MinDragDistanceBuffer + Mathf.Max(0.0f, currentGrabDistance - closestDistance);
                 m_targetDragDistance = Mathf.Clamp(m_targetDragDistance, m_minSafeDragDistance, maxDistance);
             }
 
+            m_currentDragDistance = Mathf.Lerp(m_currentDragDistance, m_targetDragDistance, Time.deltaTime * 5f);
+            Vector3 desiredPosition = character.Camera.transform.position + character.Data.lookDirection * m_currentDragDistance;
             m_currentGrabbedObject.HandleDrag(desiredPosition);
         }
 
@@ -98,18 +116,11 @@ namespace RooseLabs.Gameplay.Spells
             m_targetDragDistance = Mathf.Clamp(m_targetDragDistance + value, m_minSafeDragDistance, maxDistance);
         }
 
-        private void Update()
-        {
-            if (m_currentGrabbedObject)
-            {
-                m_currentDragDistance = Mathf.Lerp(m_currentDragDistance, m_targetDragDistance, Time.deltaTime * 5f);
-            }
-        }
-
         protected override void ResetData()
         {
             base.ResetData();
             m_currentGrabbedObject = null;
+            m_currentGrabbedLocalHitPoint = Vector3.zero;
             m_currentDragDistance = 0f;
             m_targetDragDistance = 0f;
             m_minSafeDragDistance = 0f;

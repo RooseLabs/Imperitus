@@ -1,6 +1,7 @@
 using RooseLabs.Core;
 using UnityEngine;
 using UnityEditor;
+using System.Linq;
 
 namespace RooseLabs.Editor
 {
@@ -15,7 +16,13 @@ namespace RooseLabs.Editor
 
             EditorGUILayout.LabelField("Loggers", EditorStyles.boldLabel);
 
-            for (int i = 0; i < loggersProp.arraySize; i++)
+            // Create sorted indices array based on logger names
+            int[] sortedIndices = Enumerable.Range(0, loggersProp.arraySize)
+                .OrderBy(i => loggersProp.GetArrayElementAtIndex(i).FindPropertyRelative("name").stringValue)
+                .ToArray();
+
+            // Use sorted indices to display loggers
+            foreach (int i in sortedIndices)
             {
                 SerializedProperty toggle = loggersProp.GetArrayElementAtIndex(i);
                 SerializedProperty nameProp = toggle.FindPropertyRelative("name");
