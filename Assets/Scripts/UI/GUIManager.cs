@@ -11,7 +11,7 @@ namespace RooseLabs.UI
         public static GUIManager Instance { get; private set; }
 
         [SerializeField] private GameObject guiRootCanvas;
-        [SerializeField] private GameObject notebookCanvasObject; // The Notebook GameObject itself
+        [SerializeField] private GameObject notebookCanvasObject;
         [SerializeField] private NotebookUIController notebookUIController;
         [SerializeField] private TMP_Text runeCounterText;
         [SerializeField] private Slider healthSlider;
@@ -25,7 +25,13 @@ namespace RooseLabs.UI
         private PlayerInput m_playerInput;
         private bool m_isNotebookOpen = false;
         private bool m_isNotebookEnabled = true;
-        private Canvas m_notebookCanvas; // Cache the canvas component
+        private Canvas m_notebookCanvas;
+
+        [SerializeField] private GameObject customizationMenuCanvasObject;
+        [SerializeField] private CustomizationMenu customizationMenuController;
+        private bool m_isCustomizationMenuOpen = false;
+        private bool m_isCustomizationMenuEnabled = true;
+        private Canvas m_customizationMenuCanvas;
 
         private void Awake()
         {
@@ -37,6 +43,13 @@ namespace RooseLabs.UI
             {
                 m_notebookCanvas = notebookCanvasObject.GetComponent<Canvas>();
                 notebookCanvasObject.SetActive(false);
+            }
+
+            // Cache the customization menu canvas component
+            if (customizationMenuCanvasObject != null)
+            {
+                m_customizationMenuCanvas = customizationMenuCanvasObject.GetComponent<Canvas>();
+                customizationMenuCanvasObject.SetActive(false);
             }
         }
 
@@ -62,6 +75,77 @@ namespace RooseLabs.UI
                     ToggleNotebook();
                 }
             }
+
+            // Handle customization menu toggle input based on current state
+            if (m_isCustomizationMenuOpen)
+            {
+                // When customization menu is open, check for close action from UI action map
+                if (m_playerInput.CloseCustomizationMenu)
+                {
+                    ToggleCustomizationMenu();
+                }
+            }
+            else
+            {
+                // When customization menu is closed, check for open action from gameplay action map
+                if (m_playerInput.OpenCustomizationMenu)
+                {
+                    ToggleCustomizationMenu();
+                }
+            }
+        }
+
+        public void ToggleCustomizationMenu()
+        {
+            if (!m_isCustomizationMenuEnabled)
+                return;
+
+            if (m_isCustomizationMenuOpen)
+            {
+                InputHandler.Instance.EnableGameplayInput();
+                CloseCustomizationMenu();
+            }
+            else
+            {
+                InputHandler.Instance.EnableMenuInput();
+                OpenCustomizationMenu();
+            }
+        }
+
+        public void OpenCustomizationMenu()
+        {
+            if (!m_isCustomizationMenuEnabled)
+                return;
+
+            m_isCustomizationMenuOpen = true;
+
+            // Enable the customization menu canvas GameObject
+            if (customizationMenuCanvasObject != null)
+                customizationMenuCanvasObject.SetActive(true);
+
+            // Set customization menu canvas to render on top of other UI
+            if (m_customizationMenuCanvas != null)
+            {
+                m_customizationMenuCanvas.sortingOrder = 100; // Same as notebook
+                Debug.Log($"[GUIManager] Customization menu canvas sort order set to: {m_customizationMenuCanvas.sortingOrder}");
+            }
+
+            // Tell the customization menu controller to refresh its content
+            if (customizationMenuController != null)
+                customizationMenuController.OnMenuOpened();
+
+            Debug.Log("[GUIManager] Customization menu opened");
+        }
+
+        public void CloseCustomizationMenu()
+        {
+            m_isCustomizationMenuOpen = false;
+
+            // Disable the customization menu canvas GameObject
+            if (customizationMenuCanvasObject != null)
+                customizationMenuCanvasObject.SetActive(false);
+
+            Debug.Log("[GUIManager] Customization menu closed");
         }
 
         /// <summary>
@@ -158,6 +242,12 @@ namespace RooseLabs.UI
             if (!isActive && m_isNotebookOpen)
             {
                 CloseNotebook();
+            }
+
+            // When disabling GUI, also close customization menu if it's open
+            if (!isActive && m_isCustomizationMenuOpen)
+            {
+                CloseCustomizationMenu();
             }
         }
 

@@ -28,6 +28,8 @@ namespace RooseLabs.Player
         private InputAction m_actionOpenNotebook;
         private InputAction m_actionCloseNotebook;
         private InputAction m_actionGetRune;
+        private InputAction m_actionOpenCustomizationMenu;
+        private InputAction m_actionCloseCustomizationMenu;
 
         public bool pauseWasPressed;
         public Vector2 movementInput;
@@ -57,6 +59,8 @@ namespace RooseLabs.Player
         public bool openNotebookWasPressed;
         public bool closeNotebookWasPressed;
         public bool getRuneWasPressed;
+        public bool OpenCustomizationMenu;
+        public bool CloseCustomizationMenu;
 
         private void Awake()
         {
@@ -82,6 +86,8 @@ namespace RooseLabs.Player
             m_actionOpenNotebook = m_gameplayActionMap.FindAction("OpenNotebook");
             m_actionCloseNotebook = m_uiActionMap.FindAction("CloseNotebook");
             m_actionGetRune = m_gameplayActionMap.FindAction("GetRune");
+            m_actionOpenCustomizationMenu = m_gameplayActionMap.FindAction("OpenCustomizationMenu");
+            m_actionCloseCustomizationMenu = m_uiActionMap.FindAction("CloseCustomizationMenu");
         }
 
         public void Sample()
@@ -114,6 +120,8 @@ namespace RooseLabs.Player
             openNotebookWasPressed = m_actionOpenNotebook.WasPressedThisFrame();
             closeNotebookWasPressed = m_actionCloseNotebook.WasPressedThisFrame();
             getRuneWasPressed = m_actionGetRune.WasPressedThisFrame();
+            OpenCustomizationMenu = m_actionOpenCustomizationMenu.WasPressedThisFrame();
+            CloseCustomizationMenu = m_actionCloseCustomizationMenu.WasPressedThisFrame();
         }
 
         private void ResetInput()
@@ -146,6 +154,8 @@ namespace RooseLabs.Player
             openNotebookWasPressed = false;
             closeNotebookWasPressed = false;
             getRuneWasPressed = false;
+            OpenCustomizationMenu = false;
+            CloseCustomizationMenu = false;
         }
     }
 }

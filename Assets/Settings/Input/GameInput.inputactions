@@ -169,6 +169,15 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "OpenCustomizationMenu",
+                    "type": "Button",
+                    "id": "97d181e1-f94e-4951-a3d1-95f23f7554e7",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "GetRune",
                     "type": "Button",
                     "id": "94e1dfc1-665b-406f-85ca-ac1ed8d63fd4",
@@ -187,6 +196,17 @@
                     "processors": "",
                     "groups": ";Gamepad",
                     "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "2bfe9851-fbbe-45cd-a0f4-a8532cf56ad0",
+                    "path": "<Keyboard>/c",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "OpenCustomizationMenu",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -831,6 +851,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "CloseCustomizationMenu",
+                    "type": "Button",
+                    "id": "1852af56-d61c-49e5-b335-89e02b2cd423",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -1150,6 +1179,17 @@
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
                     "action": "CloseNotebook",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "73b762f2-4d73-40f4-a5c9-35c002f07765",
+                    "path": "<Keyboard>/c",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "CloseCustomizationMenu",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
