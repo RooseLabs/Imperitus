@@ -524,8 +524,8 @@ namespace RooseLabs.Gameplay.Notebook
                     GameObject nameLabel = new GameObject("OwnerNameLabel");
                     nameLabel.transform.SetParent(slotTransform, false);
 
-                    TMP_Text nameText = nameLabel.AddComponent<TMP_Text>();
-                    nameText.text = borrowedRune.ownerName;
+                    TextMeshProUGUI nameText = nameLabel.AddComponent<TextMeshProUGUI>();
+                    nameText.text = borrowedRune.ownerName; 
                     nameText.fontSize = 30;
                     nameText.color = Color.white;
                     nameText.alignment = TextAlignmentOptions.Center;
@@ -767,7 +767,7 @@ namespace RooseLabs.Gameplay.Notebook
                     GameObject nameLabel = new GameObject("OwnerNameLabel");
                     nameLabel.transform.SetParent(slotTransform, false);
 
-                    TMP_Text nameText = nameLabel.AddComponent<TMP_Text>();
+                    TextMeshProUGUI nameText = nameLabel.AddComponent<TextMeshProUGUI>();
                     nameText.text = borrowedRune.ownerName;
                     nameText.fontSize = 30;
                     nameText.color = Color.white;

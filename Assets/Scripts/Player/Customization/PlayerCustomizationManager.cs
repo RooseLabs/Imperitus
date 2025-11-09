@@ -1,13 +1,16 @@
 using System.Collections.Generic;
 using RooseLabs.ScriptableObjects;
 using UnityEngine;
+using FishNet.Object;
+using FishNet.Object.Synchronizing;
+using FishNet.Connection;
 
 namespace RooseLabs.Player.Customization
 {
     /// <summary>
     /// Manages character customization for a player prefab.
     /// </summary>
-    public class PlayerCustomizationManager : MonoBehaviour
+    public class PlayerCustomizationManager : NetworkBehaviour
     {
         [Header("Renderer Mappings")]
         [Tooltip("Map string IDs to actual renderers in your prefab. These IDs are used in CustomizationItem slots.")]
@@ -25,6 +28,12 @@ namespace RooseLabs.Player.Customization
         [Tooltip("Debug view of currently equipped items.")]
         [SerializeField] private List<string> equippedItemNames = new List<string>();
 
+        [Header("Networking")]
+        [Tooltip("If true, disable auto-save for network sync (server will handle saves).")]
+        [SerializeField] private bool disableAutoSaveForNetworking = false;
+
+        private readonly SyncVar<int[]> syncedCustomizationIndices = new SyncVar<int[]>(new int[0]);
+
         // Tracks currently equipped items: Key = equipment key (category or category_subcategory)
         private Dictionary<string, CustomizationItem> equippedItems = new Dictionary<string, CustomizationItem>();
 
@@ -34,6 +43,9 @@ namespace RooseLabs.Player.Customization
         // Cached renderer lookup: Key = renderer ID
         private Dictionary<string, Renderer> rendererLookup = new Dictionary<string, Renderer>();
 
+        // ADDED: Flag to track if we've done initial sync
+        private bool hasInitializedCustomization = false;
+
         private const string SAVE_KEY = "PlayerCustomization";
 
         private void Awake()
@@ -42,10 +54,75 @@ namespace RooseLabs.Player.Customization
             ValidateDefaultConfigurations();
         }
 
-        private void Start()
+        public override void OnStartNetwork()
         {
-            // Load saved customization
-            LoadCustomization();
+            base.OnStartNetwork();
+
+            // Subscribe to SyncVar changes
+            syncedCustomizationIndices.OnChange += OnCustomizationSynced;
+
+            if (base.Owner.IsLocalClient)
+            {
+                // This is the local player - load their saved customization
+                LoadCustomization();
+
+                Invoke(nameof(BroadcastCustomizationDelayed), 0.1f);
+            }
+            else
+            {
+                // This is a remote player - apply their synced customization if available
+                if (syncedCustomizationIndices.Value != null && syncedCustomizationIndices.Value.Length > 0)
+                {
+                    ApplyNetworkedCustomization(syncedCustomizationIndices.Value);
+                }
+            }
+        }
+
+        public override void OnStopNetwork()
+        {
+            base.OnStopNetwork();
+
+            // Unsubscribe from SyncVar changes
+            syncedCustomizationIndices.OnChange -= OnCustomizationSynced;
+        }
+
+        public override void OnStartServer()
+        {
+            base.OnStartServer();
+
+            if (base.IsServerInitialized)
+            {
+                base.NetworkManager.SceneManager.OnClientLoadedStartScenes += OnClientLoadedStartScenes;
+            }
+        }
+
+        public override void OnStopServer()
+        {
+            base.OnStopServer();
+
+            if (base.NetworkManager != null && base.NetworkManager.SceneManager != null)
+            {
+                base.NetworkManager.SceneManager.OnClientLoadedStartScenes -= OnClientLoadedStartScenes;
+            }
+        }
+
+        private void OnClientLoadedStartScenes(NetworkConnection conn, bool asServer)
+        {
+            // Only the owner should send their customization when new clients join
+            if (base.Owner.IsLocalClient && asServer)
+            {
+                Debug.Log($"[PlayerCustomizationManager] Client {conn.ClientId} loaded scenes, re-broadcasting customization");
+                Invoke(nameof(BroadcastCustomizationDelayed), 0.2f);
+            }
+        }
+
+        // Delayed broadcast to ensure network is ready
+        private void BroadcastCustomizationDelayed()
+        {
+            if (base.Owner.IsLocalClient)
+            {
+                BroadcastCustomization();
+            }
         }
 
         /// <summary>
@@ -138,8 +215,17 @@ namespace RooseLabs.Player.Customization
 
             Debug.Log($"Equipped: {item.itemName} ({key})");
 
-            // Auto-save after equipping
-            SaveCustomization();
+            // Auto-save after equipping (only for owner)
+            if (base.Owner.IsLocalClient && !disableAutoSaveForNetworking)
+            {
+                SaveCustomization();
+            }
+
+            // FIXED: Broadcast to network (only for owner)
+            if (base.Owner.IsLocalClient)
+            {
+                BroadcastCustomization();
+            }
         }
 
         /// <summary>
@@ -181,8 +267,17 @@ namespace RooseLabs.Player.Customization
 
             Debug.Log($"Removed: {item.itemName} ({key})");
 
-            // Auto-save after removing
-            SaveCustomization();
+            // Auto-save after removing (only for owner)
+            if (base.Owner.IsLocalClient && !disableAutoSaveForNetworking)
+            {
+                SaveCustomization();
+            }
+
+            // Broadcast to network (only for owner)
+            if (base.Owner.IsLocalClient)
+            {
+                BroadcastCustomization();
+            }
         }
 
         /// <summary>
@@ -291,7 +386,7 @@ namespace RooseLabs.Player.Customization
 
                 if (item != null)
                 {
-                    EquipItem(item);
+                    EquipItemWithoutSaving(item);
                     loadedCount++;
                 }
                 else
@@ -476,6 +571,182 @@ namespace RooseLabs.Player.Customization
 
         #endregion
 
+        #region Networking Methods
+
+        /// <summary>
+        /// Called when the SyncVar changes. Applies customization from other players.
+        /// </summary>
+        private void OnCustomizationSynced(int[] prev, int[] next, bool asServer)
+        {
+            // FIXED: Only apply if we're not the owner
+            if (!base.Owner.IsLocalClient && next != null && next.Length > 0)
+            {
+                Debug.Log($"[PlayerCustomizationManager] OnCustomizationSynced called - applying {next.Length} items");
+                ApplyNetworkedCustomization(next);
+                hasInitializedCustomization = true;
+            }
+        }
+
+        /// <summary>
+        /// Broadcasts current customization to all clients.
+        /// Called by the owner when they equip/unequip items.
+        /// </summary>
+        private void BroadcastCustomization()
+        {
+            // Only the owner should broadcast
+            if (!base.Owner.IsLocalClient)
+            {
+                Debug.LogWarning("[PlayerCustomizationManager] Only the owner can broadcast customization.");
+                return;
+            }
+
+            // Convert current equipped items to index array
+            int[] indices = GetEquippedItemIndices();
+
+            Debug.Log($"[PlayerCustomizationManager] Broadcasting customization: {indices.Length} items");
+
+            // Send to server using ServerRpc
+            ServerReceiveCustomization(indices);
+        }
+
+        /// <summary>
+        /// Server receives customization data from client and broadcasts to all.
+        /// </summary>
+        [ServerRpc(RequireOwnership = true)]
+        private void ServerReceiveCustomization(int[] indices)
+        {
+            Debug.Log($"[PlayerCustomizationManager] Server received customization from client: {indices.Length} items");
+
+            // Update the SyncVar - this automatically syncs to all clients including potencial late joiners
+            syncedCustomizationIndices.Value = indices;
+        }
+
+        /// <summary>
+        /// Applies customization received from the network.
+        /// </summary>
+        private void ApplyNetworkedCustomization(int[] indices)
+        {
+            if (itemDatabase == null)
+            {
+                Debug.LogError("[PlayerCustomizationManager] Item database is not assigned! Cannot apply networked customization.");
+                return;
+            }
+
+            Debug.Log($"[PlayerCustomizationManager] Applying networked customization: {indices.Length} items");
+
+            // Clear current customization (but don't save - this is from network)
+            RemoveAllItemsWithoutSaving();
+
+            // Apply each item by index
+            foreach (int index in indices)
+            {
+                CustomizationItem item = itemDatabase.GetItemByIndex(index);
+
+                if (item != null)
+                {
+                    EquipItemWithoutSaving(item);
+                }
+                else
+                {
+                    Debug.LogWarning($"[PlayerCustomizationManager] Could not find item at index {index}");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets array of currently equipped item indices.
+        /// </summary>
+        private int[] GetEquippedItemIndices()
+        {
+            if (itemDatabase == null) return new int[0];
+
+            List<int> indices = new List<int>();
+
+            foreach (var kvp in equippedItems)
+            {
+                int index = itemDatabase.GetItemIndex(kvp.Value);
+                if (index >= 0)
+                {
+                    indices.Add(index);
+                }
+            }
+
+            return indices.ToArray();
+        }
+
+        /// <summary>
+        /// Equips an item without saving or broadcasting (used for networked sync).
+        /// </summary>
+        private void EquipItemWithoutSaving(CustomizationItem item)
+        {
+            if (item == null || !item.IsValid()) return;
+
+            string key = item.GetEquipmentKey();
+
+            // Remove existing item in this slot
+            if (equippedItems.ContainsKey(key))
+            {
+                RemoveItemWithoutSaving(key);
+            }
+
+            // Apply the item based on its application mode
+            switch (item.applicationMode)
+            {
+                case ApplicationMode.SwapMaterialOnly:
+                    ApplySwapMaterialOnly(item);
+                    break;
+                case ApplicationMode.SwapMeshAndMaterial:
+                    ApplySwapMeshAndMaterial(item);
+                    break;
+                case ApplicationMode.InstantiateNew:
+                    ApplyInstantiateNew(item, key);
+                    break;
+            }
+
+            // Track the equipped item
+            equippedItems[key] = item;
+            UpdateDebugList();
+        }
+
+        /// <summary>
+        /// Removes an item without saving or broadcasting (used for networked sync).
+        /// </summary>
+        private void RemoveItemWithoutSaving(string key)
+        {
+            if (!equippedItems.ContainsKey(key)) return;
+
+            CustomizationItem item = equippedItems[key];
+
+            // Handle removal based on application mode
+            switch (item.applicationMode)
+            {
+                case ApplicationMode.SwapMaterialOnly:
+                case ApplicationMode.SwapMeshAndMaterial:
+                    RestoreDefaults(item);
+                    break;
+                case ApplicationMode.InstantiateNew:
+                    DestroyInstantiatedObjects(key);
+                    break;
+            }
+
+            equippedItems.Remove(key);
+            UpdateDebugList();
+        }
+
+        /// <summary>
+        /// Removes all items without saving (used for networked sync).
+        /// </summary>
+        private void RemoveAllItemsWithoutSaving()
+        {
+            List<string> keys = new List<string>(equippedItems.Keys);
+            foreach (string key in keys)
+            {
+                RemoveItemWithoutSaving(key);
+            }
+        }
+
+        #endregion
+
         #region Helper Methods
 
         private string GetEquipmentKey(CustomizationCategory category, string subCategory)
@@ -509,5 +780,4 @@ namespace RooseLabs.Player.Customization
 
         #endregion
     }
-
 }
