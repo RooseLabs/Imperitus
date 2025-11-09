@@ -822,7 +822,7 @@ Transform:
   m_GameObject: {fileID: 2380479872278542995}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.17998, y: 0.88608, z: 0.17352}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1410,7 +1410,7 @@ Transform:
   m_GameObject: {fileID: 5797356793073778088}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.16847, y: 1.53935, z: 0.16166}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1993,11 +1993,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b553be8b7a44a7a4f80de3445f1aeef2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Player.PlayerData
-  m_healthSlider: {fileID: 0}
-  m_staminaSlider: {fileID: 0}
+  isAiming: 0
+  isCasting: 0
   lookValues: {x: 0, y: 0}
   lookDirection: {x: 0, y: 0, z: 0}
   lookDirectionFlat: {x: 0, y: 0, z: 0}
+  sinceUseStamina: 0
 --- !u!114 &2052681945483115521
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2012,13 +2013,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Player.PlayerMovementAV
   modelTransform: {fileID: 6279997357253256316}
   walkSpeed: 1.5
-  runSpeed: 5
+  sprintSpeed: 5
   crouchSpeed: 0.75
   crawlSpeed: 0.5
   jumpHeight: 0.5
-  staminaRegenRate: 20
-  staminaSpendRate: 10
-  minStaminaToRun: 0
+  sprintStaminaUsage: 25
   standingCollider: {fileID: 910997788957776308}
   crouchingCollider: {fileID: 1079084056669295952}
   crawlingCollider: {fileID: 5542213905719861265}

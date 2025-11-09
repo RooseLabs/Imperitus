@@ -1,10 +1,10 @@
-using RooseLabs.ScriptableObjects;
 using System.Collections.Generic;
+using RooseLabs.ScriptableObjects;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace RooseLabs.UI
+namespace RooseLabs.Gameplay.Notebook
 {
     /// <summary>
     /// Controls the Notebook UI display.
@@ -19,7 +19,7 @@ namespace RooseLabs.UI
         [SerializeField] private GameObject spellsPage;
 
         [Header("Assignment Page Elements")]
-        [SerializeField] private TextMeshProUGUI assignmentNumberText;
+        [SerializeField] private TMP_Text assignmentNumberText;
         [SerializeField] private Transform assignmentTasksContainer;
         [SerializeField] private GameObject taskDescriptionPrefab;
         [SerializeField] private Transform assignmentTaskImagesContainer;
@@ -39,7 +39,7 @@ namespace RooseLabs.UI
         }
 
         private NotebookTab m_currentTab = NotebookTab.Assignment;
-        private Gameplay.PlayerNotebook m_localPlayerNotebook;
+        private PlayerNotebook m_localPlayerNotebook;
 
         // Track which rune slots have been filled (indices of Image components in runesContainer)
         private List<int> m_availableRuneSlots = new List<int>();
@@ -51,7 +51,7 @@ namespace RooseLabs.UI
             Debug.Log("[NotebookUI] OnEnable called!");
 
             // Get reference to local player's notebook
-            m_localPlayerNotebook = Gameplay.PlayerNotebook.GetLocalPlayerNotebook();
+            m_localPlayerNotebook = PlayerNotebook.GetLocalPlayerNotebook();
             if (m_localPlayerNotebook == null)
             {
                 Debug.LogError("[NotebookUI] Could not find local player notebook!");
@@ -59,9 +59,9 @@ namespace RooseLabs.UI
             }
 
             // Subscribe to data changes
-            if (Gameplay.NotebookManager.Instance != null)
+            if (NotebookManager.Instance != null)
             {
-                Gameplay.NotebookManager.Instance.OnAssignmentDataChanged += RefreshAssignmentPage;
+                NotebookManager.Instance.OnAssignmentDataChanged += RefreshAssignmentPage;
             }
 
             if (m_localPlayerNotebook != null)
@@ -82,9 +82,9 @@ namespace RooseLabs.UI
             Debug.Log("[NotebookUI] OnDisable called!");
 
             // Unsubscribe from events
-            if (Gameplay.NotebookManager.Instance != null)
+            if (NotebookManager.Instance != null)
             {
-                Gameplay.NotebookManager.Instance.OnAssignmentDataChanged -= RefreshAssignmentPage;
+                NotebookManager.Instance.OnAssignmentDataChanged -= RefreshAssignmentPage;
             }
 
             if (m_localPlayerNotebook != null)
@@ -188,10 +188,10 @@ namespace RooseLabs.UI
 
         private void RefreshAssignmentPage()
         {
-            if (Gameplay.NotebookManager.Instance == null)
+            if (NotebookManager.Instance == null)
                 return;
 
-            var assignmentData = Gameplay.NotebookManager.Instance.GetCurrentAssignment();
+            var assignmentData = NotebookManager.Instance.GetCurrentAssignment();
             if (assignmentData == null)
             {
                 Debug.LogWarning("[NotebookUI] No assignment data available");
@@ -218,7 +218,7 @@ namespace RooseLabs.UI
                     if (taskDescriptionPrefab != null)
                     {
                         GameObject taskObj = Instantiate(taskDescriptionPrefab, assignmentTasksContainer);
-                        TextMeshProUGUI taskText = taskObj.GetComponentInChildren<TextMeshProUGUI>();
+                        TMP_Text taskText = taskObj.GetComponentInChildren<TMP_Text>();
                         if (taskText != null)
                         {
                             taskText.text = task.description;
@@ -319,7 +319,7 @@ namespace RooseLabs.UI
                     // Only remove labels for slots that aren't borrowed runes
                     if (!m_borrowedRuneSlots.ContainsKey(i))
                     {
-                        TextMeshProUGUI existingLabel = slotImage.GetComponentInChildren<TextMeshProUGUI>();
+                        TMP_Text existingLabel = slotImage.GetComponentInChildren<TMP_Text>();
                         if (existingLabel != null)
                         {
                             Destroy(existingLabel.gameObject);
@@ -387,7 +387,7 @@ namespace RooseLabs.UI
                     // If this was a borrowed rune that we now own, remove the label
                     if (m_borrowedRuneSlots.ContainsKey(slotIndex))
                     {
-                        TextMeshProUGUI label = slotImage.GetComponentInChildren<TextMeshProUGUI>();
+                        TMP_Text label = slotImage.GetComponentInChildren<TMP_Text>();
                         if (label != null)
                         {
                             Destroy(label.gameObject);
@@ -449,7 +449,7 @@ namespace RooseLabs.UI
 
             m_borrowedRuneSlots.Clear();
 
-            List<Gameplay.BorrowedRune> borrowedRunes = m_localPlayerNotebook.GetBorrowedRunes();
+            List<BorrowedRune> borrowedRunes = m_localPlayerNotebook.GetBorrowedRunes();
 
             foreach (var borrowedRune in borrowedRunes)
             {
@@ -471,10 +471,10 @@ namespace RooseLabs.UI
                         break;
                     }
 
-                    if (Gameplay.GameManager.Instance == null)
+                    if (GameManager.Instance == null)
                         continue;
 
-                    if (borrowedRune.runeIndex < 0 || borrowedRune.runeIndex >= Gameplay.GameManager.Instance.RuneDatabase.Count)
+                    if (borrowedRune.runeIndex < 0 || borrowedRune.runeIndex >= GameManager.Instance.RuneDatabase.Count)
                     {
                         Debug.LogWarning($"[NotebookUI] Invalid borrowed rune index: {borrowedRune.runeIndex}");
                         continue;
@@ -487,7 +487,7 @@ namespace RooseLabs.UI
                     m_runeIndexToSlotIndex[borrowedRune.runeIndex] = slotIndex;
                 }
 
-                RuneSO rune = Gameplay.GameManager.Instance.RuneDatabase[borrowedRune.runeIndex];
+                RuneSO rune = GameManager.Instance.RuneDatabase[borrowedRune.runeIndex];
 
                 Transform slotTransform = runesContainer.GetChild(slotIndex);
                 Image slotImage = slotTransform.GetComponent<Image>();
@@ -514,7 +514,7 @@ namespace RooseLabs.UI
                     UpdateRuneToggleVisual(slotImage.gameObject, m_localPlayerNotebook.IsRuneToggled(borrowedRune.runeIndex));
 
                     // Remove old label if it exists
-                    TextMeshProUGUI existingLabel = slotImage.GetComponentInChildren<TextMeshProUGUI>();
+                    TMP_Text existingLabel = slotImage.GetComponentInChildren<TMP_Text>();
                     if (existingLabel != null)
                     {
                         Destroy(existingLabel.gameObject);
@@ -524,7 +524,7 @@ namespace RooseLabs.UI
                     GameObject nameLabel = new GameObject("OwnerNameLabel");
                     nameLabel.transform.SetParent(slotTransform, false);
 
-                    TextMeshProUGUI nameText = nameLabel.AddComponent<TextMeshProUGUI>();
+                    TMP_Text nameText = nameLabel.AddComponent<TMP_Text>();
                     nameText.text = borrowedRune.ownerName;
                     nameText.fontSize = 30;
                     nameText.color = Color.white;
@@ -567,7 +567,7 @@ namespace RooseLabs.UI
                 // If it was borrowed, we need to remove the owner name label
                 int existingSlotIndex = m_runeIndexToSlotIndex[newRuneIndex];
                 Transform slotTransform = runesContainer.GetChild(existingSlotIndex);
-                TextMeshProUGUI existingLabel = slotTransform.GetComponentInChildren<TextMeshProUGUI>();
+                TMP_Text existingLabel = slotTransform.GetComponentInChildren<TMP_Text>();
                 if (existingLabel != null)
                 {
                     Destroy(existingLabel.gameObject);
@@ -586,16 +586,16 @@ namespace RooseLabs.UI
             }
 
             // Get the rune data
-            if (Gameplay.GameManager.Instance == null)
+            if (GameManager.Instance == null)
                 return;
 
-            if (newRuneIndex < 0 || newRuneIndex >= Gameplay.GameManager.Instance.RuneDatabase.Count)
+            if (newRuneIndex < 0 || newRuneIndex >= GameManager.Instance.RuneDatabase.Count)
             {
                 Debug.LogWarning($"[NotebookUI] Invalid rune index: {newRuneIndex}");
                 return;
             }
 
-            RuneSO rune = Gameplay.GameManager.Instance.RuneDatabase[newRuneIndex];
+            RuneSO rune = GameManager.Instance.RuneDatabase[newRuneIndex];
 
             // Pick a random available slot
             int randomIndex = Random.Range(0, m_availableRuneSlots.Count);
@@ -630,7 +630,7 @@ namespace RooseLabs.UI
                 return;
 
             // Get current borrowed runes
-            List<Gameplay.BorrowedRune> borrowedRunes = m_localPlayerNotebook.GetBorrowedRunes();
+            List<BorrowedRune> borrowedRunes = m_localPlayerNotebook.GetBorrowedRunes();
             HashSet<int> currentBorrowedRuneIndices = new HashSet<int>();
 
             foreach (var borrowedRune in borrowedRunes)
@@ -689,7 +689,7 @@ namespace RooseLabs.UI
                         slotImage.enabled = false;
 
                         // Remove owner name label
-                        TextMeshProUGUI label = slotImage.GetComponentInChildren<TextMeshProUGUI>();
+                        TMP_Text label = slotImage.GetComponentInChildren<TMP_Text>();
                         if (label != null)
                         {
                             Destroy(label.gameObject);
@@ -722,13 +722,13 @@ namespace RooseLabs.UI
                 }
 
                 // Get the rune data
-                if (Gameplay.GameManager.Instance == null)
+                if (GameManager.Instance == null)
                     continue;
 
-                if (borrowedRune.runeIndex < 0 || borrowedRune.runeIndex >= Gameplay.GameManager.Instance.RuneDatabase.Count)
+                if (borrowedRune.runeIndex < 0 || borrowedRune.runeIndex >= GameManager.Instance.RuneDatabase.Count)
                     continue;
 
-                RuneSO rune = Gameplay.GameManager.Instance.RuneDatabase[borrowedRune.runeIndex];
+                RuneSO rune = GameManager.Instance.RuneDatabase[borrowedRune.runeIndex];
 
                 // Pick a random available slot
                 int randomIndex = Random.Range(0, m_availableRuneSlots.Count);
@@ -767,7 +767,7 @@ namespace RooseLabs.UI
                     GameObject nameLabel = new GameObject("OwnerNameLabel");
                     nameLabel.transform.SetParent(slotTransform, false);
 
-                    TextMeshProUGUI nameText = nameLabel.AddComponent<TextMeshProUGUI>();
+                    TMP_Text nameText = nameLabel.AddComponent<TMP_Text>();
                     nameText.text = borrowedRune.ownerName;
                     nameText.fontSize = 30;
                     nameText.color = Color.white;

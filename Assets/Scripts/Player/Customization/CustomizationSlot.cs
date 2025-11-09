@@ -1,12 +1,13 @@
+using System;
 using UnityEngine;
 
-namespace RooseLabs
+namespace RooseLabs.Player.Customization
 {
     /// <summary>
     /// Represents a single visual component that can be applied to a renderer.
     /// Multiple slots can be combined to create complete customization items.
     /// </summary>
-    [System.Serializable]
+    [Serializable]
     public class CustomizationSlot
     {
         [Tooltip("The mesh to apply. Can be null for material-only changes.")]

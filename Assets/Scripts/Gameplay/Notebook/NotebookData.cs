@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace RooseLabs.Gameplay
+namespace RooseLabs.Gameplay.Notebook
 {
     /// <summary>
     /// Data container for assignment information.

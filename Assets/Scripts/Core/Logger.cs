@@ -1,46 +1,23 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using UnityEngine;
 
 namespace RooseLabs.Core
 {
     public class LoggerManager : SingletonBehaviour<LoggerManager>
     {
-        [Serializable]
-        public class LoggerToggle
-        {
-            public string name;
-            public bool enabled;
-        }
-
-        [SerializeField]
-        private List<LoggerToggle> loggers = new();
+        [SerializeField] private List<Logger> loggers = new();
 
         private void Awake()
         {
             DontDestroyOnLoad(this);
         }
 
-        private void OnValidate()
-        {
-            foreach (var toggle in loggers)
-            {
-                var logger = Logger.GetLogger(toggle.name);
-                logger.Enabled = toggle.enabled;
-            }
-        }
-
-        public void AddLogger(string loggerName)
-        {
-            if (loggers.All(t => t.name != loggerName))
-            {
-                loggers.Add(new LoggerToggle { name = loggerName, enabled = true });
-            }
-        }
+        public void AddLogger(Logger logger) => loggers.Add(logger);
     }
 
+    [Serializable]
     public class Logger
     {
         private enum MessageType
@@ -51,25 +28,24 @@ namespace RooseLabs.Core
             Error = 3
         }
 
-        public string Name { get; }
-
-        public bool Enabled { get; set; }
+        [field: SerializeField] public string Name { get; private set; }
+        [field: SerializeField] public bool Enabled { get; set; }
 
         private static readonly Dictionary<string, Logger> Instances = new(StringComparer.OrdinalIgnoreCase);
 
-        public static Logger GetLogger(string name)
+        public static Logger GetLogger(string name, bool enableOnCreate = false)
         {
             if (Instances.TryGetValue(name, out var logger)) return logger;
-            logger = new Logger(name);
+            logger = new Logger(name, enableOnCreate);
             Instances[name] = logger;
-            LoggerManager.Instance.AddLogger(name);
+            LoggerManager.Instance.AddLogger(logger);
             return logger;
         }
 
-        private Logger(string name)
+        private Logger(string name, bool enabled)
         {
             Name = name;
-            Enabled = true;
+            Enabled = enabled;
         }
 
         [HideInCallstack]

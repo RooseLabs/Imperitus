@@ -1,7 +1,6 @@
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
 using RooseLabs.UI;
-using TMPro;
 using UnityEngine;
 
 namespace RooseLabs
@@ -38,7 +37,7 @@ namespace RooseLabs
         [ObserversRpc]
         private void ShowTimerRPC()
         {
-            GUIManager.Instance.ToggleTimerText(true);
+            GUIManager.Instance.SetTimerActive(true);
         }
 
         /// <summary>
@@ -92,7 +91,7 @@ namespace RooseLabs
             if (currentSecond != lastDisplayedSecond)
             {
                 lastDisplayedSecond = currentSecond;
-                GUIManager.Instance.UpdateTimerText(Mathf.Max(currentSecond, 0));
+                GUIManager.Instance.UpdateTimer(Mathf.Max(currentSecond, 0));
             }
         }
 

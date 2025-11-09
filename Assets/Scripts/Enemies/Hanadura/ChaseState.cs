@@ -5,7 +5,7 @@ namespace RooseLabs.Enemies
 {
     public class ChaseState : IEnemyState
     {
-        private Logger Logger => Logger.GetLogger("Hanadura");
+        private static Logger Logger => Logger.GetLogger("Hanadura");
 
         private HanaduraAI ai;
         private float updateInterval = 0.2f;

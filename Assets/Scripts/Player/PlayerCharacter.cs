@@ -4,7 +4,9 @@ using FishNet.Connection;
 using FishNet.Object;
 using RooseLabs.Core;
 using RooseLabs.Gameplay;
+using RooseLabs.Gameplay.Notebook;
 using RooseLabs.Network;
+using RooseLabs.UI;
 using RooseLabs.Utils;
 using UnityEngine;
 
@@ -13,7 +15,7 @@ namespace RooseLabs.Player
     [DefaultExecutionOrder(-98)]
     [RequireComponent(typeof(PlayerInput))]
     [RequireComponent(typeof(PlayerData))]
-    public class PlayerCharacter : NetworkBehaviour
+    public class PlayerCharacter : NetworkBehaviour, IDamageable
     {
         public static PlayerCharacter LocalCharacter;
 
@@ -64,6 +66,7 @@ namespace RooseLabs.Player
         {
             if (!IsOwner) return;
             LocalCharacter = this;
+            GUIManager.Instance.SetHUDActive(true);
 
             // Initialize look values based on spawn rotation
             Data.lookValues.x = transform.eulerAngles.y;
@@ -97,6 +100,17 @@ namespace RooseLabs.Player
             {
                 Notebook.AddRandomUncollectedRune();
             }
+
+            UpdateVariables();
+        }
+
+        private void UpdateVariables()
+        {
+            const float staminaRegenRate = 40f;
+
+            Data.sinceUseStamina += Time.deltaTime;
+            if (!CanRegenStamina()) return;
+            Data.Stamina += staminaRegenRate * Time.deltaTime;
         }
 
         public void UpdateLookDirection()
@@ -116,6 +130,35 @@ namespace RooseLabs.Player
             UpdateLookDirection();
         }
 
+        public bool UseStamina(float amount)
+        {
+            if (amount == 0.0f) return true;
+            Data.Stamina -= amount;
+            Data.sinceUseStamina = 0.0f;
+            return Data.Stamina > 0.0f;
+        }
+
+        private bool CanRegenStamina()
+        {
+            return Data.sinceUseStamina >= (Data.Stamina > 0.0f ? 1.0f : 2.0f);
+        }
+
+        public bool ApplyDamage(DamageInfo damage)
+        {
+            if (Data.Health <= 0) return false;
+
+            Data.Health -= damage.Amount;
+
+            // TODO: Trigger death if health <= 0
+            if (Data.Health <= 0)
+            {
+                Debug.Log($"Player '{Player.PlayerName}' died!");
+            }
+
+            return true;
+        }
+
+        #region Utils
         public Transform GetBodypart(HumanBodyBones bone) => Ragdoll.partDict[bone];
 
         public bool RaycastIgnoreSelf(Ray ray, out RaycastHit hitInfo, float maxDistance = Mathf.Infinity, int layerMask = Physics.DefaultRaycastLayers, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
@@ -138,5 +181,6 @@ namespace RooseLabs.Player
             }
             return hit;
         }
+        #endregion
     }
 }

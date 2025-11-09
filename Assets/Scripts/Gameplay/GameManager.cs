@@ -1,11 +1,12 @@
+using System.Collections.Generic;
+using System.IO;
 using FishNet;
 using FishNet.Managing.Scened;
 using FishNet.Object;
 using GameKit.Dependencies.Utilities.Types;
+using RooseLabs.Gameplay.Notebook;
 using RooseLabs.Network;
 using RooseLabs.ScriptableObjects;
-using System.Collections.Generic;
-using System.IO;
 using UnityEngine;
 using Random = UnityEngine.Random;
 

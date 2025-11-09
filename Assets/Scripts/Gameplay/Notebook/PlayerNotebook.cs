@@ -1,18 +1,20 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using FishNet.Object;
 using FishNet.Connection;
+using FishNet.Object;
+using RooseLabs.Player;
 using RooseLabs.ScriptableObjects;
 using UnityEngine;
-using RooseLabs.Player;
+using Logger = RooseLabs.Core.Logger;
+using Random = UnityEngine.Random;
 
-namespace RooseLabs.Gameplay
+namespace RooseLabs.Gameplay.Notebook
 {
     /// <summary>
     /// Data structure for transmitting borrowed rune information over the network.
     /// </summary>
-    [System.Serializable]
+    [Serializable]
     public struct BorrowedRuneData
     {
         public int runeIndex;
@@ -22,7 +24,7 @@ namespace RooseLabs.Gameplay
     /// <summary>
     /// Tracks a borrowed rune with its owner information.
     /// </summary>
-    [System.Serializable]
+    [Serializable]
     public class BorrowedRune
     {
         public int runeIndex;
@@ -48,6 +50,8 @@ namespace RooseLabs.Gameplay
     /// </summary>
     public class PlayerNotebook : NetworkBehaviour
     {
+        private static Logger Logger => Logger.GetLogger("PlayerNotebook");
+
         #region Serialized Fields
         [Header("Rune Proximity Settings")]
         [SerializeField] private RuneDetectionMode detectionMode = RuneDetectionMode.OnDemand;
@@ -90,12 +94,12 @@ namespace RooseLabs.Gameplay
         /// <summary>
         /// Runes borrowed from nearby players.
         /// </summary>
-        private List<BorrowedRune> m_borrowedRunes = new List<BorrowedRune>();
+        private readonly List<BorrowedRune> m_borrowedRunes = new();
 
         /// <summary>
         /// Set of rune indices that are currently toggled/selected by the player.
         /// </summary>
-        private HashSet<int> m_toggledRunes = new HashSet<int>();
+        private readonly HashSet<int> m_toggledRunes = new();
         #endregion
 
         #region Coroutines
@@ -161,7 +165,7 @@ namespace RooseLabs.Gameplay
                     m_spellLoadout.equippedSpellIndices.Add(i);
                 }
 
-                Debug.Log($"[PlayerNotebook] Initialized with {spellCount} spells for local player");
+                Logger.Info($"Initialized with {spellCount} spells for local player");
             }
         }
 
@@ -175,7 +179,7 @@ namespace RooseLabs.Gameplay
             m_spellLoadout.equippedSpellIndices.Clear();
             m_spellLoadout.equippedSpellIndices.AddRange(spellIndices);
 
-            Debug.Log($"[PlayerNotebook] Spell loadout set: {spellIndices.Count} spells");
+            Logger.Info($"Spell loadout set: {spellIndices.Count} spells");
         }
 
         /// <summary>
@@ -205,7 +209,7 @@ namespace RooseLabs.Gameplay
                 }
                 else
                 {
-                    Debug.LogWarning($"[PlayerNotebook] Invalid spell index: {spellIndex}");
+                    Logger.Warning($"Invalid spell index: {spellIndex}");
                 }
             }
 
@@ -241,7 +245,7 @@ namespace RooseLabs.Gameplay
 
             if (runeIndex == -1)
             {
-                Debug.LogWarning($"[PlayerNotebook] Rune not found in GameManager.AllRunes");
+                Logger.Warning($"Rune not found in GameManager.AllRunes");
                 return;
             }
 
@@ -271,17 +275,17 @@ namespace RooseLabs.Gameplay
             // Check if there are any uncollected runes
             if (uncollectedIndices.Count == 0)
             {
-                Debug.LogWarning("[PlayerNotebook] All runes have already been collected!");
+                Logger.Warning("All runes have already been collected!");
                 return;
             }
 
             // Pick a random uncollected rune and add it
-            int randomIndex = UnityEngine.Random.Range(0, uncollectedIndices.Count);
+            int randomIndex = Random.Range(0, uncollectedIndices.Count);
             int runeIndexToAdd = uncollectedIndices[randomIndex];
 
             CollectRune(runeIndexToAdd);
 
-            Debug.Log($"[PlayerNotebook] Added random rune: {GameManager.Instance.RuneDatabase[runeIndexToAdd].name}");
+            Logger.Info($"Added random rune: {GameManager.Instance.RuneDatabase[runeIndexToAdd].name}");
         }
 
         /// <summary>
@@ -292,7 +296,7 @@ namespace RooseLabs.Gameplay
         {
             if (m_runeCollection.collectedRuneIndices.Contains(runeIndex))
             {
-                Debug.LogWarning($"[PlayerNotebook] Player already has rune {runeIndex}");
+                Logger.Warning($"Player already has rune {runeIndex}");
                 return;
             }
 
@@ -306,7 +310,7 @@ namespace RooseLabs.Gameplay
 
             OnRuneCollected?.Invoke();
 
-            Debug.Log($"[PlayerNotebook] Rune {runeIndex} collected. Total runes: {m_runeCollection.collectedRuneIndices.Count}");
+            Logger.Info($"Rune {runeIndex} collected. Total runes: {m_runeCollection.collectedRuneIndices.Count}");
         }
 
         /// <summary>
@@ -319,7 +323,7 @@ namespace RooseLabs.Gameplay
             if (!m_runeCollection.collectedRuneIndices.Contains(runeIndex))
             {
                 m_runeCollection.collectedRuneIndices.Add(runeIndex);
-                Debug.Log($"[PlayerNotebook - SERVER] Player {Owner.ClientId} collected rune {runeIndex}");
+                Logger.Info($"[PlayerNotebook - SERVER] Player {Owner.ClientId} collected rune {runeIndex}");
             }
         }
 
@@ -349,7 +353,7 @@ namespace RooseLabs.Gameplay
                 }
                 else
                 {
-                    Debug.LogWarning($"[PlayerNotebook] Invalid rune index: {runeIndex}");
+                    Logger.Warning($"Invalid rune index: {runeIndex}");
                 }
             }
 
@@ -484,7 +488,7 @@ namespace RooseLabs.Gameplay
                 m_borrowedRunes.Add(new BorrowedRune(data.runeIndex, ownerName));
             }
 
-            Debug.Log($"[PlayerNotebook] Updated borrowed runes: {m_borrowedRunes.Count} borrowed");
+            Logger.Info($"Updated borrowed runes: {m_borrowedRunes.Count} borrowed");
 
             // Notify UI
             OnBorrowedRunesChanged?.Invoke();
@@ -496,7 +500,7 @@ namespace RooseLabs.Gameplay
         private string GetPlayerNameByClientId(int clientId)
         {
             // Try to find the PlayerConnection with this client ID
-            var allConnections = FindObjectsByType<RooseLabs.Player.PlayerConnection>(FindObjectsSortMode.None);
+            var allConnections = FindObjectsByType<PlayerConnection>(FindObjectsSortMode.None);
 
             foreach (var connection in allConnections)
             {
@@ -530,12 +534,12 @@ namespace RooseLabs.Gameplay
             if (m_toggledRunes.Contains(runeIndex))
             {
                 m_toggledRunes.Remove(runeIndex);
-                Debug.Log($"[PlayerNotebook] Rune {runeIndex} deselected");
+                Logger.Info($"Rune {runeIndex} deselected");
             }
             else
             {
                 m_toggledRunes.Add(runeIndex);
-                Debug.Log($"[PlayerNotebook] Rune {runeIndex} selected");
+                Logger.Info($"Rune {runeIndex} selected");
             }
 
             // Broadcast the change (indices)
@@ -545,7 +549,7 @@ namespace RooseLabs.Gameplay
             List<RuneSO> toggledRunes = GetToggledRuneObjects();
             OnToggledRuneObjectsChanged?.Invoke(toggledRunes);
 
-            Debug.Log("[PlayerNotebook] Toggled Runes: " + string.Join(", ", toggledRunes.ConvertAll(r => r.Name)));
+            Logger.Info("Toggled Runes: " + string.Join(", ", toggledRunes.ConvertAll(r => r.Name)));
         }
 
         /// <summary>
@@ -571,7 +575,7 @@ namespace RooseLabs.Gameplay
         {
             m_toggledRunes.Clear();
             OnToggledRunesChanged?.Invoke(new List<int>());
-            Debug.Log("[PlayerNotebook] All runes deselected");
+            Logger.Info("All runes deselected");
         }
 
         /// <summary>
@@ -583,7 +587,7 @@ namespace RooseLabs.Gameplay
 
             if (GameManager.Instance == null)
             {
-                Debug.LogWarning("[PlayerNotebook] GameManager.Instance is null, cannot get toggled runes");
+                Logger.Warning("GameManager.Instance is null, cannot get toggled runes");
                 return toggledRunes;
             }
 
@@ -595,7 +599,7 @@ namespace RooseLabs.Gameplay
                 }
                 else
                 {
-                    Debug.LogWarning($"[PlayerNotebook] Invalid toggled rune index: {runeIndex}");
+                    Logger.Warning($"Invalid toggled rune index: {runeIndex}");
                 }
             }
 
@@ -651,7 +655,7 @@ namespace RooseLabs.Gameplay
                     return notebook;
             }
 
-            Debug.LogWarning("[PlayerNotebook] Could not find local player's notebook");
+            Logger.Warning("Could not find local player's notebook");
             return null;
         }
 

@@ -4,11 +4,14 @@ using RooseLabs.Core;
 using RooseLabs.Gameplay.Spells;
 using RooseLabs.ScriptableObjects;
 using UnityEngine;
+using Logger = RooseLabs.Core.Logger;
 
 namespace RooseLabs.Player
 {
     public class PlayerWand : NetworkBehaviour
     {
+        private static Logger Logger => Logger.GetLogger("PlayerWand");
+
         #region Serialized
         [SerializeField] private PlayerCharacter character;
         [SerializeField] private SpellDatabase spellDatabase;
@@ -40,7 +43,7 @@ namespace RooseLabs.Player
                 if (previousValue != m_currentSpellIndex)
                 {
                     m_currentSpellInstanceDirty = true;
-                    Debug.Log($"[PlayerWand] Switched to spell index {m_currentSpellIndex} (Spell ID: {m_availableSpells[m_currentSpellIndex]})");
+                    Logger.Info($"[PlayerWand] Switched to spell index {m_currentSpellIndex} (Spell ID: {m_availableSpells[m_currentSpellIndex]})");
                 }
             }
         }
@@ -48,31 +51,31 @@ namespace RooseLabs.Player
         private void Update()
         {
             if (!IsOwner) return;
-            bool wasAiming = character.Data.IsAiming;
-            character.Data.IsAiming = CanUseWand && character.Input.aimIsPressed;
-            if (character.Data.IsAiming)
+            bool wasAiming = character.Data.isAiming;
+            character.Data.isAiming = CanUseWand && character.Input.aimIsPressed;
+            if (character.Data.isAiming)
             {
                 if (m_currentSpellInstance)
                 {
                     if (m_currentSpellInstance.CanAimToSustain && m_currentSpellInstance.IsBeingSustained)
                     {
                         m_currentSpellInstance.ContinueCast();
-                        character.Data.IsCasting = true;
+                        character.Data.isCasting = true;
                     }
                     else if (character.Input.castWasPressed)
                     {
                         m_currentSpellInstance.StartCast();
-                        character.Data.IsCasting = true;
+                        character.Data.isCasting = true;
                     }
                     else if (character.Input.castIsPressed)
                     {
                         m_currentSpellInstance.ContinueCast();
-                        character.Data.IsCasting = true;
+                        character.Data.isCasting = true;
                     }
                     else if (character.Input.castWasReleased)
                     {
                         m_currentSpellInstance.CancelCast();
-                        character.Data.IsCasting = false;
+                        character.Data.isCasting = false;
                     }
                     if (m_currentSpellInstance.IsBeingSustained)
                     {
@@ -84,7 +87,7 @@ namespace RooseLabs.Player
                         else if (character.Input.scrollInput != 0f) m_currentSpellInstance.Scroll(character.Input.scrollInput);
                     }
                 }
-                if (character.Data.IsCasting) return;
+                if (character.Data.isCasting) return;
                 // TODO: Switching spells needs a small cooldown (<= 1 second).
                 if (character.Input.scrollButtonWasPressed || (InputHandler.Instance.IsCurrentDeviceGamepad() && character.Input.nextIsPressed && character.Input.previousIsPressed))
                 {
@@ -103,10 +106,10 @@ namespace RooseLabs.Player
                     UpdateCurrentSpellInstance();
                 }
             }
-            else if (character.Data.IsCasting)
+            else if (character.Data.isCasting)
             {
                 m_currentSpellInstance?.CancelCast();
-                character.Data.IsCasting = false;
+                character.Data.isCasting = false;
             }
         }
 
@@ -123,11 +126,11 @@ namespace RooseLabs.Player
             if (spellPrefab)
             {
                 m_currentSpellInstance = SpellBase.Instantiate(spellPrefab);
-                Debug.Log($"[PlayerWand] Instantiated spell ID {spellID} ({spellPrefab.name})");
+                Logger.Info($"[PlayerWand] Instantiated spell ID {spellID} ({spellPrefab.name})");
             }
             else
             {
-                Debug.LogWarning($"[PlayerWand] Spell ID {spellID} not found in database.");
+                Logger.Warning($"[PlayerWand] Spell ID {spellID} not found in database.");
             }
             m_currentSpellInstanceDirty = false;
         }
@@ -143,7 +146,7 @@ namespace RooseLabs.Player
         // TODO: We probably also want to prevent using the wand when there's no active heist.
         public bool CanUseWand =>
             !character.Data.IsCrawling &&
-            !character.Data.IsRunning &&
+            !character.Data.IsSprinting &&
             !character.Data.IsRagdollActive;
     }
 }

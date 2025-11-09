@@ -1,12 +1,13 @@
 using System.Collections.Generic;
+using RooseLabs.Player.Customization;
 using UnityEngine;
 
-namespace RooseLabs
+namespace RooseLabs.ScriptableObjects
 {
     /// <summary>
     /// Database that holds references to all available customization items.
     /// </summary>
-    [CreateAssetMenu(fileName = "Customization Item Database", menuName = "Imperitus/CustomizationItem Database")]
+    [CreateAssetMenu(fileName = "CustomizationItemDatabase", menuName = "Imperitus/Customization Item Database")]
     public class CustomizationItemDatabase : ScriptableObject
     {
         [Tooltip("List of all available customization items in the game.")]

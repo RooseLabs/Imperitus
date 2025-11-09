@@ -1,10 +1,8 @@
+using System;
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
 using RooseLabs.Network;
-using RooseLabs.UI;
-using System;
 using UnityEngine;
-//using UnityEngine.InputSystem;
 
 namespace RooseLabs.Player
 {
@@ -53,9 +51,6 @@ namespace RooseLabs.Player
             {
                 LocalPlayer = this;
                 SetPlayerName(Nickname);
-                GUIManager.Instance.SetGUIActive(true);
-                GUIManager.Instance.UpdateSliders(Character.Data);
-                GUIManager.Instance.SetPlayerInput(Character.Input);
             }
         }
 

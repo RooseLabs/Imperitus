@@ -1,6 +1,4 @@
-using UnityEngine;
-
-namespace RooseLabs
+namespace RooseLabs.Player.Customization
 {
     /// <summary>
     /// Main categories for character customization.

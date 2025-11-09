@@ -1,8 +1,8 @@
 using UnityEngine;
 
-namespace RooseLabs
+namespace RooseLabs.ScriptableObjects
 {
-    [CreateAssetMenu(menuName = "Imperitus/Sound Type", fileName = "NewSoundType")]
+    [CreateAssetMenu(fileName = "NewSoundType", menuName = "Imperitus/Sound Type")]
     public class SoundType : ScriptableObject
     {
         [Tooltip("Unique key (for debug/tuning). Not network-serialized.")]

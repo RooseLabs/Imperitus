@@ -16,9 +16,7 @@ namespace RooseLabs.Core
         public InputActionMap UIActions => m_uiActionMap;
 
         #region Event Actions
-
         public event Action<InputDevice> InputDeviceChanged = delegate { };
-
         #endregion
 
         private void Awake()
@@ -65,7 +63,7 @@ namespace RooseLabs.Core
             GameplayActions.Disable();
             UIActions.Enable();
             Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
+            Cursor.visible = IsCurrentDeviceKBM();
         }
 
         public void DisableAllInput()

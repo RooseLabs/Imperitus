@@ -1,3 +1,4 @@
+using System;
 using FishNet;
 using FishNet.Component.Ownership;
 using FishNet.Object;
@@ -9,7 +10,7 @@ using Logger = RooseLabs.Core.Logger;
 
 namespace RooseLabs.Gameplay.Spells
 {
-    [System.Serializable]
+    [Serializable]
     public enum SpellCastType
     {
         OneShot,       // After cast completes, effect happens immediately
@@ -17,18 +18,17 @@ namespace RooseLabs.Gameplay.Spells
         AimToSustain   // After cast completes, effect persists while aim button is held (cast button can be released)
     }
 
-    [System.Serializable]
+    [Serializable]
     public enum StaminaConsumptionType
     {
-        OnCastStart,        // Stamina cost applied immediately when casting starts
-        LinearlyDuringCast, // Stamina cost applied gradually over the cast time
-        OnCastFinish        // Stamina cost applied when the cast finishes
+        OnCastStart,       // Stamina cost applied immediately when casting starts
+        LinearlyDuringCast // Stamina cost applied gradually over the cast time
     }
 
     [RequireComponent(typeof(PredictedSpawn))]
     public abstract class SpellBase : NetworkBehaviour
     {
-        protected Logger Logger => Logger.GetLogger("SpellCasting");
+        protected static Logger Logger => Logger.GetLogger("SpellCasting");
 
         #region Serialized
         [field: SerializeField] public SpellSO SpellInfo { get; private set; }
@@ -68,15 +68,15 @@ namespace RooseLabs.Gameplay.Spells
 
         public void StartCast()
         {
-            if (PlayerCharacter.LocalCharacter.Data.Stamina < staminaCost) return;
+            if (isCasting) return;
+            if (staminaConsumptionType == StaminaConsumptionType.OnCastStart)
+            {
+                if (PlayerCharacter.LocalCharacter.Data.Stamina < staminaCost) return;
+                PlayerCharacter.LocalCharacter.UseStamina(staminaCost);
+            }
 
             isCasting = true;
             castProgress = 0f;
-
-            if (staminaConsumptionType == StaminaConsumptionType.OnCastStart)
-            {
-                ConsumeStamina(staminaCost);
-            }
 
             OnStartCast();
         }
@@ -105,28 +105,32 @@ namespace RooseLabs.Gameplay.Spells
             if (castProgress < castTime)
             {
                 castProgress += Time.deltaTime;
-
                 if (castTime > 0f && staminaCost > 0f && staminaConsumptionType == StaminaConsumptionType.LinearlyDuringCast)
                 {
                     float staminaThisFrame = (staminaCost / castTime) * Time.deltaTime;
-                    ConsumeStamina(staminaThisFrame);
+                    if (!PlayerCharacter.LocalCharacter.UseStamina(staminaThisFrame))
+                    {
+                        // Not enough stamina to continue casting
+                        CancelCast();
+                        return;
+                    }
                 }
-
                 OnContinueCast();
             }
             else
             {
                 if (IsBeingSustained)
                 {
-                    float staminaThisFrame = staminaCostPerSecond * Time.deltaTime;
-                    if (PlayerCharacter.LocalCharacter.Data.Stamina < staminaThisFrame)
+                    if (staminaCostPerSecond > 0f)
                     {
-                        // Not enough stamina to continue sustaining
-                        IsBeingSustained = false;
-                        OnCancelCastSustained();
-                        return;
+                        float staminaThisFrame = staminaCostPerSecond * Time.deltaTime;
+                        if (!PlayerCharacter.LocalCharacter.UseStamina(staminaThisFrame))
+                        {
+                            // Not enough stamina to sustain the spell
+                            CancelCast();
+                            return;
+                        }
                     }
-                    ConsumeStamina(staminaThisFrame);
                     OnContinueCastSustained();
                 }
                 else
@@ -180,11 +184,6 @@ namespace RooseLabs.Gameplay.Spells
 
         private void CompleteCast()
         {
-            if (staminaConsumptionType == StaminaConsumptionType.OnCastFinish)
-            {
-                ConsumeStamina(staminaCost);
-            }
-
             bool successfulCast = OnCastFinished();
 
             if (successfulCast && castType != SpellCastType.OneShot)
@@ -196,12 +195,6 @@ namespace RooseLabs.Gameplay.Spells
                 isCasting = false;
                 castProgress = 0f;
             }
-        }
-
-        private void ConsumeStamina(float amount)
-        {
-            if (amount <= 0f) return;
-            PlayerCharacter.LocalCharacter.Data.UpdateStamina(amount);
         }
 
         /// <summary>

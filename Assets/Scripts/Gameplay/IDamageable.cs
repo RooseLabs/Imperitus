@@ -1,6 +1,4 @@
-using UnityEngine;
-
-namespace RooseLabs
+namespace RooseLabs.Gameplay
 {
     public interface IDamageable
     {

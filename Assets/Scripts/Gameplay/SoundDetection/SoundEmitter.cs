@@ -1,5 +1,7 @@
-using FishNet.Object;
+using System;
 using System.Collections.Generic;
+using FishNet.Object;
+using RooseLabs.ScriptableObjects;
 using UnityEngine;
 
 namespace RooseLabs
@@ -7,7 +9,7 @@ namespace RooseLabs
     [RequireComponent(typeof(NetworkObject))]
     public class SoundEmitter : NetworkBehaviour
     {
-        [System.Serializable]
+        [Serializable]
         public struct NamedSound
         {
             [Tooltip("The SoundType ScriptableObject defining radius, duration, etc.")]
@@ -113,7 +115,7 @@ namespace RooseLabs
             for (int i = 0; i < availableSounds.Count; i++)
             {
                 if (availableSounds[i].type != null &&
-                    availableSounds[i].type.key.Equals(key, System.StringComparison.OrdinalIgnoreCase))
+                    availableSounds[i].type.key.Equals(key, StringComparison.OrdinalIgnoreCase))
                 {
                     return availableSounds[i].type;
                 }

@@ -1,6 +1,7 @@
 using System.Collections;
 using FishNet.Connection;
 using FishNet.Object;
+using RooseLabs.ScriptableObjects;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Rendering;
@@ -13,7 +14,7 @@ namespace RooseLabs.Enemies
     [RequireComponent(typeof(NetworkObject))]
     public class HanaduraAI : NetworkBehaviour, ISoundListener
     {
-        private Logger Logger => Logger.GetLogger("Hanadura");
+        private static Logger Logger => Logger.GetLogger("Hanadura");
 
         [Header("References")]
         public NavMeshAgent navAgent;
@@ -575,7 +576,7 @@ namespace RooseLabs.Enemies
             return true;
         }
 
-        public void TriggerVignetteFlash(FishNet.Connection.NetworkConnection connection)
+        public void TriggerVignetteFlash(NetworkConnection connection)
         {
             if (!base.IsServerInitialized) return;
             FlashVignette_TargetRPC(connection);

@@ -8,7 +8,7 @@ namespace RooseLabs.Gameplay.Interactions
 {
     public class Book : NetworkBehaviour
     {
-        private Logger Logger => Logger.GetLogger("Interactions");
+        private static Logger Logger => Logger.GetLogger("Interactions");
 
         [SerializeField] private RuneSO rune;
         [SerializeField] private Animator animator;
@@ -20,7 +20,7 @@ namespace RooseLabs.Gameplay.Interactions
             hasDropped = false;
         }
 
-        public void OnInteract(Player.PlayerCharacter character, PlayerPickup playerPickup)
+        public void OnInteract(PlayerCharacter character, PlayerPickup playerPickup)
         {
             ToggleBook_ServerRPC(playerPickup);
         }

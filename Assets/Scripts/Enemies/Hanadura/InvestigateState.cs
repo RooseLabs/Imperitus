@@ -5,7 +5,7 @@ namespace RooseLabs.Enemies
 {
     public class InvestigateState : IEnemyState
     {
-        private Logger Logger => Logger.GetLogger("Hanadura");
+        private static Logger Logger => Logger.GetLogger("Hanadura");
 
         private readonly HanaduraAI owner;
         private float investigateTimer;

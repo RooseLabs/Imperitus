@@ -1,12 +1,13 @@
+using System;
 using UnityEngine;
 
-namespace RooseLabs
+namespace RooseLabs.Player.Customization
 {
     /// <summary>
     /// Stores default mesh and material data for a category.
     /// Used to restore original appearance when items are removed.
     /// </summary>
-    [System.Serializable]
+    [Serializable]
     public class DefaultCustomizationData
     {
         [Tooltip("The renderer that holds the default appearance.")]

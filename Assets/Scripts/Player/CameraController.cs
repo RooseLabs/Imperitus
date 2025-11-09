@@ -37,7 +37,7 @@ namespace RooseLabs.Player
             }
             else
             {
-                Vector3 desiredPosition = character.Data.IsRunning ? runPosition.position
+                Vector3 desiredPosition = character.Data.IsSprinting ? runPosition.position
                     : character.Data.IsCrouching ? crouchPosition.position
                     : character.Data.IsCrawling ? crawlPosition.position
                     : standPosition.position;

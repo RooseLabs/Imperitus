@@ -1,10 +1,11 @@
 using System;
+using System.Collections.Generic;
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
 using RooseLabs.ScriptableObjects;
 using UnityEngine;
 
-namespace RooseLabs.Gameplay
+namespace RooseLabs.Gameplay.Notebook
 {
     /// <summary>
     /// Manages assignment data synchronization across all players using FishNet.
@@ -158,7 +159,7 @@ namespace RooseLabs.Gameplay
             m_assignmentData = new AssignmentData
             {
                 assignmentNumber = networkData.assignmentNumber,
-                tasks = new System.Collections.Generic.List<AssignmentTask>()
+                tasks = new List<AssignmentTask>()
             };
 
             foreach (var networkTask in networkData.tasks)

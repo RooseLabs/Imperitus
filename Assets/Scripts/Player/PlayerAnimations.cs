@@ -93,7 +93,7 @@ namespace RooseLabs.Player
         private void UpdateAnimatorParameters()
         {
             if (!m_character.Data.StateChangedThisFrame) return;
-            Animator.SetBool(B_IsRunning, m_character.Data.IsRunning);
+            Animator.SetBool(B_IsRunning, m_character.Data.IsSprinting);
             Animator.SetBool(B_IsCrouching, m_character.Data.IsCrouching);
             Animator.SetBool(B_IsCrawling, m_character.Data.IsCrawling);
         }
@@ -108,7 +108,7 @@ namespace RooseLabs.Player
             if (m_character.Data.IsRagdollActive) speed = 1.0f;
             else if (m_character.Data.IsCrawling) speed = m_character.Data.CurrentSpeed / AnimCrawlSpeed;
             else if (m_character.Data.IsCrouching) speed = m_character.Data.CurrentSpeed / AnimCrouchSpeed;
-            else if (m_character.Data.IsRunning) speed = m_character.Data.CurrentSpeed / AnimRunSpeed;
+            else if (m_character.Data.IsSprinting) speed = m_character.Data.CurrentSpeed / AnimRunSpeed;
             else speed = m_character.Data.CurrentSpeed / AnimWalkSpeed;
             Animator.speed = Mathf.Clamp(speed, 1.0f, 2.0f);
         }
@@ -156,7 +156,7 @@ namespace RooseLabs.Player
             const float minAngleCrouchingHand = 120f;
             const float maxAngleCrouchingHand = 140f;
 
-            if (m_character.Data.IsAiming)
+            if (m_character.Data.isAiming)
             {
                 armRig.weight = Mathf.SmoothDamp(armRig.weight, 1f, ref m_armRigWeightVelocity, 0.1f);
             }

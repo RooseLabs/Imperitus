@@ -1,8 +1,8 @@
 using RooseLabs.Core;
+using RooseLabs.Gameplay.Notebook;
 using RooseLabs.Player;
-using TMPro;
+using RooseLabs.Player.Customization;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace RooseLabs.UI
 {
@@ -10,59 +10,28 @@ namespace RooseLabs.UI
     {
         public static GUIManager Instance { get; private set; }
 
-        [SerializeField] private GameObject guiRootCanvas;
-        [SerializeField] private GameObject notebookCanvasObject;
+        [SerializeField] private HUDManager hudManager;
         [SerializeField] private NotebookUIController notebookUIController;
-        [SerializeField] private TMP_Text runeCounterText;
-        [SerializeField] private Slider healthSlider;
-        [SerializeField] private Slider staminaSlider;
-        [SerializeField] private TMP_Text timerText;
-
-        public Slider HealthSlider => healthSlider;
-        public Slider StaminaSlider => staminaSlider;
-
-        private HeistTimer m_heistTimer;
-        private PlayerInput m_playerInput;
-        private bool m_isNotebookOpen = false;
-        private bool m_isNotebookEnabled = true;
-        private Canvas m_notebookCanvas;
-
-        [SerializeField] private GameObject customizationMenuCanvasObject;
         [SerializeField] private CustomizationMenu customizationMenuController;
+
+        private bool m_isNotebookOpen = false;
         private bool m_isCustomizationMenuOpen = false;
-        private bool m_isCustomizationMenuEnabled = true;
-        private Canvas m_customizationMenuCanvas;
 
         private void Awake()
         {
             Instance = this;
-            m_heistTimer = GetComponentInChildren<HeistTimer>();
-
-            // Cache the notebook canvas component
-            if (notebookCanvasObject != null)
-            {
-                m_notebookCanvas = notebookCanvasObject.GetComponent<Canvas>();
-                notebookCanvasObject.SetActive(false);
-            }
-
-            // Cache the customization menu canvas component
-            if (customizationMenuCanvasObject != null)
-            {
-                m_customizationMenuCanvas = customizationMenuCanvasObject.GetComponent<Canvas>();
-                customizationMenuCanvasObject.SetActive(false);
-            }
         }
 
         private void Update()
         {
-            if (m_playerInput == null)
-                return;
+            var character = PlayerCharacter.LocalCharacter;
+            if (!character) return;
 
             // Handle notebook toggle input based on current state
             if (m_isNotebookOpen)
             {
                 // When notebook is open, check for close action from UI action map
-                if (m_playerInput.closeNotebookWasPressed)
+                if (character.Input.closeNotebookWasPressed)
                 {
                     ToggleNotebook();
                 }
@@ -70,7 +39,7 @@ namespace RooseLabs.UI
             else
             {
                 // When notebook is closed, check for open action from gameplay action map
-                if (m_playerInput.openNotebookWasPressed)
+                if (character.Input.openNotebookWasPressed)
                 {
                     ToggleNotebook();
                 }
@@ -80,7 +49,7 @@ namespace RooseLabs.UI
             if (m_isCustomizationMenuOpen)
             {
                 // When customization menu is open, check for close action from UI action map
-                if (m_playerInput.CloseCustomizationMenu)
+                if (character.Input.CloseCustomizationMenu)
                 {
                     ToggleCustomizationMenu();
                 }
@@ -88,7 +57,7 @@ namespace RooseLabs.UI
             else
             {
                 // When customization menu is closed, check for open action from gameplay action map
-                if (m_playerInput.OpenCustomizationMenu)
+                if (character.Input.OpenCustomizationMenu)
                 {
                     ToggleCustomizationMenu();
                 }
@@ -97,9 +66,6 @@ namespace RooseLabs.UI
 
         public void ToggleCustomizationMenu()
         {
-            if (!m_isCustomizationMenuEnabled)
-                return;
-
             if (m_isCustomizationMenuOpen)
             {
                 InputHandler.Instance.EnableGameplayInput();
@@ -114,26 +80,11 @@ namespace RooseLabs.UI
 
         public void OpenCustomizationMenu()
         {
-            if (!m_isCustomizationMenuEnabled)
-                return;
-
             m_isCustomizationMenuOpen = true;
 
             // Enable the customization menu canvas GameObject
-            if (customizationMenuCanvasObject != null)
-                customizationMenuCanvasObject.SetActive(true);
-
-            // Set customization menu canvas to render on top of other UI
-            if (m_customizationMenuCanvas != null)
-            {
-                m_customizationMenuCanvas.sortingOrder = 100; // Same as notebook
-                Debug.Log($"[GUIManager] Customization menu canvas sort order set to: {m_customizationMenuCanvas.sortingOrder}");
-            }
-
-            // Tell the customization menu controller to refresh its content
-            if (customizationMenuController != null)
-                customizationMenuController.OnMenuOpened();
-
+            customizationMenuController.gameObject.SetActive(true);
+            customizationMenuController.OnMenuOpened();
             Debug.Log("[GUIManager] Customization menu opened");
         }
 
@@ -142,29 +93,12 @@ namespace RooseLabs.UI
             m_isCustomizationMenuOpen = false;
 
             // Disable the customization menu canvas GameObject
-            if (customizationMenuCanvasObject != null)
-                customizationMenuCanvasObject.SetActive(false);
-
+            customizationMenuController.gameObject.SetActive(false);
             Debug.Log("[GUIManager] Customization menu closed");
         }
 
-        /// <summary>
-        /// Sets the player input reference for this GUI manager.
-        /// Call this when the local player spawns.
-        /// </summary>
-        public void SetPlayerInput(PlayerInput playerInput)
-        {
-            m_playerInput = playerInput;
-        }
-
-        /// <summary>
-        /// Toggles the notebook open/closed.
-        /// </summary>
         public void ToggleNotebook()
         {
-            if (!m_isNotebookEnabled)
-                return;
-
             if (m_isNotebookOpen)
             {
                 InputHandler.Instance.EnableGameplayInput();
@@ -177,120 +111,27 @@ namespace RooseLabs.UI
             }
         }
 
-        /// <summary>
-        /// Opens the notebook UI.
-        /// </summary>
         public void OpenNotebook()
         {
-            if (!m_isNotebookEnabled)
-                return;
-
             m_isNotebookOpen = true;
 
             // Enable the notebook canvas GameObject
-            if (notebookCanvasObject != null)
-                notebookCanvasObject.SetActive(true);
-
-            // Set notebook canvas to render on top of other UI
-            if (m_notebookCanvas != null)
-            {
-                m_notebookCanvas.sortingOrder = 100; // Higher than main GUI
-                Debug.Log($"[GUIManager] Notebook canvas sort order set to: {m_notebookCanvas.sortingOrder}");
-            }
-
-            // Tell the notebook controller to refresh its content
-            if (notebookUIController != null)
-                notebookUIController.RefreshCurrentTab();
-
-            // Debug check for EventSystem
-            var eventSystem = UnityEngine.EventSystems.EventSystem.current;
-            if (eventSystem == null)
-            {
-                Debug.LogError("[GUIManager] No EventSystem found in scene! UI buttons won't work.");
-            }
-            else
-            {
-                Debug.Log($"[GUIManager] EventSystem found: {eventSystem.name}");
-            }
-
-            Debug.Log("[GUIManager] Notebook opened");
+            notebookUIController.gameObject.SetActive(true);
+            // Refresh the content of the notebook's current tab
+            notebookUIController.RefreshCurrentTab();
         }
 
-        /// <summary>
-        /// Closes the notebook UI.
-        /// </summary>
         public void CloseNotebook()
         {
             m_isNotebookOpen = false;
 
             // Disable the notebook canvas GameObject
-            if (notebookCanvasObject != null)
-                notebookCanvasObject.SetActive(false);
-
-            Debug.Log("[GUIManager] Notebook closed");
+            notebookUIController.gameObject.SetActive(false);
         }
 
-        /// <summary>
-        /// Activates or deactivates the main GUI and notebook.
-        /// Use this when transitioning between gameplay and menus.
-        /// </summary>
-        public void SetGUIActive(bool isActive)
-        {
-            guiRootCanvas.SetActive(isActive);
+        public void SetHUDActive(bool isActive) => hudManager.gameObject.SetActive(isActive);
 
-            // When disabling GUI, also close notebook if it's open
-            if (!isActive && m_isNotebookOpen)
-            {
-                CloseNotebook();
-            }
-
-            // When disabling GUI, also close customization menu if it's open
-            if (!isActive && m_isCustomizationMenuOpen)
-            {
-                CloseCustomizationMenu();
-            }
-        }
-
-        /// <summary>
-        /// Enables or disables only the notebook without affecting other GUI elements.
-        /// Useful if you want notebook available in some contexts but not others.
-        /// </summary>
-        public void SetNotebookEnabled(bool enabled)
-        {
-            m_isNotebookEnabled = enabled;
-
-            // If disabling while open, close it
-            if (!enabled && m_isNotebookOpen)
-            {
-                CloseNotebook();
-            }
-        }
-
-        public void UpdateRuneCounter(int count)
-        {
-            runeCounterText.text = $"{count} Runes Discovered";
-        }
-
-        public void UpdateSliders(PlayerData data)
-        {
-            if (data == null) return;
-            data.SetSliders(healthSlider, staminaSlider);
-        }
-
-        internal void ToggleTimerText(bool isActive)
-        {
-            if (timerText != null)
-                timerText.gameObject.SetActive(isActive);
-        }
-
-        /// <summary>
-        /// Formats the time as MM:SS and updates the timer TMP_Text.
-        /// </summary>
-        internal void UpdateTimerText(float time)
-        {
-            int minutes = Mathf.FloorToInt(time / 60f);
-            int seconds = Mathf.FloorToInt(time % 60f);
-            timerText.text = $"{minutes:00}:{seconds:00}";
-        }
+        public void SetTimerActive(bool isActive) => hudManager.SetTimerActive(isActive);
+        public void UpdateTimer(float time) => hudManager.UpdateTimer(time);
     }
 }

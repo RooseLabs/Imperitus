@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace RooseLabs
+namespace RooseLabs.Gameplay
 {
     public enum DamageType
     {

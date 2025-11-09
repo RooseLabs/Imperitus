@@ -1,5 +1,5 @@
-using RooseLabs.Player;
 using System.Collections.Generic;
+using RooseLabs.Player;
 using UnityEngine;
 
 namespace RooseLabs.Enemies

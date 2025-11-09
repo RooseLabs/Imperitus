@@ -1,6 +1,4 @@
-using UnityEngine;
-
-namespace RooseLabs
+namespace RooseLabs.Player.Customization
 {
     /// <summary>
     /// Defines how a customization item should be applied to the player.

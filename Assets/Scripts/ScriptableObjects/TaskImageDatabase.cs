@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace RooseLabs
+namespace RooseLabs.ScriptableObjects
 {
     /// <summary>
     /// ScriptableObject database that holds all possible task images.
@@ -16,7 +16,7 @@ namespace RooseLabs
             public Sprite sprite;
         }
 
-        [SerializeField] private List<TaskImageEntry> taskImages = new List<TaskImageEntry>();
+        [SerializeField] private List<TaskImageEntry> taskImages = new();
 
         private Dictionary<string, Sprite> m_imageLookup;
 
@@ -60,10 +60,11 @@ namespace RooseLabs
                     ids.Add(entry.imageId);
                 }
             }
+
             return ids;
         }
 
-    #if UNITY_EDITOR
+        #if UNITY_EDITOR
         /// <summary>
         /// Editor helper to validate that all IDs are unique.
         /// </summary>
@@ -78,10 +79,11 @@ namespace RooseLabs
                     {
                         Debug.LogError($"Duplicate image ID found: {entry.imageId}", this);
                     }
+
                     seenIds.Add(entry.imageId);
                 }
             }
         }
-    #endif
+        #endif
     }
 }

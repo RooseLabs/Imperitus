@@ -1,3 +1,4 @@
+using RooseLabs.ScriptableObjects;
 using UnityEngine;
 
 namespace RooseLabs

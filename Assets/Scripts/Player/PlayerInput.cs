@@ -6,8 +6,6 @@ namespace RooseLabs.Player
 {
     public class PlayerInput : MonoBehaviour
     {
-        private InputActionMap m_gameplayActionMap;
-        private InputActionMap m_uiActionMap;
         private InputAction m_actionPause;
         private InputAction m_actionMove;
         private InputAction m_actionLook;
@@ -64,30 +62,30 @@ namespace RooseLabs.Player
 
         private void Awake()
         {
-            m_gameplayActionMap = InputHandler.Instance.GameplayActions;
-            m_uiActionMap = InputHandler.Instance.UIActions;
-            m_actionPause = m_gameplayActionMap.FindAction("Pause");
-            m_actionMove = m_gameplayActionMap.FindAction("Move");
-            m_actionLook = m_gameplayActionMap.FindAction("Look");
-            m_actionAim = m_gameplayActionMap.FindAction("Aim");
-            m_actionCast = m_gameplayActionMap.FindAction("Cast");
-            m_actionCrouch = m_gameplayActionMap.FindAction("Crouch");
-            m_actionSprint = m_gameplayActionMap.FindAction("Sprint");
-            m_actionJump = m_gameplayActionMap.FindAction("Jump");
-            m_actionInteract = m_gameplayActionMap.FindAction("Interact");
-            m_actionDrop = m_gameplayActionMap.FindAction("Drop");
-            m_actionPrevious = m_gameplayActionMap.FindAction("Previous");
-            m_actionNext = m_gameplayActionMap.FindAction("Next");
-            m_actionScroll = m_gameplayActionMap.FindAction("Scroll");
-            m_actionScrollButton = m_gameplayActionMap.FindAction("ScrollButton");
-            m_actionScrollBackward = m_gameplayActionMap.FindAction("ScrollBackward");
-            m_actionScrollForward = m_gameplayActionMap.FindAction("ScrollForward");
-            m_actionPushToTalk = m_gameplayActionMap.FindAction("PushToTalk");
-            m_actionOpenNotebook = m_gameplayActionMap.FindAction("OpenNotebook");
-            m_actionCloseNotebook = m_uiActionMap.FindAction("CloseNotebook");
-            m_actionGetRune = m_gameplayActionMap.FindAction("GetRune");
-            m_actionOpenCustomizationMenu = m_gameplayActionMap.FindAction("OpenCustomizationMenu");
-            m_actionCloseCustomizationMenu = m_uiActionMap.FindAction("CloseCustomizationMenu");
+            var gameplayActionMap = InputHandler.Instance.GameplayActions;
+            var uiActionMap = InputHandler.Instance.UIActions;
+            m_actionPause = gameplayActionMap.FindAction("Pause");
+            m_actionMove = gameplayActionMap.FindAction("Move");
+            m_actionLook = gameplayActionMap.FindAction("Look");
+            m_actionAim = gameplayActionMap.FindAction("Aim");
+            m_actionCast = gameplayActionMap.FindAction("Cast");
+            m_actionCrouch = gameplayActionMap.FindAction("Crouch");
+            m_actionSprint = gameplayActionMap.FindAction("Sprint");
+            m_actionJump = gameplayActionMap.FindAction("Jump");
+            m_actionInteract = gameplayActionMap.FindAction("Interact");
+            m_actionDrop = gameplayActionMap.FindAction("Drop");
+            m_actionPrevious = gameplayActionMap.FindAction("Previous");
+            m_actionNext = gameplayActionMap.FindAction("Next");
+            m_actionScroll = gameplayActionMap.FindAction("Scroll");
+            m_actionScrollButton = gameplayActionMap.FindAction("ScrollButton");
+            m_actionScrollBackward = gameplayActionMap.FindAction("ScrollBackward");
+            m_actionScrollForward = gameplayActionMap.FindAction("ScrollForward");
+            m_actionPushToTalk = gameplayActionMap.FindAction("PushToTalk");
+            m_actionOpenNotebook = gameplayActionMap.FindAction("OpenNotebook");
+            m_actionCloseNotebook = uiActionMap.FindAction("CloseNotebook");
+            m_actionGetRune = gameplayActionMap.FindAction("GetRune");
+            m_actionOpenCustomizationMenu = gameplayActionMap.FindAction("OpenCustomizationMenu");
+            m_actionCloseCustomizationMenu = uiActionMap.FindAction("CloseCustomizationMenu");
         }
 
         public void Sample()

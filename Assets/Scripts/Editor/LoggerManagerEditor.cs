@@ -1,7 +1,7 @@
-using RooseLabs.Core;
-using UnityEngine;
-using UnityEditor;
 using System.Linq;
+using RooseLabs.Core;
+using UnityEditor;
+using UnityEngine;
 
 namespace RooseLabs.Editor
 {
@@ -18,15 +18,15 @@ namespace RooseLabs.Editor
 
             // Create sorted indices array based on logger names
             int[] sortedIndices = Enumerable.Range(0, loggersProp.arraySize)
-                .OrderBy(i => loggersProp.GetArrayElementAtIndex(i).FindPropertyRelative("name").stringValue)
+                .OrderBy(i => FindPropertyField(loggersProp.GetArrayElementAtIndex(i), "Name").stringValue)
                 .ToArray();
 
             // Use sorted indices to display loggers
             foreach (int i in sortedIndices)
             {
-                SerializedProperty toggle = loggersProp.GetArrayElementAtIndex(i);
-                SerializedProperty nameProp = toggle.FindPropertyRelative("name");
-                SerializedProperty enabledProp = toggle.FindPropertyRelative("enabled");
+                SerializedProperty logger = loggersProp.GetArrayElementAtIndex(i);
+                SerializedProperty nameProp = FindPropertyField(logger, "Name");
+                SerializedProperty enabledProp = FindPropertyField(logger, "Enabled");
 
                 EditorGUILayout.BeginVertical(EditorStyles.helpBox);
                 EditorGUILayout.BeginHorizontal(GUILayout.ExpandWidth(true));
@@ -44,26 +44,29 @@ namespace RooseLabs.Editor
             {
                 for (int i = 0; i < loggersProp.arraySize; i++)
                 {
-                    SerializedProperty toggle = loggersProp.GetArrayElementAtIndex(i);
-                    SerializedProperty enabledProp = toggle.FindPropertyRelative("enabled");
+                    SerializedProperty logger = loggersProp.GetArrayElementAtIndex(i);
+                    SerializedProperty enabledProp = FindPropertyField(logger, "Enabled");
                     enabledProp.boolValue = true;
                 }
-                serializedObject.ApplyModifiedProperties();
             }
 
             if (GUILayout.Button("Disable All"))
             {
                 for (int i = 0; i < loggersProp.arraySize; i++)
                 {
-                    SerializedProperty toggle = loggersProp.GetArrayElementAtIndex(i);
-                    SerializedProperty enabledProp = toggle.FindPropertyRelative("enabled");
+                    SerializedProperty logger = loggersProp.GetArrayElementAtIndex(i);
+                    SerializedProperty enabledProp = FindPropertyField(logger, "Enabled");
                     enabledProp.boolValue = false;
                 }
-                serializedObject.ApplyModifiedProperties();
             }
             EditorGUILayout.EndHorizontal();
 
             serializedObject.ApplyModifiedProperties();
+        }
+
+        private static SerializedProperty FindPropertyField(SerializedProperty rootProp, string propName)
+        {
+            return rootProp.FindPropertyRelative($"<{propName}>k__BackingField");
         }
     }
 }

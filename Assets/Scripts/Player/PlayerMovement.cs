@@ -18,15 +18,11 @@ namespace RooseLabs.Player
 
         [Header("Movement Settings")]
         [SerializeField] private float walkSpeed   = 1.50f; // Average speed from animation: 1.20f;
-        [SerializeField] private float runSpeed    = 5.00f; // Average speed from animation: 5.83f;
+        [SerializeField] private float sprintSpeed = 5.00f; // Average speed from animation: 5.83f;
         [SerializeField] private float crouchSpeed = 0.75f; // Average speed from animation: 0.67f;
         [SerializeField] private float crawlSpeed  = 0.50f; // Average speed from animation: 0.25f;
         [SerializeField] private float jumpHeight  = 0.50f;
-
-        [Header("Stamina Settings")]
-        [SerializeField] private float staminaRegenRate = 10f; // per second
-        [SerializeField] private float staminaSpendRate = 15f; // per second
-        [SerializeField] private float minStaminaToRun = 0f;
+        [SerializeField] private float sprintStaminaUsage = 25f;
 
         [Header("Object Colliders")]
         [SerializeField] private Collider standingCollider;
@@ -39,7 +35,7 @@ namespace RooseLabs.Player
             {
                 if (m_character.Data.IsCrawling) return crawlSpeed;
                 if (m_character.Data.IsCrouching) return crouchSpeed;
-                if (m_character.Data.IsRunning) return runSpeed;
+                if (m_character.Data.IsSprinting) return sprintSpeed;
                 return walkSpeed;
             }
         }
@@ -76,7 +72,11 @@ namespace RooseLabs.Player
             HandleLookInput();
             HandleMovementAndRotation();
             UpdateColliders();
-            UpdateStamina();
+
+            if (m_character.Data.IsSprinting)
+            {
+                m_character.UseStamina(sprintStaminaUsage * Time.deltaTime);
+            }
         }
 
         private void FixedUpdate()
@@ -118,7 +118,7 @@ namespace RooseLabs.Player
             m_avatarMover.Move(deltaMovement);
 
             int soundIndex = -1;
-            if (m_character.Data.IsRunning)
+            if (m_character.Data.IsSprinting)
                 soundIndex = runningIndex;
             else if (m_character.Data.IsCrouching)
                 soundIndex = crouchingIndex;
@@ -131,30 +131,9 @@ namespace RooseLabs.Player
             {
                 m_soundEmitter.RequestEmitFromClient(soundIndex);
 
-                float interval = m_character.Data.IsRunning ? 0.1f :
+                float interval = m_character.Data.IsSprinting ? 0.1f :
                                  m_character.Data.IsCrouching ? 0.5f : 0.4f;
                 m_nextFootstepTime = Time.time + interval;
-            }
-        }
-
-        private void UpdateStamina()
-        {
-            if (!m_character.IsOwner) return;
-
-            if (m_character.Data.IsRunning)
-            {
-                // Spend stamina while running
-                m_character.Data.UpdateStamina(-staminaSpendRate * Time.deltaTime);
-
-                // If stamina depleted, stop running
-                if (m_character.Data.Stamina <= 0f)
-                    m_character.Data.IsRunning = false;
-            }
-            else
-            {
-                // Regenerate stamina when not running
-                if (m_character.Data.Stamina < m_character.Data.MaxStamina)
-                    m_character.Data.UpdateStamina(staminaRegenRate * Time.deltaTime);
             }
         }
 
@@ -226,19 +205,20 @@ namespace RooseLabs.Player
             }
             #endregion
 
-            #region Run Logic
-            bool canRun = m_movementValue > 0.0f && !m_character.Data.IsCrouching && !m_character.Data.IsCrawling;
-            if (!canRun)
+            #region Sprint Logic
+            bool canSprint = m_movementValue > 0.0f && m_character.Data.Stamina > 0.0f &&
+                             !m_character.Data.IsCrouching && !m_character.Data.IsCrawling;
+            if (!canSprint)
             {
-                m_character.Data.IsRunning = false;
+                m_character.Data.IsSprinting = false;
             }
             else if (m_inputHandler.IsCurrentDeviceKBM())
             {
-                m_character.Data.IsRunning = m_character.Input.sprintIsPressed;
+                m_character.Data.IsSprinting = m_character.Input.sprintIsPressed;
             }
             else if (m_character.Input.sprintWasPressed)
             {
-                m_character.Data.IsRunning = !m_character.Data.IsRunning;
+                m_character.Data.IsSprinting = !m_character.Data.IsSprinting;
             }
             #endregion
 
@@ -248,7 +228,7 @@ namespace RooseLabs.Player
             }
 
             // Handle rotation
-            if (m_character.Data.IsAiming)
+            if (m_character.Data.isAiming)
             {
                 // While aiming, rotation should always face look direction
                 modelTransform.rotation = Quaternion.LookRotation(m_character.Data.lookDirectionFlat);

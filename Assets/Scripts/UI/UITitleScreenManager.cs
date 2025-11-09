@@ -10,7 +10,7 @@ namespace RooseLabs.UI
     {
         [SerializeField] private UIMainMenuManager mainMenuPanel;
         [SerializeField] private GameObject usernamePanel;
-        [SerializeField] private TextMeshProUGUI currentUsernameGO;
+        [SerializeField] private TMP_Text currentUsernameGO;
         // [SerializeField] private UISettingsManager settingsPanel;
         // [SerializeField] private UICreditsManager creditsPanel;
 

@@ -1,8 +1,8 @@
-using RooseLabs.Player;
 using System.Collections.Generic;
+using RooseLabs.ScriptableObjects;
 using UnityEngine;
 
-namespace RooseLabs
+namespace RooseLabs.Player.Customization
 {
     /// <summary>
     /// Manages character customization for a player prefab.

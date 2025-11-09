@@ -9,8 +9,6 @@ namespace RooseLabs.Player
     {
         [SerializeField] private TMP_Text nameTagText;
 
-        private Transform localCamera;
-
         public override void OnStartClient()
         {
             if (IsOwner)
@@ -39,14 +37,8 @@ namespace RooseLabs.Player
 
         private void LateUpdate()
         {
-            if (localCamera != null)
-            {
-                transform.forward = localCamera.forward;
-            }
-            else if (PlayerCharacter.LocalCharacter != null)
-            {
-                localCamera = PlayerCharacter.LocalCharacter.Camera.transform;
-            }
+            if (PlayerCharacter.LocalCharacter)
+                transform.forward = PlayerCharacter.LocalCharacter.Camera.transform.forward;
         }
 
         private void OnNameChanged(string newName)

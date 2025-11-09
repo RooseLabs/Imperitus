@@ -1,11 +1,11 @@
+using System;
 using System.Collections.Generic;
+using RooseLabs.ScriptableObjects;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using FishNet.Object;
-using RooseLabs.Player;
 
-namespace RooseLabs
+namespace RooseLabs.Player.Customization
 {
     /// <summary>
     /// Manages the customization menu UI, displaying and filtering customization items.
@@ -21,10 +21,10 @@ namespace RooseLabs
         [SerializeField] private Transform itemContainer;
 
         [Tooltip("Title text that displays the current category name.")]
-        [SerializeField] private TextMeshProUGUI categoryTitleText;
+        [SerializeField] private TMP_Text categoryTitleText;
 
         [Tooltip("Text displayed when no items are found for the selected category.")]
-        [SerializeField] private TextMeshProUGUI noItemsFoundText;
+        [SerializeField] private TMP_Text noItemsFoundText;
 
         [Header("Button Appearance")]
         [Tooltip("Color for the equipped item border.")]
@@ -92,7 +92,7 @@ namespace RooseLabs
             }
 
             // Try to parse the category name
-            if (System.Enum.TryParse(categoryName, out CustomizationCategory category))
+            if (Enum.TryParse(categoryName, out CustomizationCategory category))
             {
                 currentCategory = category;
                 UpdateCategoryTitle(categoryName);

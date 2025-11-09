@@ -1,22 +1,14 @@
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace RooseLabs.Player
 {
     [DefaultExecutionOrder(1)]
-    public class PlayerData : MonoBehaviour, IDamageable
+    public class PlayerData : MonoBehaviour
     {
         private float m_maxHealth = 100f;
         private float m_health = 100f;
         private float m_maxStamina = 100f;
         private float m_stamina = 100f;
-
-        // References
-        public Slider m_healthSlider;
-        public Slider m_staminaSlider;
-
-        public bool StateChangedThisFrame { get; private set; }
-        public bool SpeedChangedThisFrame { get; private set; }
 
         public float MaxHealth
         {
@@ -42,14 +34,14 @@ namespace RooseLabs.Player
             set => m_stamina = Mathf.Clamp(value, 0f, m_maxStamina);
         }
 
-        private bool m_isRunning = false;
-        public bool IsRunning
+        private bool m_isSprinting = false;
+        public bool IsSprinting
         {
-            get => m_isRunning;
+            get => m_isSprinting;
             set
             {
-                if (m_isRunning == value) return;
-                m_isRunning = value;
+                if (m_isSprinting == value) return;
+                m_isSprinting = value;
                 StateChangedThisFrame = true;
             }
         }
@@ -90,7 +82,7 @@ namespace RooseLabs.Player
                 {
                     m_isCrawling = false;
                     m_isCrouching = false;
-                    m_isRunning = false;
+                    m_isSprinting = false;
                 }
                 StateChangedThisFrame = true;
             }
@@ -107,65 +99,22 @@ namespace RooseLabs.Player
             }
         }
 
-        public bool IsAiming { get; set; }
-        public bool IsCasting { get; set; }
+        public bool isAiming;
+        public bool isCasting;
 
         public Vector2 lookValues;
         public Vector3 lookDirection;
         public Vector3 lookDirectionFlat;
 
+        public float sinceUseStamina;
+
+        public bool StateChangedThisFrame { get; private set; }
+        public bool SpeedChangedThisFrame { get; private set; }
+
         private void LateUpdate()
         {
             StateChangedThisFrame = false;
             SpeedChangedThisFrame = false;
-        }
-
-        public void UpdateHealth(float amount)
-        {
-            Health += amount;
-
-            if (m_healthSlider != null)
-                m_healthSlider.value = Health / MaxHealth;
-        }
-
-        public void UpdateStamina(float amount)
-        {
-            Stamina += amount;
-
-            if (m_staminaSlider != null)
-            {
-                float targetValue = Stamina / MaxStamina;
-                float speed = 10f;
-                m_staminaSlider.value = Mathf.MoveTowards(
-                    m_staminaSlider.value,
-                    targetValue,
-                    Time.deltaTime * speed
-                );
-            }
-        }
-
-        public bool ApplyDamage(DamageInfo damage)
-        {
-            if (Health <= 0) return false;
-
-            UpdateHealth(-damage.Amount);
-
-            // TODO: trigger death if health <= 0
-            if (Health <= 0)
-            {
-                Debug.Log("Player died!");
-            }
-
-            return true;
-        }
-
-        public void SetSliders(Slider health, Slider stamina)
-        {
-            m_healthSlider = health;
-            m_staminaSlider = stamina;
-
-            m_healthSlider.value = Health / MaxHealth;
-            m_staminaSlider.value = Stamina / MaxStamina;
         }
     }
 }

@@ -1,12 +1,13 @@
 using System.Collections.Generic;
+using RooseLabs.Player.Customization;
 using UnityEngine;
 
-namespace RooseLabs
+namespace RooseLabs.ScriptableObjects
 {
     /// <summary>
     /// ScriptableObject that defines a single customization item.
     /// </summary>
-    [CreateAssetMenu(fileName = "New Customization Item", menuName = "Imperitus/Customization Item")]
+    [CreateAssetMenu(fileName = "NewCustomizationItem", menuName = "Imperitus/Customization Item")]
     public class CustomizationItem : ScriptableObject
     {
         [Header("Category Settings")]
