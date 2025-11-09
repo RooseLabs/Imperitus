@@ -17,6 +17,10 @@ namespace RooseLabs.Player.Customization
         [Tooltip("Define default meshes and materials for each category. Used when removing items.")]
         [SerializeField] private List<DefaultCustomizationData> defaultConfigurations = new List<DefaultCustomizationData>();
 
+        [Header("Save/Load")]
+        [Tooltip("Reference to the item database for save/load functionality.")]
+        [SerializeField] private CustomizationItemDatabase itemDatabase;
+
         [Header("Runtime Data")]
         [Tooltip("Debug view of currently equipped items.")]
         [SerializeField] private List<string> equippedItemNames = new List<string>();
@@ -30,10 +34,18 @@ namespace RooseLabs.Player.Customization
         // Cached renderer lookup: Key = renderer ID
         private Dictionary<string, Renderer> rendererLookup = new Dictionary<string, Renderer>();
 
+        private const string SAVE_KEY = "PlayerCustomization";
+
         private void Awake()
         {
             BuildRendererLookup();
             ValidateDefaultConfigurations();
+        }
+
+        private void Start()
+        {
+            // Load saved customization
+            LoadCustomization();
         }
 
         /// <summary>
@@ -125,6 +137,9 @@ namespace RooseLabs.Player.Customization
             UpdateDebugList();
 
             Debug.Log($"Equipped: {item.itemName} ({key})");
+
+            // Auto-save after equipping
+            SaveCustomization();
         }
 
         /// <summary>
@@ -165,6 +180,9 @@ namespace RooseLabs.Player.Customization
             UpdateDebugList();
 
             Debug.Log($"Removed: {item.itemName} ({key})");
+
+            // Auto-save after removing
+            SaveCustomization();
         }
 
         /// <summary>
@@ -199,6 +217,103 @@ namespace RooseLabs.Player.Customization
             string key = GetEquipmentKey(category, subCategory);
             return equippedItems.ContainsKey(key) ? equippedItems[key] : null;
         }
+
+        #region Save/Load Methods
+
+        /// <summary>
+        /// Saves the current customization to PlayerPrefs.
+        /// </summary>
+        public void SaveCustomization()
+        {
+            if (itemDatabase == null)
+            {
+                Debug.LogError("Item database is not assigned! Cannot save customization.");
+                return;
+            }
+
+            CustomizationSaveData saveData = new CustomizationSaveData();
+
+            foreach (var kvp in equippedItems)
+            {
+                int itemIndex = itemDatabase.GetItemIndex(kvp.Value);
+
+                if (itemIndex >= 0)
+                {
+                    saveData.equippedItems.Add(new EquippedItemData
+                    {
+                        itemIndex = itemIndex,
+                        equipmentKey = kvp.Key
+                    });
+                }
+            }
+
+            string json = JsonUtility.ToJson(saveData);
+            PlayerPrefs.SetString(SAVE_KEY, json);
+            PlayerPrefs.Save();
+
+            Debug.Log($"[PlayerCustomizationManager] Saved {saveData.equippedItems.Count} equipped items.");
+        }
+
+        /// <summary>
+        /// Loads and applies saved customization from PlayerPrefs.
+        /// </summary>
+        public void LoadCustomization()
+        {
+            if (itemDatabase == null)
+            {
+                Debug.LogError("Item database is not assigned! Cannot load customization.");
+                return;
+            }
+
+            if (!PlayerPrefs.HasKey(SAVE_KEY))
+            {
+                Debug.Log("[PlayerCustomizationManager] No saved customization found.");
+                return;
+            }
+
+            string json = PlayerPrefs.GetString(SAVE_KEY);
+            CustomizationSaveData saveData = JsonUtility.FromJson<CustomizationSaveData>(json);
+
+            if (saveData == null || saveData.equippedItems == null)
+            {
+                Debug.LogWarning("[PlayerCustomizationManager] Failed to load customization data.");
+                return;
+            }
+
+            // Clear current customization before loading
+            RemoveAllItems();
+
+            // Apply each saved item
+            int loadedCount = 0;
+            foreach (var itemData in saveData.equippedItems)
+            {
+                CustomizationItem item = itemDatabase.GetItemByIndex(itemData.itemIndex);
+
+                if (item != null)
+                {
+                    EquipItem(item);
+                    loadedCount++;
+                }
+                else
+                {
+                    Debug.LogWarning($"[PlayerCustomizationManager] Could not find item at index {itemData.itemIndex}");
+                }
+            }
+
+            Debug.Log($"[PlayerCustomizationManager] Loaded {loadedCount} equipped items.");
+        }
+
+        /// <summary>
+        /// Clears all saved customization data.
+        /// </summary>
+        public void ClearSavedCustomization()
+        {
+            PlayerPrefs.DeleteKey(SAVE_KEY);
+            PlayerPrefs.Save();
+            Debug.Log("[PlayerCustomizationManager] Cleared saved customization.");
+        }
+
+        #endregion
 
         #region Application Methods
 

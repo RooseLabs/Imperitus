@@ -48,5 +48,25 @@ namespace RooseLabs.ScriptableObjects
 
             return validItems;
         }
+
+        /// <summary>
+        /// Gets the index of an item in the database.
+        /// Returns -1 if not found.
+        /// </summary>
+        public int GetItemIndex(CustomizationItem item)
+        {
+            if (item == null) return -1;
+            return allItems.IndexOf(item);
+        }
+
+        /// <summary>
+        /// Gets an item by its index in the database.
+        /// Returns null if index is invalid.
+        /// </summary>
+        public CustomizationItem GetItemByIndex(int index)
+        {
+            if (index < 0 || index >= allItems.Count) return null;
+            return allItems[index];
+        }
     }
 }
