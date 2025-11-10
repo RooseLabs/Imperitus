@@ -174,6 +174,8 @@ GameObject:
   - component: {fileID: 237211371112094711}
   - component: {fileID: 4866373312013150636}
   - component: {fileID: 2923893137017715159}
+  - component: {fileID: 5557008658885784378}
+  - component: {fileID: 6459826222640076540}
   m_Layer: 0
   m_Name: SentientGrimoire
   m_TagString: Untagged
@@ -194,7 +196,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children:
-  - {fileID: 8248191243932331900}
+  - {fileID: 584479379418611331}
   - {fileID: 7769504255186393303}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -410,7 +412,51 @@ MonoBehaviour:
     X: 0
     Y: 0
     Z: 0
---- !u!1001 &8502179550441998487
+--- !u!95 &5557008658885784378
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8490385624122815485}
+  m_Enabled: 1
+  m_Avatar: {fileID: 9000000, guid: 87a8f0a71cca913419f624fb53986985, type: 3}
+  m_Controller: {fileID: 9100000, guid: fc20f756b1c60c942b45d47809e1e015, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &6459826222640076540
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8490385624122815485}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8cac635f24954048aad3a6ff9110beb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FishNet.Runtime::FishNet.Component.Animating.NetworkAnimator
+  _componentIndexCache: 255
+  _addedNetworkObject: {fileID: 4866373312013150636}
+  _networkObjectCache: {fileID: 0}
+  IgnoredParameters: []
+  _animator: {fileID: 5557008658885784378}
+  _synchronizeWhenDisabled: 0
+  _smoothFloats: 1
+  _interpolation: 2
+  _clientAuthoritative: 1
+  _sendToOwner: 0
+--- !u!1001 &1123302428237896040
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -418,47 +464,47 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1748971770594778435}
     m_Modifications:
-    - target: {fileID: -8679921383154817045, guid: f4a1b94fbc17ae648a4365031bad249f, type: 3}
+    - target: {fileID: -8679921383154817045, guid: 87a8f0a71cca913419f624fb53986985, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: f4a1b94fbc17ae648a4365031bad249f, type: 3}
+    - target: {fileID: -8679921383154817045, guid: 87a8f0a71cca913419f624fb53986985, type: 3}
       propertyPath: m_LocalPosition.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: f4a1b94fbc17ae648a4365031bad249f, type: 3}
+    - target: {fileID: -8679921383154817045, guid: 87a8f0a71cca913419f624fb53986985, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.479
+      value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: f4a1b94fbc17ae648a4365031bad249f, type: 3}
+    - target: {fileID: -8679921383154817045, guid: 87a8f0a71cca913419f624fb53986985, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.7071068
+      value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: f4a1b94fbc17ae648a4365031bad249f, type: 3}
+    - target: {fileID: -8679921383154817045, guid: 87a8f0a71cca913419f624fb53986985, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0.7071068
+      value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: f4a1b94fbc17ae648a4365031bad249f, type: 3}
+    - target: {fileID: -8679921383154817045, guid: 87a8f0a71cca913419f624fb53986985, type: 3}
       propertyPath: m_LocalRotation.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: f4a1b94fbc17ae648a4365031bad249f, type: 3}
+    - target: {fileID: -8679921383154817045, guid: 87a8f0a71cca913419f624fb53986985, type: 3}
       propertyPath: m_LocalRotation.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: f4a1b94fbc17ae648a4365031bad249f, type: 3}
+    - target: {fileID: -8679921383154817045, guid: 87a8f0a71cca913419f624fb53986985, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
-      value: 90
+      value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: f4a1b94fbc17ae648a4365031bad249f, type: 3}
+    - target: {fileID: -8679921383154817045, guid: 87a8f0a71cca913419f624fb53986985, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: f4a1b94fbc17ae648a4365031bad249f, type: 3}
+    - target: {fileID: -8679921383154817045, guid: 87a8f0a71cca913419f624fb53986985, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 919132149155446097, guid: f4a1b94fbc17ae648a4365031bad249f, type: 3}
+    - target: {fileID: 919132149155446097, guid: 87a8f0a71cca913419f624fb53986985, type: 3}
       propertyPath: m_Name
       value: GrimoireModel
       objectReference: {fileID: 0}
@@ -466,9 +512,9 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: f4a1b94fbc17ae648a4365031bad249f, type: 3}
---- !u!4 &8248191243932331900 stripped
+  m_SourcePrefab: {fileID: 100100000, guid: 87a8f0a71cca913419f624fb53986985, type: 3}
+--- !u!4 &584479379418611331 stripped
 Transform:
-  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: f4a1b94fbc17ae648a4365031bad249f, type: 3}
-  m_PrefabInstance: {fileID: 8502179550441998487}
+  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 87a8f0a71cca913419f624fb53986985, type: 3}
+  m_PrefabInstance: {fileID: 1123302428237896040}
   m_PrefabAsset: {fileID: 0}

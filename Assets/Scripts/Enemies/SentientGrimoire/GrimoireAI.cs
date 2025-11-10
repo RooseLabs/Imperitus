@@ -58,12 +58,23 @@ namespace RooseLabs.Enemies
         private float reinforcementTimer = 0f;
         private float detectionTimer = 0f;
 
-        // Network synchronized variables (new Fish-Net syntax)
+        // Network synchronized variables
         private readonly SyncVar<Color> syncedSpotlightColor = new SyncVar<Color>(new SyncTypeSettings(WritePermission.ServerOnly, ReadPermission.Observers));
         private readonly SyncVar<Quaternion> syncedSpotlightRotation = new SyncVar<Quaternion>(new SyncTypeSettings(WritePermission.ServerOnly, ReadPermission.Observers));
 
         // Public properties for states to access
         public Transform DetectedPlayer => detectedPlayer;
+        public Animator Animator => animator;
+
+        private string whatWasPreviousState = "";
+
+        private void Awake()
+        {
+            if (animator == null)
+            {
+                animator = GetComponentInChildren<Animator>();
+            }
+        }
 
         private void Reset()
         {
@@ -145,12 +156,11 @@ namespace RooseLabs.Enemies
         {
             if (!base.IsServerInitialized)
             {
-                // Client-side: smoothly interpolate to synced values
                 UpdateSpotlightVisualsClient();
                 return;
             }
 
-            // Server logic
+            // Server logic only
             detectionTimer -= Time.deltaTime;
             reinforcementTimer -= Time.deltaTime;
 
@@ -164,8 +174,18 @@ namespace RooseLabs.Enemies
             // Tick current state
             currentState?.Tick();
 
+            //if (whatWasPreviousState != (currentState != null ? currentState.GetType().Name : "null"))
+            //{
+            //    Debug.Log("currentState is " + (currentState != null ? currentState.GetType().Name : "null"));
+            //}
+
+            whatWasPreviousState = currentState != null ? currentState.GetType().Name : "null";
+               
             // Update spotlight visuals and sync to network
             UpdateSpotlightVisualsServer();
+
+            // Update animator parameters (NetworkAnimator handles the syncing)
+            UpdateAnimatorParameters();
         }
 
         #region State Management
@@ -182,6 +202,25 @@ namespace RooseLabs.Enemies
                 //Debug.Log($"[GrimoireAI] Entered state: {currentState.GetType().Name}");
                 currentState.Enter();
             }
+        }
+
+        #endregion
+
+        #region Animation Control
+
+        /// <summary>
+        /// Updates animator parameters based on current state.
+        /// </summary>
+        private void UpdateAnimatorParameters()
+        {
+            if (animator == null) return;
+
+            // Set state bools based on current state
+            bool isInPatrolState = currentState is GrimoirePatrolState;
+            bool isInAlertOrTracking = currentState is GrimoireAlertState || currentState is GrimoireTrackingState;
+
+            animator.SetBool("isPatrolling", isInPatrolState);
+            animator.SetBool("isAlert", isInAlertOrTracking);
         }
 
         #endregion
@@ -218,12 +257,12 @@ namespace RooseLabs.Enemies
                     RaycastHit hit;
                     if (Physics.Raycast(spotlightPos, dirToTarget, out hit, dist, obstructionMask))
                     {
-                        Debug.Log($"[GrimoireAI] Line of sight BLOCKED by: {hit.collider.name}, Layer: {LayerMask.LayerToName(hit.collider.gameObject.layer)}, Distance: {hit.distance}");
+                        //Debug.Log($"[GrimoireAI] Line of sight BLOCKED by: {hit.collider.name}, Layer: {LayerMask.LayerToName(hit.collider.gameObject.layer)}, Distance: {hit.distance}");
                         Debug.DrawRay(spotlightPos, dirToTarget * hit.distance, Color.red, 0.5f);
                     }
                     else
                     {
-                        Debug.Log("[GrimoireAI] Line of sight CLEAR!");
+                        //Debug.Log("[GrimoireAI] Line of sight CLEAR!");
                         Debug.DrawRay(spotlightPos, dirToTarget * dist, Color.green, 0.5f);
 
                         if (dist < closestDist)
@@ -254,7 +293,7 @@ namespace RooseLabs.Enemies
             detectedPlayer = player;
             detectedPlayerCollider = playerCollider;
 
-            Debug.Log("[GrimoireAI] Player detected!");
+            //Debug.Log("[GrimoireAI] Player detected!");
 
             // Transition to alert state if currently patrolling
             if (currentState is GrimoirePatrolState)
@@ -366,7 +405,7 @@ namespace RooseLabs.Enemies
                 }
             }
 
-            Debug.Log($"[GrimoireAI] Called {called} Hanadura reinforcements!");
+            //Debug.Log($"[GrimoireAI] Called {called} Hanadura reinforcements!");
 
             // Notify all clients of reinforcement call
             RPC_PlayReinforcementCallEffect();
@@ -441,11 +480,7 @@ namespace RooseLabs.Enemies
         public void RPC_ShowAlert()
         {
             // Play alert sound, particle effects, etc.
-            if (animator != null)
-            {
-                animator.SetTrigger("Alert");
-            }
-
+            // Animation is handled by NetworkAnimator automatically
             //Debug.Log("[GrimoireAI] Alert RPC received");
         }
 
@@ -483,6 +518,20 @@ namespace RooseLabs.Enemies
             // Draw reinforcement radius
             Gizmos.color = Color.cyan;
             Gizmos.DrawWireSphere(transform.position, reinforcementSearchRadius);
+        }
+
+        private void RotateModelToTarget(Transform detectedPlayer)
+        {
+            // Rotate the Grimoire model to face the detected player smoothly
+            Vector3 directionToPlayer = (detectedPlayer.position - transform.position).normalized;
+            Quaternion targetRotation = Quaternion.LookRotation(directionToPlayer);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 5f);
+        }
+
+        private void RotateModelBackToDefault()
+        {
+            // Rotate the Grimoire model back to its default forward position smoothly
+            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.identity, Time.deltaTime * 5f);
         }
 
         #endregion

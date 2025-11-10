@@ -35,14 +35,14 @@ namespace RooseLabs.Enemies
 
                 if (weaponCollider == null)
                 {
-                    Debug.LogError("[WeaponCollider] No Collider found on weaponTipObject! Please add a collider to the weapon tip.");
+                    //Debug.LogError("[WeaponCollider] No Collider found on weaponTipObject! Please add a collider to the weapon tip.");
                     return;
                 }
 
                 // Ensure it's a trigger
                 if (!weaponCollider.isTrigger)
                 {
-                    Debug.LogWarning("[WeaponCollider] Collider is not a trigger! Setting isTrigger to true.");
+                    //Debug.LogWarning("[WeaponCollider] Collider is not a trigger! Setting isTrigger to true.");
                     weaponCollider.isTrigger = true;
                 }
 
@@ -51,7 +51,7 @@ namespace RooseLabs.Enemies
             }
             else
             {
-                Debug.LogError("[WeaponCollider] weaponTipObject reference is not set! Please assign it in the inspector.");
+                //Debug.LogError("[WeaponCollider] weaponTipObject reference is not set! Please assign it in the inspector.");
             }
         }
 
@@ -78,7 +78,7 @@ namespace RooseLabs.Enemies
             weaponCollider.enabled = true;
             damageTimer = 0f; // Reset cooldown so first hit can register immediately
             canDealDamage = true;
-            Debug.Log("[WeaponCollider] Weapon enabled for attack");
+            //Debug.Log("[WeaponCollider] Weapon enabled for attack");
         }
 
         /// <summary>
@@ -92,7 +92,7 @@ namespace RooseLabs.Enemies
 
             weaponCollider.enabled = false;
             canDealDamage = false;
-            Debug.Log("[WeaponCollider] Weapon disabled");
+            //Debug.Log("[WeaponCollider] Weapon disabled");
         }
 
         private void OnTriggerEnter(Collider other)
@@ -116,7 +116,7 @@ namespace RooseLabs.Enemies
 
             if (damageable == null)
             {
-                Debug.LogWarning($"[WeaponCollider] Hit {other.name} but no IDamageable found!");
+                //Debug.LogWarning($"[WeaponCollider] Hit {other.name} but no IDamageable found!");
                 return;
             }
 
@@ -133,7 +133,7 @@ namespace RooseLabs.Enemies
 
             if (damageApplied)
             {
-                Debug.Log($"[WeaponCollider] Hit {other.name} for {ownerAI.attackDamage} damage");
+                //Debug.Log($"[WeaponCollider] Hit {other.name} for {ownerAI.attackDamage} damage");
 
                 // Start damage cooldown
                 damageTimer = damageCooldown;
@@ -152,7 +152,7 @@ namespace RooseLabs.Enemies
             }
             else
             {
-                Debug.Log($"[WeaponCollider] Hit {other.name} but damage was not applied (target may be dead or invincible)");
+                //Debug.Log($"[WeaponCollider] Hit {other.name} but damage was not applied (target may be dead or invincible)");
             }
         }
     }

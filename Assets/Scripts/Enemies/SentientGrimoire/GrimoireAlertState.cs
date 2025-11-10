@@ -22,21 +22,15 @@ namespace RooseLabs.Enemies
             ai.navAgent.isStopped = true;
             alertTimer = alertDuration;
 
-            // Trigger alert animation/effects
-            if (ai.animator != null)
-            {
-                ai.animator.SetTrigger("Alert");
-            }
-
             // RPC to show visual alert to all clients
             ai.RPC_ShowAlert();
 
-            Debug.Log("[GrimoireAlertState] Player detected! Entering Alert state");
+            //Debug.Log("[GrimoireAlertState] Player detected! Entering Alert state");
         }
 
         public void Exit()
         {
-            // Nothing special needed on exit
+
         }
 
         public void Tick()

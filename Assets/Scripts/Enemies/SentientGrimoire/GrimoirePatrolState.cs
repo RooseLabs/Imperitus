@@ -39,7 +39,7 @@ namespace RooseLabs.Enemies
 
         public void Exit()
         {
-            // Nothing special needed on exit
+
         }
 
         public void Tick()

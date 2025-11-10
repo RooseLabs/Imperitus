@@ -16,12 +16,12 @@ namespace RooseLabs.Enemies
 
         public void Enter()
         {
-            Debug.Log("[GrimoireTrackingState] Entered - actively tracking player");
+            //Debug.Log("[GrimoireTrackingState] Entered - actively tracking player");
         }
 
         public void Exit()
         {
-            // Nothing special needed on exit
+
         }
 
         public void Tick()
