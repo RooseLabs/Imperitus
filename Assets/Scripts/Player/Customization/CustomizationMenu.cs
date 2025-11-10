@@ -75,7 +75,7 @@ namespace RooseLabs.Player.Customization
         {
             currentCategory = null;
             UpdateCategoryTitle("All");
-            PopulateItems(itemDatabase.GetAllItems());
+            PopulateItems(itemDatabase);
         }
 
         /// <summary>
@@ -107,13 +107,13 @@ namespace RooseLabs.Player.Customization
         /// <summary>
         /// Populates the container with item buttons.
         /// </summary>
-        private void PopulateItems(List<CustomizationItem> items)
+        private void PopulateItems(IEnumerable<CustomizationItem> items)
         {
             // Clear existing buttons
             ClearContainer();
 
             // Check if no items were found
-            if (items == null || items.Count == 0)
+            if (itemDatabase.Count == 0)
             {
                 noItemsFoundText.gameObject.SetActive(true);
                 return;

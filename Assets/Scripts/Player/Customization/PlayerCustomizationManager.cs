@@ -1,9 +1,10 @@
 using System.Collections.Generic;
-using RooseLabs.ScriptableObjects;
-using UnityEngine;
+using FishNet.Connection;
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
-using FishNet.Connection;
+using RooseLabs.ScriptableObjects;
+using UnityEngine;
+using Logger = RooseLabs.Core.Logger;
 
 namespace RooseLabs.Player.Customization
 {
@@ -12,6 +13,8 @@ namespace RooseLabs.Player.Customization
     /// </summary>
     public class PlayerCustomizationManager : NetworkBehaviour
     {
+        private Logger Logger => Logger.GetLogger("PlayerCustomization");
+
         [Header("Renderer Mappings")]
         [Tooltip("Map string IDs to actual renderers in your prefab. These IDs are used in CustomizationItem slots.")]
         [SerializeField] private List<RendererMapping> rendererMappings = new List<RendererMapping>();
@@ -330,7 +333,7 @@ namespace RooseLabs.Player.Customization
 
             foreach (var kvp in equippedItems)
             {
-                int itemIndex = itemDatabase.GetItemIndex(kvp.Value);
+                int itemIndex = itemDatabase.IndexOf(kvp.Value);
 
                 if (itemIndex >= 0)
                 {
@@ -382,7 +385,7 @@ namespace RooseLabs.Player.Customization
             int loadedCount = 0;
             foreach (var itemData in saveData.equippedItems)
             {
-                CustomizationItem item = itemDatabase.GetItemByIndex(itemData.itemIndex);
+                CustomizationItem item = itemDatabase[itemData.itemIndex];
 
                 if (item != null)
                 {
@@ -640,7 +643,7 @@ namespace RooseLabs.Player.Customization
             // Apply each item by index
             foreach (int index in indices)
             {
-                CustomizationItem item = itemDatabase.GetItemByIndex(index);
+                CustomizationItem item = itemDatabase[index];
 
                 if (item != null)
                 {
@@ -664,7 +667,7 @@ namespace RooseLabs.Player.Customization
 
             foreach (var kvp in equippedItems)
             {
-                int index = itemDatabase.GetItemIndex(kvp.Value);
+                int index = itemDatabase.IndexOf(kvp.Value);
                 if (index >= 0)
                 {
                     indices.Add(index);
