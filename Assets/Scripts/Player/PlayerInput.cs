@@ -42,6 +42,8 @@ namespace RooseLabs.Player
         public bool sprintIsPressed;
         public bool jumpWasPressed;
         public bool interactWasPressed;
+        public bool interactIsPressed;
+        public bool interactWasReleased;
         public bool dropWasPressed;
         public bool previousWasPressed;
         public bool previousIsPressed;
@@ -104,6 +106,8 @@ namespace RooseLabs.Player
             sprintIsPressed = m_actionSprint.IsPressed();
             jumpWasPressed = m_actionJump.WasPressedThisFrame();
             interactWasPressed = m_actionInteract.WasPressedThisFrame();
+            interactIsPressed = m_actionInteract.IsPressed();
+            interactWasReleased = m_actionInteract.WasReleasedThisFrame();
             dropWasPressed = m_actionDrop.WasPressedThisFrame();
             previousWasPressed = m_actionPrevious.WasPressedThisFrame();
             previousIsPressed = m_actionPrevious.IsPressed();
@@ -138,6 +142,8 @@ namespace RooseLabs.Player
             sprintIsPressed = false;
             jumpWasPressed = false;
             interactWasPressed = false;
+            interactIsPressed = false;
+            interactWasReleased = false;
             dropWasPressed = false;
             previousWasPressed = false;
             previousIsPressed = false;
