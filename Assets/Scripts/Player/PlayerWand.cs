@@ -53,6 +53,10 @@ namespace RooseLabs.Player
             if (!IsOwner) return;
             bool wasAiming = character.Data.isAiming;
             character.Data.isAiming = CanUseWand && character.Input.aimIsPressed;
+            if (wasAiming != character.Data.isAiming)
+            {
+                SyncAimingState(character.Data.isAiming);
+            }
             if (character.Data.isAiming)
             {
                 if (m_currentSpellInstance)
@@ -60,22 +64,18 @@ namespace RooseLabs.Player
                     if (m_currentSpellInstance.CanAimToSustain && m_currentSpellInstance.IsBeingSustained)
                     {
                         m_currentSpellInstance.ContinueCast();
-                        character.Data.isCasting = true;
                     }
                     else if (character.Input.castWasPressed)
                     {
                         m_currentSpellInstance.StartCast();
-                        character.Data.isCasting = true;
                     }
                     else if (character.Input.castIsPressed)
                     {
                         m_currentSpellInstance.ContinueCast();
-                        character.Data.isCasting = true;
                     }
                     else if (character.Input.castWasReleased)
                     {
                         m_currentSpellInstance.CancelCast();
-                        character.Data.isCasting = false;
                     }
                     if (m_currentSpellInstance.IsBeingSustained)
                     {
@@ -86,6 +86,7 @@ namespace RooseLabs.Player
                         else if (character.Input.scrollBackwardIsPressed) m_currentSpellInstance.ScrollBackwardHeld();
                         else if (character.Input.scrollInput != 0f) m_currentSpellInstance.Scroll(character.Input.scrollInput);
                     }
+                    character.Data.isCasting = m_currentSpellInstance.IsCasting;
                 }
                 if (character.Data.isCasting) return;
                 // TODO: Switching spells needs a small cooldown (<= 1 second).
@@ -147,6 +148,27 @@ namespace RooseLabs.Player
         public bool CanUseWand =>
             !character.Data.IsCrawling &&
             !character.Data.IsSprinting &&
-            !character.Data.IsRagdollActive;
+            !character.Data.IsRagdollActive &&
+            !character.Data.isDead;
+
+        private void SyncAimingState(bool isAiming)
+        {
+            if (IsServerInitialized)
+                SyncAimingState_ObserversRPC(isAiming);
+            else
+                SyncAimingState_ServerRPC(isAiming);
+        }
+
+        [ServerRpc(RequireOwnership = true)]
+        private void SyncAimingState_ServerRPC(bool isAiming)
+        {
+            SyncAimingState_ObserversRPC(isAiming);
+        }
+
+        [ObserversRpc(ExcludeOwner = true)]
+        private void SyncAimingState_ObserversRPC(bool isAiming)
+        {
+            character.Data.isAiming = isAiming;
+        }
     }
 }

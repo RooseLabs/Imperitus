@@ -45,9 +45,10 @@ namespace RooseLabs.Gameplay.Spells
         #endregion
 
         #region Private Fields
-        private float castProgress = 0f;
-        private bool isCasting = false;
+        private float m_castProgress = 0f;
         #endregion
+
+        public bool IsCasting { get; private set; }
 
         public override void OnStartClient()
         {
@@ -68,25 +69,25 @@ namespace RooseLabs.Gameplay.Spells
 
         public void StartCast()
         {
-            if (isCasting) return;
+            if (IsCasting) return;
             if (staminaConsumptionType == StaminaConsumptionType.OnCastStart)
             {
                 if (PlayerCharacter.LocalCharacter.Data.Stamina < staminaCost) return;
                 PlayerCharacter.LocalCharacter.UseStamina(staminaCost);
             }
 
-            isCasting = true;
-            castProgress = 0f;
+            IsCasting = true;
+            m_castProgress = 0f;
 
             OnStartCast();
         }
 
         public void CancelCast()
         {
-            if (!isCasting) return;
+            if (!IsCasting) return;
 
-            isCasting = false;
-            castProgress = 0f;
+            IsCasting = false;
+            m_castProgress = 0f;
             if (IsBeingSustained)
             {
                 IsBeingSustained = false;
@@ -100,11 +101,11 @@ namespace RooseLabs.Gameplay.Spells
 
         public void ContinueCast()
         {
-            if (!isCasting) return;
+            if (!IsCasting) return;
 
-            if (castProgress < castTime)
+            if (m_castProgress < castTime)
             {
-                castProgress += Time.deltaTime;
+                m_castProgress += Time.deltaTime;
                 if (castTime > 0f && staminaCost > 0f && staminaConsumptionType == StaminaConsumptionType.LinearlyDuringCast)
                 {
                     float staminaThisFrame = (staminaCost / castTime) * Time.deltaTime;
@@ -172,6 +173,8 @@ namespace RooseLabs.Gameplay.Spells
             var localCharacter = PlayerCharacter.LocalCharacter;
             if (!localCharacter) return null;
             NetworkObject nob = nm.GetPooledInstantiated(spellPrefab.gameObject, false);
+            nob.transform.SetParent(localCharacter.Wand.transform);
+            nob.transform.localPosition = localCharacter.Wand.SpellCastPointLocalPosition;
             nm.ServerManager.Spawn(nob, localCharacter.Owner);
             return nob.GetComponent<SpellBase>();
         }
@@ -192,8 +195,8 @@ namespace RooseLabs.Gameplay.Spells
             }
             else
             {
-                isCasting = false;
-                castProgress = 0f;
+                IsCasting = false;
+                m_castProgress = 0f;
             }
         }
 
@@ -294,8 +297,8 @@ namespace RooseLabs.Gameplay.Spells
 
         protected virtual void ResetData()
         {
-            isCasting = false;
-            castProgress = 0f;
+            IsCasting = false;
+            m_castProgress = 0f;
             IsBeingSustained = false;
         }
     }

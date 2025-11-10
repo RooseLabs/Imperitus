@@ -97,6 +97,7 @@ namespace RooseLabs.Player
             aimIsPressed = m_actionAim.IsPressed();
             castWasPressed = m_actionCast.WasPressedThisFrame();
             castIsPressed = m_actionCast.IsPressed();
+            castWasReleased = m_actionCast.WasReleasedThisFrame();
             crouchWasPressed = m_actionCrouch.WasPressedThisFrame();
             crouchIsPressed = m_actionCrouch.IsPressed();
             sprintWasPressed = m_actionSprint.WasPressedThisFrame();

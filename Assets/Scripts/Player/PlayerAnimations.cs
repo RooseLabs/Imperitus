@@ -67,13 +67,9 @@ namespace RooseLabs.Player
             m_rightLowerArm = Animator.GetBoneTransform(HumanBodyBones.RightLowerArm);
         }
 
-        public override void OnStartClient()
-        {
-            enabled = IsOwner;
-        }
-
         private void Update()
         {
+            if (!IsOwner) return;
             UpdateAnimatorParameters();
             if (m_character.Data.SpeedChangedThisFrame)
                 AdjustAnimationSpeed();
@@ -165,6 +161,8 @@ namespace RooseLabs.Player
                 armRig.weight = Mathf.SmoothDamp(armRig.weight, 0f, ref m_armRigWeightVelocity, 0.1f);
                 return;
             }
+
+            if (!IsOwner) return;
 
             Vector2 viewAngles = CameraPlaneUtils.ViewportToViewAngles(m_character.Camera, handViewportPos);
             float yawOffset = viewAngles.x * Mathf.Rad2Deg;

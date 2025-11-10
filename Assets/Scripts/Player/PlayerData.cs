@@ -108,6 +108,8 @@ namespace RooseLabs.Player
 
         public float sinceUseStamina;
 
+        public bool isDead;
+
         public bool StateChangedThisFrame { get; private set; }
         public bool SpeedChangedThisFrame { get; private set; }
 

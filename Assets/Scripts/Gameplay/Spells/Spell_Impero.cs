@@ -1,4 +1,5 @@
 using RooseLabs.Player;
+using RooseLabs.Utils;
 using UnityEngine;
 
 namespace RooseLabs.Gameplay.Spells
@@ -10,8 +11,6 @@ namespace RooseLabs.Gameplay.Spells
         [SerializeField] private float maxDistance = 5f;
         #endregion
 
-        private static int s_raycastMask;
-
         private Draggable m_currentGrabbedObject;
         private Vector3 m_currentGrabbedLocalHitPoint;
         private float m_currentDragDistance;
@@ -19,18 +18,12 @@ namespace RooseLabs.Gameplay.Spells
         private float m_minSafeDragDistance;
         private const float MinDragDistanceBuffer = 0.5f;
 
-        private void Awake()
-        {
-            if (s_raycastMask == 0)
-                s_raycastMask = LayerMask.GetMask("Default", "Ground", "PlayerHitbox", "Draggable");
-        }
-
         protected override bool OnCastFinished()
         {
             var character = PlayerCharacter.LocalCharacter;
             var cameraPosition = character.Camera.transform.position;
             if (!character.RaycastIgnoreSelf(cameraPosition, character.Data.lookDirection,
-                    out RaycastHit hitInfo, maxDistance, s_raycastMask))
+                    out RaycastHit hitInfo, maxDistance, HelperFunctions.AllPhysicalLayerMask))
             {
                 Logger.Info("[Impero] No hit detected.");
                 return false;
@@ -38,6 +31,7 @@ namespace RooseLabs.Gameplay.Spells
             Logger.Info($"[Impero] Hit object: {hitInfo.collider.name}");
             if (!hitInfo.collider.TryGetComponent(out Draggable hitDraggable)) return false;
 
+            if (!hitDraggable.IsDraggable) return false;
             if (hitDraggable.IsDoor)
             {
                 m_minSafeDragDistance = 1.0f;
@@ -60,7 +54,7 @@ namespace RooseLabs.Gameplay.Spells
 
         protected override void OnContinueCastSustained()
         {
-            if (!m_currentGrabbedObject || !m_currentGrabbedObject.IsOwner)
+            if (!m_currentGrabbedObject || !m_currentGrabbedObject.IsOwner || !m_currentGrabbedObject.IsDraggable)
             {
                 CancelCast();
                 return;

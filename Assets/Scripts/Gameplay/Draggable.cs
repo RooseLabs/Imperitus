@@ -11,6 +11,7 @@ namespace RooseLabs.Gameplay
     public class Draggable : NetworkBehaviour
     {
         #region Serialized
+        [Header("Draggable Settings")]
         [SerializeField] private float force = 600;
         [SerializeField] private float damping = 50;
         #endregion
@@ -34,7 +35,7 @@ namespace RooseLabs.Gameplay
         protected Rigidbody m_rigidbody;
         protected bool m_isDragging;
 
-        private PredictedOwner m_predictedOwner;
+        protected PredictedOwner predictedOwner;
         private ConfigurableJoint m_joint;
         private Vector3 m_targetPosition;
         private float m_initialAngularDamping;
@@ -42,14 +43,14 @@ namespace RooseLabs.Gameplay
 
         protected virtual void Awake()
         {
-            TryGetComponent(out m_predictedOwner);
+            TryGetComponent(out predictedOwner);
             TryGetComponent(out m_rigidbody);
             Collider = GetComponent<Collider>();
         }
 
         public void HandleDragBegin(Vector3 hitPoint)
         {
-            m_predictedOwner.TakeOwnership(true);
+            predictedOwner.TakeOwnership(true);
             CanOwnershipBeTakenByCollision = false;
             AttachJoint(hitPoint);
             m_isDragging = true;
@@ -149,15 +150,17 @@ namespace RooseLabs.Gameplay
         {
             if (other.gameObject.TryGetComponent(out NetworkObject networkObject))
             {
-                if (m_isDragging) return;
+                if (m_isDragging || !IsDraggable) return;
                 if (!CanOwnershipBeTakenByCollision) return;
                 m_wasLastInteractionDrag = false;
                 if (!networkObject.IsOwner) return;
-                m_predictedOwner.TakeOwnership(true);
+                predictedOwner.TakeOwnership(true);
             }
         }
 
         [ServerRpc(RunLocally = true)]
         private void SetCanOwnershipBeTakenByCollision(bool value) => m_canOwnershipBeTakenByCollision.Value = value;
+
+        public virtual bool IsDraggable => true;
     }
 }
