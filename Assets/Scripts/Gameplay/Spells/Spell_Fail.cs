@@ -1,6 +1,6 @@
 namespace RooseLabs.Gameplay.Spells
 {
-    public class Fireball : SpellBase
+    public class FailedSpell : SpellBase
     {
         protected override void OnStartCast()
         {
@@ -12,13 +12,9 @@ namespace RooseLabs.Gameplay.Spells
             base.OnCancelCast();
         }
 
-        protected override void OnContinueCast()
-        {
-            base.OnContinueCast();
-        }
-
         protected override bool OnCastFinished()
         {
+            // TODO: Do some random funny stuff here.
             return base.OnCastFinished();
         }
     }

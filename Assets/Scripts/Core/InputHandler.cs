@@ -82,7 +82,7 @@ namespace RooseLabs.Core
                 // and set the cursor visibility based on the device type.
                 if (m_currentDevice != value) InputDeviceChanged.Invoke(value);
                 m_currentDevice = value;
-                if (value is Gamepad) Cursor.visible = false;
+                Cursor.visible = value is Keyboard or Pointer;
             }
         }
 

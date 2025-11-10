@@ -26,10 +26,7 @@ namespace RooseLabs.Player
         private SpellBase m_currentSpellInstance;
         private bool m_currentSpellInstanceDirty = true; // Start dirty to ensure initial setup
 
-        // TODO: Either add public methods to add/remove spells from this list or make it public.
-        //   We'll probably listen to some events from the player's notebook to manage this list.
-        //   Might change this to a List<SpellBase> or HashSet<SpellBase> later.
-        private readonly List<int> m_availableSpells = new() { 0, 1 };
+        private readonly List<int> m_availableSpells = new() { 0, 2, 1 };
 
         private int m_currentSpellIndex = 0;
         private int CurrentSpellIndex
