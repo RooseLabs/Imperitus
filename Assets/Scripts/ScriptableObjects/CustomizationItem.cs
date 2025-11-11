@@ -14,11 +14,11 @@ namespace RooseLabs.ScriptableObjects
         [Tooltip("The main category this item belongs to.")]
         public CustomizationCategory category;
 
-        [Tooltip("Subcategory for organization within stackable categories.")]
-        public string subCategory;
+        //[Tooltip("Subcategory for organization within stackable categories.")]
+        //public string subCategory;
 
-        [Tooltip("If true, multiple items of this category can be worn simultaneously (differentiated by subcategory).")]
-        public bool allowStacking = false;
+        //[Tooltip("If true, multiple items of this category can be worn simultaneously (differentiated by subcategory).")]
+        //public bool allowStacking = false;
 
         [Header("Application Settings")]
         [Tooltip("Defines how this item is applied to the player.")]
@@ -46,10 +46,10 @@ namespace RooseLabs.ScriptableObjects
         /// </summary>
         public string GetEquipmentKey()
         {
-            if (allowStacking && !string.IsNullOrEmpty(subCategory))
-            {
-                return $"{category}_{subCategory}";
-            }
+            //if (allowStacking && !string.IsNullOrEmpty(subCategory))
+            //{
+            //    return $"{category}_{subCategory}";
+            //}
             return category.ToString();
         }
 
@@ -73,11 +73,11 @@ namespace RooseLabs.ScriptableObjects
                 }
             }
 
-            if (allowStacking && string.IsNullOrEmpty(subCategory))
-            {
-                Debug.LogWarning($"CustomizationItem '{itemName}' allows stacking but has no subcategory defined.");
-                return false;
-            }
+            //if (allowStacking && string.IsNullOrEmpty(subCategory))
+            //{
+            //    Debug.LogWarning($"CustomizationItem '{itemName}' allows stacking but has no subcategory defined.");
+            //    return false;
+            //}
 
             return true;
         }

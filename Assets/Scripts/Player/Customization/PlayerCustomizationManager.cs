@@ -44,7 +44,7 @@ namespace RooseLabs.Player.Customization
         private Dictionary<string, List<GameObject>> instantiatedObjects = new Dictionary<string, List<GameObject>>();
 
         // Cached renderer lookup: Key = renderer ID
-        private Dictionary<string, Renderer> rendererLookup = new Dictionary<string, Renderer>();
+        private Dictionary<RendererID, Renderer> rendererLookup = new Dictionary<RendererID, Renderer>();
 
         // ADDED: Flag to track if we've done initial sync
         private bool hasInitializedCustomization = false;
@@ -156,14 +156,8 @@ namespace RooseLabs.Player.Customization
         /// <summary>
         /// Gets a renderer by its ID.
         /// </summary>
-        private Renderer GetRendererById(string id)
+        private Renderer GetRendererById(RendererID id)
         {
-            if (string.IsNullOrEmpty(id))
-            {
-                Debug.LogError("Renderer ID is null or empty.");
-                return null;
-            }
-
             if (!rendererLookup.ContainsKey(id))
             {
                 Debug.LogError($"No renderer found with ID '{id}'. Make sure it's configured in PlayerCustomizationManager.");
@@ -529,10 +523,10 @@ namespace RooseLabs.Player.Customization
                 // Handle SkinnedMeshRenderer
                 if (renderer is SkinnedMeshRenderer skinnedRenderer)
                 {
-                    if (defaultData.defaultMesh != null)
-                    {
+                    //if (defaultData.defaultMesh != null)
+                    //{
                         skinnedRenderer.sharedMesh = defaultData.defaultMesh;
-                    }
+                    //}
 
                     if (defaultData.defaultMaterial != null)
                     {
@@ -544,9 +538,12 @@ namespace RooseLabs.Player.Customization
                 {
                     MeshFilter meshFilter = meshRenderer.GetComponent<MeshFilter>();
 
-                    if (meshFilter != null && defaultData.defaultMesh != null)
+                    if (meshFilter != null)
                     {
-                        meshFilter.mesh = defaultData.defaultMesh;
+                        //if(defaultData.defaultMesh != null)
+                        //{
+                            meshFilter.mesh = defaultData.defaultMesh;
+                        //} 
                     }
 
                     if (defaultData.defaultMaterial != null)

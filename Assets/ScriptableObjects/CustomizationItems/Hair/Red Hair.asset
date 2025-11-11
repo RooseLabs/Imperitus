@@ -13,13 +13,11 @@ MonoBehaviour:
   m_Name: Red Hair
   m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.CustomizationItem
   category: 0
-  subCategory: 
-  allowStacking: 0
   applicationMode: 0
   slots:
   - mesh: {fileID: 0}
     material: {fileID: 2100000, guid: 3fd7ef667b06b9a4589061f31f20d859, type: 2}
-    targetRendererId: Hair
+    targetRendererId: 0
   itemName: Red Hair
   description: Just red hair...
   icon: {fileID: 21300000, guid: 60439f2d6685ac849b08c5d45ef6a80d, type: 3}

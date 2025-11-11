@@ -13,13 +13,11 @@ MonoBehaviour:
   m_Name: Another Wand
   m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.CustomizationItem
   category: 7
-  subCategory: 
-  allowStacking: 0
   applicationMode: 1
   slots:
   - mesh: {fileID: -8158960528947569635, guid: 8b9a997247c77634282359e897ca5c51, type: 3}
-    material: {fileID: 2100000, guid: b29c897066125f14c995f89846eb13c3, type: 2}
-    targetRendererId: Wand
+    material: {fileID: 2100000, guid: 65b26ccae6f3a9649b48a016f77980d1, type: 2}
+    targetRendererId: 8
   itemName: Another Wand
   description: 
   icon: {fileID: 21300000, guid: 6d680f5f36f59bc43acad6dbc9649b82, type: 3}

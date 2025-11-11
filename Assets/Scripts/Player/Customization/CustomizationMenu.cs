@@ -168,7 +168,8 @@ namespace RooseLabs.Player.Customization
             if (isEquipped)
             {
                 // Unequip the item
-                customizationManager.RemoveItem(item.category, item.allowStacking ? item.subCategory : null);
+                customizationManager.RemoveItem(item.category);
+                //customizationManager.RemoveItem(item.category, item.allowStacking ? item.subCategory : null);
             }
             else
             {

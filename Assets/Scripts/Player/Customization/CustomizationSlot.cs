@@ -17,14 +17,11 @@ namespace RooseLabs.Player.Customization
         public Material material;
 
         [Tooltip("The ID of the target renderer. This ID must match a Renderer Mapping in the PlayerCustomizationManager.")]
-        public string targetRendererId;
+        public RendererID targetRendererId;
 
-        /// <summary>
-        /// Validates that this slot has the minimum required data.
-        /// </summary>
         public bool IsValid()
         {
-            return material != null && !string.IsNullOrEmpty(targetRendererId);
+            return material != null;
         }
     }
 }

@@ -368,7 +368,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &4645494841649699898
 Transform:
   m_ObjectHideFlags: 0
@@ -999,7 +999,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &6106940891120713810
 Transform:
   m_ObjectHideFlags: 0
@@ -1609,22 +1609,24 @@ MonoBehaviour:
   _addedNetworkObject: {fileID: 7652611172026813195}
   _networkObjectCache: {fileID: 0}
   rendererMappings:
-  - id: Hair
+  - id: 0
     renderer: {fileID: 1898582813011760090}
-  - id: Ears
+  - id: 3
     renderer: {fileID: 4538900077229077408}
-  - id: Eyes
+  - id: 1
     renderer: {fileID: 4718687908337115548}
-  - id: Mouth
+  - id: 2
     renderer: {fileID: 3885944489889949441}
-  - id: ClothingVisiblePart
+  - id: 6
     renderer: {fileID: 6831904599033618835}
-  - id: Clothing
+  - id: 7
     renderer: {fileID: 8357323513902675137}
-  - id: HeadAccessories
+  - id: 4
     renderer: {fileID: 7006513637425275682}
-  - id: Wand
+  - id: 8
     renderer: {fileID: 1301919178542139145}
+  - id: 5
+    renderer: {fileID: 7601884755037557169}
   defaultConfigurations:
   - renderer: {fileID: 8357323513902675137}
     defaultMesh: {fileID: 1596533743628303504, guid: c7d48a079d40bd94a9483826266718bb, type: 3}
@@ -1640,6 +1642,12 @@ MonoBehaviour:
     defaultMaterial: {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
   - renderer: {fileID: 1301919178542139145}
     defaultMesh: {fileID: -5220590045393546675, guid: 135cc71d114f8b34595d2347465e88c0, type: 3}
+    defaultMaterial: {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - renderer: {fileID: 7601884755037557169}
+    defaultMesh: {fileID: 0}
+    defaultMaterial: {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - renderer: {fileID: 7006513637425275682}
+    defaultMesh: {fileID: 0}
     defaultMaterial: {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
   itemDatabase: {fileID: 11400000, guid: f6c6b77d74469054981bbeaf8ece833a, type: 2}
   equippedItemNames: []
@@ -2582,7 +2590,7 @@ SpriteRenderer:
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1 &8341259078320434640
