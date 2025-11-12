@@ -829,7 +829,7 @@ MonoBehaviour:
   m_VoxelSize: 0.16666667
   m_MinRegionArea: 2
   m_NavMeshData: {fileID: 23800000, guid: f4804b845e943774ea15038a8841d699, type: 2}
-  m_BuildHeightMesh: 1
+  m_BuildHeightMesh: 0
 --- !u!1 &105178722
 GameObject:
   m_ObjectHideFlags: 0
@@ -13904,6 +13904,10 @@ PrefabInstance:
       propertyPath: volume
       value: 
       objectReference: {fileID: 832575518}
+    - target: {fileID: 3025078776930143745, guid: 57090dfd109dc2642a434deb8b456572, type: 3}
+      propertyPath: attackRange
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 3025078776930143745, guid: 57090dfd109dc2642a434deb8b456572, type: 3}
       propertyPath: patrolRoute
       value: 

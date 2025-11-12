@@ -24,9 +24,10 @@ namespace RooseLabs.Enemies
         public Volume volume;
         public WeaponCollider weaponCollider;
         public Transform RaycastOrigin;
+        public Transform modelTransform;
 
         [Header("Combat")]
-        public float attackRange = 2f;
+        public float attackRange = 4f;
         public float attackCooldown = 1.2f;
         public int attackDamage = 10;
 

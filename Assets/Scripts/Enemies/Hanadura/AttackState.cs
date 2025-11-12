@@ -1,3 +1,4 @@
+using RooseLabs.Player;
 using UnityEngine;
 
 namespace RooseLabs.Enemies
@@ -6,6 +7,8 @@ namespace RooseLabs.Enemies
     {
         private HanaduraAI ai;
         private bool hasAttacked = false;
+        private float rotationSpeed = 8f; 
+        private float minRotationThreshold = 5f;
 
         public AttackState(HanaduraAI ai)
         {
@@ -22,10 +25,18 @@ namespace RooseLabs.Enemies
 
         public void Exit()
         {
-            // MODIFIED: Disable weapon collider when leaving attack state
             if (ai.weaponCollider != null)
             {
                 ai.weaponCollider.DisableWeapon();
+            }
+
+            if (ai.modelTransform != null)
+            {
+                ai.modelTransform.localRotation = Quaternion.Slerp(
+                    ai.modelTransform.localRotation,
+                    Quaternion.identity,
+                    Time.deltaTime * rotationSpeed
+                );
             }
         }
 
@@ -33,23 +44,50 @@ namespace RooseLabs.Enemies
         {
             if (ai.CurrentTarget == null) return;
 
-            // Ensure NavMeshAgent stays stopped during attack
             if (!ai.navAgent.isStopped)
             {
                 ai.StopMovement();
             }
 
-            // Rotate to face target
-            Vector3 dir = (ai.CurrentTarget.position - ai.transform.position);
-            dir.y = 0f;
-            if (dir.sqrMagnitude > 0.001f)
+            Vector3 horizontalDir = (ai.CurrentTarget.position - ai.transform.position);
+            horizontalDir.y = 0f;
+
+            if (horizontalDir.sqrMagnitude > 0.001f)
             {
-                Quaternion look = Quaternion.LookRotation(dir);
-                ai.transform.rotation = Quaternion.Slerp(ai.transform.rotation, look, Time.deltaTime * 10f);
+                Quaternion horizontalLook = Quaternion.LookRotation(horizontalDir);
+                ai.transform.rotation = Quaternion.Slerp(
+                    ai.transform.rotation,
+                    horizontalLook,
+                    Time.deltaTime * 10f
+                );
             }
 
-            // Try to perform attack
-            if (ai.TryPerformAttack())
+            Quaternion targetLocalRotation = Quaternion.identity;
+            bool isAimedAtTarget = false;
+
+            if (ai.modelTransform != null)
+            {
+                Vector3 attackOrigin = ai.RaycastOrigin.position;
+                Vector3 targetCenter = ai.CurrentTarget.GetComponentInParent<PlayerCharacter>().RaycastTarget.position + Vector3.up * 1.5f;
+                Vector3 worldDirection = (targetCenter - attackOrigin).normalized;
+                Vector3 localDirection = ai.transform.InverseTransformDirection(worldDirection);
+
+                if (localDirection.sqrMagnitude > 0.001f)
+                {
+                    targetLocalRotation = Quaternion.LookRotation(localDirection);
+
+                    ai.modelTransform.localRotation = Quaternion.Slerp(
+                        ai.modelTransform.localRotation,
+                        targetLocalRotation,
+                        Time.deltaTime * rotationSpeed
+                    );
+
+                    float rotationDifference = Quaternion.Angle(ai.modelTransform.localRotation, targetLocalRotation);
+                    isAimedAtTarget = rotationDifference < minRotationThreshold;
+                }
+            }
+
+            if (isAimedAtTarget && ai.TryPerformAttack())
             {
                 if (!hasAttacked)
                 {
@@ -59,7 +97,6 @@ namespace RooseLabs.Enemies
             }
             else
             {
-                // Reset flag when attack cooldown ends so we can trigger again
                 hasAttacked = false;
             }
         }
