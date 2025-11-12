@@ -68,6 +68,13 @@ namespace RooseLabs.Enemies
         private bool hasTriggeredDetectedAnimation = false;
         private bool isPlayingDetectedAnimation = false;
 
+        private bool isAttackLocked = false;
+        private float attackLockDuration = 0f;
+
+        // This is just a reference to the duration of the hanadura attack so
+        // I can lock state changes during the attack animation...
+        public float attackAnimationDuration = 2.3f; 
+
         #region Detection Priority System
 
         public enum DetectionPriority
@@ -240,6 +247,15 @@ namespace RooseLabs.Enemies
 
             attackTimer -= Time.deltaTime;
 
+            if (isAttackLocked)
+            {
+                attackLockDuration -= Time.deltaTime;
+                if (attackLockDuration <= 0f)
+                {
+                    isAttackLocked = false;
+                }
+            }
+
             ProcessVisualDetection();
 
             // Only check for stale detections if NOT currently investigating
@@ -344,6 +360,7 @@ namespace RooseLabs.Enemies
         private void HandleVisualDetection()
         {
             if (CurrentTarget == null) return;
+            if (isAttackLocked) return;
 
             float dist = Vector3.Distance(transform.position, CurrentTarget.position);
 
@@ -672,6 +689,33 @@ namespace RooseLabs.Enemies
             {
                 animator.SetTrigger(paramName);
             }
+        }
+
+
+        public void SyncModelRotation(Quaternion localRotation)
+        {
+            if (!base.IsServerInitialized) return;
+            if (modelTransform != null)
+            {
+                modelTransform.localRotation = localRotation;
+
+                Rpc_SyncModelRotation(localRotation);
+            }
+        }
+
+        [ObserversRpc]
+        private void Rpc_SyncModelRotation(Quaternion localRotation)
+        {
+            if (!base.IsServerInitialized && modelTransform != null)
+            {
+                modelTransform.localRotation = localRotation;
+            }
+        }
+
+        public void LockIntoAttack()
+        {
+            isAttackLocked = true;
+            attackLockDuration = attackAnimationDuration;
         }
     }
 }

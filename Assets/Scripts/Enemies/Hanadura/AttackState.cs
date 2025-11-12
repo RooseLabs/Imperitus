@@ -76,11 +76,13 @@ namespace RooseLabs.Enemies
                 {
                     targetLocalRotation = Quaternion.LookRotation(localDirection);
 
-                    ai.modelTransform.localRotation = Quaternion.Slerp(
+                    Quaternion newRotation = Quaternion.Slerp(
                         ai.modelTransform.localRotation,
                         targetLocalRotation,
                         Time.deltaTime * rotationSpeed
                     );
+
+                    ai.SyncModelRotation(newRotation);
 
                     float rotationDifference = Quaternion.Angle(ai.modelTransform.localRotation, targetLocalRotation);
                     isAimedAtTarget = rotationDifference < minRotationThreshold;
@@ -92,6 +94,7 @@ namespace RooseLabs.Enemies
                 if (!hasAttacked)
                 {
                     ai.SetAnimatorTrigger("Attack");
+                    ai.LockIntoAttack();
                     hasAttacked = true;
                 }
             }
