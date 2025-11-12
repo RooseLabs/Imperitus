@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
+using RooseLabs.Player;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -22,6 +23,8 @@ namespace RooseLabs.Enemies
         public Transform spotlightTransform;
         private Quaternion defaultSpotlightRotation;
         private Collider detectedPlayerCollider;
+        public Transform modelTransform;
+        private Quaternion defaultModelRotation;
 
         [Header("Patrol")]
         public int startWaypointIndex = 0;
@@ -41,11 +44,17 @@ namespace RooseLabs.Enemies
         public float callReinforcementsCooldown = 10f;
         public float reinforcementSearchRadius = 50f;
         public int maxReinforcementsToCall = 3;
+        public float trackingSpeed = 1.5f;
 
         [Header("Alert Visual")]
         public Color normalSpotlightColor = Color.white;
         public Color alertSpotlightColor = Color.red;
         public float colorTransitionSpeed = 2f;
+
+        [Header("Model Rotation")]
+        public float modelRotationSpeed = 5f;
+        public bool showDebugRay = true;
+        public float debugRayLength = 3f;
 
         // FSM States
         private IEnemyState currentState;
@@ -61,6 +70,7 @@ namespace RooseLabs.Enemies
         // Network synchronized variables
         private readonly SyncVar<Color> syncedSpotlightColor = new SyncVar<Color>(new SyncTypeSettings(WritePermission.ServerOnly, ReadPermission.Observers));
         private readonly SyncVar<Quaternion> syncedSpotlightRotation = new SyncVar<Quaternion>(new SyncTypeSettings(WritePermission.ServerOnly, ReadPermission.Observers));
+        private readonly SyncVar<Quaternion> syncedModelRotation = new SyncVar<Quaternion>(new SyncTypeSettings(WritePermission.ServerOnly, ReadPermission.Observers));
 
         // Public properties for states to access
         public Transform DetectedPlayer => detectedPlayer;
@@ -73,6 +83,11 @@ namespace RooseLabs.Enemies
             if (animator == null)
             {
                 animator = GetComponentInChildren<Animator>();
+            }
+
+            if (modelTransform == null && animator != null)
+            {
+                modelTransform = animator.transform;
             }
         }
 
@@ -96,11 +111,19 @@ namespace RooseLabs.Enemies
                 syncedSpotlightRotation.Value = defaultSpotlightRotation;
             }
 
+            if (modelTransform != null)
+            {
+                defaultModelRotation = modelTransform.localRotation;
+                syncedModelRotation.Value = defaultModelRotation;
+            }
+
+
             syncedSpotlightColor.Value = normalSpotlightColor;
 
             // Subscribe to SyncVar changes
             syncedSpotlightColor.OnChange += OnSpotlightColorChanged;
             syncedSpotlightRotation.OnChange += OnSpotlightRotationChanged;
+            syncedModelRotation.OnChange += OnModelRotationChanged;
 
             // Create states
             patrolState = new GrimoirePatrolState(this, patrolRoute, loopPatrol, startWaypointIndex, waypointReachThreshold);
@@ -122,6 +145,7 @@ namespace RooseLabs.Enemies
             {
                 syncedSpotlightColor.OnChange += OnSpotlightColorChanged;
                 syncedSpotlightRotation.OnChange += OnSpotlightRotationChanged;
+                syncedModelRotation.OnChange += OnModelRotationChanged;
 
                 // Apply initial synced values
                 if (spotlight != null)
@@ -129,6 +153,9 @@ namespace RooseLabs.Enemies
 
                 if (spotlightTransform != null)
                     spotlightTransform.rotation = syncedSpotlightRotation.Value;
+
+                if (modelTransform != null)
+                    modelTransform.localRotation = syncedModelRotation.Value;
 
                 //Debug.Log("[GrimoireAI] OnStartClient - applied initial spotlight state");
             }
@@ -141,6 +168,7 @@ namespace RooseLabs.Enemies
             // Unsubscribe from events to prevent memory leaks
             syncedSpotlightColor.OnChange -= OnSpotlightColorChanged;
             syncedSpotlightRotation.OnChange -= OnSpotlightRotationChanged;
+            syncedModelRotation.OnChange -= OnModelRotationChanged;
         }
 
         public override void OnStopServer()
@@ -150,6 +178,7 @@ namespace RooseLabs.Enemies
             // Unsubscribe from events
             syncedSpotlightColor.OnChange -= OnSpotlightColorChanged;
             syncedSpotlightRotation.OnChange -= OnSpotlightRotationChanged;
+            syncedModelRotation.OnChange -= OnModelRotationChanged;
         }
 
         private void Update()
@@ -158,6 +187,11 @@ namespace RooseLabs.Enemies
             {
                 UpdateSpotlightVisualsClient();
                 return;
+            }
+
+            if (showDebugRay)
+            {
+                Debug.DrawRay(transform.position, transform.forward * debugRayLength, Color.purple);
             }
 
             // Server logic only
@@ -183,6 +217,8 @@ namespace RooseLabs.Enemies
                
             // Update spotlight visuals and sync to network
             UpdateSpotlightVisualsServer();
+
+            UpdateModelRotation();
 
             // Update animator parameters (NetworkAnimator handles the syncing)
             UpdateAnimatorParameters();
@@ -450,6 +486,15 @@ namespace RooseLabs.Enemies
                     Time.deltaTime * 10f
                 );
             }
+
+            if (modelTransform != null)
+            {
+                modelTransform.localRotation = Quaternion.Slerp(
+                    modelTransform.localRotation,
+                    syncedModelRotation.Value,
+                    Time.deltaTime * modelRotationSpeed
+                );
+            }
         }
 
         /// <summary>
@@ -492,6 +537,50 @@ namespace RooseLabs.Enemies
             //Debug.Log("[GrimoireAI] Reinforcement call effect RPC received");
         }
 
+        private void UpdateModelRotation()
+        {
+            if (!base.IsServerInitialized) return;
+            if (modelTransform == null) return;
+
+            Quaternion targetRotation;
+
+            if ((currentState is GrimoireAlertState || currentState is GrimoireTrackingState) && detectedPlayer != null)
+            {
+                Vector3 directionToPlayer = (detectedPlayer.GetComponentInParent<PlayerCharacter>().RaycastTarget.position - transform.position);
+                directionToPlayer.y = 0;
+
+                if (directionToPlayer != Vector3.zero)
+                {
+                    targetRotation = Quaternion.LookRotation(directionToPlayer);
+                    targetRotation = Quaternion.Inverse(transform.rotation) * targetRotation;
+                }
+                else
+                {
+                    targetRotation = defaultModelRotation;
+                }
+            }
+            else
+            {
+                targetRotation = defaultModelRotation;
+            }
+
+            modelTransform.localRotation = Quaternion.Slerp(
+                modelTransform.localRotation,
+                targetRotation,
+                Time.deltaTime * modelRotationSpeed
+            );
+
+            syncedModelRotation.Value = modelTransform.localRotation;
+        }
+
+        private void OnModelRotationChanged(Quaternion prev, Quaternion next, bool asServer)
+        {
+            if (!asServer && modelTransform != null)
+            {
+                modelTransform.localRotation = next;
+            }
+        }
+
         #endregion
 
         #region Debug
@@ -518,20 +607,6 @@ namespace RooseLabs.Enemies
             // Draw reinforcement radius
             Gizmos.color = Color.cyan;
             Gizmos.DrawWireSphere(transform.position, reinforcementSearchRadius);
-        }
-
-        private void RotateModelToTarget(Transform detectedPlayer)
-        {
-            // Rotate the Grimoire model to face the detected player smoothly
-            Vector3 directionToPlayer = (detectedPlayer.position - transform.position).normalized;
-            Quaternion targetRotation = Quaternion.LookRotation(directionToPlayer);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 5f);
-        }
-
-        private void RotateModelBackToDefault()
-        {
-            // Rotate the Grimoire model back to its default forward position smoothly
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.identity, Time.deltaTime * 5f);
         }
 
         #endregion

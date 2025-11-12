@@ -292,6 +292,7 @@ MonoBehaviour:
   animator: {fileID: 0}
   spotlight: {fileID: 3310447793082394167}
   spotlightTransform: {fileID: 7769504255186393303}
+  modelTransform: {fileID: 584479379418611331}
   startWaypointIndex: 0
   loopPatrol: 1
   patrolSpeed: 2
@@ -312,6 +313,9 @@ MonoBehaviour:
   normalSpotlightColor: {r: 1, g: 1, b: 1, a: 1}
   alertSpotlightColor: {r: 1, g: 0, b: 0, a: 1}
   colorTransitionSpeed: 2
+  modelRotationSpeed: 5
+  showDebugRay: 1
+  debugRayLength: 3
 --- !u!114 &4866373312013150636
 MonoBehaviour:
   m_ObjectHideFlags: 0

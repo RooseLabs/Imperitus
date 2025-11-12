@@ -16,12 +16,15 @@ namespace RooseLabs.Enemies
 
         public void Enter()
         {
+            ai.navAgent.isStopped = false;
+            ai.navAgent.speed = ai.trackingSpeed;
+
             //Debug.Log("[GrimoireTrackingState] Entered - actively tracking player");
         }
 
         public void Exit()
         {
-
+            ai.navAgent.speed = ai.patrolSpeed;
         }
 
         public void Tick()
@@ -32,6 +35,7 @@ namespace RooseLabs.Enemies
             if (detectedPlayer != null)
             {
                 ai.RotateSpotlightToTarget(detectedPlayer, 5f);
+                ai.navAgent.SetDestination(detectedPlayer.position);
             }
             else
             {
