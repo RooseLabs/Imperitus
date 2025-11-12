@@ -34,6 +34,7 @@ namespace RooseLabs.Player
         public PlayerInput Input { get; private set; }
         public PlayerData Data { get; private set; }
         public PlayerMovement Movement { get; private set; }
+        public PlayerItems Items  { get; private set; }
         [field: SerializeField]  public PlayerWand Wand { get; private set; }
         public PlayerAnimations Animations { get; private set; }
         public PlayerRagdoll Ragdoll { get; private set; }
@@ -49,6 +50,7 @@ namespace RooseLabs.Player
             Input = GetComponent<PlayerInput>();
             Data = GetComponent<PlayerData>();
             Movement = GetComponent<PlayerMovement>();
+            Items  = GetComponent<PlayerItems>();
             Animations = GetComponent<PlayerAnimations>();
             Ragdoll = GetComponent<PlayerRagdoll>();
             Notebook = GetComponentInChildren<PlayerNotebook>();

@@ -32,8 +32,8 @@ namespace RooseLabs.Gameplay
         }
 
         public Collider Collider { get; private set; }
-        protected Rigidbody m_rigidbody;
-        protected bool m_isDragging;
+        protected Rigidbody rb;
+        protected bool isBeingDraggedByImpero;
 
         protected PredictedOwner predictedOwner;
         private ConfigurableJoint m_joint;
@@ -44,7 +44,7 @@ namespace RooseLabs.Gameplay
         protected virtual void Awake()
         {
             TryGetComponent(out predictedOwner);
-            TryGetComponent(out m_rigidbody);
+            TryGetComponent(out rb);
             Collider = GetComponent<Collider>();
         }
 
@@ -53,7 +53,7 @@ namespace RooseLabs.Gameplay
             predictedOwner.TakeOwnership(true);
             CanOwnershipBeTakenByCollision = false;
             AttachJoint(hitPoint);
-            m_isDragging = true;
+            isBeingDraggedByImpero = true;
             m_wasLastInteractionDrag = true;
             m_targetPosition = hitPoint;
             HandleDragBegin_Internal();
@@ -61,13 +61,13 @@ namespace RooseLabs.Gameplay
 
         public void HandleDrag(Vector3 position)
         {
-            if (!m_isDragging) return;
+            if (!isBeingDraggedByImpero) return;
             m_targetPosition = position;
         }
 
         public void HandleDragEnd()
         {
-            m_isDragging = false;
+            isBeingDraggedByImpero = false;
             HandleDragEnd_Internal();
             if (m_joint)
                 Destroy(m_joint.gameObject);
@@ -76,13 +76,13 @@ namespace RooseLabs.Gameplay
 
         protected virtual void HandleDragBegin_Internal()
         {
-            m_initialAngularDamping = m_rigidbody.angularDamping;
-            m_rigidbody.angularDamping = 25f;
+            m_initialAngularDamping = rb.angularDamping;
+            rb.angularDamping = 25f;
         }
 
         protected virtual void HandleDragEnd_Internal()
         {
-            m_rigidbody.angularDamping = m_initialAngularDamping;
+            rb.angularDamping = m_initialAngularDamping;
         }
 
         private void AttachJoint(Vector3 attachmentPosition)
@@ -99,11 +99,11 @@ namespace RooseLabs.Gameplay
                 }
             };
 
-            var rb = go.AddComponent<Rigidbody>();
-            rb.isKinematic = true;
+            var jointRb = go.AddComponent<Rigidbody>();
+            jointRb.isKinematic = true;
 
             m_joint = go.AddComponent<ConfigurableJoint>();
-            m_joint.connectedBody = m_rigidbody;
+            m_joint.connectedBody = rb;
             m_joint.configuredInWorldSpace = true;
 
             // Set the joint to XYZ movement mode
@@ -136,13 +136,13 @@ namespace RooseLabs.Gameplay
         {
             if (!IsOwner) return;
 
-            if (m_isDragging && m_joint)
+            if (isBeingDraggedByImpero && m_joint)
             {
                 m_joint.targetPosition = m_joint.transform.InverseTransformPoint(m_targetPosition);
             }
 
             if (!m_wasLastInteractionDrag) return;
-            bool moving = m_rigidbody.linearVelocity.sqrMagnitude > 0.01f || m_rigidbody.angularVelocity.sqrMagnitude > 0.01f;
+            bool moving = rb.linearVelocity.sqrMagnitude > 0.01f || rb.angularVelocity.sqrMagnitude > 0.01f;
             CanOwnershipBeTakenByCollision = !moving;
         }
 
@@ -150,7 +150,7 @@ namespace RooseLabs.Gameplay
         {
             if (other.gameObject.TryGetComponent(out NetworkObject networkObject))
             {
-                if (m_isDragging || !IsDraggable) return;
+                if (isBeingDraggedByImpero || !IsDraggable) return;
                 if (!CanOwnershipBeTakenByCollision) return;
                 m_wasLastInteractionDrag = false;
                 if (!networkObject.IsOwner) return;

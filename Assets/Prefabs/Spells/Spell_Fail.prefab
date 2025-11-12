@@ -71,7 +71,7 @@ MonoBehaviour:
   <PredictedOwner>k__BackingField: {fileID: 0}
   NetworkBehaviours:
   - {fileID: 222979764584488480}
-  - {fileID: 0}
+  - {fileID: 6380565416162886232}
   InitializedParentNetworkBehaviour: {fileID: 0}
   InitializedNestedNetworkObjects: []
   RuntimeParentNetworkBehaviour: {fileID: 0}
@@ -117,9 +117,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 595bd3b5f0754b09ae41eb461b9b0f31, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Gameplay.Spells.FailedSpell
-  _componentIndexCache: 255
+  _componentIndexCache: 1
   _addedNetworkObject: {fileID: 7572028257010240170}
-  _networkObjectCache: {fileID: 0}
+  _networkObjectCache: {fileID: 7572028257010240170}
   <SpellInfo>k__BackingField: {fileID: 11400000, guid: c478fca8647f80a44b1790133e219993, type: 2}
   castType: 0
   castTime: 0

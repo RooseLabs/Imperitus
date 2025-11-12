@@ -10,6 +10,12 @@ namespace RooseLabs.Gameplay
         #region Serialized
         [Tooltip("Colliders that should be ignored (e.g. neighboring door parts, potentially walls and ground).")]
         [SerializeField] private Collider[] ignoredColliders;
+        [Tooltip("Strength of the spring force moving the door back to its rest position.")]
+        [SerializeField] private float positionSpringStrength = 5f;
+        [Tooltip("Strength of the spring torque rotating the door back to its rest rotation.")]
+        [SerializeField] private float rotationSpringStrength = 5f;
+        [Tooltip("Damping factor applied when returning to rest position.")]
+        [SerializeField] private float dampingFactor = 0.8f;
         #endregion
 
         private static int s_blockingObjectsLayerMask;
@@ -50,11 +56,11 @@ namespace RooseLabs.Gameplay
             base.FixedUpdate();
             if (!IsController) return;
 
-            if (m_isDragging) return;
+            if (isBeingDraggedByImpero) return;
             if (m_returnToRestPosition != null) return;
 
-            bool notMoving = Mathf.Approximately(m_rigidbody.linearVelocity.sqrMagnitude, 0f) &&
-                             Mathf.Approximately(m_rigidbody.angularVelocity.sqrMagnitude, 0f);
+            bool notMoving = Mathf.Approximately(rb.linearVelocity.sqrMagnitude, 0f) &&
+                             Mathf.Approximately(rb.angularVelocity.sqrMagnitude, 0f);
             if (notMoving)
             {
                 m_notMovingTimer += Time.deltaTime;
@@ -64,8 +70,8 @@ namespace RooseLabs.Gameplay
                     // This makes the clientHost also wait for 2 seconds of no movement before removing ownership,
                     // making a total of 3 seconds of wait before starting the coroutine to return to rest position.
                     if (m_notMovingTimer < 1f) return;
-                    bool isAtRestPosition = Vector3.Distance(m_rigidbody.position, m_initialPosition) < 0.01f &&
-                                            Quaternion.Angle( m_rigidbody.rotation, m_initialRotation) < 0.1f;
+                    bool isAtRestPosition = Vector3.Distance(rb.position, m_initialPosition) < 0.01f &&
+                                            Quaternion.Angle(rb.rotation, m_initialRotation) < 0.1f;
                     if (!isAtRestPosition)
                         m_returnToRestPosition = StartCoroutine(TryReturnToRestPosition());
                 }
@@ -89,34 +95,30 @@ namespace RooseLabs.Gameplay
         /// </summary>
         private IEnumerator TryReturnToRestPosition()
         {
-            const float positionSpringStrength = 5f;
-            const float rotationSpringStrength = 5f;
-            const float dampingFactor = 0.8f;
-
             while (true)
             {
                 // Calculate position movement
-                Vector3 toTarget = m_initialPosition - m_rigidbody.position;
+                Vector3 toTarget = m_initialPosition - rb.position;
                 Vector3 targetVelocity = toTarget * positionSpringStrength;
-                m_rigidbody.linearVelocity = Vector3.Lerp(m_rigidbody.linearVelocity, targetVelocity, Time.fixedDeltaTime * dampingFactor);
+                rb.linearVelocity = Vector3.Lerp(rb.linearVelocity, targetVelocity, Time.fixedDeltaTime * dampingFactor);
 
                 // Calculate rotation movement
-                Quaternion rotationDifference = m_initialRotation * Quaternion.Inverse(m_rigidbody.rotation);
+                Quaternion rotationDifference = m_initialRotation * Quaternion.Inverse(rb.rotation);
                 rotationDifference.ToAngleAxis(out float angle, out Vector3 axis);
 
                 if (angle > 180f)
                     angle -= 360f;
 
                 Vector3 targetAngularVelocity = axis * (angle * Mathf.Deg2Rad * rotationSpringStrength);
-                m_rigidbody.angularVelocity = Vector3.Lerp(m_rigidbody.angularVelocity, targetAngularVelocity, Time.fixedDeltaTime * dampingFactor);
+                rb.angularVelocity = Vector3.Lerp(rb.angularVelocity, targetAngularVelocity, Time.fixedDeltaTime * dampingFactor);
 
                 // Stop if we're very close to the target
                 if (toTarget.magnitude < 0.01f && Mathf.Abs(angle) < 0.1f)
                 {
                     // Ensure the object comes to a complete stop
-                    m_rigidbody.linearVelocity = Vector3.zero;
-                    m_rigidbody.angularVelocity = Vector3.zero;
-                    m_rigidbody.Sleep();
+                    rb.linearVelocity = Vector3.zero;
+                    rb.angularVelocity = Vector3.zero;
+                    rb.Sleep();
                     m_returnToRestPosition = null;
                     yield break;
                 }
@@ -142,7 +144,7 @@ namespace RooseLabs.Gameplay
         protected override void OnCollisionEnter(Collision other)
         {
             base.OnCollisionEnter(other);
-            if (m_isDragging) return;
+            if (isBeingDraggedByImpero) return;
             if (m_returnToRestPosition != null)
             {
                 StopCoroutine(m_returnToRestPosition);
