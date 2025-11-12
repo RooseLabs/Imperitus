@@ -5,7 +5,7 @@ namespace RooseLabs.Player
     public class CameraController : MonoBehaviour
     {
         [SerializeField] private Transform standPosition;
-        [SerializeField] private Transform runPosition;
+        [SerializeField] private Transform sprintPosition;
         [SerializeField] private Transform crouchPosition;
         [SerializeField] private Transform crawlPosition;
 
@@ -37,7 +37,7 @@ namespace RooseLabs.Player
             }
             else
             {
-                Vector3 desiredPosition = character.Data.IsSprinting ? runPosition.position
+                Vector3 desiredPosition = character.Data.IsSprinting ? sprintPosition.position
                     : character.Data.IsCrouching ? crouchPosition.position
                     : character.Data.IsCrawling ? crawlPosition.position
                     : standPosition.position;

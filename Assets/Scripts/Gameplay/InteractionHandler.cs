@@ -38,6 +38,7 @@ namespace RooseLabs.Gameplay
 
         private void FindBestInteractable()
         {
+            m_bestInteractable = null;
             var character = PlayerCharacter.LocalCharacter;
             if (!character.RaycastIgnoreSelf(
                 character.Camera.transform.position, character.Camera.transform.forward,
@@ -57,6 +58,8 @@ namespace RooseLabs.Gameplay
                 interactable.Interact(PlayerCharacter.LocalCharacter);
         }
 
-        private bool CanInteract => !PlayerCharacter.LocalCharacter.Data.IsRagdollActive && !PlayerCharacter.LocalCharacter.Data.isDead;
+        private bool CanInteract => !PlayerCharacter.LocalCharacter.Data.IsRagdollActive &&
+                                    !PlayerCharacter.LocalCharacter.Data.isDead &&
+                                    !PlayerCharacter.LocalCharacter.Items.CurrentHeldItem;
     }
 }

@@ -235,7 +235,6 @@ Transform:
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 7478458430039743790}
-  - {fileID: 12161768565202283}
   - {fileID: 8933597474329572650}
   - {fileID: 3835543907381643120}
   - {fileID: 7002881426695329816}
@@ -449,7 +448,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1641466989046416492}
-  - component: {fileID: 5897938885401547963}
+  - component: {fileID: 6442695042307711170}
   m_Layer: 0
   m_Name: HeldItemPosition
   m_TagString: Untagged
@@ -465,14 +464,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1060688739536047240}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0.9808211, z: 0, w: 0.19491069}
+  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
   m_LocalPosition: {x: -0.3, y: 1.275, z: 0.725}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6282181467959717603}
-  m_LocalEulerAnglesHint: {x: 0, y: 157.521, z: 0}
---- !u!114 &5897938885401547963
+  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
+--- !u!114 &6442695042307711170
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1356,37 +1355,6 @@ Transform:
   - {fileID: 4088791230269353495}
   m_Father: {fileID: 5785227541569650551}
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
---- !u!1 &4705353467757405188
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 12161768565202283}
-  m_Layer: 0
-  m_Name: WalkingPosition
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &12161768565202283
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4705353467757405188}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.49, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 1
-  m_Children: []
-  m_Father: {fileID: 3036836449846781444}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5205713743452345972
 GameObject:
   m_ObjectHideFlags: 0
@@ -2309,7 +2277,7 @@ MonoBehaviour:
   - {fileID: 7226749917790494997}
   - {fileID: 8021978832323892062}
   - {fileID: 8664526776978465645}
-  - {fileID: 5897938885401547963}
+  - {fileID: 6442695042307711170}
   - {fileID: 8476560507943759219}
   - {fileID: 1061150272878122509}
   - {fileID: 2954016431569174323}
@@ -2785,7 +2753,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8933597474329572650}
   m_Layer: 0
-  m_Name: RunningPosition
+  m_Name: SprintingPosition
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2957,7 +2925,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Player.CameraController
   standPosition: {fileID: 7478458430039743790}
-  runPosition: {fileID: 8933597474329572650}
+  sprintPosition: {fileID: 8933597474329572650}
   crouchPosition: {fileID: 3835543907381643120}
   crawlPosition: {fileID: 7002881426695329816}
 --- !u!1001 &419060412221709197

@@ -14,17 +14,25 @@ namespace RooseLabs.Gameplay.Interactables
 
         public override void OnPickupStart()
         {
+            if (!IsOwner) return;
             animator.SetBool("IsOpen", true);
         }
 
         public override void OnPickupEnd()
         {
+            if (!IsOwner) return;
             if (rune)
             {
                 HolderCharacter.Notebook.AddRune(rune);
                 if (IsServerInitialized) RuneCollected_ObserversRPC();
                 else RuneCollected_ServerRPC();
             }
+        }
+
+        public override void OnDrop()
+        {
+            if (!IsOwner) return;
+            animator.SetBool("IsOpen", false);
         }
 
         [ServerRpc]
