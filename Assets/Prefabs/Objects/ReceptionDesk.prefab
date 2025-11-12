@@ -11,16 +11,16 @@ GameObject:
   - component: {fileID: 2119174002978000957}
   - component: {fileID: 3082443544106901400}
   - component: {fileID: 946878916321143634}
-  - component: {fileID: 455341819102180315}
-  - component: {fileID: 6788790933443085529}
-  - component: {fileID: 8115610080878586390}
-  - component: {fileID: 8840766835911616312}
+  - component: {fileID: 299450383139336065}
+  - component: {fileID: 7054977204259134256}
+  - component: {fileID: 478941938750442140}
+  - component: {fileID: 4415982339555739666}
   m_Layer: 0
   m_Name: ReceptionDesk
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &2119174002978000957
 Transform:
@@ -44,7 +44,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1595119980336073351}
-  m_Mesh: {fileID: -2227948536464544276, guid: a98a41603e6dbe14ba9e9e584f110963, type: 3}
+  m_Mesh: {fileID: 6317106008045385693, guid: 47dd25c4620d3a24ebd04f6c6789b997, type: 3}
 --- !u!23 &946878916321143634
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -93,7 +93,7 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &455341819102180315
+--- !u!65 &299450383139336065
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -112,9 +112,9 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.48992437, y: 1.0924008, z: 1.4905522}
-  m_Center: {x: -0.4171255, y: 0.5462004, z: -0.00074854493}
---- !u!65 &6788790933443085529
+  m_Size: {x: 1.4905527, y: 1.092401, z: 0.48992473}
+  m_Center: {x: -0.0007485151, y: 0.5462004, z: 0.41712555}
+--- !u!65 &7054977204259134256
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -133,9 +133,9 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.6872959, y: 1.0924008, z: 0.83681726}
-  m_Center: {x: 0.028130531, y: 0.5462004, z: -1.1715915}
---- !u!65 &8115610080878586390
+  m_Size: {x: 0.8245373, y: 1.092401, z: 1.6872966}
+  m_Center: {x: -1.1558659, y: 0.5462004, z: -0.028130412}
+--- !u!65 &478941938750442140
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -154,9 +154,9 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.7039402, y: 1.0924008, z: 0.82422143}
-  m_Center: {x: 0.019808412, y: 0.5462004, z: 1.1562979}
---- !u!65 &8840766835911616312
+  m_Size: {x: 0.82422185, y: 1.092401, z: 1.7039409}
+  m_Center: {x: 1.156298, y: 0.5462004, z: -0.01980853}
+--- !u!65 &4415982339555739666
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -175,5 +175,5 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.9040068, y: 0.06847501, z: 1.4905522}
-  m_Center: {x: 0.27223668, y: 1.0581633, z: -0.0007485151}
+  m_Size: {x: 1.4905528, y: 0.06847501, z: 0.9040073}
+  m_Center: {x: -0.00074857473, y: 1.0581633, z: -0.2722367}
