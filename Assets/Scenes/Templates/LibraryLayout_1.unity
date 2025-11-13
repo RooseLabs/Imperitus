@@ -16576,12 +16576,12 @@ GameObject:
   - component: {fileID: 6053649800573954778}
   - component: {fileID: 95672547145683451}
   - component: {fileID: 6131450864625559037}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: EntranceCorridorFloor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!33 &508237471573715469
 MeshFilter:
@@ -16623,12 +16623,12 @@ GameObject:
   - component: {fileID: 6434125175191795239}
   - component: {fileID: 8828980829297660739}
   - component: {fileID: 8828980829297660740}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: FloorSmallRoom3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &559735916840702081 stripped
 Transform:
@@ -16767,12 +16767,13 @@ GameObject:
   - component: {fileID: 3808088987976979586}
   - component: {fileID: 5067610766354240071}
   - component: {fileID: 2544553240575175768}
+  - component: {fileID: 5067610766354240072}
   m_Layer: 0
   m_Name: MedCorridor.001
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!1 &642650022615652394
 GameObject:
@@ -16786,12 +16787,12 @@ GameObject:
   - component: {fileID: 1462644230735584541}
   - component: {fileID: 4744264355455873314}
   - component: {fileID: 4744264355455873315}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: FloorEntrance
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &667143680279830955 stripped
 Transform:
@@ -16881,12 +16882,13 @@ GameObject:
   - component: {fileID: 8537847267551114363}
   - component: {fileID: 336677825069999110}
   - component: {fileID: 8156269309427368081}
+  - component: {fileID: 8537847267551114364}
   m_Layer: 0
   m_Name: MainHandRail
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &852482611758487823 stripped
 Transform:
@@ -17146,12 +17148,12 @@ GameObject:
   - component: {fileID: 4063758107917195904}
   - component: {fileID: 6442625249188396639}
   - component: {fileID: 8694591280223817776}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: FloorMainRoom.003
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &1228947993260527327
 Transform:
@@ -18049,12 +18051,12 @@ GameObject:
   - component: {fileID: 7255589315145185098}
   - component: {fileID: 2981917334564696392}
   - component: {fileID: 7255589315145185099}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: BigCorridorFloor1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &2423965210049295388 stripped
 Transform:
@@ -18205,7 +18207,7 @@ GameObject:
   - component: {fileID: 4480532579325219961}
   - component: {fileID: 2857764931190727797}
   - component: {fileID: 4480532579325219962}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Stairs.001
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -18669,12 +18671,12 @@ GameObject:
   - component: {fileID: 8442390282308970669}
   - component: {fileID: 4422694177950100327}
   - component: {fileID: 8442390282308970670}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: FloorMediumRoom3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &3732289964079421103 stripped
 Transform:
@@ -19226,12 +19228,12 @@ GameObject:
   - component: {fileID: 5200025736915805721}
   - component: {fileID: 5070572177240879981}
   - component: {fileID: 5200025736915805722}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: FloorMedRoom
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &4457582479569861697 stripped
 Transform:
@@ -19623,6 +19625,28 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 637585280239057168}
   m_Mesh: {fileID: 6182560244156782456, guid: 1a6833422b7471641912289f008d8a06, type: 3}
+--- !u!64 &5067610766354240072
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 637585280239057168}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 6182560244156782456, guid: 1a6833422b7471641912289f008d8a06, type: 3}
 --- !u!23 &5070572177240879981
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -19800,12 +19824,13 @@ GameObject:
   - component: {fileID: 7472966503229465094}
   - component: {fileID: 3626326600646759661}
   - component: {fileID: 2227696084515798210}
+  - component: {fileID: 7472966503229465095}
   m_Layer: 0
   m_Name: HandRailEntrance
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!33 &5509937167003704940
 MeshFilter:
@@ -19936,12 +19961,12 @@ GameObject:
   - component: {fileID: 748266527177194836}
   - component: {fileID: 5940816159130981466}
   - component: {fileID: 5940816159130981467}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: FloorBasement
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &5826590060484003529 stripped
 Transform:
@@ -20219,7 +20244,7 @@ GameObject:
   - component: {fileID: 3913092797441148958}
   - component: {fileID: 1960624893764337501}
   - component: {fileID: 6214104741959362558}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: StairsBasement
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -20505,12 +20530,12 @@ GameObject:
   - component: {fileID: 4648958100867396604}
   - component: {fileID: 7375167019557162694}
   - component: {fileID: 7375167019557162695}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: FloorMedRoom2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &6542026333834071774
 Transform:
@@ -20782,12 +20807,12 @@ GameObject:
   - component: {fileID: 6899105867992260071}
   - component: {fileID: 7700606228916878778}
   - component: {fileID: 7700606228916878779}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: FloorMainRoom
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &6840763082743560454
 Transform:
@@ -21356,12 +21381,12 @@ GameObject:
   - component: {fileID: 2106789114768661505}
   - component: {fileID: 614957013533540720}
   - component: {fileID: 7456272205831840663}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: FloorSmallRoom2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!65 &7456272205831840663
 BoxCollider:
@@ -21414,6 +21439,28 @@ Transform:
   m_Children: []
   m_Father: {fileID: 4208491908313032656}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!64 &7472966503229465095
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5499864432759200735}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -4156536540496936445, guid: 1a6833422b7471641912289f008d8a06, type: 3}
 --- !u!4 &7482253979496965601 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1994987461114922745, guid: 314b6893924a8f54f9bf415ec6071079, type: 3}
@@ -21511,7 +21558,7 @@ GameObject:
   - component: {fileID: 6096956517209250530}
   - component: {fileID: 8681287915916790717}
   - component: {fileID: 8681287915916790718}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: EntranceCorridorStairs
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -21560,12 +21607,12 @@ GameObject:
   - component: {fileID: 3972543524108094901}
   - component: {fileID: 1309715429032884168}
   - component: {fileID: 7673575321490546699}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: BigCorridorFloor2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!64 &7673575321490546699
 MeshCollider:
@@ -21831,7 +21878,7 @@ GameObject:
   - component: {fileID: 4632358709209822527}
   - component: {fileID: 7278637548724797557}
   - component: {fileID: 8046163811919466029}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: MainStairs
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -21871,13 +21918,36 @@ GameObject:
   - component: {fileID: 518362928839265380}
   - component: {fileID: 5509937167003704940}
   - component: {fileID: 3894229567823770837}
+  - component: {fileID: 8116777838297821610}
   m_Layer: 0
   m_Name: MedCorridor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
+--- !u!64 &8116777838297821610
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8116777838297821609}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 7689439208319675094, guid: 1a6833422b7471641912289f008d8a06, type: 3}
 --- !u!4 &8133065997905492017 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7695402350451730781, guid: ec1edaa25f010de4bb2d0d98d8639172, type: 3}
@@ -21971,15 +22041,15 @@ GameObject:
   - component: {fileID: 6765322638214881323}
   - component: {fileID: 4133934245452721413}
   - component: {fileID: 8203892902516449018}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: FloorEntrance2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
---- !u!65 &8203892902516449018
-BoxCollider:
+--- !u!64 &8203892902516449018
+MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -21996,9 +22066,10 @@ BoxCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 18.900318, y: 7.5984473, z: 0.70670843}
-  m_Center: {x: 0, y: 2.5845246, z: 0.35335422}
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -6186199983643814354, guid: 1a6833422b7471641912289f008d8a06, type: 3}
 --- !u!4 &8246867489826836440 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5454154659677734133, guid: 9e691d41f24b1234896c23364da1f7b6, type: 3}
@@ -22403,6 +22474,28 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1697979207}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!64 &8537847267551114364
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 821459457310144166}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 4779684446264615189, guid: 1a6833422b7471641912289f008d8a06, type: 3}
 --- !u!4 &8578425516943609325 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8104107513880470602, guid: e108503d5f4c9bd438e39a8054a272d0, type: 3}
@@ -22425,12 +22518,12 @@ GameObject:
   - component: {fileID: 1179418064673323080}
   - component: {fileID: 618954347936581035}
   - component: {fileID: 8592825185867995060}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: FloorSmallRoom
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!65 &8592825185867995060
 BoxCollider:
@@ -23024,7 +23117,7 @@ GameObject:
   - component: {fileID: 2212320453481051904}
   - component: {fileID: 4678338512067708785}
   - component: {fileID: 9031858590689763567}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: StairsHandRail
   m_TagString: Untagged
   m_Icon: {fileID: 0}

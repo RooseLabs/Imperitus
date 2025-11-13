@@ -2027,9 +2027,9 @@ CapsuleCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.25
-  m_Height: 1.4000001
+  m_Height: 1.35
   m_Direction: 1
-  m_Center: {x: 0, y: 1, z: 0}
+  m_Center: {x: 0, y: 1.025, z: 0}
 --- !u!114 &8294842368210334450
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2054,8 +2054,8 @@ MonoBehaviour:
   _groundProbeThickness: 0.1
   _groundProbeFindRealNormal: 0
   _stepSmoothDelay: 0.1
-  _stepUpHeight: 0.3
-  _stepDownHeight: 0.3
+  _stepUpHeight: 0.35
+  _stepDownHeight: 0.35
   _stepUpSmooth: 5
   _stepDownSmooth: 5
   _stepSmoothMovingMultipler: 1
