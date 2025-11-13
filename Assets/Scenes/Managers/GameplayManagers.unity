@@ -379,6 +379,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 51769672726437127, guid: 7140b76d12e111944af61aadcbdc70fa, type: 3}
+      propertyPath: 'libraryScenes.Array.data[0]'
+      value: Assets/Scenes/Levels/Library_1.unity
+      objectReference: {fileID: 0}
     - target: {fileID: 587817716233763778, guid: 7140b76d12e111944af61aadcbdc70fa, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
