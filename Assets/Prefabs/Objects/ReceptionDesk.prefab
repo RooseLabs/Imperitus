@@ -15,6 +15,8 @@ GameObject:
   - component: {fileID: 7054977204259134256}
   - component: {fileID: 478941938750442140}
   - component: {fileID: 4415982339555739666}
+  - component: {fileID: 8246882752050755933}
+  - component: {fileID: 229658234132329438}
   m_Layer: 0
   m_Name: ReceptionDesk
   m_TagString: Untagged
@@ -177,3 +179,36 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.4905528, y: 0.06847501, z: 0.9040073}
   m_Center: {x: -0.00074857473, y: 1.0581633, z: -0.2722367}
+--- !u!114 &8246882752050755933
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1595119980336073351}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12e9a4e631b85e34e9f51b986e93a8f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Gameplay.TableCrawlZone
+--- !u!65 &229658234132329438
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1595119980336073351}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 3.1326537, y: 1.0924008, z: 1.99}
+  m_Center: {x: 0.0000005364418, y: 0.5462004, z: -0.39}

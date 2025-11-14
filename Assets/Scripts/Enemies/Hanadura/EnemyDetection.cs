@@ -1,5 +1,6 @@
-using System.Collections.Generic;
+using NUnit.Framework.Internal;
 using RooseLabs.Player;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace RooseLabs.Enemies
@@ -86,10 +87,18 @@ namespace RooseLabs.Enemies
             {
                 //Transform target = col.transform;
                 Transform target = col.GetComponentInParent<PlayerCharacter>().RaycastTarget;
+
                 if (target == null)
                 {
                     Debug.LogWarning("[EnemyDetection] Target has no RaycastTarget assigned!");
                 }
+
+                if (target.GetComponentInParent<PlayerCharacter>().Data.IsRagdollActive)
+                {
+                    best = null;
+                    break;
+                }
+
                 Vector3 dirToTarget = (target.position - transform.position).normalized;
 
                 // Horizontal angle
@@ -149,6 +158,11 @@ namespace RooseLabs.Enemies
         public bool HasLineOfSightOfHitbox(Transform target, Transform origin)
         {
             if (target == null) return false;
+
+            if (target.GetComponentInParent<PlayerCharacter>().Data.IsRagdollActive)
+            {
+                return false;
+            }
 
             Vector3 direction = (target.position - origin.position).normalized;
             float distance = Vector3.Distance(origin.position, target.position);

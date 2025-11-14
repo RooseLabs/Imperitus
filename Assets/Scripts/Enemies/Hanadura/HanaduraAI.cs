@@ -217,14 +217,6 @@ namespace RooseLabs.Enemies
             if (!base.IsServerInitialized)
                 return;
 
-            // Temporary debug - remove after fixing
-            if (Time.frameCount % 60 == 0)
-            {
-                //DebugManager.Log($"[HanaduraAI] State: {currentState?.GetType().Name}, " +
-                                //$"IsChasing: {animator?.GetBool("IsChasing")}, " +
-                                //$"IsLookingAround: {animator?.GetBool("IsLookingAround")}");
-            }
-
             // Check if Detected animation finished
             if (isPlayingDetectedAnimation)
             {
@@ -364,13 +356,18 @@ namespace RooseLabs.Enemies
 
             float dist = Vector3.Distance(transform.position, CurrentTarget.position);
 
-            if (dist <= attackRange)
+            // Check if we can actually attack (distance AND line of sight)
+            bool canAttack = dist <= attackRange &&
+                             detection.HasLineOfSightOfHitbox(CurrentTarget, RaycastOrigin);
+
+            if (canAttack)
             {
                 if (!(currentState is AttackState))
                     EnterState(attackState);
             }
             else
             {
+                // Either too far OR no line of sight -> chase
                 if (!(currentState is ChaseState))
                     EnterState(chaseState);
             }
