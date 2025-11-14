@@ -313,6 +313,8 @@ namespace RooseLabs.Gameplay.Notebook
             Logger.Info($"Rune {runeIndex} collected. Total runes: {m_runeCollection.collectedRuneIndices.Count}");
         }
 
+
+
         /// <summary>
         /// Notifies the server that this player collected a rune.
         /// </summary>
@@ -378,6 +380,12 @@ namespace RooseLabs.Gameplay.Notebook
 
             int runeIndex = GameManager.Instance.RuneDatabase.IndexOf(rune);
             return HasRune(runeIndex);
+        }
+
+        public void RemoveAllRunes()
+        {
+            m_runeCollection.collectedRuneIndices.Clear();
+            Logger.Info("All runes removed from player's collection");
         }
 
         #endregion

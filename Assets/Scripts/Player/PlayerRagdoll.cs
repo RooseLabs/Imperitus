@@ -36,7 +36,7 @@ namespace RooseLabs.Player
         private BoneTransform[] m_previousBoneTransforms;
 
         public readonly Dictionary<HumanBodyBones, Transform> partDict = new();
-        private Transform HipsBone => partDict[HumanBodyBones.Hips];
+        public Transform HipsBone => partDict[HumanBodyBones.Hips];
         private Rigidbody HipsRigidbody => m_ragdollRigidbodies[0];
         private Animator Animator => m_character.Animations.Animator;
         private GameObject ModelGameObject => Animator.gameObject;
@@ -247,7 +247,7 @@ namespace RooseLabs.Player
         }
 
         [Server]
-        public void TriggerRagdoll(Vector3 force, Vector3 hitPoint)
+        public void TriggerRagdoll(Vector3 force, Vector3 hitPoint, bool shouldStandUp = true)
         {
             StopAllCoroutines();
             if (m_character.Data.IsRagdollActive && m_isWaitingForRagdollToSettle)
@@ -265,7 +265,9 @@ namespace RooseLabs.Player
                 hitRigidbody.AddForceAtPosition(force, hitPoint, ForceMode.Impulse);
                 m_shouldSyncRagdoll = true;
             }
-            StartCoroutine(StandUpRoutine());
+
+            if(shouldStandUp)
+                StartCoroutine(StandUpRoutine());
         }
 
         [ObserversRpc(ExcludeServer = true)]

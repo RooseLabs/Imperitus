@@ -942,7 +942,7 @@ GameObject:
   - component: {fileID: 5034291265095438977}
   - component: {fileID: 8476560507943759219}
   m_Layer: 0
-  m_Name: PlayerNotebook
+  m_Name: PlayerNotebookManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2093,6 +2093,7 @@ MonoBehaviour:
   - {fileID: 3230726080438718335}
   - {fileID: 7358083918770435597}
   <RaycastTarget>k__BackingField: {fileID: 4398373416247838343}
+  <droppedNotebokPrefab>k__BackingField: {fileID: 1662366430101928264, guid: 419e7f5b3d6c00741857b3b06fe8af7c, type: 3}
   <Wand>k__BackingField: {fileID: 2178509645408755102}
 --- !u!114 &2194619057779025337
 MonoBehaviour:
@@ -2574,7 +2575,7 @@ SpriteRenderer:
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1 &8341259078320434640

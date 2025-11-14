@@ -1,13 +1,14 @@
-using System;
-using System.Collections.Generic;
 using FishNet.Connection;
 using FishNet.Object;
 using RooseLabs.Core;
 using RooseLabs.Gameplay;
+using RooseLabs.Gameplay.Interactables;
 using RooseLabs.Gameplay.Notebook;
 using RooseLabs.Network;
 using RooseLabs.UI;
 using RooseLabs.Utils;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace RooseLabs.Player
@@ -28,6 +29,7 @@ namespace RooseLabs.Player
         [SerializeField] private GameObject[] meshesToHide = Array.Empty<GameObject>();
 
         [field: SerializeField] public Transform RaycastTarget { get; private set; }
+        [field: SerializeField] public GameObject droppedNotebokPrefab { get; private set; }
         #endregion
 
         #region References
@@ -39,6 +41,7 @@ namespace RooseLabs.Player
         public PlayerAnimations Animations { get; private set; }
         public PlayerRagdoll Ragdoll { get; private set; }
         public PlayerNotebook Notebook { get; private set; }
+        public DroppedNotebook DroppedNotebook { get; private set; }
 
         private Rigidbody m_rigidbody;
         #endregion
@@ -54,6 +57,7 @@ namespace RooseLabs.Player
             Animations = GetComponent<PlayerAnimations>();
             Ragdoll = GetComponent<PlayerRagdoll>();
             Notebook = GetComponentInChildren<PlayerNotebook>();
+            DroppedNotebook = GetComponentInChildren<DroppedNotebook>();
 
             m_rigidbody = GetComponent<Rigidbody>();
         }
@@ -151,13 +155,22 @@ namespace RooseLabs.Player
 
             Data.Health -= damage.Amount;
 
-            // TODO: Trigger death if health <= 0
             if (Data.Health <= 0)
             {
                 Debug.Log($"Player '{Player.PlayerName}' died!");
+                SpawnNotebook_ServerRPC();
+                Ragdoll.TriggerRagdoll(Vector3.back * 500f, Ragdoll.HipsBone.position, false);
             }
 
             return true;
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        public void SpawnNotebook_ServerRPC()
+        {
+            GameObject droppedNotebook = Instantiate(droppedNotebokPrefab, transform.position + Vector3.up * 1.0f, Quaternion.identity);
+            Spawn(droppedNotebook, null, gameObject.scene);
+            droppedNotebook.GetComponent<DroppedNotebook>().Initialize(Notebook);
         }
 
         #region Utils
