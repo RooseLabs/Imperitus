@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using FishNet.Object;
 using RooseLabs.Core;
+using RooseLabs.Gameplay;
 using RooseLabs.Gameplay.Spells;
 using RooseLabs.ScriptableObjects;
 using UnityEngine;
@@ -18,7 +19,11 @@ namespace RooseLabs.Player
 
         [Tooltip("Point from which spells are cast. This should be at the tip of the wand.")]
         [SerializeField] private Transform spellCastPoint;
+        [Tooltip("Container for the orbiting runes.")]
+        [SerializeField] private Transform orbitingRunesContainer;
         #endregion
+
+        public Transform AttachmentPoint => spellCastPoint.parent;
 
         public Vector3 SpellCastPointLocalPosition => spellCastPoint.localPosition;
         public Vector3 SpellCastPointPosition { get; private set; }
@@ -109,6 +114,8 @@ namespace RooseLabs.Player
                 m_currentSpellInstance?.CancelCast();
                 character.Data.isCasting = false;
             }
+            if (wasAiming != character.Data.isAiming)
+                SetOrbitingRunesVisibility(character.Data.isAiming);
         }
 
         private void UpdateCurrentSpellInstance()
@@ -130,6 +137,10 @@ namespace RooseLabs.Player
             {
                 Logger.Warning($"[PlayerWand] Spell ID {spellID} not found in database.");
             }
+            if (m_currentSpellInstance)
+                SetOrbitingRunes(m_currentSpellInstance.SpellInfo.Runes);
+            else
+                ClearOrbitingRunes();
             m_currentSpellInstanceDirty = false;
         }
 
@@ -139,6 +150,10 @@ namespace RooseLabs.Player
             // which, in Update, would not have been evaluated by the Animator yet. This would be fine at normal FPS
             // but at low FPS it behaves unpredictably, reporting nonsensical positions. Unity shenanigans. ¯\_(ツ)_/¯
             SpellCastPointPosition = spellCastPoint.position;
+
+            if (!PlayerCharacter.LocalCharacter) return;
+            orbitingRunesContainer.rotation = Quaternion.LookRotation(
+                orbitingRunesContainer.position - PlayerCharacter.LocalCharacter.Camera.transform.position);
         }
 
         // TODO: We probably also want to prevent using the wand when there's no active heist.
@@ -167,5 +182,67 @@ namespace RooseLabs.Player
         {
             character.Data.isAiming = isAiming;
         }
+
+        #region Orbiting Runes
+        private readonly List<OrbitingRune> m_orbitingRunes = new();
+        private const float OrbitingRunesRadius = 3f;
+
+        private void SetOrbitingRunes(RuneSO[] runes)
+        {
+            // Clear existing runes
+            ClearOrbitingRunes();
+
+            // Instantiate new runes
+            foreach (var rune in runes)
+            {
+                if (!rune.Sprite) continue;
+                GameObject runeObj = new GameObject($"OrbitingRune_{rune.name}");
+                runeObj.transform.SetParent(orbitingRunesContainer);
+                runeObj.transform.localPosition = Vector3.zero;
+                runeObj.transform.localRotation = Quaternion.identity;
+                runeObj.transform.localScale = Vector3.one * 2;
+                var orbitingRuneComp = runeObj.AddComponent<OrbitingRune>();
+                orbitingRuneComp.SetRune(rune);
+                orbitingRuneComp.SetVisible(character.Data.isAiming);
+                m_orbitingRunes.Add(orbitingRuneComp);
+            }
+
+            DistributeOrbitingRunes();
+        }
+
+        private void ClearOrbitingRunes()
+        {
+            foreach (Transform child in orbitingRunesContainer)
+            {
+                Destroy(child.gameObject);
+            }
+            m_orbitingRunes.Clear();
+        }
+
+        private void DistributeOrbitingRunes()
+        {
+            if (m_orbitingRunes.Count == 0) return;
+
+            float angleStep = 360f / m_orbitingRunes.Count;
+            float angle = 0f;
+
+            foreach (var obj in m_orbitingRunes)
+            {
+                float x = OrbitingRunesRadius * Mathf.Cos(angle * Mathf.Deg2Rad);
+                float y = OrbitingRunesRadius * Mathf.Sin(angle * Mathf.Deg2Rad);
+
+                obj.SetPosition(new Vector3(x, y, obj.transform.localPosition.z));
+                angle += angleStep;
+            }
+        }
+
+        private void SetOrbitingRunesVisibility(bool isVisible)
+        {
+            foreach (var rune in m_orbitingRunes)
+            {
+                rune.SetVisible(isVisible);
+            }
+        }
+        #endregion
     }
 }

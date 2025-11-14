@@ -54,7 +54,7 @@ namespace RooseLabs.Gameplay.Spells
         {
             PlayerCharacter ownerCharacter = PlayerHandler.GetCharacter(Owner);
             Debug.Assert(ownerCharacter != null, "[SpellBase] No owner character found for spell.");
-            transform.SetParent(ownerCharacter.Wand.transform);
+            transform.SetParent(ownerCharacter.Wand.AttachmentPoint);
             transform.localPosition = ownerCharacter.Wand.SpellCastPointLocalPosition;
         }
 
@@ -173,7 +173,7 @@ namespace RooseLabs.Gameplay.Spells
             var localCharacter = PlayerCharacter.LocalCharacter;
             if (!localCharacter) return null;
             NetworkObject nob = nm.GetPooledInstantiated(spellPrefab.gameObject, false);
-            nob.transform.SetParent(localCharacter.Wand.transform);
+            nob.transform.SetParent(localCharacter.Wand.AttachmentPoint);
             nob.transform.localPosition = localCharacter.Wand.SpellCastPointLocalPosition;
             nm.ServerManager.Spawn(nob, localCharacter.Owner);
             return nob.GetComponent<SpellBase>();

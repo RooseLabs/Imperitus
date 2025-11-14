@@ -590,7 +590,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 87077e485d5dd384e9d1ec325d05cfbb, type: 3}
       propertyPath: m_Name
-      value: BookRunes
+      value: RuneBook
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 87077e485d5dd384e9d1ec325d05cfbb, type: 3}
       propertyPath: m_Layer
@@ -975,7 +975,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4204629389324440399}
   serializedVersion: 5
-  m_Mass: 5
+  m_Mass: 2
   m_LinearDamping: 0
   m_AngularDamping: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -1013,8 +1013,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.14019579, y: 0.21407989, z: 0.04659079}
-  m_Center: {x: -0.067130625, y: 0.10558422, z: 0.00040217862}
+  m_Size: {x: 0.13925251, y: 0.21189769, z: 0.04633929}
+  m_Center: {x: -0.06769854, y: 0.106501274, z: 0.0006293915}
 --- !u!114 &2819512474134240772
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1032,8 +1032,11 @@ MonoBehaviour:
   WasActiveDuringEdit_Set1: 1
   <ComponentIndex>k__BackingField: 0
   <PredictedSpawn>k__BackingField: {fileID: 0}
-  <PredictedOwner>k__BackingField: {fileID: 0}
-  NetworkBehaviours: []
+  <PredictedOwner>k__BackingField: {fileID: 796684813774696700}
+  NetworkBehaviours:
+  - {fileID: 457966357228422196}
+  - {fileID: 796684813774696700}
+  - {fileID: 5102793160355787799}
   InitializedParentNetworkBehaviour: {fileID: 0}
   InitializedNestedNetworkObjects: []
   RuntimeParentNetworkBehaviour: {fileID: 0}
@@ -1058,15 +1061,15 @@ MonoBehaviour:
   _spectatorInterpolation: 2
   _enableTeleport: 0
   _teleportThreshold: 1
-  <PrefabId>k__BackingField: 65535
+  <PrefabId>k__BackingField: 8
   <SpawnableCollectionId>k__BackingField: 0
-  <AssetPathHash>k__BackingField: 13934151961996422742
+  <AssetPathHash>k__BackingField: 9587970676867320266
   <SceneId>k__BackingField: 0
   SerializedTransformProperties:
     Position: {x: 0, y: 0, z: 0}
-    Rotation: {x: 0, y: 0, z: 0, w: 0}
-    Scale: {x: 0, y: 0, z: 0}
-    IsValid: 0
+    Rotation: {x: -0, y: -0, z: -0, w: 1}
+    Scale: {x: 1, y: 1, z: 1}
+    IsValid: 1
 --- !u!114 &457966357228422196
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1079,9 +1082,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2836e36774ca1c4bbbee976e17b649c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: FishNet.Runtime::FishNet.Component.Transforming.NetworkTransform
-  _componentIndexCache: 255
+  _componentIndexCache: 0
   _addedNetworkObject: {fileID: 2819512474134240772}
-  _networkObjectCache: {fileID: 0}
+  _networkObjectCache: {fileID: 2819512474134240772}
   _componentConfiguration: 2
   _synchronizeParent: 0
   _packing:
@@ -1125,9 +1128,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 03002f7d324007e41b10a9dc87ed3c38, type: 3}
   m_Name: 
   m_EditorClassIdentifier: FishNet.Runtime::FishNet.Component.Ownership.PredictedOwner
-  _componentIndexCache: 255
+  _componentIndexCache: 1
   _addedNetworkObject: {fileID: 2819512474134240772}
-  _networkObjectCache: {fileID: 0}
+  _networkObjectCache: {fileID: 2819512474134240772}
   _allowTakeOwnership: 1
 --- !u!114 &5102793160355787799
 MonoBehaviour:
@@ -1141,9 +1144,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c6322fbee26321642a0e520d20720789, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Gameplay.Interactables.Book
-  _componentIndexCache: 255
+  _componentIndexCache: 2
   _addedNetworkObject: {fileID: 2819512474134240772}
-  _networkObjectCache: {fileID: 0}
+  _networkObjectCache: {fileID: 2819512474134240772}
   force: 600
   damping: 50
   rune: {fileID: 0}
