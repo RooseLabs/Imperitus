@@ -638,7 +638,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3030200440481046367, guid: ec1edaa25f010de4bb2d0d98d8639172, type: 3}
       propertyPath: <SceneId>k__BackingField
-      value: 3720345593
+      value: 3652296682
       objectReference: {fileID: 0}
     - target: {fileID: 7025719902179816423, guid: ec1edaa25f010de4bb2d0d98d8639172, type: 3}
       propertyPath: m_Name
@@ -969,6 +969,7 @@ GameObject:
   - component: {fileID: 854402519}
   - component: {fileID: 854402521}
   - component: {fileID: 854402520}
+  - component: {fileID: 854402522}
   m_Layer: 0
   m_Name: LongBookShelves
   m_TagString: Untagged
@@ -1047,6 +1048,28 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 854402518}
   m_Mesh: {fileID: 2258633712319620078, guid: 1a6833422b7471641912289f008d8a06, type: 3}
+--- !u!64 &854402522
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 854402518}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 2258633712319620078, guid: 1a6833422b7471641912289f008d8a06, type: 3}
 --- !u!1001 &927639301
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1077,7 +1100,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3373150440347089365, guid: b2c9e911b0daf7c47aa6bbfcc3977c41, type: 3}
       propertyPath: <SceneId>k__BackingField
-      value: 4261115901
+      value: 3723622392
       objectReference: {fileID: 0}
     - target: {fileID: 4985982016308107667, guid: b2c9e911b0daf7c47aa6bbfcc3977c41, type: 3}
       propertyPath: m_Name
@@ -1147,7 +1170,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3030200440481046367, guid: ec1edaa25f010de4bb2d0d98d8639172, type: 3}
       propertyPath: <SceneId>k__BackingField
-      value: 3686225900
+      value: 4227817468
       objectReference: {fileID: 0}
     - target: {fileID: 7025719902179816423, guid: ec1edaa25f010de4bb2d0d98d8639172, type: 3}
       propertyPath: m_Name
