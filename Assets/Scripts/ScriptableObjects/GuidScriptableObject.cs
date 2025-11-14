@@ -24,26 +24,36 @@ namespace RooseLabs.ScriptableObjects
         #if UNITY_EDITOR
         protected virtual void OnValidate()
         {
-            if (lowBytes == 0 && highBytes == 0)
+            GenerateGuidFromAsset();
+        }
+
+        protected virtual void Reset()
+        {
+            GenerateGuidFromAsset();
+        }
+
+        private void GenerateGuidFromAsset()
+        {
+            UnityEditor.AssetDatabase.TryGetGUIDAndLocalFileIdentifier(this, out string unityGuidStr, out long _);
+            if (string.IsNullOrEmpty(unityGuidStr))
             {
-                GenerateNewGuid();
+                // Failed to retrieve asset GUID.
+                return;
             }
-        }
 
-        private void Reset()
-        {
-            GenerateNewGuid();
-        }
+            Guid assetGuid = new Guid(unityGuidStr);
+            byte[] guidBytes = assetGuid.ToByteArray();
+            ulong newLowBytes = BitConverter.ToUInt64(guidBytes, 0);
+            ulong newHighBytes = BitConverter.ToUInt64(guidBytes, 8);
 
-        private void GenerateNewGuid()
-        {
-            Guid newGuid = Guid.NewGuid();
-            byte[] guidBytes = newGuid.ToByteArray();
-            lowBytes = BitConverter.ToUInt64(guidBytes, 0);
-            highBytes = BitConverter.ToUInt64(guidBytes, 8);
-            hashCode = HashCode.Combine(lowBytes, highBytes);
+            if (lowBytes != newLowBytes || highBytes != newHighBytes)
+            {
+                lowBytes = newLowBytes;
+                highBytes = newHighBytes;
+                hashCode = HashCode.Combine(newLowBytes, newHighBytes);
 
-            UnityEditor.EditorUtility.SetDirty(this);
+                UnityEditor.EditorUtility.SetDirty(this);
+            }
         }
         #endif
     }
