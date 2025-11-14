@@ -10,14 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1f774909fddefc046a5a4747e866e0ac, type: 3}
-  m_Name: Red Hair
-  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.CustomizationItem
+  m_Name: Hair1
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.ScriptableObjects.CustomizationItem
   category: 0
   applicationMode: 0
   slots:
-  - mesh: {fileID: 0}
-    material: {fileID: 2100000, guid: 3fd7ef667b06b9a4589061f31f20d859, type: 2}
+  - mesh: {fileID: -8261066796910302577, guid: c7d48a079d40bd94a9483826266718bb, type: 3}
+    material: {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
     targetRendererId: 0
-  itemName: Red Hair
-  description: Just red hair...
-  icon: {fileID: 21300000, guid: 60439f2d6685ac849b08c5d45ef6a80d, type: 3}
+  itemName: Hair1
+  description: Boy Hair
+  icon: {fileID: 21300000, guid: 7c57c006e3029944a945b8fa53d68214, type: 3}
