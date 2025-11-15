@@ -82,6 +82,11 @@ namespace RooseLabs.Gameplay
                 return;
             }
 
+            Camera sceneCam = Camera.current;
+            if (sceneCam == null) return;
+            float dist = Vector3.Distance(transform.position, sceneCam.transform.position);
+            if (dist > 20f) return;
+
             Matrix4x4 originalMatrix = Gizmos.matrix;
             Gizmos.matrix = transform.localToWorldMatrix;
 
