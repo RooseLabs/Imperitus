@@ -1,7 +1,8 @@
-using System.Collections.Generic;
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
 using RooseLabs.Player;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -13,7 +14,7 @@ namespace RooseLabs.Enemies
     /// </summary>
     [RequireComponent(typeof(NavMeshAgent))]
     [RequireComponent(typeof(NetworkObject))]
-    public class GrimoireAI : NetworkBehaviour
+    public class GrimoireAI : NetworkBehaviour, IEnemyAI
     {
         [Header("References")]
         public NavMeshAgent navAgent;
@@ -25,6 +26,8 @@ namespace RooseLabs.Enemies
         private Collider detectedPlayerCollider;
         public Transform modelTransform;
         private Quaternion defaultModelRotation;
+        public EnemyData enemyData;
+        public Rigidbody rb;
 
         [Header("Patrol")]
         public int startWaypointIndex = 0;
@@ -78,6 +81,8 @@ namespace RooseLabs.Enemies
 
         private string whatWasPreviousState = "";
 
+        private bool hasHandledDeath = false;
+
         private void Awake()
         {
             if (animator == null)
@@ -88,6 +93,16 @@ namespace RooseLabs.Enemies
             if (modelTransform == null && animator != null)
             {
                 modelTransform = animator.transform;
+            }
+
+            if (enemyData == null)
+            {
+                enemyData = GetComponent<EnemyData>();
+            }
+
+            if (rb == null)
+            {
+                rb = GetComponent<Rigidbody>();
             }
         }
 
@@ -183,6 +198,14 @@ namespace RooseLabs.Enemies
 
         private void Update()
         {
+            if (!hasHandledDeath && enemyData.IsDead)
+            {
+                HandleDeath_ServerRPC();
+                return;
+            }
+            else if (enemyData.IsDead)
+                return;
+
             if (!base.IsServerInitialized)
             {
                 UpdateSpotlightVisualsClient();
@@ -582,6 +605,62 @@ namespace RooseLabs.Enemies
         }
 
         #endregion
+
+        [ServerRpc(RequireOwnership = false)]
+        public void HandleDeath_ServerRPC()
+        {
+            if (!IsServerInitialized)
+                return;
+
+            if (animator != null)
+            {
+                HandleDeath_ObserversRPC();
+            }
+            else
+            {
+                Debug.LogWarning($"No Animator found on {gameObject.name}, cannot play death animation.");
+                Despawn(gameObject);
+            }
+        }
+
+        [ObserversRpc]
+        private void HandleDeath_ObserversRPC()
+        {
+            if (animator != null && !hasHandledDeath)
+            {
+                currentState = null;
+                navAgent.isStopped = true;
+                navAgent.velocity = Vector3.zero;
+                navAgent.enabled = false;
+                rb.useGravity = true;
+                rb.isKinematic = false;
+                animator.Play("Death");
+                hasHandledDeath = true;
+
+                Debug.Log($"{gameObject.name} death sequence executed on observer");
+
+                // StartCoroutine(DespawnAfterDeath());
+            }
+        }
+
+        public void OnEnemyDeath()
+        {
+            if (IsServerInitialized)
+            {
+                HandleDeath_ServerRPC();
+            }
+        }
+
+        private IEnumerator DespawnAfterDeath()
+        {
+            // Wait for death animation to finish
+            yield return new WaitForSeconds(10f);
+
+            if (IsServerInitialized)
+            {
+                Despawn(gameObject);
+            }
+        }
 
         #region Debug
 

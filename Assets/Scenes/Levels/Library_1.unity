@@ -13479,6 +13479,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1886436304}
     m_Modifications:
+    - target: {fileID: 2753149022113849445, guid: 57090dfd109dc2642a434deb8b456572, type: 3}
+      propertyPath: minimumDamageVelocity
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 3025078776930143745, guid: 57090dfd109dc2642a434deb8b456572, type: 3}
       propertyPath: volume
       value: 

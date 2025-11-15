@@ -106,7 +106,7 @@ namespace RooseLabs.Gameplay.Notebook
             // Also set it locally on the server
             m_assignmentData = assignmentData;
 
-            Debug.Log($"[NotebookManager - SERVER] Assignment {assignmentData.assignmentNumber} initialized with {assignmentData.tasks.Count} tasks");
+            //Debug.Log($"[NotebookManager - SERVER] Assignment {assignmentData.assignmentNumber} initialized with {assignmentData.tasks.Count} tasks");
 
             OnAssignmentDataChanged?.Invoke();
         }
@@ -179,7 +179,7 @@ namespace RooseLabs.Gameplay.Notebook
                 m_assignmentData.tasks.Add(task);
             }
 
-            Debug.Log($"[NotebookManager - CLIENT] Assignment {m_assignmentData.assignmentNumber} received with {m_assignmentData.tasks.Count} tasks");
+            //Debug.Log($"[NotebookManager - CLIENT] Assignment {m_assignmentData.assignmentNumber} received with {m_assignmentData.tasks.Count} tasks");
         }
         #endregion
 
@@ -191,7 +191,7 @@ namespace RooseLabs.Gameplay.Notebook
         {
             if (asServer) return;
 
-            Debug.Log($"[NotebookManager - CLIENT] Received assignment sync from server");
+            //Debug.Log($"[NotebookManager - CLIENT] Received assignment sync from server");
             ConvertNetworkDataToLocal(next);
             OnAssignmentDataChanged?.Invoke();
         }

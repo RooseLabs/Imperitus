@@ -169,9 +169,11 @@ GameObject:
   m_Component:
   - component: {fileID: 1748971770594778435}
   - component: {fileID: 9079337599107841751}
-  - component: {fileID: 1341751001827941048}
+  - component: {fileID: 16683904257332987}
   - component: {fileID: 2039317095261099087}
   - component: {fileID: 237211371112094711}
+  - component: {fileID: 3860053999190181839}
+  - component: {fileID: 8735231212856205354}
   - component: {fileID: 4866373312013150636}
   - component: {fileID: 2923893137017715159}
   - component: {fileID: 5557008658885784378}
@@ -208,7 +210,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8490385624122815485}
   serializedVersion: 5
-  m_Mass: 1
+  m_Mass: 200
   m_LinearDamping: 0
   m_AngularDamping: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -227,8 +229,8 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!136 &1341751001827941048
-CapsuleCollider:
+--- !u!65 &16683904257332987
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -245,11 +247,9 @@ CapsuleCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5
-  m_Height: 1
-  m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
+  serializedVersion: 3
+  m_Size: {x: 0.66, y: 0.23, z: 0.38}
+  m_Center: {x: 0, y: 0.06, z: 0}
 --- !u!195 &2039317095261099087
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -293,6 +293,8 @@ MonoBehaviour:
   spotlight: {fileID: 3310447793082394167}
   spotlightTransform: {fileID: 7769504255186393303}
   modelTransform: {fileID: 584479379418611331}
+  enemyData: {fileID: 0}
+  rb: {fileID: 0}
   startWaypointIndex: 0
   loopPatrol: 1
   patrolSpeed: 2
@@ -317,6 +319,43 @@ MonoBehaviour:
   modelRotationSpeed: 5
   showDebugRay: 1
   debugRayLength: 3
+--- !u!114 &3860053999190181839
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8490385624122815485}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 99e126251eeef9a44981e710dd568cc8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Enemies.EnemyData
+  _componentIndexCache: 255
+  _addedNetworkObject: {fileID: 4866373312013150636}
+  _networkObjectCache: {fileID: 0}
+  m_enemyType: {fileID: 11400000, guid: 03d0c3d266dd0984b9d5449c2c8a14eb, type: 2}
+--- !u!114 &8735231212856205354
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8490385624122815485}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 04fc5ee9a77b5374ea3513761396c31f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.EnemyDraggableCollision
+  _componentIndexCache: 255
+  _addedNetworkObject: {fileID: 4866373312013150636}
+  _networkObjectCache: {fileID: 0}
+  enemyData: {fileID: 3860053999190181839}
+  baseDamage: 0
+  damageForceThreshold: 50
+  forceToTamageMultiplier: 2
+  minimumDamageVelocity: 2.5
+  damageCooldownDuration: 1
 --- !u!114 &4866373312013150636
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -61,12 +61,12 @@ namespace RooseLabs.Gameplay
 
             AssignmentData assignment = CreateAssignmentData();
 
-            Debug.Log($"[GameManager - SERVER] About to initialize assignment. NotebookManager.Instance is null? {NotebookManager.Instance == null}");
-            Debug.Log($"[GameManager - SERVER] Assignment object created with {assignment.tasks.Count} tasks");
+            //Debug.Log($"[GameManager - SERVER] About to initialize assignment. NotebookManager.Instance is null? {NotebookManager.Instance == null}");
+            //Debug.Log($"[GameManager - SERVER] Assignment object created with {assignment.tasks.Count} tasks");
 
             NotebookManager.Instance.InitializeAssignment(assignment);
 
-            Debug.Log($"[GameManager - SERVER] Assignment initialized. Can retrieve from NotebookManager? {NotebookManager.Instance.GetCurrentAssignment() != null}");
+            //Debug.Log($"[GameManager - SERVER] Assignment initialized. Can retrieve from NotebookManager? {NotebookManager.Instance.GetCurrentAssignment() != null}");
         }
 
 

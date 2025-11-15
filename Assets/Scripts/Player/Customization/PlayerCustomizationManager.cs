@@ -114,7 +114,7 @@ namespace RooseLabs.Player.Customization
             // Only the owner should send their customization when new clients join
             if (base.Owner.IsLocalClient && asServer)
             {
-                Debug.Log($"[PlayerCustomizationManager] Client {conn.ClientId} loaded scenes, re-broadcasting customization");
+                //Debug.Log($"[PlayerCustomizationManager] Client {conn.ClientId} loaded scenes, re-broadcasting customization");
                 Invoke(nameof(BroadcastCustomizationDelayed), 0.2f);
             }
         }
@@ -343,7 +343,7 @@ namespace RooseLabs.Player.Customization
             PlayerPrefs.SetString(SAVE_KEY, json);
             PlayerPrefs.Save();
 
-            Debug.Log($"[PlayerCustomizationManager] Saved {saveData.equippedItems.Count} equipped items.");
+            //Debug.Log($"[PlayerCustomizationManager] Saved {saveData.equippedItems.Count} equipped items.");
         }
 
         /// <summary>
@@ -392,7 +392,7 @@ namespace RooseLabs.Player.Customization
                 }
             }
 
-            Debug.Log($"[PlayerCustomizationManager] Loaded {loadedCount} equipped items.");
+            //Debug.Log($"[PlayerCustomizationManager] Loaded {loadedCount} equipped items.");
         }
 
         /// <summary>
@@ -402,7 +402,7 @@ namespace RooseLabs.Player.Customization
         {
             PlayerPrefs.DeleteKey(SAVE_KEY);
             PlayerPrefs.Save();
-            Debug.Log("[PlayerCustomizationManager] Cleared saved customization.");
+            //Debug.Log("[PlayerCustomizationManager] Cleared saved customization.");
         }
 
         #endregion
@@ -581,7 +581,7 @@ namespace RooseLabs.Player.Customization
             // FIXED: Only apply if we're not the owner
             if (!base.Owner.IsLocalClient && next != null && next.Length > 0)
             {
-                Debug.Log($"[PlayerCustomizationManager] OnCustomizationSynced called - applying {next.Length} items");
+                //Debug.Log($"[PlayerCustomizationManager] OnCustomizationSynced called - applying {next.Length} items");
                 ApplyNetworkedCustomization(next);
                 hasInitializedCustomization = true;
             }
@@ -603,7 +603,7 @@ namespace RooseLabs.Player.Customization
             // Convert current equipped items to index array
             int[] indices = GetEquippedItemIndices();
 
-            Debug.Log($"[PlayerCustomizationManager] Broadcasting customization: {indices.Length} items");
+            //Debug.Log($"[PlayerCustomizationManager] Broadcasting customization: {indices.Length} items");
 
             // Send to server using ServerRpc
             ServerReceiveCustomization(indices);
@@ -615,7 +615,7 @@ namespace RooseLabs.Player.Customization
         [ServerRpc(RequireOwnership = true)]
         private void ServerReceiveCustomization(int[] indices)
         {
-            Debug.Log($"[PlayerCustomizationManager] Server received customization from client: {indices.Length} items");
+            //Debug.Log($"[PlayerCustomizationManager] Server received customization from client: {indices.Length} items");
 
             // Update the SyncVar - this automatically syncs to all clients including potencial late joiners
             syncedCustomizationIndices.Value = indices;
@@ -632,7 +632,7 @@ namespace RooseLabs.Player.Customization
                 return;
             }
 
-            Debug.Log($"[PlayerCustomizationManager] Applying networked customization: {indices.Length} items");
+            //Debug.Log($"[PlayerCustomizationManager] Applying networked customization: {indices.Length} items");
 
             // Clear current customization (but don't save - this is from network)
             RemoveAllItemsWithoutSaving();

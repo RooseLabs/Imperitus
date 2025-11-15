@@ -11,15 +11,17 @@ namespace RooseLabs.Gameplay
     {
         public int Amount;
         public DamageType Type;
-        public Transform Source; // The attacker
-        public Vector3 Position; // Optional: point of impact
+        public Transform Source;
+        public Vector3 Position;
+        public string SourceName;
 
-        public DamageInfo(int amount, DamageType type, Transform source, Vector3 position)
+        public DamageInfo(int amount, DamageType type, Transform source, Vector3 position, string sourceName = null)
         {
             Amount = amount;
             Type = type;
             Source = source;
             Position = position;
+            SourceName = sourceName;
         }
     }
 }

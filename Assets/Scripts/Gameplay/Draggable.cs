@@ -35,6 +35,8 @@ namespace RooseLabs.Gameplay
         protected Rigidbody rb;
         protected bool isBeingDraggedByImpero;
 
+        public bool IsBeingDraggedByImpero => isBeingDraggedByImpero;
+
         protected PredictedOwner predictedOwner;
         private ConfigurableJoint m_joint;
         private Vector3 m_targetPosition;

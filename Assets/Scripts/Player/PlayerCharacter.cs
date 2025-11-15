@@ -154,7 +154,7 @@ namespace RooseLabs.Player
         {
             if (Data.Health <= 0) return false;
 
-            Data.Health -= damage.Amount;
+            //Data.Health -= damage.Amount;
 
             if (Data.Health <= 0)
             {

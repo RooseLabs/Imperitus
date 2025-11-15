@@ -1,7 +1,10 @@
-using System.Collections;
 using FishNet.Connection;
 using FishNet.Object;
+using RooseLabs.Gameplay;
 using RooseLabs.ScriptableObjects;
+using System;
+using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Rendering;
@@ -12,7 +15,7 @@ namespace RooseLabs.Enemies
 {
     [RequireComponent(typeof(NavMeshAgent))]
     [RequireComponent(typeof(NetworkObject))]
-    public class HanaduraAI : NetworkBehaviour, ISoundListener
+    public class HanaduraAI : NetworkBehaviour, ISoundListener, IEnemyAI
     {
         private static Logger Logger => Logger.GetLogger("Hanadura");
 
@@ -25,11 +28,13 @@ namespace RooseLabs.Enemies
         public WeaponCollider weaponCollider;
         public Transform RaycastOrigin;
         public Transform modelTransform;
+        public EnemyData enemyData;
+        public Rigidbody rb;
 
         [Header("Combat")]
         public float attackRange = 4f;
         public float attackCooldown = 1.2f;
-        public int attackDamage = 10;
+        public int attackDamage = 0;
 
         [Header("Patrol")]
         public int startWaypointIndex = 0;
@@ -73,7 +78,9 @@ namespace RooseLabs.Enemies
 
         // This is just a reference to the duration of the hanadura attack so
         // I can lock state changes during the attack animation...
-        public float attackAnimationDuration = 2.3f; 
+        public float attackAnimationDuration = 2.3f;
+
+        private bool hasPlayedDeathAnimation = false;
 
         #region Detection Priority System
 
@@ -109,6 +116,13 @@ namespace RooseLabs.Enemies
         {
             animator = GetComponent<Animator>();
             weaponCollider = GetComponentInChildren<WeaponCollider>();
+            enemyData = GetComponent<EnemyData>();
+            rb = GetComponent<Rigidbody>();
+
+            if (enemyData != null)
+            {
+                attackDamage = enemyData.AttackDamage;
+            }
         }
 
         private bool ShouldSwitchToNewDetection(DetectionInfo newDetection)
@@ -215,6 +229,14 @@ namespace RooseLabs.Enemies
         private void Update()
         {
             if (!base.IsServerInitialized)
+                return;
+
+            if (!hasPlayedDeathAnimation && enemyData.IsDead)
+            {
+                HandleDeath_ServerRPC();
+                return;
+            }
+            else if (enemyData.IsDead)
                 return;
 
             // Check if Detected animation finished
@@ -518,48 +540,6 @@ namespace RooseLabs.Enemies
             if (!base.IsServerInitialized) return;
             navAgent.isStopped = true;
         }
-
-        //public bool TryPerformAttack()
-        //{
-        //    if (!base.IsServerInitialized) return false;
-        //    if (attackTimer > 0f) return false;
-        //    if (CurrentTarget == null) return false;
-
-        //    float dist = Vector3.Distance(transform.position, CurrentTarget.position);
-        //    if (dist > attackRange) return false;
-
-        //    // Create damage info
-        //    DamageInfo damage = new DamageInfo(
-        //        attackDamage,
-        //        DamageType.Melee,
-        //        this.transform,
-        //        CurrentTarget.position
-        //    );
-
-        //    // Try to apply damage
-        //    IDamageable damageable = CurrentTarget.GetComponent<IDamageable>();
-        //    bool hitSuccessful = false;
-        //    if (damageable != null)
-        //    {
-        //        hitSuccessful = damageable.ApplyDamage(damage);
-        //    }
-
-        //    if (!hitSuccessful)
-        //    {
-        //        // no damage applied, skip effects
-        //        attackTimer = attackCooldown;
-        //        return false;
-        //    }
-
-        //    // Damage applied successfully -> trigger feedback
-        //    attackTimer = attackCooldown;
-
-        //    NetworkObject nobTarget = CurrentTarget.GetComponent<NetworkBehaviour>();
-        //    FlashVignette_TargetRPC(nobTarget.LocalConnection);
-
-        //    return true;
-        //}
-
         public bool TryPerformAttack()
         {
             if (!base.IsServerInitialized) return false;
@@ -627,15 +607,6 @@ namespace RooseLabs.Enemies
             yield return FadeToColor(Color.red, 0.35f, 0.5f);
             yield return FadeToColor(Color.black, originalIntensity, 0.5f);
             isFlashingVignette = false;
-        }
-
-        [ObserversRpc]
-        private void Rpc_PlayAttackAnimation()
-        {
-            if (animator != null)
-            {
-                animator.SetTrigger("Attack");
-            }
         }
 
         #endregion
@@ -713,6 +684,68 @@ namespace RooseLabs.Enemies
         {
             isAttackLocked = true;
             attackLockDuration = attackAnimationDuration;
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        public void HandleDeath_ServerRPC()
+        {
+            if (!IsServerInitialized) 
+                return;
+
+            if (animator != null)
+            {
+                HandleDeath_ObserversRPC();
+            }
+            else
+            {
+                Debug.LogWarning($"No Animator found on {gameObject.name}, cannot play death animation.");
+                Despawn(gameObject);
+            }
+        }
+
+        [ObserversRpc]
+        private void HandleDeath_ObserversRPC()
+        {
+            if (animator != null && !hasPlayedDeathAnimation)
+            {
+                StopMovement();
+                currentState = null;
+                ClearCurrentDetection();
+                rb.isKinematic = true;
+
+                Collider col = gameObject.GetComponent<Collider>();
+                if (col != null)
+                    col.enabled = false;
+
+                animator.Play("Death");
+                hasPlayedDeathAnimation = true;
+
+                if (navAgent != null)
+                    navAgent.enabled = false;
+
+                Debug.Log($"{gameObject.name} death sequence executed on observer");
+
+                // StartCoroutine(DespawnAfterDeath());
+            }
+        }
+
+        public void OnEnemyDeath()
+        {
+            if (IsServerInitialized)
+            {
+                HandleDeath_ServerRPC();
+            }
+        }
+
+        private IEnumerator DespawnAfterDeath()
+        {
+            // Wait for death animation to finish
+            yield return new WaitForSeconds(10f); 
+
+            if (IsServerInitialized)
+            {
+                Despawn(gameObject);
+            }
         }
     }
 }

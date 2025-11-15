@@ -41,9 +41,6 @@ namespace RooseLabs.Enemies
 
         private void Awake()
         {
-            Collider col = GetComponent<Collider>();
-            col.isTrigger = true;
-
             if (drawFOV)
             {
                 GameObject go = new GameObject("FOV_Mesh");
