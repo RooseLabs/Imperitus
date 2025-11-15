@@ -532,7 +532,7 @@ PrefabInstance:
     - target: {fileID: 2319429168564967547, guid: 53a2831f09be86a4d956dd88bcaab854, type: 3}
       propertyPath: m_Icon
       value: 
-      objectReference: {fileID: 2974397684917235467, guid: 0000000000000000d000000000000000, type: 0}
+      objectReference: {fileID: 0}
     - target: {fileID: 2319429168564967547, guid: 53a2831f09be86a4d956dd88bcaab854, type: 3}
       propertyPath: m_Name
       value: RuneObjectSpawnPoint (14)
@@ -635,7 +635,7 @@ PrefabInstance:
     - target: {fileID: 2319429168564967547, guid: 53a2831f09be86a4d956dd88bcaab854, type: 3}
       propertyPath: m_Icon
       value: 
-      objectReference: {fileID: 2974397684917235467, guid: 0000000000000000d000000000000000, type: 0}
+      objectReference: {fileID: 0}
     - target: {fileID: 2319429168564967547, guid: 53a2831f09be86a4d956dd88bcaab854, type: 3}
       propertyPath: m_Name
       value: RuneObjectSpawnPoint (15)
@@ -738,7 +738,7 @@ PrefabInstance:
     - target: {fileID: 2319429168564967547, guid: 53a2831f09be86a4d956dd88bcaab854, type: 3}
       propertyPath: m_Icon
       value: 
-      objectReference: {fileID: 2974397684917235467, guid: 0000000000000000d000000000000000, type: 0}
+      objectReference: {fileID: 0}
     - target: {fileID: 2319429168564967547, guid: 53a2831f09be86a4d956dd88bcaab854, type: 3}
       propertyPath: m_Name
       value: RuneObjectSpawnPoint (10)
@@ -940,7 +940,7 @@ PrefabInstance:
     - target: {fileID: 2319429168564967547, guid: 53a2831f09be86a4d956dd88bcaab854, type: 3}
       propertyPath: m_Icon
       value: 
-      objectReference: {fileID: 2974397684917235467, guid: 0000000000000000d000000000000000, type: 0}
+      objectReference: {fileID: 0}
     - target: {fileID: 2319429168564967547, guid: 53a2831f09be86a4d956dd88bcaab854, type: 3}
       propertyPath: m_Name
       value: RuneObjectSpawnPoint (11)
@@ -956,6 +956,10 @@ PrefabInstance:
     - target: {fileID: 8645961222916390646, guid: 53a2831f09be86a4d956dd88bcaab854, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.049
+      objectReference: {fileID: 0}
+    - target: {fileID: 8645961222916390646, guid: 53a2831f09be86a4d956dd88bcaab854, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8645961222916390646, guid: 53a2831f09be86a4d956dd88bcaab854, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1039,7 +1043,7 @@ PrefabInstance:
     - target: {fileID: 2319429168564967547, guid: 53a2831f09be86a4d956dd88bcaab854, type: 3}
       propertyPath: m_Icon
       value: 
-      objectReference: {fileID: 2974397684917235467, guid: 0000000000000000d000000000000000, type: 0}
+      objectReference: {fileID: 0}
     - target: {fileID: 2319429168564967547, guid: 53a2831f09be86a4d956dd88bcaab854, type: 3}
       propertyPath: m_Name
       value: RuneObjectSpawnPoint (13)
@@ -1142,7 +1146,7 @@ PrefabInstance:
     - target: {fileID: 2319429168564967547, guid: 53a2831f09be86a4d956dd88bcaab854, type: 3}
       propertyPath: m_Icon
       value: 
-      objectReference: {fileID: 2974397684917235467, guid: 0000000000000000d000000000000000, type: 0}
+      objectReference: {fileID: 0}
     - target: {fileID: 2319429168564967547, guid: 53a2831f09be86a4d956dd88bcaab854, type: 3}
       propertyPath: m_Name
       value: RuneObjectSpawnPoint (12)
@@ -1245,7 +1249,7 @@ PrefabInstance:
     - target: {fileID: 2319429168564967547, guid: 53a2831f09be86a4d956dd88bcaab854, type: 3}
       propertyPath: m_Icon
       value: 
-      objectReference: {fileID: 2974397684917235467, guid: 0000000000000000d000000000000000, type: 0}
+      objectReference: {fileID: 0}
     - target: {fileID: 2319429168564967547, guid: 53a2831f09be86a4d956dd88bcaab854, type: 3}
       propertyPath: m_Name
       value: RuneObjectSpawnPoint (6)
@@ -1258,10 +1262,6 @@ PrefabInstance:
       propertyPath: '<AllowedObjects>k__BackingField.Array.data[0]'
       value: 
       objectReference: {fileID: 4204629389324440399, guid: 2b41a62cac5acd440877edd6bced97cb, type: 3}
-    - target: {fileID: 8645961222916390646, guid: 53a2831f09be86a4d956dd88bcaab854, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 4.4033647
-      objectReference: {fileID: 0}
     - target: {fileID: 8645961222916390646, guid: 53a2831f09be86a4d956dd88bcaab854, type: 3}
       propertyPath: m_LocalRotation.w
       value: 0.7071068
@@ -1340,7 +1340,7 @@ PrefabInstance:
     - target: {fileID: 2319429168564967547, guid: 53a2831f09be86a4d956dd88bcaab854, type: 3}
       propertyPath: m_Icon
       value: 
-      objectReference: {fileID: 2974397684917235467, guid: 0000000000000000d000000000000000, type: 0}
+      objectReference: {fileID: 0}
     - target: {fileID: 2319429168564967547, guid: 53a2831f09be86a4d956dd88bcaab854, type: 3}
       propertyPath: m_Name
       value: RuneObjectSpawnPoint (16)
@@ -1443,7 +1443,7 @@ PrefabInstance:
     - target: {fileID: 2319429168564967547, guid: 53a2831f09be86a4d956dd88bcaab854, type: 3}
       propertyPath: m_Icon
       value: 
-      objectReference: {fileID: 2974397684917235467, guid: 0000000000000000d000000000000000, type: 0}
+      objectReference: {fileID: 0}
     - target: {fileID: 2319429168564967547, guid: 53a2831f09be86a4d956dd88bcaab854, type: 3}
       propertyPath: m_Name
       value: RuneObjectSpawnPoint (9)
@@ -1645,7 +1645,7 @@ PrefabInstance:
     - target: {fileID: 2319429168564967547, guid: 53a2831f09be86a4d956dd88bcaab854, type: 3}
       propertyPath: m_Icon
       value: 
-      objectReference: {fileID: 2974397684917235467, guid: 0000000000000000d000000000000000, type: 0}
+      objectReference: {fileID: 0}
     - target: {fileID: 2319429168564967547, guid: 53a2831f09be86a4d956dd88bcaab854, type: 3}
       propertyPath: m_Name
       value: RuneObjectSpawnPoint (18)
@@ -1748,7 +1748,7 @@ PrefabInstance:
     - target: {fileID: 2319429168564967547, guid: 53a2831f09be86a4d956dd88bcaab854, type: 3}
       propertyPath: m_Icon
       value: 
-      objectReference: {fileID: 2974397684917235467, guid: 0000000000000000d000000000000000, type: 0}
+      objectReference: {fileID: 0}
     - target: {fileID: 2319429168564967547, guid: 53a2831f09be86a4d956dd88bcaab854, type: 3}
       propertyPath: m_Name
       value: RuneObjectSpawnPoint (17)
@@ -1851,7 +1851,7 @@ PrefabInstance:
     - target: {fileID: 2319429168564967547, guid: 53a2831f09be86a4d956dd88bcaab854, type: 3}
       propertyPath: m_Icon
       value: 
-      objectReference: {fileID: 2974397684917235467, guid: 0000000000000000d000000000000000, type: 0}
+      objectReference: {fileID: 0}
     - target: {fileID: 2319429168564967547, guid: 53a2831f09be86a4d956dd88bcaab854, type: 3}
       propertyPath: m_Name
       value: RuneObjectSpawnPoint (5)
