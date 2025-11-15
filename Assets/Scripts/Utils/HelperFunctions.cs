@@ -4,7 +4,7 @@ namespace RooseLabs.Utils
 {
     public static class HelperFunctions
     {
-        public static readonly int AllPhysicalLayerMask = LayerMask.GetMask("Default", "Ground", "PlayerHitbox", "Draggable");
+        public static readonly int AllPhysicalLayerMask = LayerMask.GetMask("Default", "Ground", "PlayerHitbox", "Draggable", "SoundListener");
 
         /// <summary>
         /// Converts look rotation values (pitch, yaw) to Euler angles.
