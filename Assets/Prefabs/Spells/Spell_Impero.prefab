@@ -127,3 +127,6 @@ MonoBehaviour:
   staminaConsumptionType: 1
   staminaCostPerSecond: 5
   maxDistance: 5
+  tubeRadius: 0.02
+  tubeMaterial: {fileID: 10301, guid: 0000000000000000f000000000000000, type: 0}
+  numSegments: 10

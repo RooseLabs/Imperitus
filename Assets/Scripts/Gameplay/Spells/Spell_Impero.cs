@@ -7,8 +7,17 @@ namespace RooseLabs.Gameplay.Spells
     public class Impero : SpellBase
     {
         #region Serialized
+        [Header("Impero Spell Data")]
         [Tooltip("Maximum distance that the spell can reach.")]
         [SerializeField] private float maxDistance = 5f;
+
+        [Header("Tube Visual")]
+        [Tooltip("Radius of the 3D tube (thickness).")]
+        [SerializeField] private float tubeRadius = 0.02f;
+        [Tooltip("Material for the tube segments and caps.")]
+        [SerializeField] private Material tubeMaterial;
+        [Tooltip("Number of tube segments for the curve. Higher = smoother.")]
+        [SerializeField, Range(10, 50)] private int numSegments = 10;
         #endregion
 
         private Draggable m_currentGrabbedObject;
@@ -17,6 +26,10 @@ namespace RooseLabs.Gameplay.Spells
         private float m_targetDragDistance;
         private float m_minSafeDragDistance;
         private const float MinDragDistanceBuffer = 0.5f;
+
+        private GameObject[] m_tubeSegments;
+        private GameObject m_startCap;
+        private GameObject m_endCap;
 
         protected override bool OnCastFinished()
         {
@@ -49,6 +62,14 @@ namespace RooseLabs.Gameplay.Spells
             m_currentGrabbedObject = hitDraggable;
             m_currentDragDistance = hitInfo.distance;
             m_targetDragDistance = Mathf.Clamp(m_currentDragDistance, m_minSafeDragDistance, maxDistance);
+
+            // Create visuals if material assigned
+            if (tubeMaterial)
+            {
+                CreateVisuals();
+                UpdateVisuals(character);
+            }
+
             return true;
         }
 
@@ -86,12 +107,18 @@ namespace RooseLabs.Gameplay.Spells
             m_currentDragDistance = Mathf.Lerp(m_currentDragDistance, m_targetDragDistance, Time.deltaTime * 5f);
             Vector3 desiredPosition = character.Camera.transform.position + character.Data.lookDirection * m_currentDragDistance;
             m_currentGrabbedObject.HandleDrag(desiredPosition);
+
+            // Update tube positions
+            UpdateVisuals(character);
         }
 
         protected override void OnCancelCastSustained()
         {
             // Release the dragged object
             m_currentGrabbedObject?.HandleDragEnd();
+
+            // Destroy visuals
+            DestroyVisuals();
         }
 
         protected override void OnScrollBackwardHeld()
@@ -110,9 +137,130 @@ namespace RooseLabs.Gameplay.Spells
             m_targetDragDistance = Mathf.Clamp(m_targetDragDistance + value, m_minSafeDragDistance, maxDistance);
         }
 
+        private void CreateVisuals()
+        {
+            m_tubeSegments = new GameObject[numSegments];
+
+            for (int i = 0; i < numSegments; ++i)
+            {
+                GameObject cyl = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                cyl.transform.SetParent(transform);
+                cyl.GetComponent<MeshRenderer>().material = tubeMaterial;
+                Destroy(cyl.GetComponent<Collider>());
+                m_tubeSegments[i] = cyl;
+            }
+
+            // Start cap
+            m_startCap = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            m_startCap.transform.SetParent(transform);
+            m_startCap.GetComponent<MeshRenderer>().material = tubeMaterial;
+            Destroy(m_startCap.GetComponent<Collider>());
+
+            // End cap
+            m_endCap = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            m_endCap.transform.SetParent(transform);
+            m_endCap.GetComponent<MeshRenderer>().material = tubeMaterial;
+            Destroy(m_endCap.GetComponent<Collider>());
+        }
+
+        private static Vector3 GetQuadraticBezierPoint(float t, Vector3 p0, Vector3 p1, Vector3 p2)
+        {
+            float u = 1 - t;
+            float tt = t * t;
+            float uu = u * u;
+
+            Vector3 p = uu * p0;
+            p += 2 * u * t * p1;
+            p += tt * p2;
+            return p;
+        }
+
+        private void UpdateVisuals(PlayerCharacter character)
+        {
+            if (m_tubeSegments == null || !m_currentGrabbedObject) return;
+
+            Vector3 castPos = transform.position;
+            Vector3 grabPos = m_currentGrabbedObject.transform.TransformPoint(m_currentGrabbedLocalHitPoint);
+            float dist = Vector3.Distance(castPos, grabPos);
+            if (dist < 0.01f)
+            {
+                // Too close, hide visuals
+                foreach (var seg in m_tubeSegments)
+                {
+                    seg.SetActive(false);
+                }
+                m_startCap.SetActive(false);
+                m_endCap.SetActive(false);
+                return;
+            }
+
+            Vector3 midPoint = castPos + character.Data.lookDirection * (dist * 0.5f);
+
+            int numPoints = numSegments + 1;
+            Vector3[] points = new Vector3[numPoints];
+
+            for (int i = 0; i < numPoints; ++i)
+            {
+                float t = i / (float)(numPoints - 1);
+                points[i] = GetQuadraticBezierPoint(t, castPos, midPoint, grabPos);
+            }
+
+            // Update caps
+            m_startCap.transform.position = points[0];
+            m_startCap.transform.localScale = Vector3.one * (tubeRadius * 2f);
+            m_startCap.SetActive(true);
+            m_endCap.transform.position = points[numPoints - 1];
+            m_endCap.transform.localScale = Vector3.one * (tubeRadius * 2f);
+            m_endCap.SetActive(true);
+
+            // Update tube segments
+            for (int seg = 0; seg < numSegments; ++seg)
+            {
+                Vector3 pa = points[seg];
+                Vector3 pb = points[seg + 1];
+                Vector3 dirVec = pb - pa;
+                float len = dirVec.magnitude;
+                if (len < 0.001f)
+                {
+                    m_tubeSegments[seg].SetActive(false);
+                    continue;
+                }
+
+                Vector3 dir = dirVec.normalized;
+                Transform segTrans = m_tubeSegments[seg].transform;
+                segTrans.rotation = Quaternion.FromToRotation(Vector3.up, dir);
+                segTrans.position = (pa + pb) * 0.5f;
+                segTrans.localScale = new Vector3(tubeRadius * 2f, len * 0.5f, tubeRadius * 2f);
+                m_tubeSegments[seg].SetActive(true);
+            }
+        }
+
+        private void DestroyVisuals()
+        {
+            if (m_tubeSegments != null)
+            {
+                foreach (var seg in m_tubeSegments)
+                {
+                    Destroy(seg);
+                }
+                m_tubeSegments = null;
+            }
+            if (m_startCap)
+            {
+                Destroy(m_startCap);
+                m_startCap = null;
+            }
+            if (m_endCap)
+            {
+                Destroy(m_endCap);
+                m_endCap = null;
+            }
+        }
+
         protected override void ResetData()
         {
             base.ResetData();
+            DestroyVisuals();
             m_currentGrabbedObject = null;
             m_currentGrabbedLocalHitPoint = Vector3.zero;
             m_currentDragDistance = 0f;

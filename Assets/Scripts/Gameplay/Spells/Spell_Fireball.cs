@@ -7,8 +7,11 @@ namespace RooseLabs.Gameplay.Spells
 {
     public class Fireball : SpellBase
     {
+        #region Serialized
+        [Header("Fireball Spell Data")]
         [SerializeField] private GameObject projectilePrefab;
         [SerializeField] private float projectileSpeed = 10f;
+        #endregion
 
         protected override bool OnCastFinished()
         {
