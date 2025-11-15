@@ -12,7 +12,7 @@ namespace RooseLabs.Gameplay
         private Vector3 m_initialPosition;
 
         private const float NoiseSpeed = 0.5f;
-        private const float NoiseAmplitude = 0.3f;
+        private const float NoiseAmplitude = 1f;
         private Vector2 m_noiseSeed;
         private bool m_isVisible = false;
 

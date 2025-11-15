@@ -45,9 +45,9 @@ namespace RooseLabs.Gameplay.Interactables
         private void ApplyHeldItemPerlinNoise()
         {
             m_noiseTime += Time.deltaTime * NoiseFrequency;
-            float noiseX = (Mathf.PerlinNoise(m_noiseTime, 0f) - 0.5f) * 2f * NoiseAmplitude;
-            float noiseY = (Mathf.PerlinNoise(m_noiseTime + 10f, 0f) - 0.5f) * 2f * NoiseAmplitude;
-            float noiseZ = (Mathf.PerlinNoise(m_noiseTime + 20f, 0f) - 0.5f) * 2f * NoiseAmplitude;
+            float noiseX = (Mathf.PerlinNoise(m_noiseTime, 0f) - 0.5f) * NoiseAmplitude;
+            float noiseY = (Mathf.PerlinNoise(m_noiseTime + 10f, 0f) - 0.5f) * NoiseAmplitude;
+            float noiseZ = (Mathf.PerlinNoise(m_noiseTime + 20f, 0f) - 0.5f) * NoiseAmplitude;
             transform.localPosition = new Vector3(noiseX, noiseY, noiseZ);
         }
 
