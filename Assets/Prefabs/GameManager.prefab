@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 587817716233763778}
   - component: {fileID: 51769672726437127}
   - component: {fileID: 6570541006987429080}
-  - component: {fileID: 567082837154667484}
   - component: {fileID: 6655250134391753841}
   m_Layer: 0
   m_Name: GameManager
@@ -56,22 +55,6 @@ MonoBehaviour:
   <SpellDatabase>k__BackingField: {fileID: 11400000, guid: 9989f6ae5baf9cf40a61f0ef300f97fe, type: 2}
   taskImageDatabase: {fileID: 11400000, guid: 854fd49a1f67f214cb18633e649cb664, type: 2}
 --- !u!114 &6570541006987429080
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1343581432684982766}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c34d1dd2b6233e747ac3d060c3277490, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.HeistTimer
-  _componentIndexCache: 255
-  _addedNetworkObject: {fileID: 6655250134391753841}
-  _networkObjectCache: {fileID: 0}
-  defaultTime: 120
---- !u!114 &567082837154667484
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

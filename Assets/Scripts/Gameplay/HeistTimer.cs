@@ -51,7 +51,7 @@ namespace RooseLabs
             finishedTriggered = false;
             lastDisplayedSecond = -1;
 
-            Debug.Log($"Timer started for {time} seconds.");
+            //Debug.Log($"Timer started for {time} seconds.");
         }
 
         /// <summary>

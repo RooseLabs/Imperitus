@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.IO;
 using FishNet;
 using FishNet.Managing.Scened;
 using FishNet.Object;
@@ -7,6 +5,10 @@ using GameKit.Dependencies.Utilities.Types;
 using RooseLabs.Gameplay.Notebook;
 using RooseLabs.Network;
 using RooseLabs.ScriptableObjects;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -22,14 +24,20 @@ namespace RooseLabs.Gameplay
         [field: SerializeField] public RuneDatabase RuneDatabase { get; private set; }
         [field: SerializeField] public SpellDatabase SpellDatabase { get; private set; }
         [SerializeField] private TaskImageDatabase taskImageDatabase;
+
+        // For testing purposes, remove later
+        [field: SerializeField] public SpellSO Impero;
+        [field: SerializeField] public SpellSO Fireball;
         #endregion
 
         private HeistTimer m_heistTimer;
+        private RuneBookSpawnPointRandomizer m_runeBookSpawnPointRandomizer;
 
         private void Awake()
         {
             Instance = this;
             m_heistTimer = GetComponent<HeistTimer>();
+            m_runeBookSpawnPointRandomizer = GetComponent<RuneBookSpawnPointRandomizer>();
 
             // Initialize the task image database
             if (taskImageDatabase != null)
@@ -48,27 +56,60 @@ namespace RooseLabs.Gameplay
                 InstanceFinder.SceneManager.OnLoadEnd -= HandleSceneLoaded;
         }
 
-        public override void OnStartServer()
+        public override void OnStartNetwork()
         {
-            base.OnStartServer();
+            base.OnStartNetwork();
 
             InstanceFinder.SceneManager.OnLoadEnd += HandleSceneLoaded;
         }
 
         private void HandleSceneLoaded(SceneLoadEndEventArgs args)
         {
-            if (!IsServerInitialized) return;
+            if (IsServerInitialized)
+            {
+                AssignmentData assignment = CreateAssignmentData();
+                NotebookManager.Instance.InitializeAssignment(assignment);
 
-            AssignmentData assignment = CreateAssignmentData();
+                if (args.LoadedScenes.Length > 0 && libraryScenes.Any(scene => GetSceneName(scene) == args.LoadedScenes[0].name))
+                {
+                    string loadedSceneName = args.LoadedScenes[0].name;
+                    Debug.Log($"[GameManager - SERVER] Library scene '{loadedSceneName}' loaded.");
 
-            //Debug.Log($"[GameManager - SERVER] About to initialize assignment. NotebookManager.Instance is null? {NotebookManager.Instance == null}");
-            //Debug.Log($"[GameManager - SERVER] Assignment object created with {assignment.tasks.Count} tasks");
+                    if (m_runeBookSpawnPointRandomizer != null)
+                    {
+                        // Placeholder spells for testing - replace with actual spells
+                        // from the assignment whenever gameplay flow is added
+                        SpellSO[] spellSOs = { Impero, Fireball };
+                        m_runeBookSpawnPointRandomizer.SpawnBooks(-1, spellSOs);
+                    }
+                }
+            } else
+            {
+                if (args.LoadedScenes.Length > 0 && libraryScenes.Any(scene => GetSceneName(scene) == args.LoadedScenes[0].name))
+                {
+                    string loadedSceneName = args.LoadedScenes[0].name;
+                    Debug.Log($"[GameManager - SERVER] Library scene '{loadedSceneName}' loaded.");
 
-            NotebookManager.Instance.InitializeAssignment(assignment);
-
-            //Debug.Log($"[GameManager - SERVER] Assignment initialized. Can retrieve from NotebookManager? {NotebookManager.Instance.GetCurrentAssignment() != null}");
+                    if (m_runeBookSpawnPointRandomizer != null)
+                    {
+                        StartCoroutine(DestroySpawnPointsDelayed());
+                    }
+                }
+            }
         }
 
+        private IEnumerator DestroySpawnPointsDelayed()
+        {
+            //Debug.Log($"[RuneBookSpawnPointRandomizer] Waiting {0.5f} seconds before destroying spawn points...");
+            yield return new WaitForSeconds(0.5f);
+
+            //Debug.Log("[RuneBookSpawnPointRandomizer] Destroying all RuneObjectSpawnPoints in the scene.");
+            RuneObjectSpawnPoint[] all = FindObjectsByType<RuneObjectSpawnPoint>(FindObjectsSortMode.None);
+            foreach (var s in all)
+            {
+                Destroy(s.gameObject);
+            }
+        }
 
         [Server]
         public void StartHeist()

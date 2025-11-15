@@ -210,7 +210,7 @@ namespace RooseLabs.Player.Customization
             equippedItems[key] = item;
             UpdateDebugList();
 
-            Debug.Log($"Equipped: {item.itemName} ({key})");
+            //Debug.Log($"Equipped: {item.itemName} ({key})");
 
             // Auto-save after equipping (only for owner)
             if (base.Owner.IsLocalClient && !disableAutoSaveForNetworking)
@@ -262,7 +262,7 @@ namespace RooseLabs.Player.Customization
             equippedItems.Remove(key);
             UpdateDebugList();
 
-            Debug.Log($"Removed: {item.itemName} ({key})");
+            //Debug.Log($"Removed: {item.itemName} ({key})");
 
             // Auto-save after removing (only for owner)
             if (base.Owner.IsLocalClient && !disableAutoSaveForNetworking)
@@ -359,7 +359,7 @@ namespace RooseLabs.Player.Customization
 
             if (!PlayerPrefs.HasKey(SAVE_KEY))
             {
-                Debug.Log("[PlayerCustomizationManager] No saved customization found.");
+                //Debug.Log("[PlayerCustomizationManager] No saved customization found.");
                 return;
             }
 

@@ -1143,6 +1143,10 @@ PrefabInstance:
       value: RuneObjectSpawnPoint (6)
       objectReference: {fileID: 0}
     - target: {fileID: 7621367813276363679, guid: 53a2831f09be86a4d956dd88bcaab854, type: 3}
+      propertyPath: mode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7621367813276363679, guid: 53a2831f09be86a4d956dd88bcaab854, type: 3}
       propertyPath: <AllowedObjects>k__BackingField.Array.size
       value: 1
       objectReference: {fileID: 0}
