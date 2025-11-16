@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using FishNet;
 using FishNet.Managing.Scened;
 using FishNet.Object;
@@ -5,49 +8,33 @@ using GameKit.Dependencies.Utilities.Types;
 using RooseLabs.Gameplay.Notebook;
 using RooseLabs.Network;
 using RooseLabs.ScriptableObjects;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+using RooseLabs.Utils;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
 namespace RooseLabs.Gameplay
 {
     [DefaultExecutionOrder(-99)]
-    public class GameManager : NetworkBehaviour
+    public partial class GameManager : NetworkBehaviour
     {
         public static GameManager Instance { get; private set; }
 
         #region Serialized
-        [SerializeField][Scene] private string[] libraryScenes;
+        [SerializeField][Scene] private string lobbyScene;
+        [SerializeField][Scene] private string[] heistScenes;
         [field: SerializeField] public RuneDatabase RuneDatabase { get; private set; }
         [field: SerializeField] public SpellDatabase SpellDatabase { get; private set; }
-        [SerializeField] private TaskImageDatabase taskImageDatabase;
-
-        // For testing purposes, remove later
-        [field: SerializeField] public SpellSO Impero;
-        [field: SerializeField] public SpellSO Fireball;
+        [field: SerializeField] public TaskDatabase TaskDatabase { get; private set; }
         #endregion
 
         private HeistTimer m_heistTimer;
-        private RuneBookSpawnPointRandomizer m_runeBookSpawnPointRandomizer;
+
+        public AssignmentData CurrentAssignment { get; private set; }
 
         private void Awake()
         {
             Instance = this;
             m_heistTimer = GetComponent<HeistTimer>();
-            m_runeBookSpawnPointRandomizer = GetComponent<RuneBookSpawnPointRandomizer>();
-
-            // Initialize the task image database
-            if (taskImageDatabase != null)
-            {
-                taskImageDatabase.Initialize();
-            }
-            else
-            {
-                Debug.LogError("[GameManager] TaskImageDatabase is not assigned!", this);
-            }
         }
 
         private void OnDestroy()
@@ -65,122 +52,78 @@ namespace RooseLabs.Gameplay
 
         private void HandleSceneLoaded(SceneLoadEndEventArgs args)
         {
-            if (IsServerInitialized)
+            if (args.LoadedScenes.Length == 0) return;
+
+            bool hasLoadedLobby = false;
+            bool hasLoadedHeistScene = false;
+            foreach (var scene in args.LoadedScenes)
             {
-                AssignmentData assignment = CreateAssignmentData();
-                NotebookManager.Instance.InitializeAssignment(assignment);
+                this.LogInfo($"Loaded Scene: {scene.name}");
+                if (scene.name == GetSceneName(lobbyScene))
+                    hasLoadedLobby = true;
+                else if (heistScenes.Any(heistScene => scene.name == GetSceneName(heistScene)))
+                    hasLoadedHeistScene = true;
+            }
 
-                if (args.LoadedScenes.Length > 0 && libraryScenes.Any(scene => GetSceneName(scene) == args.LoadedScenes[0].name))
-                {
-                    string loadedSceneName = args.LoadedScenes[0].name;
-                    Debug.Log($"[GameManager - SERVER] Library scene '{loadedSceneName}' loaded.");
-
-                    if (m_runeBookSpawnPointRandomizer != null)
-                    {
-                        // Placeholder spells for testing - replace with actual spells
-                        // from the assignment whenever gameplay flow is added
-                        SpellSO[] spellSOs = { Impero, Fireball };
-                        m_runeBookSpawnPointRandomizer.SpawnBooks(-1, spellSOs);
-                    }
-                }
-            } else
+            if (hasLoadedLobby)
             {
-                if (args.LoadedScenes.Length > 0 && libraryScenes.Any(scene => GetSceneName(scene) == args.LoadedScenes[0].name))
-                {
-                    string loadedSceneName = args.LoadedScenes[0].name;
-                    Debug.Log($"[GameManager - SERVER] Library scene '{loadedSceneName}' loaded.");
-
-                    if (m_runeBookSpawnPointRandomizer != null)
-                    {
-                        StartCoroutine(DestroySpawnPointsDelayed());
-                    }
-                }
+                HandleLobbyLoaded();
+            }
+            else if (hasLoadedHeistScene)
+            {
+                HandleHeistSceneLoaded();
             }
         }
 
-        private IEnumerator DestroySpawnPointsDelayed()
-        {
-            //Debug.Log($"[RuneBookSpawnPointRandomizer] Waiting {0.5f} seconds before destroying spawn points...");
-            yield return new WaitForSeconds(0.5f);
-
-            //Debug.Log("[RuneBookSpawnPointRandomizer] Destroying all RuneObjectSpawnPoints in the scene.");
-            RuneObjectSpawnPoint[] all = FindObjectsByType<RuneObjectSpawnPoint>(FindObjectsSortMode.None);
-            foreach (var s in all)
-            {
-                Destroy(s.gameObject);
-            }
-        }
-
-        [Server]
         public void StartHeist()
         {
-            int randomIndex = Random.Range(0, libraryScenes.Length);
-            string selectedSceneName = GetSceneName(libraryScenes[randomIndex]);
+            if (!IsServerInitialized) return;
+            int randomIndex = Random.Range(0, heistScenes.Length);
+            string selectedSceneName = GetSceneName(heistScenes[randomIndex]);
             SceneManagement.SceneManager.Instance.LoadScene(selectedSceneName, PlayerHandler.CharacterNetworkObjects);
+        }
 
+        public void EndHeist()
+        {
+            if (!IsServerInitialized) return;
+            SceneManagement.SceneManager.Instance.LoadScene(GetSceneName(lobbyScene), PlayerHandler.CharacterNetworkObjects);
+        }
+
+        private void HandleLobbyLoaded()
+        {
+            if (!IsServerInitialized) return;
+            if (CurrentAssignment == null)
+            {
+                GenerateNewAssignment();
+            }
+            else
+            {
+                // TODO: Check if all tasks are completed
+            }
+        }
+
+        private void HandleHeistSceneLoaded()
+        {
             m_heistTimer.ShowTimer();
-            m_heistTimer.StartTimer(m_heistTimer.defaultTime);
+            if (IsServerInitialized)
+            {
+                SpawnHeistRuneContainerObjects();
+                m_heistTimer.StartTimer(m_heistTimer.defaultTime);
+            }
+            else
+            {
+                DestroyRuneObjectSpawnPoints();
+            }
         }
 
-        /// <summary>
-        /// Creates assignment data with proper image IDs from the TaskImageDatabase.
-        /// </summary>
-        private AssignmentData CreateAssignmentData()
+        private void GenerateNewAssignment()
         {
-            if (taskImageDatabase == null)
+            CurrentAssignment = new AssignmentData
             {
-                Debug.LogError("[GameManager] Cannot create assignment - TaskImageDatabase is null!");
-                return null;
-            }
-
-            // Get available image IDs from the database
-            List<string> availableImageIds = taskImageDatabase.GetAllImageIds();
-
-            AssignmentData assignment = new AssignmentData
-            {
-                assignmentNumber = 1,
-                tasks = new List<AssignmentTask>()
+                assignmentNumber = CurrentAssignment != null ? CurrentAssignment.assignmentNumber + 1 : 0,
+                tasks = new List<int> { TaskDatabase.GetRandomIndex() }
             };
-
-            string imageId1 = GetRandomImageId(availableImageIds);
-            assignment.tasks.Add(new AssignmentTask
-            {
-                description = "Collect all the ancient runes scattered around the library.",
-                imageId = imageId1,
-                taskImage = taskImageDatabase.GetSprite(imageId1)
-            });
-
-            string imageId2 = GetRandomImageId(availableImageIds);
-            assignment.tasks.Add(new AssignmentTask
-            {
-                description = "Avoid the library guardians while collecting the runes.",
-                imageId = imageId2,
-                taskImage = taskImageDatabase.GetSprite(imageId2)
-            });
-
-            string imageId3 = GetRandomImageId(availableImageIds);
-            assignment.tasks.Add(new AssignmentTask
-            {
-                description = "Return to the entrance once all runes are collected.",
-                imageId = imageId3,
-                taskImage = taskImageDatabase.GetSprite(imageId3)
-            });
-
-            return assignment;
-        }
-
-        /// <summary>
-        /// Gets a random image ID from the available list.
-        /// </summary>
-        private string GetRandomImageId(List<string> availableIds)
-        {
-            if (availableIds.Count == 0)
-            {
-                Debug.LogError("[GameManager] No available image IDs!");
-                return "default";
-            }
-
-            return availableIds[Random.Range(0, availableIds.Count)];
+            NotebookManager.Instance.InitializeAssignment(CurrentAssignment);
         }
 
         private static string GetSceneName(string fullPath)

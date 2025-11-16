@@ -274,7 +274,6 @@ MonoBehaviour:
   _componentIndexCache: 255
   _addedNetworkObject: {fileID: 1097472411}
   _networkObjectCache: {fileID: 0}
-  taskImageDatabase: {fileID: 11400000, guid: 854fd49a1f67f214cb18633e649cb664, type: 2}
 --- !u!114 &1097472411
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -321,7 +320,7 @@ MonoBehaviour:
   <PrefabId>k__BackingField: 65535
   <SpawnableCollectionId>k__BackingField: 0
   <AssetPathHash>k__BackingField: 0
-  <SceneId>k__BackingField: 4268183035
+  <SceneId>k__BackingField: 4218933245
   SerializedTransformProperties:
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0, w: 0}
@@ -380,16 +379,8 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 51769672726437127, guid: 7140b76d12e111944af61aadcbdc70fa, type: 3}
-      propertyPath: Impero
-      value: 
-      objectReference: {fileID: 11400000, guid: 74d21139607205c4893af88737549570, type: 2}
-    - target: {fileID: 51769672726437127, guid: 7140b76d12e111944af61aadcbdc70fa, type: 3}
-      propertyPath: Fireball
-      value: 
-      objectReference: {fileID: 11400000, guid: 63e2e96185be7354bb00c0564c373325, type: 2}
-    - target: {fileID: 51769672726437127, guid: 7140b76d12e111944af61aadcbdc70fa, type: 3}
-      propertyPath: 'libraryScenes.Array.data[0]'
-      value: Assets/Scenes/Levels/Library_1.unity
+      propertyPath: heistScenes.Array.size
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 587817716233763778, guid: 7140b76d12e111944af61aadcbdc70fa, type: 3}
       propertyPath: m_LocalPosition.x
@@ -441,49 +432,13 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6655250134391753841, guid: 7140b76d12e111944af61aadcbdc70fa, type: 3}
       propertyPath: <SceneId>k__BackingField
-      value: 4201643513
+      value: 4268215807
       objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 567082837154667484, guid: 7140b76d12e111944af61aadcbdc70fa, type: 3}
+    m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 1343581432684982766, guid: 7140b76d12e111944af61aadcbdc70fa, type: 3}
-      insertIndex: 2
-      addedObject: {fileID: 1773707399}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7140b76d12e111944af61aadcbdc70fa, type: 3}
---- !u!1 &1773707397 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1343581432684982766, guid: 7140b76d12e111944af61aadcbdc70fa, type: 3}
-  m_PrefabInstance: {fileID: 1773707396}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1773707398 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 6655250134391753841, guid: 7140b76d12e111944af61aadcbdc70fa, type: 3}
-  m_PrefabInstance: {fileID: 1773707396}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1773707397}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 26b716c41e9b56b4baafaf13a523ba2e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: FishNet.Runtime::FishNet.Object.NetworkObject
---- !u!114 &1773707399
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1773707397}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 46b7142389421b04c9da3829ba71b556, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Gameplay.RuneBookSpawnPointRandomizer
-  _componentIndexCache: 255
-  _addedNetworkObject: {fileID: 1773707398}
-  _networkObjectCache: {fileID: 0}
-  defaultBooksToSpawn: 30
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

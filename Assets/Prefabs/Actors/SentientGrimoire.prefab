@@ -331,9 +331,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 99e126251eeef9a44981e710dd568cc8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Enemies.EnemyData
-  _componentIndexCache: 255
+  _componentIndexCache: 1
   _addedNetworkObject: {fileID: 4866373312013150636}
-  _networkObjectCache: {fileID: 0}
+  _networkObjectCache: {fileID: 4866373312013150636}
   m_enemyType: {fileID: 11400000, guid: 03d0c3d266dd0984b9d5449c2c8a14eb, type: 2}
 --- !u!114 &8735231212856205354
 MonoBehaviour:
@@ -347,9 +347,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 04fc5ee9a77b5374ea3513761396c31f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.EnemyDraggableCollision
-  _componentIndexCache: 255
+  _componentIndexCache: 2
   _addedNetworkObject: {fileID: 4866373312013150636}
-  _networkObjectCache: {fileID: 0}
+  _networkObjectCache: {fileID: 4866373312013150636}
   enemyData: {fileID: 3860053999190181839}
   baseDamage: 0
   damageForceThreshold: 50
@@ -376,6 +376,8 @@ MonoBehaviour:
   <PredictedOwner>k__BackingField: {fileID: 0}
   NetworkBehaviours:
   - {fileID: 237211371112094711}
+  - {fileID: 3860053999190181839}
+  - {fileID: 8735231212856205354}
   - {fileID: 2923893137017715159}
   - {fileID: 6459826222640076540}
   InitializedParentNetworkBehaviour: {fileID: 0}
@@ -423,7 +425,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2836e36774ca1c4bbbee976e17b649c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: FishNet.Runtime::FishNet.Component.Transforming.NetworkTransform
-  _componentIndexCache: 1
+  _componentIndexCache: 3
   _addedNetworkObject: {fileID: 4866373312013150636}
   _networkObjectCache: {fileID: 4866373312013150636}
   _componentConfiguration: 0
@@ -491,7 +493,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8cac635f24954048aad3a6ff9110beb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: FishNet.Runtime::FishNet.Component.Animating.NetworkAnimator
-  _componentIndexCache: 2
+  _componentIndexCache: 4
   _addedNetworkObject: {fileID: 4866373312013150636}
   _networkObjectCache: {fileID: 4866373312013150636}
   IgnoredParameters: []

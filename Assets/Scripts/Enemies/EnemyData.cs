@@ -1,9 +1,7 @@
-using UnityEngine;
-using RooseLabs.Gameplay;
-using System.Collections;
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
-using System;
+using RooseLabs.Gameplay;
+using UnityEngine;
 
 namespace RooseLabs.Enemies
 {

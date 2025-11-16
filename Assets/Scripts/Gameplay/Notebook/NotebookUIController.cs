@@ -213,15 +213,16 @@ namespace RooseLabs.Gameplay.Notebook
                 }
 
                 // Populate task descriptions
-                foreach (var task in assignmentData.tasks)
+                foreach (var taskId in assignmentData.tasks)
                 {
+                    var task = GameManager.Instance.TaskDatabase[taskId];
                     if (taskDescriptionPrefab != null)
                     {
                         GameObject taskObj = Instantiate(taskDescriptionPrefab, assignmentTasksContainer);
                         TMP_Text taskText = taskObj.GetComponentInChildren<TMP_Text>();
                         if (taskText != null)
                         {
-                            taskText.text = task.description;
+                            taskText.text = task.Description;
                         }
                     }
                 }
@@ -236,15 +237,16 @@ namespace RooseLabs.Gameplay.Notebook
                 }
 
                 // Populate task images
-                foreach (var task in assignmentData.tasks)
+                foreach (var taskId in assignmentData.tasks)
                 {
-                    if (task.taskImage != null)
+                    var task = GameManager.Instance.TaskDatabase[taskId];
+                    if (task.Image != null)
                     {
                         GameObject imageObj = new GameObject("TaskImage");
                         imageObj.transform.SetParent(assignmentTaskImagesContainer, false);
 
                         Image img = imageObj.AddComponent<Image>();
-                        img.sprite = task.taskImage;
+                        img.sprite = task.Image;
                         img.preserveAspect = true;
                     }
                 }

@@ -49,11 +49,13 @@ MonoBehaviour:
   _componentIndexCache: 255
   _addedNetworkObject: {fileID: 6655250134391753841}
   _networkObjectCache: {fileID: 0}
-  libraryScenes:
-  - Assets/Scenes/Levels/DevelopmentScene1.unity
+  lobbyScene: Assets/Scenes/Levels/Dormitory.unity
+  heistScenes:
+  - Assets/Scenes/Levels/Library_1.unity
+  - Assets/Scenes/Levels/Library_2.unity
   <RuneDatabase>k__BackingField: {fileID: 11400000, guid: 5e955f610ead9a946b30436dad306e3e, type: 2}
   <SpellDatabase>k__BackingField: {fileID: 11400000, guid: 9989f6ae5baf9cf40a61f0ef300f97fe, type: 2}
-  taskImageDatabase: {fileID: 11400000, guid: 854fd49a1f67f214cb18633e649cb664, type: 2}
+  <TaskDatabase>k__BackingField: {fileID: 11400000, guid: 3622dc21f1cf0be4783ca38e43c41d80, type: 2}
 --- !u!114 &6570541006987429080
 MonoBehaviour:
   m_ObjectHideFlags: 0

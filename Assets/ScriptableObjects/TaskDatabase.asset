@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c242a09a1e444eb2a9d98c7c33f7e06d, type: 3}
+  m_Name: TaskDatabase
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.ScriptableObjects.TaskDatabase
+  objects:
+  - <Description>k__BackingField: Discover the runes that make up the Fireball spell.
+    <Image>k__BackingField: {fileID: 21300000, guid: 60439f2d6685ac849b08c5d45ef6a80d, type: 3}
+    <CompletionCondition>k__BackingField:
+      rid: 4843676729035194832
+  references:
+    version: 2
+    RefIds:
+    - rid: 4843676729035194832
+      type: {class: CastSpellCondition, ns: RooseLabs.ScriptableObjects, asm: Assembly-CSharp}
+      data: {<Spell>k__BackingField: {fileID: 11400000, guid: 63e2e96185be7354bb00c0564c373325, type: 2}}

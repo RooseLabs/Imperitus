@@ -1,5 +1,6 @@
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
+using RooseLabs.Gameplay;
 using RooseLabs.UI;
 using UnityEngine;
 
@@ -27,15 +28,6 @@ namespace RooseLabs
         }
 
         public void ShowTimer()
-        {
-            if (IsServerInitialized)
-            {
-                ShowTimerRPC();
-            }
-        }
-
-        [ObserversRpc]
-        private void ShowTimerRPC()
         {
             GUIManager.Instance.SetTimerActive(true);
         }
@@ -112,8 +104,8 @@ namespace RooseLabs
         /// </summary>
         private void HandleTimerFinished()
         {
-            // TODO: Implement end-game logic here
             Debug.Log("Timer ran out!");
+            GameManager.Instance.EndHeist();
         }
     }
 }
