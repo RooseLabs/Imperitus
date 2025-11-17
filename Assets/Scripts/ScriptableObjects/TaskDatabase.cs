@@ -26,6 +26,8 @@ namespace RooseLabs.ScriptableObjects
 
         [field: SerializeReference][field: SubclassSelector]
         public CompletionCondition CompletionCondition { get; private set; }
+
+        public bool IsCompleted { get; set; } = false;
     }
 
     [CreateAssetMenu(fileName = "TaskDatabase", menuName = "Imperitus/Task Database")]

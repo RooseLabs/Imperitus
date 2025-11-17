@@ -1,5 +1,3 @@
-using System.Reflection;
-using GameKit.Dependencies.Utilities;
 using RooseLabs.ScriptableObjects;
 using UnityEditor;
 using UnityEditorInternal;
@@ -46,6 +44,18 @@ namespace RooseLabs.Editor
                 if (!CheckMatch(element, m_searchString)) return 0f;
                 return EditorGUI.GetPropertyHeight(element, true) + EditorGUIUtility.standardVerticalSpacing;
             };
+
+            m_list.onAddCallback = list =>
+            {
+                var prop = list.serializedProperty;
+                int newIndex = prop.arraySize;
+                prop.arraySize++;
+                list.index = newIndex;
+                var newElement = prop.GetArrayElementAtIndex(newIndex);
+                EditorUtils.FindProperty(newElement, "Description").stringValue = "";
+                EditorUtils.FindProperty(newElement, "Image").objectReferenceValue = null;
+                EditorUtils.FindProperty(newElement, "CompletionCondition").managedReferenceValue = null;
+            };
         }
 
         public override void OnInspectorGUI()
@@ -85,13 +95,13 @@ namespace RooseLabs.Editor
 
             string lowerSearch = search.ToLower();
 
-            SerializedProperty descProp = element.FindPropertyRelative("<Description>k__BackingField");
+            SerializedProperty descProp = EditorUtils.FindProperty(element, "Description");
             if (descProp is { propertyType: SerializedPropertyType.String } && descProp.stringValue.ToLower().Contains(lowerSearch))
             {
                 return true;
             }
 
-            SerializedProperty condProp = element.FindPropertyRelative("<CompletionCondition>k__BackingField");
+            SerializedProperty condProp = EditorUtils.FindProperty(element, "CompletionCondition");
             if (condProp == null || string.IsNullOrEmpty(condProp.managedReferenceFullTypename))
             {
                 return false;
@@ -99,7 +109,7 @@ namespace RooseLabs.Editor
 
             if (condProp.managedReferenceFullTypename.EndsWith("CastSpellCondition"))
             {
-                SerializedProperty spellProp = condProp.FindPropertyRelative("<Spell>k__BackingField");
+                SerializedProperty spellProp = EditorUtils.FindProperty(condProp, "Spell");
                 if (spellProp is { objectReferenceValue: SpellSO spell })
                 {
                     if (spell.Name.ToLower().Contains(lowerSearch) || spell.EnglishName.ToLower().Contains(lowerSearch))

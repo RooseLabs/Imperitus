@@ -198,6 +198,11 @@ namespace RooseLabs.Gameplay.Spells
                 IsCasting = false;
                 m_castProgress = 0f;
             }
+
+            if (successfulCast)
+            {
+                GameManager.Instance.OnSpellCast(SpellInfo);
+            }
         }
 
         /// <summary>

@@ -17,9 +17,18 @@ MonoBehaviour:
     <Image>k__BackingField: {fileID: 21300000, guid: 60439f2d6685ac849b08c5d45ef6a80d, type: 3}
     <CompletionCondition>k__BackingField:
       rid: 4843676729035194832
+  - <Description>k__BackingField: Discover the runes that make up the Waterball spell.
+    <Image>k__BackingField: {fileID: 21300000, guid: 4f9b3087b431e8044ac77cac7053f318, type: 3}
+    <CompletionCondition>k__BackingField:
+      rid: 4843676773740445796
   references:
     version: 2
     RefIds:
     - rid: 4843676729035194832
       type: {class: CastSpellCondition, ns: RooseLabs.ScriptableObjects, asm: Assembly-CSharp}
-      data: {<Spell>k__BackingField: {fileID: 11400000, guid: 63e2e96185be7354bb00c0564c373325, type: 2}}
+      data:
+        <Spell>k__BackingField: {fileID: 11400000, guid: 63e2e96185be7354bb00c0564c373325, type: 2}
+    - rid: 4843676773740445796
+      type: {class: CastSpellCondition, ns: RooseLabs.ScriptableObjects, asm: Assembly-CSharp}
+      data:
+        <Spell>k__BackingField: {fileID: 11400000, guid: 5395674b563c12a4ca763b5eec6e5d3a, type: 2}

@@ -18,15 +18,15 @@ namespace RooseLabs.Editor
 
             // Create sorted indices array based on logger names
             int[] sortedIndices = Enumerable.Range(0, loggersProp.arraySize)
-                .OrderBy(i => FindPropertyField(loggersProp.GetArrayElementAtIndex(i), "Name").stringValue)
+                .OrderBy(i => EditorUtils.FindProperty(loggersProp.GetArrayElementAtIndex(i), "Name").stringValue)
                 .ToArray();
 
             // Use sorted indices to display loggers
             foreach (int i in sortedIndices)
             {
                 SerializedProperty logger = loggersProp.GetArrayElementAtIndex(i);
-                SerializedProperty nameProp = FindPropertyField(logger, "Name");
-                SerializedProperty enabledProp = FindPropertyField(logger, "Enabled");
+                SerializedProperty nameProp = EditorUtils.FindProperty(logger, "Name");
+                SerializedProperty enabledProp = EditorUtils.FindProperty(logger, "Enabled");
 
                 EditorGUILayout.BeginVertical(EditorStyles.helpBox);
                 EditorGUILayout.BeginHorizontal(GUILayout.ExpandWidth(true));
@@ -45,7 +45,7 @@ namespace RooseLabs.Editor
                 for (int i = 0; i < loggersProp.arraySize; i++)
                 {
                     SerializedProperty logger = loggersProp.GetArrayElementAtIndex(i);
-                    SerializedProperty enabledProp = FindPropertyField(logger, "Enabled");
+                    SerializedProperty enabledProp = EditorUtils.FindProperty(logger, "Enabled");
                     enabledProp.boolValue = true;
                 }
             }
@@ -55,18 +55,13 @@ namespace RooseLabs.Editor
                 for (int i = 0; i < loggersProp.arraySize; i++)
                 {
                     SerializedProperty logger = loggersProp.GetArrayElementAtIndex(i);
-                    SerializedProperty enabledProp = FindPropertyField(logger, "Enabled");
+                    SerializedProperty enabledProp = EditorUtils.FindProperty(logger, "Enabled");
                     enabledProp.boolValue = false;
                 }
             }
             EditorGUILayout.EndHorizontal();
 
             serializedObject.ApplyModifiedProperties();
-        }
-
-        private static SerializedProperty FindPropertyField(SerializedProperty rootProp, string propName)
-        {
-            return rootProp.FindPropertyRelative($"<{propName}>k__BackingField");
         }
     }
 }

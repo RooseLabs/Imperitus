@@ -39,6 +39,9 @@ namespace RooseLabs.Network
         public static PlayerConnection GetPlayer(NetworkConnection conn) => Players.GetValueOrDefault(conn);
         public static PlayerCharacter GetCharacter(NetworkConnection conn) => Characters.GetValueOrDefault(conn);
 
+        public static IEnumerable<PlayerConnection> AllPlayers => Players.Values;
+        public static IEnumerable<PlayerCharacter> AllCharacters => Characters.Values;
+
         public static NetworkObject[] CharacterNetworkObjects
         {
             get

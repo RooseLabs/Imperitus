@@ -102,38 +102,43 @@ namespace RooseLabs.SceneManagement
 
         private void SceneManager_OnLoadEnd(SceneLoadEndEventArgs obj)
         {
-            bool currentOnlineSceneLoaded = false;
             bool startingOnlineSceneLoaded = false;
             bool gameplayManagersSceneLoaded = false;
             foreach (Scene s in obj.LoadedScenes)
             {
-                if (s.name == m_currentlyLoadedOnlineScene)
-                    currentOnlineSceneLoaded = true;
+                Logger.Info($"Scene loaded: {s.name}");
+                if (s.name == GetSceneName(gameplayManagersScene))
+                {
+                    gameplayManagersSceneLoaded = true;
+                    continue;
+                }
                 if (s.name == GetSceneName(startingOnlineScene))
                     startingOnlineSceneLoaded = true;
-                if (s.name == GetSceneName(gameplayManagersScene))
-                    gameplayManagersSceneLoaded = true;
+                m_currentlyLoadedOnlineScene = s.name;
             }
 
             if (startingOnlineSceneLoaded)
             {
-                m_currentlyLoadedOnlineScene = GetSceneName(startingOnlineScene);
                 UnloadOfflineScene();
             }
             else if (gameplayManagersSceneLoaded)
             {
                 LoadStartingOnlineScene();
             }
-            else if (currentOnlineSceneLoaded && !string.IsNullOrEmpty(m_pendingUnloadAfterLoad))
+
+            if (!string.IsNullOrEmpty(m_pendingUnloadAfterLoad))
             {
+                Logger.Info($"Unloading pending scene '{m_pendingUnloadAfterLoad}'.");
                 Scene pendingScene = UnitySceneManager.GetSceneByName(m_pendingUnloadAfterLoad);
                 if (pendingScene.IsValid())
                 {
+                    Logger.Info("Previous scene is valid, unloading.");
                     SceneUnloadData sud = new(pendingScene);
                     m_networkManager.SceneManager.UnloadGlobalScenes(sud);
                 }
                 else
                 {
+                    Logger.Warning("Previous scene is invalid.");
                     m_pendingUnloadAfterLoad = string.Empty;
                 }
             }
@@ -205,12 +210,14 @@ namespace RooseLabs.SceneManagement
                 return;
             }
 
+            Logger.Info($"Loading scene '{sceneName}'.");
+
             Scene previousScene = UnitySceneManager.GetSceneByName(m_currentlyLoadedOnlineScene);
             if (previousScene.IsValid())
             {
+                Logger.Info($"Scheduling previous scene '{m_currentlyLoadedOnlineScene}' for unload after new scene is loaded.");
                 m_pendingUnloadAfterLoad = m_currentlyLoadedOnlineScene;
             }
-            m_currentlyLoadedOnlineScene = sceneName;
 
             SceneLoadData sld = new(sceneName);
             sld.ReplaceScenes = ReplaceOption.None;

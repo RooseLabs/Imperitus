@@ -341,10 +341,10 @@ namespace RooseLabs.Player
             m_character.Data.IsRagdollActive = false;
         }
 
-        private void ToggleRagdoll(bool enable)
+        public void ToggleRagdoll(bool enable)
         {
             SetRagdollPhysicsActive(enable);
-            m_rigidbody.isKinematic = enable;
+            m_rigidbody.isKinematic = !IsOwner;
             m_collider.enabled = !enable;
             Animator.enabled = !enable;
         }

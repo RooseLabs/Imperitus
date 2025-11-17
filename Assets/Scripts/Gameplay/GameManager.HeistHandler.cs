@@ -1,14 +1,86 @@
-using RooseLabs.ScriptableObjects;
 using System.Collections.Generic;
 using System.Linq;
+using FishNet.Object;
 using FishNet.Utility.Performance;
-using UnityEngine;
+using RooseLabs.Network;
+using RooseLabs.ScriptableObjects;
 using RooseLabs.Utils;
+using UnityEngine;
 
 namespace RooseLabs.Gameplay
 {
     public partial class GameManager
     {
+        private bool m_hasEnteredLibrary = false;
+        private bool m_isEndingHeist = false;
+
+        private void HandleHeistSceneLoaded()
+        {
+            m_hasEnteredLibrary = false;
+            m_heistTimer.ToggleTimerVisibility(true);
+            if (IsServerInitialized)
+            {
+                SpawnHeistRuneContainerObjects();
+                m_heistTimer.StartTimer(m_heistTimer.defaultTime);
+            }
+            else
+            {
+                DestroyRuneObjectSpawnPoints();
+            }
+        }
+
+        /// <summary>
+        /// Called when exiting the lobby to start a heist. Loads a random heist scene.
+        /// </summary>
+        public void StartHeist()
+        {
+            if (!IsServerInitialized) return;
+            int randomIndex = Random.Range(0, heistScenes.Length);
+            string selectedSceneName = GetSceneName(heistScenes[randomIndex]);
+            SceneManagement.SceneManager.Instance.LoadScene(selectedSceneName, PlayerHandler.CharacterNetworkObjects);
+            m_isEndingHeist = false;
+        }
+
+        /// <summary>
+        /// Called to end the heist and return to the lobby.
+        /// </summary>
+        /// <param name="successful">If true, the heist was completed successfully; otherwise, it failed.</param>
+        public void EndHeist(bool successful)
+        {
+            m_heistTimer.ToggleTimerVisibility(false);
+            if (!IsServerInitialized) return;
+            if (m_isEndingHeist) return;
+            m_isEndingHeist = true;
+            m_heistTimer.PauseTimer();
+            SceneManagement.SceneManager.Instance.LoadScene(GetSceneName(lobbyScene), PlayerHandler.CharacterNetworkObjects);
+            if (!successful)
+            {
+                m_aboutToLearnSpells.Clear();
+                // Mark all tasks as incomplete
+                foreach (var taskId in CurrentAssignment.tasks)
+                {
+                    var task = TaskDatabase[taskId];
+                    task.IsCompleted = false;
+                }
+            }
+            else
+            {
+                foreach (var spell in m_aboutToLearnSpells)
+                {
+                    int spellIndex = SpellDatabase.IndexOf(spell);
+                    if (!LearnedSpellsIndices.Contains(spellIndex))
+                    {
+                        LearnedSpellsIndices.Add(spellIndex);
+                    }
+                }
+                m_aboutToLearnSpells.Clear();
+            }
+            foreach (var player in PlayerHandler.AllCharacters)
+            {
+                player.OnReturnToLobby_TargetRPC(player.Owner);
+            }
+        }
+
         private void SpawnHeistRuneContainerObjects()
         {
             // Get required runes for current assignment
@@ -45,7 +117,7 @@ namespace RooseLabs.Gameplay
             // Spawn additional books with 10% chance
             for (int i = spawnedCount; i < allSpawnPoints.Length; ++i)
             {
-                if (Random.Range(0f, 1f) <= 0.1f)
+                if (Random.value <= 0.1f)
                     SpawnRuneContainerObjectAtPoint(allSpawnPoints[i]);
                 Destroy(allSpawnPoints[i].gameObject);
             }
@@ -94,6 +166,21 @@ namespace RooseLabs.Gameplay
             {
                 Destroy(s.gameObject);
             }
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        public void NotifyEnteredLibrary()
+        {
+            if (m_hasEnteredLibrary) return;
+            m_hasEnteredLibrary = true;
+            this.LogInfo("Player has entered the library for the first time in this heist.");
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        public void NotifyReturnToLobby()
+        {
+            if (!m_hasEnteredLibrary) return;
+            EndHeist(true);
         }
     }
 }

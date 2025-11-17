@@ -27,9 +27,9 @@ namespace RooseLabs
             syncTimer.OnChange -= OnTimerChanged;
         }
 
-        public void ShowTimer()
+        public void ToggleTimerVisibility(bool visible)
         {
-            GUIManager.Instance.SetTimerActive(true);
+            GUIManager.Instance.SetTimerActive(visible);
         }
 
         /// <summary>
@@ -105,7 +105,7 @@ namespace RooseLabs
         private void HandleTimerFinished()
         {
             Debug.Log("Timer ran out!");
-            GameManager.Instance.EndHeist();
+            GameManager.Instance.EndHeist(false);
         }
     }
 }

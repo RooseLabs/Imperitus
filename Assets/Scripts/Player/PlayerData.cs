@@ -1,9 +1,10 @@
+using FishNet.Object;
 using UnityEngine;
 
 namespace RooseLabs.Player
 {
     [DefaultExecutionOrder(1)]
-    public class PlayerData : MonoBehaviour
+    public class PlayerData : NetworkBehaviour
     {
         private float m_maxHealth = 100f;
         private float m_health = 100f;
@@ -112,6 +113,56 @@ namespace RooseLabs.Player
 
         public bool StateChangedThisFrame { get; private set; }
         public bool SpeedChangedThisFrame { get; private set; }
+
+        [System.Serializable]
+        private struct CharacterSyncDataPayload
+        {
+            public float health;
+            public float stamina;
+            public bool isDead;
+        }
+
+        public override void OnStartNetwork()
+        {
+            if (!Owner.IsLocalClient) return;
+            NetworkManager.TimeManager.OnTick += SyncCharacterData;
+        }
+
+        public override void OnStopNetwork()
+        {
+            if (!Owner.IsLocalClient) return;
+            NetworkManager.TimeManager.OnTick -= SyncCharacterData;
+        }
+
+        private void SyncCharacterData()
+        {
+            var syncData = new CharacterSyncDataPayload
+            {
+                health = Health,
+                stamina = Stamina,
+                isDead = isDead
+            };
+            if (IsServerInitialized)
+            {
+                SyncCharacterData_ObserversRPC(syncData);
+            }
+            else
+            {
+                SyncCharacterData_ServerRPC(syncData);
+            }
+        }
+
+        [ServerRpc(RequireOwnership = true)]
+        private void SyncCharacterData_ServerRPC(CharacterSyncDataPayload data)
+        {
+            SyncCharacterData_ObserversRPC(data);
+        }
+
+        [ObserversRpc(ExcludeOwner = true)]
+        private void SyncCharacterData_ObserversRPC(CharacterSyncDataPayload data)
+        {
+            isDead = data.isDead;
+        }
 
         private void LateUpdate()
         {

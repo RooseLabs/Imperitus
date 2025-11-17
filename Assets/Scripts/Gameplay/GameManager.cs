@@ -4,13 +4,12 @@ using System.Linq;
 using FishNet;
 using FishNet.Managing.Scened;
 using FishNet.Object;
+using FishNet.Object.Synchronizing;
 using GameKit.Dependencies.Utilities.Types;
 using RooseLabs.Gameplay.Notebook;
-using RooseLabs.Network;
 using RooseLabs.ScriptableObjects;
 using RooseLabs.Utils;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 namespace RooseLabs.Gameplay
 {
@@ -26,6 +25,13 @@ namespace RooseLabs.Gameplay
         [field: SerializeField] public SpellDatabase SpellDatabase { get; private set; }
         [field: SerializeField] public TaskDatabase TaskDatabase { get; private set; }
         #endregion
+
+        public readonly SyncList<int> LearnedSpellsIndices = new();
+
+        /// <summary>
+        /// The spells that will be learned permanently should the player escape the heist successfully.
+        /// </summary>
+        private readonly HashSet<SpellSO> m_aboutToLearnSpells = new();
 
         private HeistTimer m_heistTimer;
 
@@ -75,20 +81,6 @@ namespace RooseLabs.Gameplay
             }
         }
 
-        public void StartHeist()
-        {
-            if (!IsServerInitialized) return;
-            int randomIndex = Random.Range(0, heistScenes.Length);
-            string selectedSceneName = GetSceneName(heistScenes[randomIndex]);
-            SceneManagement.SceneManager.Instance.LoadScene(selectedSceneName, PlayerHandler.CharacterNetworkObjects);
-        }
-
-        public void EndHeist()
-        {
-            if (!IsServerInitialized) return;
-            SceneManagement.SceneManager.Instance.LoadScene(GetSceneName(lobbyScene), PlayerHandler.CharacterNetworkObjects);
-        }
-
         private void HandleLobbyLoaded()
         {
             if (!IsServerInitialized) return;
@@ -98,21 +90,21 @@ namespace RooseLabs.Gameplay
             }
             else
             {
-                // TODO: Check if all tasks are completed
-            }
-        }
-
-        private void HandleHeistSceneLoaded()
-        {
-            m_heistTimer.ShowTimer();
-            if (IsServerInitialized)
-            {
-                SpawnHeistRuneContainerObjects();
-                m_heistTimer.StartTimer(m_heistTimer.defaultTime);
-            }
-            else
-            {
-                DestroyRuneObjectSpawnPoints();
+                // If all tasks are complete, generate new assignment.
+                bool allComplete = true;
+                foreach (var taskId in CurrentAssignment.tasks)
+                {
+                    var task = TaskDatabase[taskId];
+                    if (!task.IsCompleted)
+                    {
+                        allComplete = false;
+                        break;
+                    }
+                }
+                if (allComplete)
+                {
+                    GenerateNewAssignment();
+                }
             }
         }
 
@@ -121,9 +113,28 @@ namespace RooseLabs.Gameplay
             CurrentAssignment = new AssignmentData
             {
                 assignmentNumber = CurrentAssignment != null ? CurrentAssignment.assignmentNumber + 1 : 0,
-                tasks = new List<int> { TaskDatabase.GetRandomIndex() }
+                tasks = new List<int> { TaskDatabase.GetRandomIndex(t => !t.IsCompleted) }
             };
             NotebookManager.Instance.InitializeAssignment(CurrentAssignment);
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        public void OnSpellCast(SpellSO spell)
+        {
+            foreach (var taskId in CurrentAssignment.tasks)
+            {
+                var task = TaskDatabase[taskId];
+                if (task.IsCompleted) continue;
+                if (task.CompletionCondition is CastSpellCondition csc)
+                {
+                    if (csc.Spell == spell)
+                    {
+                        // Task is complete. Add spell to about to learn list.
+                        m_aboutToLearnSpells.Add(spell);
+                        task.IsCompleted = true;
+                    }
+                }
+            }
         }
 
         private static string GetSceneName(string fullPath)

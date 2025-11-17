@@ -153,19 +153,16 @@ namespace RooseLabs.Gameplay.Notebook
         /// </summary>
         public void InitializeSpellLoadout()
         {
-            // TODO: Replace this with actual data later... for now we just give the player some spells
             m_spellLoadout.equippedSpellIndices.Clear();
 
-            // Example: Player brings the first 3 learned spells
-            if (GameManager.Instance != null && GameManager.Instance.SpellDatabase.Count > 0)
+            if (GameManager.Instance != null && GameManager.Instance.LearnedSpellsIndices.Count > 0)
             {
-                int spellCount = Mathf.Min(3, GameManager.Instance.SpellDatabase.Count);
-                for (int i = 0; i < spellCount; i++)
+                foreach (int spellIndex in GameManager.Instance.LearnedSpellsIndices)
                 {
-                    m_spellLoadout.equippedSpellIndices.Add(i);
+                    m_spellLoadout.equippedSpellIndices.Add(spellIndex);
                 }
 
-                Logger.Info($"Initialized with {spellCount} spells for local player");
+                Logger.Info($"Initialized with {m_spellLoadout.equippedSpellIndices.Count} learned spells");
             }
         }
 

@@ -154,24 +154,39 @@ namespace RooseLabs.Player
         {
             if (Data.Health <= 0) return false;
 
-            //Data.Health -= damage.Amount;
+            Data.Health -= damage.Amount;
 
             if (Data.Health <= 0)
             {
-                Debug.Log($"Player '{Player.PlayerName}' died!");
-                SpawnNotebook_ServerRPC();
-                Ragdoll.TriggerRagdoll(Vector3.back * 500f, Ragdoll.HipsBone.position, false);
+                this.LogInfo($"Player '{Player.PlayerName}' died!");
+                HandlePlayerDeath_ServerRPC();
             }
 
             return true;
         }
 
         [ServerRpc(RequireOwnership = false)]
-        public void SpawnNotebook_ServerRPC()
+        private void HandlePlayerDeath_ServerRPC()
         {
+            // Spawn dropped notebook
             GameObject droppedNotebook = Instantiate(droppedNotebokPrefab, transform.position + Vector3.up * 1.0f, Quaternion.identity);
             Spawn(droppedNotebook, null, gameObject.scene);
             droppedNotebook.GetComponent<DroppedNotebook>().Initialize(Notebook);
+
+            // Trigger ragdoll
+            Ragdoll.TriggerRagdoll(Vector3.back * 500f, Ragdoll.HipsBone.position, false);
+        }
+
+        [TargetRpc]
+        public void OnReturnToLobby_TargetRPC(NetworkConnection _)
+        {
+            Data.Health = Data.MaxHealth;
+            Data.Stamina = Data.MaxStamina;
+            if (Data.isDead)
+            {
+                Data.isDead = false;
+                Ragdoll.ToggleRagdoll(false);
+            }
         }
 
         #region Utils
