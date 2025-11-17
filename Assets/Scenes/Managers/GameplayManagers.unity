@@ -426,6 +426,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: GameManager
       objectReference: {fileID: 0}
+    - target: {fileID: 6570541006987429080, guid: 7140b76d12e111944af61aadcbdc70fa, type: 3}
+      propertyPath: defaultTime
+      value: 500
+      objectReference: {fileID: 0}
     - target: {fileID: 6655250134391753841, guid: 7140b76d12e111944af61aadcbdc70fa, type: 3}
       propertyPath: WasActiveDuringEdit
       value: 1

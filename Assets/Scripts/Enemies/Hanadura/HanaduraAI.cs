@@ -111,7 +111,7 @@ namespace RooseLabs.Enemies
 
         private void Start()
         {
-            animator = GetComponent<Animator>();
+            animator = GetComponentInChildren<Animator>();
             weaponCollider = GetComponentInChildren<WeaponCollider>();
             enemyData = GetComponent<EnemyData>();
             rb = GetComponent<Rigidbody>();

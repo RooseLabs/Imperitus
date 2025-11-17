@@ -20,7 +20,6 @@ GameObject:
   - component: {fileID: 2753149022113849445}
   - component: {fileID: 912312794422129550}
   - component: {fileID: 6208631941009141882}
-  - component: {fileID: 6587192327317228320}
   m_Layer: 14
   m_Name: Hanadura
   m_TagString: Untagged
@@ -359,34 +358,12 @@ MonoBehaviour:
   _addedNetworkObject: {fileID: 8806621658639097980}
   _networkObjectCache: {fileID: 8806621658639097980}
   IgnoredParameters: []
-  _animator: {fileID: 6587192327317228320}
+  _animator: {fileID: 0}
   _synchronizeWhenDisabled: 0
   _smoothFloats: 1
   _interpolation: 2
   _clientAuthoritative: 1
   _sendToOwner: 0
---- !u!95 &6587192327317228320
-Animator:
-  serializedVersion: 7
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3774049500881470253}
-  m_Enabled: 1
-  m_Avatar: {fileID: 9000000, guid: 40a8f7565f3902043897dd549a7663b9, type: 3}
-  m_Controller: {fileID: 9100000, guid: 716216096869c7046b04ca227edeb8aa, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &5795615496227046880
 GameObject:
   m_ObjectHideFlags: 0

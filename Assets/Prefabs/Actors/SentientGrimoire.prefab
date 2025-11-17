@@ -352,9 +352,9 @@ MonoBehaviour:
   _networkObjectCache: {fileID: 4866373312013150636}
   enemyData: {fileID: 3860053999190181839}
   baseDamage: 0
-  damageForceThreshold: 50
+  damageForceThreshold: 25
   forceToTamageMultiplier: 2
-  minimumDamageVelocity: 2.5
+  minimumDamageVelocity: 1.5
   damageCooldownDuration: 1
 --- !u!114 &4866373312013150636
 MonoBehaviour:
