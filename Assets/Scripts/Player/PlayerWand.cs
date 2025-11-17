@@ -4,15 +4,13 @@ using RooseLabs.Core;
 using RooseLabs.Gameplay;
 using RooseLabs.Gameplay.Spells;
 using RooseLabs.ScriptableObjects;
+using RooseLabs.Utils;
 using UnityEngine;
-using Logger = RooseLabs.Core.Logger;
 
 namespace RooseLabs.Player
 {
     public class PlayerWand : NetworkBehaviour
     {
-        private static Logger Logger => Logger.GetLogger("PlayerWand");
-
         #region Serialized
         [SerializeField] private PlayerCharacter character;
         [SerializeField] private SpellDatabase spellDatabase;
@@ -30,8 +28,13 @@ namespace RooseLabs.Player
 
         private SpellBase m_currentSpellInstance;
         private bool m_currentSpellInstanceDirty = true; // Start dirty to ensure initial setup
+        private bool m_isLastAvailableSpellTemporary = false;
+        private RuneSO[] m_temporarySpellRunes;
 
-        private readonly List<int> m_availableSpells = new() { 0, 2, 1 };
+        /// <summary>
+        /// List of SpellBase prefabs that the player can currently use.
+        /// </summary>
+        private readonly List<SpellBase> m_availableSpells = new();
 
         private int m_currentSpellIndex = 0;
         private int CurrentSpellIndex
@@ -45,9 +48,24 @@ namespace RooseLabs.Player
                 if (previousValue != m_currentSpellIndex)
                 {
                     m_currentSpellInstanceDirty = true;
-                    Logger.Info($"[PlayerWand] Switched to spell index {m_currentSpellIndex} (Spell ID: {m_availableSpells[m_currentSpellIndex]})");
+                    this.LogInfo($"Switched to spell index {m_currentSpellIndex} (Spell: {m_availableSpells[m_currentSpellIndex].SpellInfo.EnglishName})");
                 }
             }
+        }
+
+        public override void OnStartNetwork()
+        {
+            if (!Owner.IsLocalClient) return;
+            character.Notebook.OnToggledRuneObjectsChanged += OnRuneSelectionChanged;
+
+            m_availableSpells.Clear();
+            m_availableSpells.Add(GameManager.Instance.SpellDatabase[0]); // 0 = Impero (default spell)
+        }
+
+        public override void OnStopNetwork()
+        {
+            if (!IsOwner) return;
+            character.Notebook.OnToggledRuneObjectsChanged -= OnRuneSelectionChanged;
         }
 
         private void Update()
@@ -126,21 +144,32 @@ namespace RooseLabs.Player
                 m_currentSpellInstance.Destroy();
                 m_currentSpellInstance = null;
             }
-            int spellID = m_availableSpells[m_currentSpellIndex];
-            SpellBase spellPrefab = spellDatabase[spellID];
+            SpellBase spellPrefab = m_availableSpells[m_currentSpellIndex];
             if (spellPrefab)
             {
                 m_currentSpellInstance = SpellBase.Instantiate(spellPrefab);
-                Logger.Info($"[PlayerWand] Instantiated spell ID {spellID} ({spellPrefab.name})");
+                this.LogInfo($"Instantiated spell '{spellPrefab.name}'");
             }
             else
             {
-                Logger.Warning($"[PlayerWand] Spell ID {spellID} not found in database.");
+                this.LogError($"Spell at index {m_currentSpellIndex} is null!");
             }
             if (m_currentSpellInstance)
-                SetOrbitingRunes(m_currentSpellInstance.SpellInfo.Runes);
+            {
+                if (CurrentSpellIndex == m_availableSpells.Count - 1 && m_isLastAvailableSpellTemporary)
+                {
+                    // Current spell is temporary, set the orbiting runes to the temporary runes (selected by the player in the notebook)
+                    SetOrbitingRunes(m_temporarySpellRunes);
+                }
+                else
+                {
+                    SetOrbitingRunes(m_currentSpellInstance.SpellInfo.Runes);
+                }
+            }
             else
+            {
                 ClearOrbitingRunes();
+            }
             m_currentSpellInstanceDirty = false;
         }
 
@@ -154,6 +183,66 @@ namespace RooseLabs.Player
             if (!PlayerCharacter.LocalCharacter) return;
             orbitingRunesContainer.rotation = Quaternion.LookRotation(
                 orbitingRunesContainer.position - PlayerCharacter.LocalCharacter.Camera.transform.position);
+        }
+
+        private void OnRuneSelectionChanged(List<RuneSO> selectedRunes)
+        {
+            if (!IsOwner) return;
+            if (selectedRunes.Count == 0 && m_isLastAvailableSpellTemporary)
+            {
+                // Remove the temporary spell if no runes are selected
+                m_availableSpells.RemoveAt(m_availableSpells.Count - 1);
+                m_isLastAvailableSpellTemporary = false;
+                this.LogInfo("Removed temporary spell due to no runes being selected.");
+                return;
+            }
+            int spellIndexToSwitchTo;
+            var spell = GameManager.Instance.SpellDatabase.GetSpellWithMatchingRunes(selectedRunes);
+            if (spell)
+            {
+                if (!m_availableSpells.Contains(spell))
+                {
+                    m_availableSpells.Add(spell);
+                    spellIndexToSwitchTo = m_availableSpells.Count - 1;
+                    m_isLastAvailableSpellTemporary = true;
+                    m_temporarySpellRunes = selectedRunes.ToArray();
+                    this.LogInfo($"Added temporary spell '{spell.SpellInfo.EnglishName}' to available spells.");
+                }
+                else
+                {
+                    // Found existing spell, switch to it and remove temporary spell if it exists
+                    spellIndexToSwitchTo = m_availableSpells.IndexOf(spell);
+                    if (m_isLastAvailableSpellTemporary)
+                    {
+                        m_availableSpells.RemoveAt(m_availableSpells.Count - 1);
+                        this.LogInfo("Removed temporary spell from available spells due to selecting an existing spell.");
+                    }
+                    m_isLastAvailableSpellTemporary = false;
+                    m_temporarySpellRunes = null;
+                }
+            }
+            else
+            {
+                if (!m_isLastAvailableSpellTemporary)
+                {
+                    var failedSpell = GameManager.Instance.SpellDatabase[1]; // 1 = Failed Spell
+                    m_availableSpells.Add(failedSpell);
+                    m_isLastAvailableSpellTemporary = true;
+                    this.LogInfo("Added 'Nothing' spell (Failed Spell) to available spells.");
+                }
+                m_temporarySpellRunes = selectedRunes.ToArray();
+                spellIndexToSwitchTo = m_availableSpells.Count - 1;
+            }
+            CurrentSpellIndex = spellIndexToSwitchTo;
+            if (m_currentSpellInstanceDirty)
+            {
+                UpdateCurrentSpellInstance();
+            }
+            else if (m_isLastAvailableSpellTemporary && CurrentSpellIndex == m_availableSpells.Count - 1)
+            {
+                // Update orbiting runes if the current spell is already the temporary spell
+                SetOrbitingRunes(m_temporarySpellRunes);
+            }
         }
 
         // TODO: We probably also want to prevent using the wand when there's no active heist.
@@ -191,6 +280,8 @@ namespace RooseLabs.Player
         {
             // Clear existing runes
             ClearOrbitingRunes();
+
+            if (runes == null || runes.Length == 0) return;
 
             // Instantiate new runes
             foreach (var rune in runes)
