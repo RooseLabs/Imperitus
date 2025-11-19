@@ -11,18 +11,16 @@ using UnityEngine;
 
 namespace RooseLabs.Gameplay.Interactables
 {
-    public class DroppedNotebook : Item
+    public class DroppedNotebook : NetworkBehaviour, IInteractable
     {
         [SerializeField] GameObject notebookVisual;
         private PlayerNotebook deadPlayerNotebook;
-        private PlayerConnection deadPlayerConnection;
 
         private readonly SyncList<int> syncedRuneIndices = new SyncList<int>();
         private List<RuneSO> availableRunes = new List<RuneSO>();
 
         private void Awake()
         {
-            base.Awake();
             syncedRuneIndices.OnChange += OnSyncedRuneIndicesChanged;
         }
 
@@ -90,24 +88,33 @@ namespace RooseLabs.Gameplay.Interactables
             }
         }
 
-        public override void OnPickupEnd()
+        public string GetInteractionText() => "Get Runes";
+
+        public bool IsInteractable(PlayerCharacter interactor)
+        {
+            // The dropped notebook is interactable if there is at least one rune available
+            return availableRunes.Count > 0;
+        }
+
+        public void Interact(PlayerCharacter interactor)
         {
             // Check if notebook contains any rune the player is missing
             // If a valid rune is found, add it to the player's notebook collection
             // After updating the player's notebook, remove the rune(s) from the dropped notebook rune list
 
+            if (!IsInteractable(interactor))
+                return;
+
             for (int i = availableRunes.Count - 1; i >= 0; i--)
             {
                 var rune = availableRunes[i];
-                if (!HolderCharacter.Notebook.HasRune(rune))
+                if (!interactor.Notebook.HasRune(rune))
                 {
-                    HolderCharacter.Notebook.AddRune(rune);
+                    interactor.Notebook.AddRune(rune);
                     availableRunes.RemoveAt(i);
-                    Debug.Log($"{HolderCharacter.name} picked up rune {rune.Name} from dropped notebook.");
+                    Debug.Log($"{interactor.Player.PlayerName} picked up rune {rune.Name} from dropped notebook.");
                 }
             }
         }
-
-        public override string GetInteractionText() => "Get Runes";
     }
 }

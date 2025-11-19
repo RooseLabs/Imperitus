@@ -22,6 +22,7 @@ GameObject:
   - component: {fileID: 3030200440481046367}
   - component: {fileID: 1687837743367512938}
   - component: {fileID: 668080569384609683}
+  - component: {fileID: 8153533842583981225}
   m_Layer: 11
   m_Name: NormalChair
   m_TagString: Untagged
@@ -384,3 +385,19 @@ MonoBehaviour:
   _addedNetworkObject: {fileID: 3030200440481046367}
   _networkObjectCache: {fileID: 0}
   _allowTakeOwnership: 1
+--- !u!208 &8153533842583981225
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7025719902179816423}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.00001, y: 0.66, z: 0.00001}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 0
+  m_Center: {x: 0, y: 0.66, z: 0.041}
+  m_TimeToStationary: 0.5

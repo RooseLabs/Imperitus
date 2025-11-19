@@ -18,6 +18,7 @@ GameObject:
   - component: {fileID: 4292649201613096106}
   - component: {fileID: 5571619973382862551}
   - component: {fileID: 4009390388133462810}
+  - component: {fileID: 7032045738778952911}
   m_Layer: 11
   m_Name: DoorLeft_Prefab
   m_TagString: Untagged
@@ -319,6 +320,22 @@ MonoBehaviour:
   positionSpringStrength: 1
   rotationSpringStrength: 1
   dampingFactor: 0.8
+--- !u!208 &7032045738778952911
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2564243508404271667}
+  m_Enabled: 0
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.68200004, y: 1.4810001, z: 0.105000004}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 0
+  m_Center: {x: 0.68200004, y: 1.4810001, z: -0.013}
+  m_TimeToStationary: 0.5
 --- !u!1 &4682063195481342977
 GameObject:
   m_ObjectHideFlags: 0
@@ -328,6 +345,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4822887728888421206}
+  - component: {fileID: 1534607340471994226}
   m_Layer: 0
   m_Name: DoubleDoors
   m_TagString: Untagged
@@ -352,6 +370,26 @@ Transform:
   - {fileID: 5476672486186733909}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1534607340471994226
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4682063195481342977}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e3fdca004f2d45fe8abbed571a8abd5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.AI.Navigation::Unity.AI.Navigation.NavMeshModifier
+  m_SerializedVersion: 0
+  m_OverrideArea: 0
+  m_Area: 0
+  m_OverrideGenerateLinks: 0
+  m_GenerateLinks: 0
+  m_IgnoreFromBuild: 1
+  m_ApplyToChildren: 1
+  m_AffectedAgents: ffffffff
 --- !u!1 &7310659469645037114
 GameObject:
   m_ObjectHideFlags: 0
@@ -370,6 +408,7 @@ GameObject:
   - component: {fileID: 6582071187457085070}
   - component: {fileID: 3920859219981319481}
   - component: {fileID: 5132140405066379798}
+  - component: {fileID: 6669198228568988616}
   m_Layer: 11
   m_Name: DoorRight_Prefab
   m_TagString: Untagged
@@ -671,3 +710,19 @@ MonoBehaviour:
   positionSpringStrength: 1
   rotationSpringStrength: 1
   dampingFactor: 0.8
+--- !u!208 &6669198228568988616
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7310659469645037114}
+  m_Enabled: 0
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.68200004, y: 1.4810001, z: 0.105000004}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 0
+  m_Center: {x: -0.68100005, y: 1.4810001, z: -0.013}
+  m_TimeToStationary: 0.5

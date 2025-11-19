@@ -41,7 +41,6 @@ namespace RooseLabs.Player
         public PlayerAnimations Animations { get; private set; }
         public PlayerRagdoll Ragdoll { get; private set; }
         public PlayerNotebook Notebook { get; private set; }
-        public DroppedNotebook DroppedNotebook { get; private set; }
 
         private Rigidbody m_rigidbody;
         #endregion
@@ -58,7 +57,6 @@ namespace RooseLabs.Player
             Animations = GetComponent<PlayerAnimations>();
             Ragdoll = GetComponent<PlayerRagdoll>();
             Notebook = GetComponentInChildren<PlayerNotebook>();
-            DroppedNotebook = GetComponentInChildren<DroppedNotebook>();
 
             m_rigidbody = GetComponent<Rigidbody>();
         }

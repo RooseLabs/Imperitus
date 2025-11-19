@@ -2093,7 +2093,7 @@ MonoBehaviour:
   - {fileID: 3230726080438718335}
   - {fileID: 7358083918770435597}
   <RaycastTarget>k__BackingField: {fileID: 4398373416247838343}
-  <droppedNotebokPrefab>k__BackingField: {fileID: 1662366430101928264, guid: 419e7f5b3d6c00741857b3b06fe8af7c, type: 3}
+  <droppedNotebokPrefab>k__BackingField: {fileID: 3228943848150757951, guid: 4bc14a557ea0a1c4f8efc1cf374dfd2d, type: 3}
 --- !u!114 &2194619057779025337
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2150,6 +2150,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b553be8b7a44a7a4f80de3445f1aeef2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Player.PlayerData
+  _componentIndexCache: 255
+  _addedNetworkObject: {fileID: 7652611172026813195}
+  _networkObjectCache: {fileID: 0}
   isAiming: 0
   isCasting: 0
   lookValues: {x: 0, y: 0}

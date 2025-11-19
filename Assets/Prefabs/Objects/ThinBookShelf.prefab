@@ -25,6 +25,7 @@ GameObject:
   - component: {fileID: 8878228992218115064}
   - component: {fileID: 9151725814419496386}
   - component: {fileID: 3468950005285167101}
+  - component: {fileID: 1116010356697115907}
   m_Layer: 0
   m_Name: ThinBookShelf
   m_TagString: Untagged
@@ -405,6 +406,26 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.10248947, y: 4.6100388, z: 0.71912885}
   m_Center: {x: -1.1867049, y: 2.93501, z: 0.026435673}
+--- !u!114 &1116010356697115907
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3246156217024663637}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e3fdca004f2d45fe8abbed571a8abd5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.AI.Navigation::Unity.AI.Navigation.NavMeshModifier
+  m_SerializedVersion: 0
+  m_OverrideArea: 1
+  m_Area: 1
+  m_OverrideGenerateLinks: 0
+  m_GenerateLinks: 0
+  m_IgnoreFromBuild: 0
+  m_ApplyToChildren: 1
+  m_AffectedAgents: ffffffff
 --- !u!1001 &200302981376666952
 PrefabInstance:
   m_ObjectHideFlags: 0

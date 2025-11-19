@@ -29,6 +29,7 @@ GameObject:
   - component: {fileID: 6499772291943613421}
   - component: {fileID: 7724297204710371689}
   - component: {fileID: 7142397962732450965}
+  - component: {fileID: 9183404652454585805}
   m_Layer: 0
   m_Name: DuoLargeBookShelf
   m_TagString: Untagged
@@ -499,6 +500,26 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 4.73, y: 0.8328347, z: 0.09598866}
   m_Center: {x: 0.000005722046, y: 4.8245354, z: -0.00002437085}
+--- !u!114 &9183404652454585805
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1543937444807711989}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e3fdca004f2d45fe8abbed571a8abd5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.AI.Navigation::Unity.AI.Navigation.NavMeshModifier
+  m_SerializedVersion: 0
+  m_OverrideArea: 1
+  m_Area: 1
+  m_OverrideGenerateLinks: 0
+  m_GenerateLinks: 0
+  m_IgnoreFromBuild: 0
+  m_ApplyToChildren: 1
+  m_AffectedAgents: ffffffff
 --- !u!1001 &1366233551072926756
 PrefabInstance:
   m_ObjectHideFlags: 0

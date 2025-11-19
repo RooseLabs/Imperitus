@@ -1731,6 +1731,7 @@ GameObject:
   - component: {fileID: 162364012}
   - component: {fileID: 162364011}
   - component: {fileID: 162364010}
+  - component: {fileID: 162364013}
   m_Layer: 0
   m_Name: CeilingSmallRoom2
   m_TagString: Untagged
@@ -1830,6 +1831,26 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 162364008}
   m_Mesh: {fileID: 3406223096902599908, guid: 1a6833422b7471641912289f008d8a06, type: 3}
+--- !u!114 &162364013
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 162364008}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e3fdca004f2d45fe8abbed571a8abd5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.AI.Navigation::Unity.AI.Navigation.NavMeshModifier
+  m_SerializedVersion: 0
+  m_OverrideArea: 1
+  m_Area: 1
+  m_OverrideGenerateLinks: 0
+  m_GenerateLinks: 0
+  m_IgnoreFromBuild: 0
+  m_ApplyToChildren: 1
+  m_AffectedAgents: ffffffff
 --- !u!1001 &170955508
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2427,6 +2448,7 @@ GameObject:
   - component: {fileID: 212959611}
   - component: {fileID: 212959610}
   - component: {fileID: 212959609}
+  - component: {fileID: 212959612}
   m_Layer: 0
   m_Name: CeilingSmallRoom
   m_TagString: Untagged
@@ -2526,6 +2548,26 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 212959607}
   m_Mesh: {fileID: -8930253032909799365, guid: 1a6833422b7471641912289f008d8a06, type: 3}
+--- !u!114 &212959612
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 212959607}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e3fdca004f2d45fe8abbed571a8abd5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.AI.Navigation::Unity.AI.Navigation.NavMeshModifier
+  m_SerializedVersion: 0
+  m_OverrideArea: 1
+  m_Area: 1
+  m_OverrideGenerateLinks: 0
+  m_GenerateLinks: 0
+  m_IgnoreFromBuild: 0
+  m_ApplyToChildren: 1
+  m_AffectedAgents: ffffffff
 --- !u!1001 &213475801
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2718,6 +2760,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Doors (14)
       objectReference: {fileID: 0}
+    - target: {fileID: 4682063195481342977, guid: 9611a326ae4865542b4d101d430e376f, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4822887728888421206, guid: 9611a326ae4865542b4d101d430e376f, type: 3}
       propertyPath: m_LocalPosition.x
       value: -30.99211
@@ -2765,6 +2811,22 @@ PrefabInstance:
     - target: {fileID: 5103575641134234343, guid: 9611a326ae4865542b4d101d430e376f, type: 3}
       propertyPath: <SceneId>k__BackingField
       value: 3183259109
+      objectReference: {fileID: 0}
+    - target: {fileID: 5354748222646516985, guid: 9611a326ae4865542b4d101d430e376f, type: 3}
+      propertyPath: m_Extents.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5354748222646516985, guid: 9611a326ae4865542b4d101d430e376f, type: 3}
+      propertyPath: m_Extents.z
+      value: 0.00001
+      objectReference: {fileID: 0}
+    - target: {fileID: 5354748222646516985, guid: 9611a326ae4865542b4d101d430e376f, type: 3}
+      propertyPath: m_CarveOnlyStationary
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7310659469645037114, guid: 9611a326ae4865542b4d101d430e376f, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -3118,6 +3180,7 @@ GameObject:
   - component: {fileID: 284808476}
   - component: {fileID: 284808475}
   - component: {fileID: 284808474}
+  - component: {fileID: 284808477}
   m_Layer: 0
   m_Name: EntranceCorridorCeiling
   m_TagString: Untagged
@@ -3217,6 +3280,26 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 284808472}
   m_Mesh: {fileID: -9068814056162935660, guid: 1a6833422b7471641912289f008d8a06, type: 3}
+--- !u!114 &284808477
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 284808472}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e3fdca004f2d45fe8abbed571a8abd5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.AI.Navigation::Unity.AI.Navigation.NavMeshModifier
+  m_SerializedVersion: 0
+  m_OverrideArea: 1
+  m_Area: 1
+  m_OverrideGenerateLinks: 0
+  m_GenerateLinks: 0
+  m_IgnoreFromBuild: 0
+  m_ApplyToChildren: 1
+  m_AffectedAgents: ffffffff
 --- !u!1001 &285487704
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4096,6 +4179,7 @@ GameObject:
   - component: {fileID: 353023301}
   - component: {fileID: 353023300}
   - component: {fileID: 353023299}
+  - component: {fileID: 353023302}
   m_Layer: 0
   m_Name: CeilingMedRoom
   m_TagString: Untagged
@@ -4195,6 +4279,26 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 353023297}
   m_Mesh: {fileID: -927085455975494292, guid: 1a6833422b7471641912289f008d8a06, type: 3}
+--- !u!114 &353023302
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 353023297}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e3fdca004f2d45fe8abbed571a8abd5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.AI.Navigation::Unity.AI.Navigation.NavMeshModifier
+  m_SerializedVersion: 0
+  m_OverrideArea: 1
+  m_Area: 1
+  m_OverrideGenerateLinks: 0
+  m_GenerateLinks: 0
+  m_IgnoreFromBuild: 0
+  m_ApplyToChildren: 1
+  m_AffectedAgents: ffffffff
 --- !u!1001 &370556956
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4937,6 +5041,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Doors (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 4682063195481342977, guid: 9611a326ae4865542b4d101d430e376f, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4822887728888421206, guid: 9611a326ae4865542b4d101d430e376f, type: 3}
       propertyPath: m_LocalPosition.x
       value: -26.733696
@@ -5561,6 +5669,7 @@ GameObject:
   - component: {fileID: 472924750}
   - component: {fileID: 472924749}
   - component: {fileID: 472924748}
+  - component: {fileID: 472924751}
   m_Layer: 0
   m_Name: CeilingMedRoom.2
   m_TagString: Untagged
@@ -5660,6 +5769,26 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 472924746}
   m_Mesh: {fileID: 9050933013368148718, guid: 1a6833422b7471641912289f008d8a06, type: 3}
+--- !u!114 &472924751
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 472924746}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e3fdca004f2d45fe8abbed571a8abd5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.AI.Navigation::Unity.AI.Navigation.NavMeshModifier
+  m_SerializedVersion: 0
+  m_OverrideArea: 1
+  m_Area: 1
+  m_OverrideGenerateLinks: 0
+  m_GenerateLinks: 0
+  m_IgnoreFromBuild: 0
+  m_ApplyToChildren: 1
+  m_AffectedAgents: ffffffff
 --- !u!1001 &481780390
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8463,6 +8592,10 @@ PrefabInstance:
       propertyPath: patrolRoute
       value: 
       objectReference: {fileID: 841143749}
+    - target: {fileID: 3200562120539995110, guid: 57090dfd109dc2642a434deb8b456572, type: 3}
+      propertyPath: m_BaseOffset
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3679536469295908050, guid: 57090dfd109dc2642a434deb8b456572, type: 3}
       propertyPath: m_LocalPosition.x
       value: 1.1914387
@@ -8506,6 +8639,10 @@ PrefabInstance:
     - target: {fileID: 3774049500881470253, guid: 57090dfd109dc2642a434deb8b456572, type: 3}
       propertyPath: m_Name
       value: Hanadura1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3774049500881470253, guid: 57090dfd109dc2642a434deb8b456572, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8806621658639097980, guid: 57090dfd109dc2642a434deb8b456572, type: 3}
       propertyPath: WasActiveDuringEdit
@@ -10158,6 +10295,7 @@ GameObject:
   - component: {fileID: 922772450}
   - component: {fileID: 922772449}
   - component: {fileID: 922772448}
+  - component: {fileID: 922772451}
   m_Layer: 0
   m_Name: CeilingMedRoom3
   m_TagString: Untagged
@@ -10257,6 +10395,26 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 922772446}
   m_Mesh: {fileID: 1201711120377657960, guid: 1a6833422b7471641912289f008d8a06, type: 3}
+--- !u!114 &922772451
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 922772446}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e3fdca004f2d45fe8abbed571a8abd5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.AI.Navigation::Unity.AI.Navigation.NavMeshModifier
+  m_SerializedVersion: 0
+  m_OverrideArea: 1
+  m_Area: 1
+  m_OverrideGenerateLinks: 0
+  m_GenerateLinks: 0
+  m_IgnoreFromBuild: 0
+  m_ApplyToChildren: 1
+  m_AffectedAgents: ffffffff
 --- !u!1001 &928197295
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -14413,6 +14571,7 @@ GameObject:
   - component: {fileID: 1306371983}
   - component: {fileID: 1306371982}
   - component: {fileID: 1306371981}
+  - component: {fileID: 1306371984}
   m_Layer: 0
   m_Name: CeilingEntrance
   m_TagString: Untagged
@@ -14512,6 +14671,26 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1306371979}
   m_Mesh: {fileID: -4104890639362770161, guid: 1a6833422b7471641912289f008d8a06, type: 3}
+--- !u!114 &1306371984
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1306371979}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e3fdca004f2d45fe8abbed571a8abd5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.AI.Navigation::Unity.AI.Navigation.NavMeshModifier
+  m_SerializedVersion: 0
+  m_OverrideArea: 1
+  m_Area: 1
+  m_OverrideGenerateLinks: 0
+  m_GenerateLinks: 0
+  m_IgnoreFromBuild: 0
+  m_ApplyToChildren: 1
+  m_AffectedAgents: ffffffff
 --- !u!1 &1308562889
 GameObject:
   m_ObjectHideFlags: 0
@@ -15024,6 +15203,7 @@ GameObject:
   - component: {fileID: 1386481499}
   - component: {fileID: 1386481498}
   - component: {fileID: 1386481497}
+  - component: {fileID: 1386481500}
   m_Layer: 0
   m_Name: CeilingSmallRoom3
   m_TagString: Untagged
@@ -15123,6 +15303,26 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1386481495}
   m_Mesh: {fileID: -5018851569589028247, guid: 1a6833422b7471641912289f008d8a06, type: 3}
+--- !u!114 &1386481500
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1386481495}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e3fdca004f2d45fe8abbed571a8abd5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.AI.Navigation::Unity.AI.Navigation.NavMeshModifier
+  m_SerializedVersion: 0
+  m_OverrideArea: 1
+  m_Area: 1
+  m_OverrideGenerateLinks: 0
+  m_GenerateLinks: 0
+  m_IgnoreFromBuild: 0
+  m_ApplyToChildren: 1
+  m_AffectedAgents: ffffffff
 --- !u!1001 &1402386797
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -15436,6 +15636,14 @@ PrefabInstance:
       propertyPath: patrolRoute
       value: 
       objectReference: {fileID: 1503819957}
+    - target: {fileID: 3200562120539995110, guid: 57090dfd109dc2642a434deb8b456572, type: 3}
+      propertyPath: m_AgentTypeID
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3200562120539995110, guid: 57090dfd109dc2642a434deb8b456572, type: 3}
+      propertyPath: m_WalkableMask
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3679536469295908050, guid: 57090dfd109dc2642a434deb8b456572, type: 3}
       propertyPath: m_LocalPosition.x
       value: 10.511412
@@ -16813,6 +17021,10 @@ PrefabInstance:
       propertyPath: m_NavMeshData
       value: 
       objectReference: {fileID: 23800000, guid: 0cc9074353769f841bd255cbc213edb3, type: 2}
+    - target: {fileID: 5940453641392170277, guid: 110566241b3e52240b9a61dcde43652d, type: 3}
+      propertyPath: m_LayerMask.m_Bits
+      value: 10369
+      objectReference: {fileID: 0}
     - target: {fileID: 6414868621126683790, guid: 110566241b3e52240b9a61dcde43652d, type: 3}
       propertyPath: m_LocalPosition.x
       value: -21.76469
@@ -17425,6 +17637,7 @@ GameObject:
   - component: {fileID: 1547767642}
   - component: {fileID: 1547767641}
   - component: {fileID: 1547767640}
+  - component: {fileID: 1547767643}
   m_Layer: 0
   m_Name: BigCorridorCeiling2
   m_TagString: Untagged
@@ -17524,6 +17737,26 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1547767638}
   m_Mesh: {fileID: 7299462384167980659, guid: 1a6833422b7471641912289f008d8a06, type: 3}
+--- !u!114 &1547767643
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1547767638}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e3fdca004f2d45fe8abbed571a8abd5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.AI.Navigation::Unity.AI.Navigation.NavMeshModifier
+  m_SerializedVersion: 0
+  m_OverrideArea: 1
+  m_Area: 1
+  m_OverrideGenerateLinks: 0
+  m_GenerateLinks: 0
+  m_IgnoreFromBuild: 0
+  m_ApplyToChildren: 1
+  m_AffectedAgents: ffffffff
 --- !u!1 &1551259763
 GameObject:
   m_ObjectHideFlags: 0
@@ -18288,6 +18521,7 @@ GameObject:
   - component: {fileID: 1597800903}
   - component: {fileID: 1597800902}
   - component: {fileID: 1597800901}
+  - component: {fileID: 1597800904}
   m_Layer: 0
   m_Name: MedCorridorCeiling
   m_TagString: Untagged
@@ -18387,6 +18621,26 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1597800899}
   m_Mesh: {fileID: -4179102402943766258, guid: 1a6833422b7471641912289f008d8a06, type: 3}
+--- !u!114 &1597800904
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1597800899}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e3fdca004f2d45fe8abbed571a8abd5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.AI.Navigation::Unity.AI.Navigation.NavMeshModifier
+  m_SerializedVersion: 0
+  m_OverrideArea: 1
+  m_Area: 1
+  m_OverrideGenerateLinks: 0
+  m_GenerateLinks: 0
+  m_IgnoreFromBuild: 0
+  m_ApplyToChildren: 1
+  m_AffectedAgents: ffffffff
 --- !u!1001 &1603092544
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -20690,6 +20944,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: NormalChair (10)
       objectReference: {fileID: 0}
+    - target: {fileID: 7025719902179816423, guid: ec1edaa25f010de4bb2d0d98d8639172, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7695402350451730781, guid: ec1edaa25f010de4bb2d0d98d8639172, type: 3}
       propertyPath: m_LocalPosition.x
       value: -30.272251
@@ -20700,7 +20958,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7695402350451730781, guid: ec1edaa25f010de4bb2d0d98d8639172, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -115.79941
+      value: -115.89
       objectReference: {fileID: 0}
     - target: {fileID: 7695402350451730781, guid: ec1edaa25f010de4bb2d0d98d8639172, type: 3}
       propertyPath: m_LocalRotation.w
@@ -20729,6 +20987,18 @@ PrefabInstance:
     - target: {fileID: 7695402350451730781, guid: ec1edaa25f010de4bb2d0d98d8639172, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8153533842583981225, guid: ec1edaa25f010de4bb2d0d98d8639172, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8153533842583981225, guid: ec1edaa25f010de4bb2d0d98d8639172, type: 3}
+      propertyPath: m_Extents.x
+      value: 0.00001
+      objectReference: {fileID: 0}
+    - target: {fileID: 8153533842583981225, guid: ec1edaa25f010de4bb2d0d98d8639172, type: 3}
+      propertyPath: m_Extents.z
+      value: 0.00001
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -21434,6 +21704,7 @@ GameObject:
   - component: {fileID: 1878110407}
   - component: {fileID: 1878110406}
   - component: {fileID: 1878110405}
+  - component: {fileID: 1878110408}
   m_Layer: 0
   m_Name: CeilingMainRoom
   m_TagString: Untagged
@@ -21533,6 +21804,26 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1878110403}
   m_Mesh: {fileID: 8173075773538276256, guid: 1a6833422b7471641912289f008d8a06, type: 3}
+--- !u!114 &1878110408
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1878110403}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e3fdca004f2d45fe8abbed571a8abd5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.AI.Navigation::Unity.AI.Navigation.NavMeshModifier
+  m_SerializedVersion: 0
+  m_OverrideArea: 1
+  m_Area: 1
+  m_OverrideGenerateLinks: 0
+  m_GenerateLinks: 0
+  m_IgnoreFromBuild: 0
+  m_ApplyToChildren: 1
+  m_AffectedAgents: ffffffff
 --- !u!1 &1878624376
 GameObject:
   m_ObjectHideFlags: 0
@@ -23209,6 +23500,7 @@ GameObject:
   - component: {fileID: 2053331252}
   - component: {fileID: 2053331251}
   - component: {fileID: 2053331250}
+  - component: {fileID: 2053331253}
   m_Layer: 0
   m_Name: CeilingBasement
   m_TagString: Untagged
@@ -23309,6 +23601,26 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2053331248}
   m_Mesh: {fileID: -8788667974402190594, guid: 1a6833422b7471641912289f008d8a06, type: 3}
+--- !u!114 &2053331253
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2053331248}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e3fdca004f2d45fe8abbed571a8abd5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.AI.Navigation::Unity.AI.Navigation.NavMeshModifier
+  m_SerializedVersion: 0
+  m_OverrideArea: 1
+  m_Area: 1
+  m_OverrideGenerateLinks: 0
+  m_GenerateLinks: 0
+  m_IgnoreFromBuild: 0
+  m_ApplyToChildren: 1
+  m_AffectedAgents: ffffffff
 --- !u!1001 &2058172539
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -23767,6 +24079,10 @@ PrefabInstance:
       propertyPath: m_NavMeshData
       value: 
       objectReference: {fileID: 23800000, guid: c90dd7a55fbbab94ea9817ce7854236f, type: 2}
+    - target: {fileID: 5859014967402355504, guid: d0ab904e22b48a94fab7dc864cf4444a, type: 3}
+      propertyPath: m_BuildHeightMesh
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8786696429341981050, guid: d0ab904e22b48a94fab7dc864cf4444a, type: 3}
       propertyPath: m_LocalPosition.x
       value: -21.76469
