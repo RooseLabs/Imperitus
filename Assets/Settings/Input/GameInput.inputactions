@@ -176,15 +176,6 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
-                },
-                {
-                    "name": "GetRune",
-                    "type": "Button",
-                    "id": "94e1dfc1-665b-406f-85ca-ac1ed8d63fd4",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -724,17 +715,6 @@
                     "processors": "",
                     "groups": ";Gamepad",
                     "action": "ScrollForward",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "477bb050-c4f6-4082-9dda-7227321e507f",
-                    "path": "<Keyboard>/r",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": ";Keyboard&Mouse",
-                    "action": "GetRune",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

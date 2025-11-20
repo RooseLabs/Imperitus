@@ -28,11 +28,6 @@ namespace RooseLabs.Gameplay
 
         public readonly SyncList<int> LearnedSpellsIndices = new();
 
-        /// <summary>
-        /// The spells that will be learned permanently should the player escape the heist successfully.
-        /// </summary>
-        private readonly HashSet<SpellSO> m_aboutToLearnSpells = new();
-
         private HeistTimer m_heistTimer;
 
         public AssignmentData CurrentAssignment { get; private set; }
@@ -40,7 +35,7 @@ namespace RooseLabs.Gameplay
         private void Awake()
         {
             Instance = this;
-            m_heistTimer = GetComponent<HeistTimer>();
+            TryGetComponent(out m_heistTimer);
         }
 
         private void OnDestroy()
@@ -83,6 +78,7 @@ namespace RooseLabs.Gameplay
 
         private void HandleLobbyLoaded()
         {
+            m_heistTimer.ToggleTimerVisibility(false);
             if (!IsServerInitialized) return;
             if (CurrentAssignment == null)
             {
@@ -112,7 +108,7 @@ namespace RooseLabs.Gameplay
         {
             CurrentAssignment = new AssignmentData
             {
-                assignmentNumber = CurrentAssignment != null ? CurrentAssignment.assignmentNumber + 1 : 0,
+                assignmentNumber = CurrentAssignment != null ? CurrentAssignment.assignmentNumber + 1 : 1,
                 tasks = new List<int> { TaskDatabase.GetRandomIndex(t => !t.IsCompleted) }
             };
             NotebookManager.Instance.InitializeAssignment(CurrentAssignment);
@@ -129,8 +125,6 @@ namespace RooseLabs.Gameplay
                 {
                     if (csc.Spell == spell)
                     {
-                        // Task is complete. Add spell to about to learn list.
-                        m_aboutToLearnSpells.Add(spell);
                         task.IsCompleted = true;
                     }
                 }

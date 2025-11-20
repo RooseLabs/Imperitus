@@ -25,7 +25,6 @@ namespace RooseLabs.Player
         private InputAction m_actionPushToTalk;
         private InputAction m_actionOpenNotebook;
         private InputAction m_actionCloseNotebook;
-        private InputAction m_actionGetRune;
         private InputAction m_actionOpenCustomizationMenu;
         private InputAction m_actionCloseCustomizationMenu;
 
@@ -58,7 +57,6 @@ namespace RooseLabs.Player
         public bool pushToTalkIsPressed;
         public bool openNotebookWasPressed;
         public bool closeNotebookWasPressed;
-        public bool getRuneWasPressed;
         public bool OpenCustomizationMenu;
         public bool CloseCustomizationMenu;
 
@@ -85,7 +83,6 @@ namespace RooseLabs.Player
             m_actionPushToTalk = gameplayActionMap.FindAction("PushToTalk");
             m_actionOpenNotebook = gameplayActionMap.FindAction("OpenNotebook");
             m_actionCloseNotebook = uiActionMap.FindAction("CloseNotebook");
-            m_actionGetRune = gameplayActionMap.FindAction("GetRune");
             m_actionOpenCustomizationMenu = gameplayActionMap.FindAction("OpenCustomizationMenu");
             m_actionCloseCustomizationMenu = uiActionMap.FindAction("CloseCustomizationMenu");
         }
@@ -122,7 +119,6 @@ namespace RooseLabs.Player
             pushToTalkIsPressed = m_actionPushToTalk.IsPressed();
             openNotebookWasPressed = m_actionOpenNotebook.WasPressedThisFrame();
             closeNotebookWasPressed = m_actionCloseNotebook.WasPressedThisFrame();
-            getRuneWasPressed = m_actionGetRune.WasPressedThisFrame();
             OpenCustomizationMenu = m_actionOpenCustomizationMenu.WasPressedThisFrame();
             CloseCustomizationMenu = m_actionCloseCustomizationMenu.WasPressedThisFrame();
         }
@@ -158,7 +154,6 @@ namespace RooseLabs.Player
             pushToTalkIsPressed = false;
             openNotebookWasPressed = false;
             closeNotebookWasPressed = false;
-            getRuneWasPressed = false;
             OpenCustomizationMenu = false;
             CloseCustomizationMenu = false;
         }

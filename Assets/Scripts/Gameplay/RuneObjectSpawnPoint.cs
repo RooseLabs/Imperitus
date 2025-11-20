@@ -18,11 +18,11 @@ namespace RooseLabs.Gameplay
         [Tooltip("Mode for filtering the runes that can be spawned at this spawn point.\n\n" +
                  "<b>Any</b>: Any rune from the database can be spawned.\n" +
                  "<b>Blacklist</b>: All runes from the database except the specified ones can be spawned.\n" +
-                 "<b>Whitelist</b>: Only the specified runes can be spawned.")]
+                 "<b>Whitelist</b>: Only the specified runes can be spawned, given they also exist in the database.")]
         [SerializeField] private Mode mode;
         [SerializeField] private RuneSO[] runes = Array.Empty<RuneSO>();
 
-        public IEnumerable<RuneSO> GetPossibleRunes()
+        public IReadOnlyList<RuneSO> GetPossibleRunes()
         {
             if (!GameManager.Instance || !GameManager.Instance.RuneDatabase)
             {

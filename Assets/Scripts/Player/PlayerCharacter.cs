@@ -106,11 +106,6 @@ namespace RooseLabs.Player
             if (!IsOwner) return;
             Input.Sample();
 
-            if (Input.getRuneWasPressed)
-            {
-                Notebook.AddRandomUncollectedRune();
-            }
-
             UpdateVariables();
         }
 
@@ -156,20 +151,40 @@ namespace RooseLabs.Player
         public bool ApplyDamage(DamageInfo damage)
         {
             if (Data.Health <= 0) return false;
-
-            Data.Health -= damage.Amount;
-
-            if (Data.Health <= 0)
+            if (IsServerInitialized)
             {
-                this.LogInfo($"Player '{Player.PlayerName}' died!");
-                HandlePlayerDeath_ServerRPC();
+                ApplyDamage_ObserversRPC(damage);
             }
-
+            else
+            {
+                ApplyDamage_ServerRPC(damage);
+            }
             return true;
         }
 
         [ServerRpc(RequireOwnership = false)]
-        private void HandlePlayerDeath_ServerRPC()
+        private void ApplyDamage_ServerRPC(DamageInfo damage)
+        {
+            ApplyDamage_ObserversRPC(damage);
+        }
+
+        [ObserversRpc]
+        private void ApplyDamage_ObserversRPC(DamageInfo damage)
+        {
+            Data.Health -= damage.Amount;
+            if (Data.Health <= 0)
+            {
+                Data.isDead = true;
+                if (IsServerInitialized)
+                {
+                    HandlePlayerDeath();
+                }
+                this.LogInfo($"Player '{Player.PlayerName}' died!");
+            }
+        }
+
+        [Server]
+        private void HandlePlayerDeath()
         {
             // Spawn dropped notebook
             GameObject droppedNotebook = Instantiate(droppedNotebookPrefab, transform.position + Vector3.up * 1.0f, Quaternion.identity);
@@ -180,15 +195,38 @@ namespace RooseLabs.Player
             Ragdoll.TriggerRagdoll(Vector3.back * 500f, Ragdoll.HipsBone.position, false);
         }
 
-        [TargetRpc]
-        public void OnReturnToLobby_TargetRPC(NetworkConnection _)
+        public void ResetState()
+        {
+            if (IsServerInitialized)
+            {
+                ResetState_ObserversRPC();
+            }
+            else
+            {
+                ResetState_ServerRPC();
+            }
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        private void ResetState_ServerRPC()
+        {
+            ResetState_ObserversRPC();
+        }
+
+        [ObserversRpc]
+        private void ResetState_ObserversRPC()
         {
             Data.Health = Data.MaxHealth;
             Data.Stamina = Data.MaxStamina;
             if (Data.isDead)
             {
-                Data.isDead = false;
                 Ragdoll.ToggleRagdoll(false);
+                Data.IsRagdollActive = false;
+                Data.isDead = false;
+            }
+            if (IsOwner)
+            {
+                CameraController.Instance.ResetPosition();
             }
         }
 

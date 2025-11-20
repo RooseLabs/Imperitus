@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using FishNet.Object;
-using FishNet.Utility.Performance;
 using RooseLabs.Network;
 using RooseLabs.ScriptableObjects;
 using RooseLabs.Utils;
@@ -11,17 +10,22 @@ namespace RooseLabs.Gameplay
 {
     public partial class GameManager
     {
-        private bool m_hasEnteredLibrary = false;
+        private const float HeistMaxTime = 30f * 60f; // 30 minutes (base time)
+        private const float HeistMinTime = 15f * 60f; // 15 minutes (minimum time)
+        private const float HeistTimeReductionPerAdditionalPlayer = 5f * 60f; // Less 5 minutes per additional player
+
         private bool m_isEndingHeist = false;
 
         private void HandleHeistSceneLoaded()
         {
-            m_hasEnteredLibrary = false;
             m_heistTimer.ToggleTimerVisibility(true);
             if (IsServerInitialized)
             {
                 SpawnHeistRuneContainerObjects();
-                m_heistTimer.StartTimer(m_heistTimer.defaultTime);
+                // Determine time limit based on number of players
+                float timeLimit = HeistMaxTime - (PlayerHandler.AllCharacters.Count - 1) * HeistTimeReductionPerAdditionalPlayer;
+                timeLimit = Mathf.Clamp(timeLimit, HeistMinTime, HeistMaxTime);
+                m_heistTimer.StartTimer(timeLimit);
             }
             else
             {
@@ -47,15 +51,12 @@ namespace RooseLabs.Gameplay
         /// <param name="successful">If true, the heist was completed successfully; otherwise, it failed.</param>
         public void EndHeist(bool successful)
         {
-            m_heistTimer.ToggleTimerVisibility(false);
             if (!IsServerInitialized) return;
             if (m_isEndingHeist) return;
             m_isEndingHeist = true;
-            m_heistTimer.PauseTimer();
-            SceneManagement.SceneManager.Instance.LoadScene(GetSceneName(lobbyScene), PlayerHandler.CharacterNetworkObjects);
+            m_heistTimer.StopTimer();
             if (!successful)
             {
-                m_aboutToLearnSpells.Clear();
                 // Mark all tasks as incomplete
                 foreach (var taskId in CurrentAssignment.tasks)
                 {
@@ -65,20 +66,26 @@ namespace RooseLabs.Gameplay
             }
             else
             {
-                foreach (var spell in m_aboutToLearnSpells)
+                // Permanently learn spells from completed tasks
+                foreach (var taskId in CurrentAssignment.tasks)
                 {
-                    int spellIndex = SpellDatabase.IndexOf(spell);
-                    if (!LearnedSpellsIndices.Contains(spellIndex))
+                    var task = TaskDatabase[taskId];
+                    if (!task.IsCompleted) continue;
+                    if (task.CompletionCondition is CastSpellCondition csc)
                     {
-                        LearnedSpellsIndices.Add(spellIndex);
+                        int spellIndex = SpellDatabase.IndexOf(csc.Spell);
+                        if (!LearnedSpellsIndices.Contains(spellIndex))
+                        {
+                            LearnedSpellsIndices.Add(spellIndex);
+                        }
                     }
                 }
-                m_aboutToLearnSpells.Clear();
             }
             foreach (var player in PlayerHandler.AllCharacters)
             {
-                player.OnReturnToLobby_TargetRPC(player.Owner);
+                player.ResetState();
             }
+            SceneManagement.SceneManager.Instance.LoadScene(GetSceneName(lobbyScene), PlayerHandler.CharacterNetworkObjects);
         }
 
         private void SpawnHeistRuneContainerObjects()
@@ -98,30 +105,65 @@ namespace RooseLabs.Gameplay
             RuneObjectSpawnPoint[] allSpawnPoints = FindObjectsByType<RuneObjectSpawnPoint>(FindObjectsSortMode.None);
             if (allSpawnPoints.Length == 0)
             {
-                Debug.LogWarning("No RuneObjectSpawnPoint found in the scene!");
+                this.LogWarning("No RuneObjectSpawnPoint found in the scene!");
                 return;
+            }
+            if (requiredRunes.Count > allSpawnPoints.Length)
+            {
+                this.LogWarning("Not enough RuneObjectSpawnPoints to spawn all required runes!");
             }
             allSpawnPoints.Shuffle();
 
             // Spawn required runes first
-            int spawnedCount = 0;
             foreach (var rune in requiredRunes)
             {
-                if (spawnedCount >= allSpawnPoints.Length)
-                    break;
-                SpawnRuneContainerObjectAtPoint(allSpawnPoints[spawnedCount], rune);
-                Destroy(allSpawnPoints[spawnedCount].gameObject);
-                ++spawnedCount;
+                int selectedSpawnPointIndex = -1;
+                for (int i = 0; i < allSpawnPoints.Length; ++i)
+                {
+                    var spawnPoint = allSpawnPoints[i];
+                    if (!spawnPoint) continue;
+                    if (spawnPoint.GetPossibleRunes().Contains(rune))
+                    {
+                        selectedSpawnPointIndex = i;
+                        break;
+                    }
+                }
+                if (selectedSpawnPointIndex == -1)
+                {
+                    this.LogWarning($"No spawn point allows required rune '{rune.name}'!");
+                    if (!RuneDatabase.Contains(rune))
+                    {
+                        this.LogWarning($"Required rune '{rune.name}' is not in the RuneDatabase!");
+                    }
+                    this.LogWarning("Forcing spawn at next available point.");
+                    for (int i = 0; i < allSpawnPoints.Length; ++i)
+                    {
+                        if (!allSpawnPoints[i]) continue;
+                        selectedSpawnPointIndex = i;
+                        break;
+                    }
+                }
+                if (selectedSpawnPointIndex == -1)
+                {
+                    this.LogWarning($"No available spawn point found for required rune '{rune.name}'!");
+                }
+                else
+                {
+                    var spawnPoint = allSpawnPoints[selectedSpawnPointIndex];
+                    SpawnRuneContainerObjectAtPoint(spawnPoint, rune);
+                    Destroy(spawnPoint.gameObject);
+                    allSpawnPoints[selectedSpawnPointIndex] = null;
+                }
             }
 
             // Spawn additional books with 10% chance
-            for (int i = spawnedCount; i < allSpawnPoints.Length; ++i)
+            foreach (var spawnPoint in allSpawnPoints)
             {
+                if (!spawnPoint) continue;
                 if (Random.value <= 0.1f)
-                    SpawnRuneContainerObjectAtPoint(allSpawnPoints[i]);
-                Destroy(allSpawnPoints[i].gameObject);
+                    SpawnRuneContainerObjectAtPoint(spawnPoint);
+                Destroy(spawnPoint.gameObject);
             }
-            (NetworkManager.ObjectPool as DefaultObjectPool)?.ClearPool();
         }
 
         private void SpawnRuneContainerObjectAtPoint(RuneObjectSpawnPoint spawnPoint, RuneSO rune = null)
@@ -142,7 +184,7 @@ namespace RooseLabs.Gameplay
             RuneSO selectedRune = rune;
             if (!selectedRune)
             {
-                List<RuneSO> possibleRunes = spawnPoint.GetPossibleRunes().ToList();
+                var possibleRunes = spawnPoint.GetPossibleRunes();
                 if (possibleRunes.Count == 0)
                 {
                     this.LogWarning($"Spawn point '{spawnPoint.name}' has no possible runes to assign!");
@@ -168,19 +210,22 @@ namespace RooseLabs.Gameplay
             }
         }
 
-        [ServerRpc(RequireOwnership = false)]
-        public void NotifyEnteredLibrary()
+        public void ReturnToLobby()
         {
-            if (m_hasEnteredLibrary) return;
-            m_hasEnteredLibrary = true;
-            this.LogInfo("Player has entered the library for the first time in this heist.");
+            if (IsServerInitialized)
+            {
+                EndHeist(true);
+            }
+            else
+            {
+                EndHeist_ServerRPC(true);
+            }
         }
 
         [ServerRpc(RequireOwnership = false)]
-        public void NotifyReturnToLobby()
+        private void EndHeist_ServerRPC(bool successful)
         {
-            if (!m_hasEnteredLibrary) return;
-            EndHeist(true);
+            EndHeist(successful);
         }
     }
 }

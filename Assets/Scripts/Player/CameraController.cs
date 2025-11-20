@@ -58,5 +58,17 @@ namespace RooseLabs.Player
                 }
             }
         }
+
+        public void ResetPosition()
+        {
+            PlayerCharacter character = PlayerCharacter.LocalCharacter;
+
+            Vector3 desiredPosition = character.Data.IsSprinting ? sprintPosition.position
+                : character.Data.IsCrouching ? crouchPosition.position
+                : character.Data.IsCrawling ? crawlPosition.position
+                : standPosition.position;
+
+            transform.position = desiredPosition;
+        }
     }
 }

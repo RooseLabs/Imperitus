@@ -43,7 +43,7 @@ namespace RooseLabs.Gameplay
             if (!character.RaycastIgnoreSelf(
                 character.Camera.transform.position, character.Camera.transform.forward,
                 out var hitInfo, InteractMaxDistance, HelperFunctions.AllPhysicalLayerMask,
-                queryTriggerInteraction: QueryTriggerInteraction.Ignore
+                queryTriggerInteraction: QueryTriggerInteraction.Collide
             )) return;
             hitInfo.collider.TryGetComponent(out IInteractable interactable);
             if (interactable == null || !interactable.IsInteractable(character)) return;

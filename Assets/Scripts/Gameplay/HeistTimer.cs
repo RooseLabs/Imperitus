@@ -1,30 +1,24 @@
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
-using RooseLabs.Gameplay;
 using RooseLabs.UI;
+using RooseLabs.Utils;
 using UnityEngine;
 
-namespace RooseLabs
+namespace RooseLabs.Gameplay
 {
     public class HeistTimer : NetworkBehaviour
     {
-        [Header("Timer Settings")]
-        public float defaultTime = 300f;
+        private readonly SyncTimer m_syncTimer = new();
+        private bool m_finishedTriggered;
 
-        private readonly SyncTimer syncTimer = new SyncTimer();
-
-        private int lastDisplayedSecond = -1;
-
-        private bool finishedTriggered = false;
-
-        private void Awake()
+        private void OnEnable()
         {
-            syncTimer.OnChange += OnTimerChanged;
+            m_syncTimer.OnChange += OnTimerChanged;
         }
 
-        private void OnDestroy()
+        private void OnDisable()
         {
-            syncTimer.OnChange -= OnTimerChanged;
+            m_syncTimer.OnChange -= OnTimerChanged;
         }
 
         public void ToggleTimerVisibility(bool visible)
@@ -32,79 +26,49 @@ namespace RooseLabs
             GUIManager.Instance.SetTimerActive(visible);
         }
 
-        /// <summary>
-        /// Start the timer with a specified duration. Server only.
-        /// </summary>
         [Server]
         public void StartTimer(float time)
         {
-            syncTimer.StartTimer(time, true);
-
-            finishedTriggered = false;
-            lastDisplayedSecond = -1;
-
-            //Debug.Log($"Timer started for {time} seconds.");
+            m_syncTimer.StartTimer(time, sendRemainingOnStop: true);
+            m_finishedTriggered = false;
         }
 
-        /// <summary>
-        /// Pause the timer. Server only.
-        /// </summary>
         [Server]
-        public void PauseTimer(bool updateClients = false)
+        public void PauseTimer()
         {
-            syncTimer.PauseTimer(updateClients);
+            m_syncTimer.PauseTimer(sendRemaining: true);
         }
 
-        /// <summary>
-        /// Resume the timer. Server only.
-        /// </summary>
         [Server]
         public void ResumeTimer()
         {
-            syncTimer.UnpauseTimer();
+            m_syncTimer.UnpauseTimer();
+        }
+
+        [Server]
+        public void StopTimer()
+        {
+            m_syncTimer.StopTimer(sendRemaining: true);
         }
 
         private void Update()
         {
-            // Update SyncTimer every frame
-            syncTimer.Update();
-
-            // Update UI per second
-            UpdateTimerUI();
+            m_syncTimer.Update(Time.deltaTime);
+            float remainingTime = Mathf.Max(Mathf.CeilToInt(m_syncTimer.Remaining), 0);
+            GUIManager.Instance.UpdateTimer(remainingTime);
         }
 
-        /// <summary>
-        /// Updates TMP_Text UI per whole second, clamped to zero
-        /// </summary>
-        private void UpdateTimerUI()
-        {
-            int currentSecond = Mathf.CeilToInt(syncTimer.Remaining);
-
-            if (currentSecond != lastDisplayedSecond)
-            {
-                lastDisplayedSecond = currentSecond;
-                GUIManager.Instance.UpdateTimer(Mathf.Max(currentSecond, 0));
-            }
-        }
-
-        /// <summary>
-        /// Callback for SyncTimer changes
-        /// </summary>
         private void OnTimerChanged(SyncTimerOperation op, float prev, float next, bool asServer)
         {
-            if (op == SyncTimerOperation.Finished && !finishedTriggered)
-            {
-                finishedTriggered = true;
-                HandleTimerFinished();
-            }
+            if (op != SyncTimerOperation.Finished || m_finishedTriggered) return;
+            HandleTimerFinished();
         }
 
-        /// <summary>
-        /// Handles logic when timer reaches zero
-        /// </summary>
         private void HandleTimerFinished()
         {
-            Debug.Log("Timer ran out!");
+            if (!IsServerInitialized) return;
+            this.LogInfo("Heist timer has reached zero. Ending heist as failed.");
+            m_finishedTriggered = true;
             GameManager.Instance.EndHeist(false);
         }
     }

@@ -266,7 +266,7 @@ namespace RooseLabs.Player
                 m_shouldSyncRagdoll = true;
             }
 
-            if(shouldStandUp)
+            if (shouldStandUp)
                 StartCoroutine(StandUpRoutine());
         }
 
@@ -344,7 +344,7 @@ namespace RooseLabs.Player
         public void ToggleRagdoll(bool enable)
         {
             SetRagdollPhysicsActive(enable);
-            m_rigidbody.isKinematic = !IsOwner;
+            m_rigidbody.isKinematic = enable;
             m_collider.enabled = !enable;
             Animator.enabled = !enable;
         }
