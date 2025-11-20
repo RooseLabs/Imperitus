@@ -52,9 +52,9 @@ namespace RooseLabs.Editor
                 prop.arraySize++;
                 list.index = newIndex;
                 var newElement = prop.GetArrayElementAtIndex(newIndex);
-                EditorUtils.FindProperty(newElement, "Description").stringValue = "";
-                EditorUtils.FindProperty(newElement, "Image").objectReferenceValue = null;
-                EditorUtils.FindProperty(newElement, "CompletionCondition").managedReferenceValue = null;
+                newElement.FindProperty("Description").stringValue = "";
+                newElement.FindProperty("Image").objectReferenceValue = null;
+                newElement.FindProperty("CompletionCondition").managedReferenceValue = null;
             };
         }
 
@@ -95,13 +95,13 @@ namespace RooseLabs.Editor
 
             string lowerSearch = search.ToLower();
 
-            SerializedProperty descProp = EditorUtils.FindProperty(element, "Description");
+            SerializedProperty descProp = element.FindProperty("Description");
             if (descProp is { propertyType: SerializedPropertyType.String } && descProp.stringValue.ToLower().Contains(lowerSearch))
             {
                 return true;
             }
 
-            SerializedProperty condProp = EditorUtils.FindProperty(element, "CompletionCondition");
+            SerializedProperty condProp = element.FindProperty("CompletionCondition");
             if (condProp == null || string.IsNullOrEmpty(condProp.managedReferenceFullTypename))
             {
                 return false;
@@ -109,7 +109,7 @@ namespace RooseLabs.Editor
 
             if (condProp.managedReferenceFullTypename.EndsWith("CastSpellCondition"))
             {
-                SerializedProperty spellProp = EditorUtils.FindProperty(condProp, "Spell");
+                SerializedProperty spellProp = condProp.FindProperty("Spell");
                 if (spellProp is { objectReferenceValue: SpellSO spell })
                 {
                     if (spell.Name.ToLower().Contains(lowerSearch) || spell.EnglishName.ToLower().Contains(lowerSearch))

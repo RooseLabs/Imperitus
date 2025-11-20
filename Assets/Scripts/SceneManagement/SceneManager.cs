@@ -139,8 +139,8 @@ namespace RooseLabs.SceneManagement
                 else
                 {
                     Logger.Warning("Previous scene is invalid.");
-                    m_pendingUnloadAfterLoad = string.Empty;
                 }
+                m_pendingUnloadAfterLoad = string.Empty;
             }
         }
 

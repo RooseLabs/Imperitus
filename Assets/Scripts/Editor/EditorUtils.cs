@@ -4,12 +4,13 @@ namespace RooseLabs.Editor
 {
     public static class EditorUtils
     {
-        public static SerializedProperty FindProperty(SerializedProperty rootProp, string propName)
+        /// <summary>
+        /// Retrieves the SerializedProperty at a relative path to the current property,
+        /// handling auto-implemented property backing fields.
+        /// </summary>
+        public static SerializedProperty FindProperty(this SerializedProperty p, string n)
         {
-            var prop = rootProp.FindPropertyRelative(propName);
-            if (prop == null)
-                prop = rootProp.FindPropertyRelative($"<{propName}>k__BackingField");
-            return prop;
+            return p.FindPropertyRelative(n) ?? p.FindPropertyRelative($"<{n}>k__BackingField");
         }
     }
 }

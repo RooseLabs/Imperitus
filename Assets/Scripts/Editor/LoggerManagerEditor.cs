@@ -18,15 +18,15 @@ namespace RooseLabs.Editor
 
             // Create sorted indices array based on logger names
             int[] sortedIndices = Enumerable.Range(0, loggersProp.arraySize)
-                .OrderBy(i => EditorUtils.FindProperty(loggersProp.GetArrayElementAtIndex(i), "Name").stringValue)
+                .OrderBy(i => loggersProp.GetArrayElementAtIndex(i).FindProperty("Name").stringValue)
                 .ToArray();
 
             // Use sorted indices to display loggers
             foreach (int i in sortedIndices)
             {
                 SerializedProperty logger = loggersProp.GetArrayElementAtIndex(i);
-                SerializedProperty nameProp = EditorUtils.FindProperty(logger, "Name");
-                SerializedProperty enabledProp = EditorUtils.FindProperty(logger, "Enabled");
+                SerializedProperty nameProp = logger.FindProperty("Name");
+                SerializedProperty enabledProp = logger.FindProperty("Enabled");
 
                 EditorGUILayout.BeginVertical(EditorStyles.helpBox);
                 EditorGUILayout.BeginHorizontal(GUILayout.ExpandWidth(true));
@@ -45,7 +45,7 @@ namespace RooseLabs.Editor
                 for (int i = 0; i < loggersProp.arraySize; i++)
                 {
                     SerializedProperty logger = loggersProp.GetArrayElementAtIndex(i);
-                    SerializedProperty enabledProp = EditorUtils.FindProperty(logger, "Enabled");
+                    SerializedProperty enabledProp = logger.FindProperty("Enabled");
                     enabledProp.boolValue = true;
                 }
             }
@@ -55,7 +55,7 @@ namespace RooseLabs.Editor
                 for (int i = 0; i < loggersProp.arraySize; i++)
                 {
                     SerializedProperty logger = loggersProp.GetArrayElementAtIndex(i);
-                    SerializedProperty enabledProp = EditorUtils.FindProperty(logger, "Enabled");
+                    SerializedProperty enabledProp = logger.FindProperty("Enabled");
                     enabledProp.boolValue = false;
                 }
             }
