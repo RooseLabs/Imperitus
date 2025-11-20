@@ -56,6 +56,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: DroppedNotebook
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 5c97855b8bbc9af438265f59725614f1, type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -74,10 +78,10 @@ PrefabInstance:
       addedObject: {fileID: 4766535839371201746}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5c97855b8bbc9af438265f59725614f1, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 5262493594109913043}
+      addedObject: {fileID: 5922534373811243445}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5c97855b8bbc9af438265f59725614f1, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 5691729597358315000}
+      addedObject: {fileID: 6196262984778135795}
   m_SourcePrefab: {fileID: 100100000, guid: 5c97855b8bbc9af438265f59725614f1, type: 3}
 --- !u!1 &3228943848150757951 stripped
 GameObject:
@@ -103,8 +107,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.13453126, y: 0.03206372, z: 0.16942713}
-  m_Center: {x: -0.0050455146, y: -0.0009164268, z: 0}
+  m_Size: {x: 0.16518871, y: 0.04328427, z: 0.22210242}
+  m_Center: {x: -0.006195307, y: -0.0012371261, z: 0}
 --- !u!54 &4205408927399772891
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -159,7 +163,7 @@ MonoBehaviour:
   _isSpawnable: 1
   _isGlobal: 0
   _initializeOrder: 0
-  _preventDespawnOnDisconnect: 0
+  _preventDespawnOnDisconnect: 1
   _defaultDespawnType: 0
   NetworkObserver: {fileID: 0}
   _enablePrediction: 0
@@ -199,7 +203,7 @@ MonoBehaviour:
   _componentIndexCache: 255
   _addedNetworkObject: {fileID: 1105512751977791544}
   _networkObjectCache: {fileID: 0}
-  _componentConfiguration: 0
+  _componentConfiguration: 2
   _synchronizeParent: 0
   _packing:
     Position: 1
@@ -224,13 +228,13 @@ MonoBehaviour:
     X: 0
     Y: 0
     Z: 0
-  _synchronizeScale: 1
+  _synchronizeScale: 0
   _scaleSensitivity: 0.001
   _scaleSnapping:
     X: 0
     Y: 0
     Z: 0
---- !u!114 &5262493594109913043
+--- !u!114 &5922534373811243445
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -246,7 +250,7 @@ MonoBehaviour:
   _addedNetworkObject: {fileID: 1105512751977791544}
   _networkObjectCache: {fileID: 0}
   _allowTakeOwnership: 1
---- !u!114 &5691729597358315000
+--- !u!114 &6196262984778135795
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -263,4 +267,3 @@ MonoBehaviour:
   _networkObjectCache: {fileID: 0}
   force: 600
   damping: 50
-  notebookVisual: {fileID: 3228943848150757951}

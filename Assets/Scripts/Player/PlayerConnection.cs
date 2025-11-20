@@ -38,6 +38,12 @@ namespace RooseLabs.Player
             PlayerHandler.RegisterPlayer(Owner, this);
         }
 
+        public override void OnStopNetwork()
+        {
+            PlayerHandler.UnregisterPlayer(Owner);
+            PlayerHandler.UnregisterCharacter(Owner);
+        }
+
         public override void OnStartServer()
         {
             // Spawn this player's character at this object's position and rotation

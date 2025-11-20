@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using FishNet.Connection;
 using FishNet.Object;
 using RooseLabs.Core;
@@ -7,8 +9,6 @@ using RooseLabs.Gameplay.Notebook;
 using RooseLabs.Network;
 using RooseLabs.UI;
 using RooseLabs.Utils;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace RooseLabs.Player
@@ -29,7 +29,8 @@ namespace RooseLabs.Player
         [SerializeField] private GameObject[] meshesToHide = Array.Empty<GameObject>();
 
         [field: SerializeField] public Transform RaycastTarget { get; private set; }
-        [field: SerializeField] public GameObject droppedNotebokPrefab { get; private set; }
+
+        [SerializeField] private GameObject droppedNotebookPrefab;
         #endregion
 
         #region References
@@ -171,9 +172,9 @@ namespace RooseLabs.Player
         private void HandlePlayerDeath_ServerRPC()
         {
             // Spawn dropped notebook
-            GameObject droppedNotebook = Instantiate(droppedNotebokPrefab, transform.position + Vector3.up * 1.0f, Quaternion.identity);
+            GameObject droppedNotebook = Instantiate(droppedNotebookPrefab, transform.position + Vector3.up * 1.0f, Quaternion.identity);
             Spawn(droppedNotebook, null, gameObject.scene);
-            droppedNotebook.GetComponent<DroppedNotebook>().Initialize(Notebook);
+            droppedNotebook.GetComponent<DroppedNotebook>().Initialize(this);
 
             // Trigger ragdoll
             Ragdoll.TriggerRagdoll(Vector3.back * 500f, Ragdoll.HipsBone.position, false);
