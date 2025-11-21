@@ -1287,8 +1287,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4180884156796240193}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.06270655, y: -0.000000186885, z: 0.000000011742022, w: 0.99803203}
-  m_LocalPosition: {x: -1.1025426e-33, y: 1.3822404, z: -0.07351458}
+  m_LocalRotation: {x: 0.062706366, y: -0.000000186885, z: 0.000000011741986, w: 0.99803203}
+  m_LocalPosition: {x: 0, y: 1.3822404, z: -0.07351494}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1577,45 +1577,114 @@ MonoBehaviour:
   _networkObjectCache: {fileID: 7652611172026813195}
   rendererMappings:
   - id: 0
-    renderer: {fileID: 1898582813011760090}
+    rendererPairs:
+    - renderer: {fileID: 1898582813011760090}
+      materialIndex: -1
+    - renderer: {fileID: 1321327194098140632}
+      materialIndex: 1
   - id: 3
-    renderer: {fileID: 4538900077229077408}
+    rendererPairs:
+    - renderer: {fileID: 4538900077229077408}
+      materialIndex: -1
   - id: 1
-    renderer: {fileID: 4718687908337115548}
+    rendererPairs:
+    - renderer: {fileID: 4718687908337115548}
+      materialIndex: -1
   - id: 2
-    renderer: {fileID: 3885944489889949441}
+    rendererPairs:
+    - renderer: {fileID: 3885944489889949441}
+      materialIndex: -1
   - id: 6
-    renderer: {fileID: 6831904599033618835}
+    rendererPairs:
+    - renderer: {fileID: 6831904599033618835}
+      materialIndex: 0
   - id: 7
-    renderer: {fileID: 8357323513902675137}
+    rendererPairs:
+    - renderer: {fileID: 8357323513902675137}
+      materialIndex: 0
   - id: 4
-    renderer: {fileID: 7006513637425275682}
+    rendererPairs:
+    - renderer: {fileID: 7006513637425275682}
+      materialIndex: -1
   - id: 8
-    renderer: {fileID: 1301919178542139145}
+    rendererPairs:
+    - renderer: {fileID: 1301919178542139145}
+      materialIndex: -1
   - id: 5
-    renderer: {fileID: 7601884755037557169}
+    rendererPairs:
+    - renderer: {fileID: 7601884755037557169}
+      materialIndex: -1
+  - id: 9
+    rendererPairs:
+    - renderer: {fileID: 1321327194098140632}
+      materialIndex: 0
+    - renderer: {fileID: 8357323513902675137}
+      materialIndex: 1
+    - renderer: {fileID: 6831904599033618835}
+      materialIndex: 1
   defaultConfigurations:
-  - renderer: {fileID: 8357323513902675137}
-    defaultMesh: {fileID: 1596533743628303504, guid: c7d48a079d40bd94a9483826266718bb, type: 3}
-    defaultMaterial: {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
-  - renderer: {fileID: 6831904599033618835}
-    defaultMesh: {fileID: 3805891118310368171, guid: c7d48a079d40bd94a9483826266718bb, type: 3}
-    defaultMaterial: {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
-  - renderer: {fileID: 1898582813011760090}
-    defaultMesh: {fileID: -8261066796910302577, guid: c7d48a079d40bd94a9483826266718bb, type: 3}
-    defaultMaterial: {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
-  - renderer: {fileID: 4538900077229077408}
-    defaultMesh: {fileID: -311742922521694981, guid: c7d48a079d40bd94a9483826266718bb, type: 3}
-    defaultMaterial: {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
-  - renderer: {fileID: 1301919178542139145}
-    defaultMesh: {fileID: -5220590045393546675, guid: 135cc71d114f8b34595d2347465e88c0, type: 3}
-    defaultMaterial: {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
-  - renderer: {fileID: 7601884755037557169}
-    defaultMesh: {fileID: 0}
-    defaultMaterial: {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
-  - renderer: {fileID: 7006513637425275682}
-    defaultMesh: {fileID: 0}
-    defaultMaterial: {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - defaultRendererData:
+    - renderer: {fileID: 1898582813011760090}
+      materialIndex: -1
+      defaultMesh: {fileID: -8261066796910302577, guid: c7d48a079d40bd94a9483826266718bb, type: 3}
+      defaultMaterial: {fileID: 2100000, guid: d1d61e814b74c694cbfab3211b55381c, type: 2}
+  - defaultRendererData:
+    - renderer: {fileID: 4538900077229077408}
+      materialIndex: -1
+      defaultMesh: {fileID: -311742922521694981, guid: c7d48a079d40bd94a9483826266718bb, type: 3}
+      defaultMaterial: {fileID: 2100000, guid: b91701fc91203014cab146ff617e8274, type: 2}
+  - defaultRendererData:
+    - renderer: {fileID: 4718687908337115548}
+      materialIndex: -1
+      defaultMesh: {fileID: -1148468937837461133, guid: c7d48a079d40bd94a9483826266718bb, type: 3}
+      defaultMaterial: {fileID: 2100000, guid: 9b39112853f1cf44e8acd8e075dbee66, type: 2}
+  - defaultRendererData:
+    - renderer: {fileID: 7601884755037557169}
+      materialIndex: -1
+      defaultMesh: {fileID: 0}
+      defaultMaterial: {fileID: 0}
+  - defaultRendererData:
+    - renderer: {fileID: 7006513637425275682}
+      materialIndex: -1
+      defaultMesh: {fileID: 0}
+      defaultMaterial: {fileID: 0}
+  - defaultRendererData:
+    - renderer: {fileID: 1321327194098140632}
+      materialIndex: 0
+      defaultMesh: {fileID: -8839368762345780380, guid: c7d48a079d40bd94a9483826266718bb, type: 3}
+      defaultMaterial: {fileID: 2100000, guid: 875edfbe870d3044c9bc62e75742fc86, type: 2}
+    - renderer: {fileID: 1321327194098140632}
+      materialIndex: 1
+      defaultMesh: {fileID: -8839368762345780380, guid: c7d48a079d40bd94a9483826266718bb, type: 3}
+      defaultMaterial: {fileID: 2100000, guid: d1d61e814b74c694cbfab3211b55381c, type: 2}
+  - defaultRendererData:
+    - renderer: {fileID: 3885944489889949441}
+      materialIndex: -1
+      defaultMesh: {fileID: 6508885813359641771, guid: c7d48a079d40bd94a9483826266718bb, type: 3}
+      defaultMaterial: {fileID: 2100000, guid: 08df1ebd18c744e46959769635bea2c8, type: 2}
+  - defaultRendererData:
+    - renderer: {fileID: 6831904599033618835}
+      materialIndex: 0
+      defaultMesh: {fileID: 0}
+      defaultMaterial: {fileID: 2100000, guid: aaf5e8b8c7ce1db4e993aed1c1c7b23a, type: 2}
+    - renderer: {fileID: 6831904599033618835}
+      materialIndex: 1
+      defaultMesh: {fileID: 0}
+      defaultMaterial: {fileID: 2100000, guid: 875edfbe870d3044c9bc62e75742fc86, type: 2}
+  - defaultRendererData:
+    - renderer: {fileID: 8357323513902675137}
+      materialIndex: 0
+      defaultMesh: {fileID: 0}
+      defaultMaterial: {fileID: 2100000, guid: aaf5e8b8c7ce1db4e993aed1c1c7b23a, type: 2}
+    - renderer: {fileID: 8357323513902675137}
+      materialIndex: 1
+      defaultMesh: {fileID: 0}
+      defaultMaterial: {fileID: 2100000, guid: 875edfbe870d3044c9bc62e75742fc86, type: 2}
+  - defaultRendererData:
+    - renderer: {fileID: 1301919178542139145}
+      materialIndex: -1
+      defaultMesh: {fileID: -5220590045393546675, guid: 135cc71d114f8b34595d2347465e88c0, type: 3}
+      defaultMaterial: {fileID: -876546973899608171, guid: 2cf888f8593df3c40af1d106f0cb5bb6, type: 3}
   itemDatabase: {fileID: 11400000, guid: f6c6b77d74469054981bbeaf8ece833a, type: 2}
   equippedItemNames: []
   disableAutoSaveForNetworking: 0
@@ -2135,7 +2204,6 @@ MonoBehaviour:
   pushToTalkIsPressed: 0
   openNotebookWasPressed: 0
   closeNotebookWasPressed: 0
-  getRuneWasPressed: 0
   OpenCustomizationMenu: 0
   CloseCustomizationMenu: 0
 --- !u!114 &8138562761348339283
@@ -2410,7 +2478,7 @@ Transform:
   m_GameObject: {fileID: 6922205013769619118}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: 1, z: -0, w: 0}
-  m_LocalPosition: {x: 7.1054274e-15, y: 1.9, z: 0.00000017881393}
+  m_LocalPosition: {x: 7.1054274e-15, y: 1.9, z: 0}
   m_LocalScale: {x: 0.15, y: 0.15, z: 0.15}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -2482,7 +2550,7 @@ Transform:
   m_GameObject: {fileID: 8341259078320434640}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.00000003332281, y: 0.74534327, z: -0.08897754}
+  m_LocalPosition: {x: -0.000000033322873, y: 0.74534327, z: -0.08897772}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -2999,6 +3067,14 @@ PrefabInstance:
       propertyPath: m_UpdateWhenOffscreen
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: -8186844667690343932, guid: c7d48a079d40bd94a9483826266718bb, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: aaf5e8b8c7ce1db4e993aed1c1c7b23a, type: 2}
+    - target: {fileID: -8186844667690343932, guid: c7d48a079d40bd94a9483826266718bb, type: 3}
+      propertyPath: 'm_Materials.Array.data[1]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 875edfbe870d3044c9bc62e75742fc86, type: 2}
     - target: {fileID: -8184312443741069459, guid: c7d48a079d40bd94a9483826266718bb, type: 3}
       propertyPath: m_LocalScale.x
       value: 1
@@ -3379,6 +3455,14 @@ PrefabInstance:
       propertyPath: m_UpdateWhenOffscreen
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: -4396642182433536433, guid: c7d48a079d40bd94a9483826266718bb, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 875edfbe870d3044c9bc62e75742fc86, type: 2}
+    - target: {fileID: -4396642182433536433, guid: c7d48a079d40bd94a9483826266718bb, type: 3}
+      propertyPath: 'm_Materials.Array.data[1]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 3f39d0a3325b6f344a2471d435982de2, type: 2}
     - target: {fileID: -4305490942254661135, guid: c7d48a079d40bd94a9483826266718bb, type: 3}
       propertyPath: m_LocalScale.x
       value: 1
@@ -4910,6 +4994,11 @@ Transform:
 --- !u!4 &1304072896462347951 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -4416537769344508616, guid: c7d48a079d40bd94a9483826266718bb, type: 3}
+  m_PrefabInstance: {fileID: 5813497512308605847}
+  m_PrefabAsset: {fileID: 0}
+--- !u!137 &1321327194098140632 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -4396642182433536433, guid: c7d48a079d40bd94a9483826266718bb, type: 3}
   m_PrefabInstance: {fileID: 5813497512308605847}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &1377976012745719923 stripped

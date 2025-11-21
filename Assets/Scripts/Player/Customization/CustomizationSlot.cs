@@ -16,7 +16,7 @@ namespace RooseLabs.Player.Customization
         [Tooltip("The material to apply. Should never be null.")]
         public Material material;
 
-        [Tooltip("The ID of the target renderer. This ID must match a Renderer Mapping in the PlayerCustomizationManager.")]
+        [Tooltip("The ID of the target renderer group.")]
         public RendererID targetRendererId;
 
         public bool IsValid()

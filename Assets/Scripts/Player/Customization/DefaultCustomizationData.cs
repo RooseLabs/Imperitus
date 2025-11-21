@@ -1,30 +1,35 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace RooseLabs.Player.Customization
 {
-    /// <summary>
-    /// Stores default mesh and material data for a category.
-    /// Used to restore original appearance when items are removed.
-    /// </summary>
     [Serializable]
     public class DefaultCustomizationData
     {
-        [Tooltip("The renderer that holds the default appearance.")]
-        public Renderer renderer;
+        [Tooltip("Default configurations for each renderer/material pair.")]
+        public List<DefaultRendererData> defaultRendererData = new List<DefaultRendererData>();
 
-        [Tooltip("Default mesh (can be null for material-only categories).")]
-        public Mesh defaultMesh;
-
-        [Tooltip("Default material (can be null if nothing should be shown by default).")]
-        public Material defaultMaterial;
-
-        /// <summary>
-        /// Validates that this default data has minimum required info.
-        /// </summary>
         public bool IsValid()
         {
-            return renderer != null;
+            return defaultRendererData != null && defaultRendererData.Count > 0 &&
+                   defaultRendererData.TrueForAll(d => d.renderer != null);
         }
+    }
+
+    [Serializable]
+    public class DefaultRendererData
+    {
+        [Tooltip("The renderer to restore.")]
+        public Renderer renderer;
+
+        [Tooltip("Which material index to restore (-1 = all materials, 0+ = specific index).")]
+        public int materialIndex = -1;
+
+        [Tooltip("Default mesh for this renderer (can be null for material-only).")]
+        public Mesh defaultMesh;
+
+        [Tooltip("Default material for this renderer (can be null if nothing shown by default).")]
+        public Material defaultMaterial;
     }
 }
