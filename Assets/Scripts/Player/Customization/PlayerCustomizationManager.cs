@@ -44,12 +44,14 @@ namespace RooseLabs.Player.Customization
         private Dictionary<string, List<GameObject>> instantiatedObjects = new Dictionary<string, List<GameObject>>();
 
         // Cached renderer lookup: Key = renderer ID
-        private Dictionary<RendererID, Renderer> rendererLookup = new Dictionary<RendererID, Renderer>();
+        private Dictionary<RendererID, List<RendererMaterialPair>> rendererLookup = new Dictionary<RendererID, List<RendererMaterialPair>>();
 
         // ADDED: Flag to track if we've done initial sync
         private bool hasInitializedCustomization = false;
 
         private const string SAVE_KEY = "PlayerCustomization";
+
+        private Color CurrentSkinColor;
 
         private void Awake()
         {
@@ -143,25 +145,21 @@ namespace RooseLabs.Player.Customization
                     continue;
                 }
 
-                if (rendererLookup.ContainsKey(mapping.id))
+                if (!rendererLookup.ContainsKey(mapping.id))
                 {
-                    Debug.LogWarning($"Duplicate renderer ID '{mapping.id}' found on '{gameObject.name}'. Only the first will be used.");
-                    continue;
+                    rendererLookup[mapping.id] = new List<RendererMaterialPair>();
                 }
 
-                rendererLookup[mapping.id] = mapping.renderer;
+                rendererLookup[mapping.id].AddRange(mapping.rendererPairs);
             }
         }
 
-        /// <summary>
-        /// Gets a renderer by its ID.
-        /// </summary>
-        private Renderer GetRendererById(RendererID id)
+        private List<RendererMaterialPair> GetRendererPairsById(RendererID id)
         {
             if (!rendererLookup.ContainsKey(id))
             {
-                Debug.LogError($"No renderer found with ID '{id}'. Make sure it's configured in PlayerCustomizationManager.");
-                return null;
+                Debug.LogError($"No renderers found with ID '{id}'.");
+                return new List<RendererMaterialPair>();
             }
 
             return rendererLookup[id];
@@ -247,12 +245,16 @@ namespace RooseLabs.Player.Customization
 
             CustomizationItem item = equippedItems[key];
 
+            bool isAccessory = item.category == CustomizationCategory.EyeAccessories
+                                || item.category == CustomizationCategory.HeadAccessories;
+
             // Handle removal based on application mode
             switch (item.applicationMode)
             {
                 case ApplicationMode.SwapMaterialOnly:
                 case ApplicationMode.SwapMeshAndMaterial:
-                    RestoreDefaults(item);
+                    if (isAccessory)
+                        RestoreDefaults(item);
                     break;
                 case ApplicationMode.InstantiateNew:
                     DestroyInstantiatedObjects(key);
@@ -413,12 +415,33 @@ namespace RooseLabs.Player.Customization
         {
             foreach (var slot in item.slots)
             {
-                Renderer renderer = GetRendererById(slot.targetRendererId);
+                List<RendererMaterialPair> pairs = GetRendererPairsById(slot.targetRendererId);
 
-                if (renderer != null && slot.material != null)
+                foreach (var pair in pairs)
                 {
-                    // Instance the material (creates a runtime copy)
-                    renderer.material = slot.material;
+                    if (pair.renderer != null && slot.material != null)
+                    {
+                        ApplyMaterialToRenderer(pair.renderer, slot.material, pair.materialIndex);
+
+                        if (item.category == CustomizationCategory.SkinColor)
+                        {
+                            CurrentSkinColor = slot.material.color;
+                            Debug.Log("[PlayerCustomizationManager] Updated CurrentSkinColor to " + CurrentSkinColor);
+
+                            if (rendererLookup.ContainsKey(RendererID.Ears))
+                            {
+                                foreach (var earPair in rendererLookup[RendererID.Ears])
+                                {
+                                    if (earPair.renderer != null)
+                                    {
+                                        Material earMaterial = earPair.renderer.materials[0];
+                                        earMaterial.color = CurrentSkinColor;
+                                        Debug.Log("[PlayerCustomizationManager] Applied CurrentSkinColor to Ears: " + CurrentSkinColor);
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -427,36 +450,78 @@ namespace RooseLabs.Player.Customization
         {
             foreach (var slot in item.slots)
             {
-                Renderer renderer = GetRendererById(slot.targetRendererId);
+                List<RendererMaterialPair> pairs = GetRendererPairsById(slot.targetRendererId);
 
-                if (renderer == null) continue;
-
-                // Handle SkinnedMeshRenderer
-                if (renderer is SkinnedMeshRenderer skinnedRenderer)
+                foreach (var pair in pairs)
                 {
-                    if (slot.mesh != null)
-                    {
-                        skinnedRenderer.sharedMesh = slot.mesh;
-                    }
+                    if (pair.renderer == null) continue;
 
-                    if (slot.material != null)
+                    // Handle SkinnedMeshRenderer
+                    if (pair.renderer is SkinnedMeshRenderer skinnedRenderer)
                     {
-                        skinnedRenderer.material = slot.material;
-                    }
-                }
-                // Handle MeshRenderer
-                else if (renderer is MeshRenderer meshRenderer)
-                {
-                    MeshFilter meshFilter = meshRenderer.GetComponent<MeshFilter>();
+                        if (slot.mesh != null)
+                        {
+                            skinnedRenderer.sharedMesh = slot.mesh;
+                        }
 
-                    if (meshFilter != null && slot.mesh != null)
-                    {
-                        meshFilter.mesh = slot.mesh;
-                    }
+                        if (slot.material != null)
+                        {
+                            if (item.category == CustomizationCategory.Outfit && !item.femaleOutfitFix)
+                            {
+                                Material[] mats = skinnedRenderer.sharedMaterials;
 
-                    if (slot.material != null)
+                                if (mats.Length >= 2)
+                                {
+                                    // Swap index 1 and 0
+                                    Material temp = mats[1];
+                                    mats[1] = mats[0];
+                                    mats[0] = temp;
+                                    skinnedRenderer.sharedMaterials = mats;
+                                }
+                            }
+
+                            ApplyMaterialToRenderer(pair.renderer, slot.material, pair.materialIndex);
+
+                            if (item.femaleOutfitFix)
+                            {
+                                Material[] mats = skinnedRenderer.sharedMaterials;
+
+                                if (mats.Length >= 2)
+                                {
+                                    // Swap index 0 and 1
+                                    Material temp = mats[0];
+                                    mats[0] = mats[1];
+                                    mats[1] = temp;
+
+                                    skinnedRenderer.sharedMaterials = mats;
+
+                                    Debug.Log($"Swapped material order on {gameObject.name}");
+                                }
+                            }
+                        }
+                    }
+                    // Handle MeshRenderer
+                    else if (pair.renderer is MeshRenderer meshRenderer)
                     {
-                        meshRenderer.material = slot.material;
+                        MeshFilter meshFilter = meshRenderer.GetComponent<MeshFilter>();
+
+                        if (meshFilter != null && slot.mesh != null)
+                        {
+                            meshFilter.mesh = slot.mesh;
+                        }
+
+                        if (slot.material != null)
+                        {
+                            ApplyMaterialToRenderer(pair.renderer, slot.material, pair.materialIndex);
+
+                            if (item.category == CustomizationCategory.Ears)
+                            {
+                                // Apply the current skin color to the new ear material
+                                Material earMaterial = pair.renderer.materials[0];
+                                earMaterial.color = CurrentSkinColor;
+                                Debug.Log("[PlayerCustomizationManager] Applied CurrentSkinColor to Ears: " + CurrentSkinColor);
+                            }
+                        }
                     }
                 }
             }
@@ -468,35 +533,59 @@ namespace RooseLabs.Player.Customization
 
             foreach (var slot in item.slots)
             {
-                Renderer attachmentPoint = GetRendererById(slot.targetRendererId);
+                List<RendererMaterialPair> pairs = GetRendererPairsById(slot.targetRendererId);
 
-                if (attachmentPoint == null) continue;
-
-                // Create new GameObject at the attachment point
-                GameObject newObj = new GameObject($"{item.itemName}_Instance");
-                newObj.transform.SetParent(attachmentPoint.transform, false);
-                newObj.transform.localPosition = Vector3.zero;
-                newObj.transform.localRotation = Quaternion.identity;
-                newObj.transform.localScale = Vector3.one;
-
-                // Add appropriate renderer and assign mesh/material
-                if (slot.mesh != null)
+                foreach (var pair in pairs)
                 {
-                    // Check if we need a SkinnedMeshRenderer or regular MeshRenderer
-                    // For simplicity, we'll use MeshRenderer for InstantiateNew mode
-                    // If we need SkinnedMeshRenderer for accessories, this logic can be expanded...
-                    MeshFilter meshFilter = newObj.AddComponent<MeshFilter>();
-                    MeshRenderer meshRenderer = newObj.AddComponent<MeshRenderer>();
+                    if (pair.renderer == null) continue;
 
-                    meshFilter.mesh = slot.mesh;
-                    meshRenderer.material = slot.material;
+                    // Create new GameObject at the attachment point
+                    GameObject newObj = new GameObject($"{item.itemName}_Instance");
+                    newObj.transform.SetParent(pair.renderer.transform, false);
+                    newObj.transform.localPosition = Vector3.zero;
+                    newObj.transform.localRotation = Quaternion.identity;
+                    newObj.transform.localScale = Vector3.one;
+
+                    // Add appropriate renderer and assign mesh/material
+                    if (slot.mesh != null)
+                    {
+                        MeshFilter meshFilter = newObj.AddComponent<MeshFilter>();
+                        MeshRenderer meshRenderer = newObj.AddComponent<MeshRenderer>();
+
+                        meshFilter.mesh = slot.mesh;
+                        meshRenderer.material = slot.material;
+                    }
+
+                    spawnedObjects.Add(newObj);
                 }
-
-                spawnedObjects.Add(newObj);
             }
 
-            // Track spawned objects for later cleanup
             instantiatedObjects[key] = spawnedObjects;
+        }
+
+        private void ApplyMaterialToRenderer(Renderer renderer, Material material, int materialIndex)
+        {
+            if (materialIndex == -1)
+            {
+                // Replace ALL materials
+                Material[] materials = renderer.materials;
+                for (int i = 0; i < materials.Length; i++)
+                {
+                    materials[i] = material;
+                }
+                renderer.materials = materials;
+            }
+            else
+            {
+                // Replace SPECIFIC material index
+                Material[] materials = renderer.materials;
+                if (materialIndex < materials.Length)
+                {
+                    
+                    materials[materialIndex] = material;
+                    renderer.materials = materials;
+                }
+            }
         }
 
         #endregion
@@ -507,48 +596,90 @@ namespace RooseLabs.Player.Customization
         {
             foreach (var slot in item.slots)
             {
-                Renderer renderer = GetRendererById(slot.targetRendererId);
+                List<RendererMaterialPair> pairs = GetRendererPairsById(slot.targetRendererId);
 
-                if (renderer == null) continue;
-
-                // Find matching default configuration
-                DefaultCustomizationData defaultData = defaultConfigurations.Find(d => d.renderer == renderer);
-
-                if (defaultData == null || !defaultData.IsValid())
+                if (item.category == CustomizationCategory.SkinColor)
                 {
-                    Debug.LogWarning($"No default configuration found for renderer '{renderer.name}'.");
-                    continue;
-                }
+                    CurrentSkinColor = Color.white;
+                    Debug.Log("[PlayerCustomizationManager] Updated CurrentSkinColor to " + CurrentSkinColor);
 
-                // Handle SkinnedMeshRenderer
-                if (renderer is SkinnedMeshRenderer skinnedRenderer)
-                {
-                    //if (defaultData.defaultMesh != null)
-                    //{
-                        skinnedRenderer.sharedMesh = defaultData.defaultMesh;
-                    //}
-
-                    if (defaultData.defaultMaterial != null)
+                    if (rendererLookup.ContainsKey(RendererID.Ears))
                     {
-                        skinnedRenderer.material = defaultData.defaultMaterial;
+                        foreach (var earPair in rendererLookup[RendererID.Ears])
+                        {
+                            if (earPair.renderer != null)
+                            {
+                                Material earMaterial = earPair.renderer.materials[0];
+                                earMaterial.color = CurrentSkinColor;
+                                Debug.Log("[PlayerCustomizationManager] Applied CurrentSkinColor to Ears: " + CurrentSkinColor);
+                            }
+                        }
                     }
                 }
-                // Handle MeshRenderer
-                else if (renderer is MeshRenderer meshRenderer)
-                {
-                    MeshFilter meshFilter = meshRenderer.GetComponent<MeshFilter>();
 
-                    if (meshFilter != null)
+                foreach (var pair in pairs)
+                {
+                    if (pair.renderer == null) continue;
+
+                    // Find the default configuration that contains this renderer/material pair
+                    DefaultCustomizationData defaultConfig = null;
+                    DefaultRendererData defaultRendererData = null;
+
+                    foreach (var config in defaultConfigurations)
                     {
-                        //if(defaultData.defaultMesh != null)
-                        //{
-                            meshFilter.mesh = defaultData.defaultMesh;
-                        //} 
+                        defaultRendererData = config.defaultRendererData.Find(d =>
+                            d.renderer == pair.renderer && d.materialIndex == pair.materialIndex);
+
+                        if (defaultRendererData != null)
+                        {
+                            defaultConfig = config;
+                            break;
+                        }
                     }
 
-                    if (defaultData.defaultMaterial != null)
+                    if (defaultConfig == null || defaultRendererData == null)
                     {
-                        meshRenderer.material = defaultData.defaultMaterial;
+                        Debug.LogWarning($"No default configuration found for renderer '{pair.renderer.name}' at material index {pair.materialIndex}.");
+                        continue;
+                    }
+
+                    bool isAccessory = item.category == CustomizationCategory.EyeAccessories
+                                        || item.category == CustomizationCategory.HeadAccessories;
+
+                    // Handle SkinnedMeshRenderer
+                    if (pair.renderer is SkinnedMeshRenderer skinnedRenderer)
+                    {
+                        if (isAccessory || defaultRendererData.defaultMesh != null)
+                        {
+                            skinnedRenderer.sharedMesh = defaultRendererData.defaultMesh;
+                        }
+
+                        if (isAccessory || defaultRendererData.defaultMaterial != null)
+                        {
+                            ApplyMaterialToRenderer(pair.renderer, defaultRendererData.defaultMaterial, pair.materialIndex);
+                        }
+                    }
+                    // Handle MeshRenderer
+                    else if (pair.renderer is MeshRenderer meshRenderer)
+                    {
+                        MeshFilter meshFilter = meshRenderer.GetComponent<MeshFilter>();
+
+                        if (isAccessory || (meshFilter != null && defaultRendererData.defaultMesh != null))
+                        {
+                            meshFilter.mesh = defaultRendererData.defaultMesh;
+                        }
+
+                        if (isAccessory || defaultRendererData.defaultMaterial != null)
+                        {
+                            ApplyMaterialToRenderer(pair.renderer, defaultRendererData.defaultMaterial, pair.materialIndex);
+
+                            if (item.category == CustomizationCategory.Ears)
+                            {
+                                Material earMaterial = pair.renderer.materials[0];
+                                earMaterial.color = CurrentSkinColor;
+                                Debug.Log("[PlayerCustomizationManager] Applied CurrentSkinColor to Ears: " + CurrentSkinColor);
+                            } 
+                        }
                     }
                 }
             }
@@ -717,12 +848,16 @@ namespace RooseLabs.Player.Customization
 
             CustomizationItem item = equippedItems[key];
 
+            bool isAccessory = item.category == CustomizationCategory.EyeAccessories
+                                || item.category == CustomizationCategory.HeadAccessories;
+
             // Handle removal based on application mode
             switch (item.applicationMode)
             {
                 case ApplicationMode.SwapMaterialOnly:
                 case ApplicationMode.SwapMeshAndMaterial:
-                    RestoreDefaults(item);
+                    if(isAccessory)
+                        RestoreDefaults(item);
                     break;
                 case ApplicationMode.InstantiateNew:
                     DestroyInstantiatedObjects(key);
@@ -765,6 +900,14 @@ namespace RooseLabs.Player.Customization
                 if (!config.IsValid())
                 {
                     Debug.LogWarning($"Invalid default configuration detected. Check PlayerCustomizationManager on '{gameObject.name}'.");
+                }
+
+                foreach (var rendererData in config.defaultRendererData)
+                {
+                    if (rendererData.renderer == null)
+                    {
+                        Debug.LogWarning($"Default configuration has null renderer. Check PlayerCustomizationManager on '{gameObject.name}'.");
+                    }
                 }
             }
         }

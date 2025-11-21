@@ -10,6 +10,7 @@ namespace RooseLabs.Player.Customization
         EyeAccessories,
         OutfitVisible,
         OutfitHidden,
-        Wands
+        Wands,
+        SkinColor
     }
 }

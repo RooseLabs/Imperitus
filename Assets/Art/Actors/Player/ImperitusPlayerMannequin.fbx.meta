@@ -3,7 +3,47 @@ guid: d4661e9eea52fb34794de2c448187555
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: FemaleUniform
+    second: {fileID: 2100000, guid: 94f1dcf2f05f4b44083f2241267ef1a5, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Glasses1
+    second: {fileID: 2100000, guid: 4d6da4cd876c70b41aee58f03813db52, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Glasses2
+    second: {fileID: 2100000, guid: ce92573d95fa7964c81fcb273d6b8bf3, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Hair3
+    second: {fileID: 2100000, guid: 7b6849382194332438a76f61e8b85c9f, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Lens
+    second: {fileID: 2100000, guid: b8f61511814d83b4c8761cba4c14db41, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Skin Ears
+    second: {fileID: 2100000, guid: 43521dd80415a494fb32e912621d905e, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: SkinColor
+    second: {fileID: 2100000, guid: ec790447f60543b4fb4fd63358072290, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: WitchHat
+    second: {fileID: 2100000, guid: a0319de1da65dd746832f108119f0788, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

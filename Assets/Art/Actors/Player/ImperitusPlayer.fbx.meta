@@ -3,7 +3,42 @@ guid: c7d48a079d40bd94a9483826266718bb
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Eyes
+    second: {fileID: 2100000, guid: 9b39112853f1cf44e8acd8e075dbee66, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Hair
+    second: {fileID: 2100000, guid: 3f39d0a3325b6f344a2471d435982de2, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Hair1
+    second: {fileID: 2100000, guid: d1d61e814b74c694cbfab3211b55381c, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MaleUniform
+    second: {fileID: 2100000, guid: aaf5e8b8c7ce1db4e993aed1c1c7b23a, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Mouth
+    second: {fileID: 2100000, guid: 08df1ebd18c744e46959769635bea2c8, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Skin Ears
+    second: {fileID: 2100000, guid: b91701fc91203014cab146ff617e8274, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: SkinColor
+    second: {fileID: 2100000, guid: 875edfbe870d3044c9bc62e75742fc86, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

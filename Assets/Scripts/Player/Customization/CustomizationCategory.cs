@@ -12,6 +12,7 @@ namespace RooseLabs.Player.Customization
         HeadAccessories,
         EyeAccessories,
         Outfit,
-        Wands
+        Wands,
+        SkinColor
     }
 }
