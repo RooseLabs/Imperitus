@@ -466,7 +466,38 @@ namespace RooseLabs.Player.Customization
 
                         if (slot.material != null)
                         {
+                            if (item.category == CustomizationCategory.Outfit && !item.femaleOutfitFix)
+                            {
+                                Material[] mats = skinnedRenderer.sharedMaterials;
+
+                                if (mats.Length >= 2)
+                                {
+                                    // Swap index 1 and 0
+                                    Material temp = mats[1];
+                                    mats[1] = mats[0];
+                                    mats[0] = temp;
+                                    skinnedRenderer.sharedMaterials = mats;
+                                }
+                            }
+
                             ApplyMaterialToRenderer(pair.renderer, slot.material, pair.materialIndex);
+
+                            if (item.femaleOutfitFix)
+                            {
+                                Material[] mats = skinnedRenderer.sharedMaterials;
+
+                                if (mats.Length >= 2)
+                                {
+                                    // Swap index 0 and 1
+                                    Material temp = mats[0];
+                                    mats[0] = mats[1];
+                                    mats[1] = temp;
+
+                                    skinnedRenderer.sharedMaterials = mats;
+
+                                    Debug.Log($"Swapped material order on {gameObject.name}");
+                                }
+                            }
                         }
                     }
                     // Handle MeshRenderer

@@ -39,6 +39,10 @@ namespace RooseLabs.ScriptableObjects
         [Tooltip("Icon displayed in UI.")]
         public Sprite icon;
 
+        [Header("Female outfit stupid fix")]
+        [Tooltip("Female outfit stupid fix")]
+        public bool femaleOutfitFix = false;
+
         /// <summary>
         /// Generates a unique key for tracking equipped items.
         /// Non-stackable: just category name
