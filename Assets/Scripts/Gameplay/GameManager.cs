@@ -135,5 +135,11 @@ namespace RooseLabs.Gameplay
         {
             return Path.GetFileNameWithoutExtension(fullPath);
         }
+
+        // Method that gets the current heist timer value
+        public float GetHeistTimerValue()
+        {
+            return m_heistTimer != null ? m_heistTimer.GetRemainingTime() : 0f;
+        }
     }
 }

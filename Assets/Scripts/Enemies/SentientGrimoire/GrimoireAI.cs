@@ -461,7 +461,13 @@ namespace RooseLabs.Enemies
                 {
                     hanadura.AlertToPosition(detectedPlayer.position);
                     called++;
-                }
+                }   
+            }
+
+            if (detectedPlayer != null && EnemySpawnManager.Instance != null)
+            {
+                EnemySpawnManager.Instance.OnGrimoireAlert(detectedPlayer.position);
+                //Debug.Log("[GrimoireAI] Notified spawn manager of alert");
             }
 
             //Debug.Log($"[GrimoireAI] Called {called} Hanadura reinforcements!");

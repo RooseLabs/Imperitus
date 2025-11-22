@@ -426,7 +426,7 @@ namespace RooseLabs.Player.Customization
                         if (item.category == CustomizationCategory.SkinColor)
                         {
                             CurrentSkinColor = slot.material.color;
-                            Debug.Log("[PlayerCustomizationManager] Updated CurrentSkinColor to " + CurrentSkinColor);
+                            //Debug.Log("[PlayerCustomizationManager] Updated CurrentSkinColor to " + CurrentSkinColor);
 
                             if (rendererLookup.ContainsKey(RendererID.Ears))
                             {
@@ -436,7 +436,7 @@ namespace RooseLabs.Player.Customization
                                     {
                                         Material earMaterial = earPair.renderer.materials[0];
                                         earMaterial.color = CurrentSkinColor;
-                                        Debug.Log("[PlayerCustomizationManager] Applied CurrentSkinColor to Ears: " + CurrentSkinColor);
+                                        //Debug.Log("[PlayerCustomizationManager] Applied CurrentSkinColor to Ears: " + CurrentSkinColor);
                                     }
                                 }
                             }
@@ -495,7 +495,7 @@ namespace RooseLabs.Player.Customization
 
                                     skinnedRenderer.sharedMaterials = mats;
 
-                                    Debug.Log($"Swapped material order on {gameObject.name}");
+                                    //Debug.Log($"Swapped material order on {gameObject.name}");
                                 }
                             }
                         }
@@ -519,7 +519,7 @@ namespace RooseLabs.Player.Customization
                                 // Apply the current skin color to the new ear material
                                 Material earMaterial = pair.renderer.materials[0];
                                 earMaterial.color = CurrentSkinColor;
-                                Debug.Log("[PlayerCustomizationManager] Applied CurrentSkinColor to Ears: " + CurrentSkinColor);
+                                //Debug.Log("[PlayerCustomizationManager] Applied CurrentSkinColor to Ears: " + CurrentSkinColor);
                             }
                         }
                     }
@@ -601,7 +601,7 @@ namespace RooseLabs.Player.Customization
                 if (item.category == CustomizationCategory.SkinColor)
                 {
                     CurrentSkinColor = Color.white;
-                    Debug.Log("[PlayerCustomizationManager] Updated CurrentSkinColor to " + CurrentSkinColor);
+                    //Debug.Log("[PlayerCustomizationManager] Updated CurrentSkinColor to " + CurrentSkinColor);
 
                     if (rendererLookup.ContainsKey(RendererID.Ears))
                     {
@@ -611,7 +611,7 @@ namespace RooseLabs.Player.Customization
                             {
                                 Material earMaterial = earPair.renderer.materials[0];
                                 earMaterial.color = CurrentSkinColor;
-                                Debug.Log("[PlayerCustomizationManager] Applied CurrentSkinColor to Ears: " + CurrentSkinColor);
+                                //Debug.Log("[PlayerCustomizationManager] Applied CurrentSkinColor to Ears: " + CurrentSkinColor);
                             }
                         }
                     }
@@ -677,7 +677,7 @@ namespace RooseLabs.Player.Customization
                             {
                                 Material earMaterial = pair.renderer.materials[0];
                                 earMaterial.color = CurrentSkinColor;
-                                Debug.Log("[PlayerCustomizationManager] Applied CurrentSkinColor to Ears: " + CurrentSkinColor);
+                                //Debug.Log("[PlayerCustomizationManager] Applied CurrentSkinColor to Ears: " + CurrentSkinColor);
                             } 
                         }
                     }
