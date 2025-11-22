@@ -3,7 +3,27 @@ guid: 87a8f0a71cca913419f624fb53986985
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Cape
+    second: {fileID: 2100000, guid: dda2d4dad28dc2144a4196ca914d9778, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Material.001
+    second: {fileID: 2100000, guid: 4209558fa52282c47b8cc403f376a1d6, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Pages
+    second: {fileID: 2100000, guid: e6fed8efc55a71a4ba4eb41226502fdc, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: ThickPages
+    second: {fileID: 2100000, guid: 9d86aed6ee20fa34cae1058dde1caf1b, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
