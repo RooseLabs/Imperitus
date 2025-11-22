@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using FishNet.Object;
+using RooseLabs.Enemies;
 using RooseLabs.Network;
 using RooseLabs.ScriptableObjects;
 using RooseLabs.Utils;
@@ -21,7 +22,12 @@ namespace RooseLabs.Gameplay
             m_heistTimer.ToggleTimerVisibility(true);
             if (IsServerInitialized)
             {
+                EnemySpawnManager.Instance.RegisterAllSpawners();
+                CacheRequiredRunesForAssignment();
                 SpawnHeistRuneContainerObjects();
+                InitializeEnemyPatrolSystem();
+                InitializeEnemySpawnManager();
+
                 // Determine time limit based on number of players
                 float timeLimit = HeistMaxTime - (PlayerHandler.AllCharacters.Count - 1) * HeistTimeReductionPerAdditionalPlayer;
                 timeLimit = Mathf.Clamp(timeLimit, HeistMinTime, HeistMaxTime);

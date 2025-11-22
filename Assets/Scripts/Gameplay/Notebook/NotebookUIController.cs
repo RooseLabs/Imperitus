@@ -1,5 +1,8 @@
-using System.Collections.Generic;
+using RooseLabs.Enemies;
+using RooseLabs.Player;
 using RooseLabs.ScriptableObjects;
+using RooseLabs.Utils;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -613,6 +616,17 @@ namespace RooseLabs.Gameplay.Notebook
             {
                 slotImage.sprite = rune.Sprite;
                 slotImage.enabled = true;
+            }
+
+            if (GameManager.Instance.currentRequiredRunes.Contains(rune))
+            {
+                this.LogInfo($"Task-required rune collected: {rune.name}");
+
+                // Notify spawn manager
+                if (EnemySpawnManager.Instance != null)
+                {
+                    EnemySpawnManager.Instance.OnTaskRuneCollected(m_localPlayerNotebook.GetComponentInParent<PlayerCharacter>().transform.position);
+                }
             }
 
             Debug.Log($"[NotebookUI] New rune collected and placed in slot {slotIndex}");

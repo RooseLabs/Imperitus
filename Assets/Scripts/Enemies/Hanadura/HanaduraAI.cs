@@ -223,6 +223,25 @@ namespace RooseLabs.Enemies
             EnterState(patrolState);
         }
 
+        /// <summary>
+        /// Call this after assigning a patrol route to reinitialize the patrol state
+        /// </summary>
+        public void ReinitializePatrolState()
+        {
+            if (!IsServerInitialized) return;
+
+            // Recreate patrol state with new route
+            patrolState = new PatrolState(this, patrolRoute, loopPatrol, startWaypointIndex);
+
+            // If currently patrolling, re-enter the state to apply changes
+            if (currentState is PatrolState)
+            {
+                EnterState(patrolState);
+            }
+
+            Logger.Info($"[HanaduraAI] Patrol state reinitialized with {patrolRoute?.Count ?? 0} waypoints");
+        }
+
         private void Update()
         {
             if (!base.IsServerInitialized)
@@ -709,6 +728,7 @@ namespace RooseLabs.Enemies
                 currentState = null;
                 ClearCurrentDetection();
                 rb.isKinematic = true;
+                weaponCollider.DisableWeapon();
 
                 Collider col = gameObject.GetComponent<Collider>();
                 if (col != null)

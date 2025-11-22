@@ -1,6 +1,7 @@
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
 using RooseLabs.Gameplay;
+using RooseLabs.ScriptableObjects;
 using UnityEngine;
 
 namespace RooseLabs.Enemies

@@ -916,6 +916,37 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5646026982886600592, guid: 6be8ac753ffc457468cc6a55e07ff225, type: 3}
   m_PrefabInstance: {fileID: 72297165}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &75210083
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 75210084}
+  m_Layer: 0
+  m_Name: 1 (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &75210084
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 75210083}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -11.75, y: 0, z: -0.41}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 900558023}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &80356137
 GameObject:
   m_ObjectHideFlags: 0
@@ -1276,7 +1307,7 @@ GameObject:
   - component: {fileID: 92892584}
   m_Layer: 0
   m_Name: Library
-  m_TagString: Untagged
+  m_TagString: Map
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1924,7 +1955,7 @@ GameObject:
   - component: {fileID: 177972200}
   m_Layer: 0
   m_Name: Basement
-  m_TagString: Untagged
+  m_TagString: Room
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1944,6 +1975,8 @@ Transform:
   m_Children:
   - {fileID: 951883803}
   - {fileID: 1058085128}
+  - {fileID: 1462235660}
+  - {fileID: 668883801}
   m_Father: {fileID: 92892584}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &180398880
@@ -2109,6 +2142,57 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1503819956}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &193966309
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 193966310}
+  - component: {fileID: 193966311}
+  m_Layer: 0
+  m_Name: MedRoom1_ESpawner_1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &193966310
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 193966309}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -27.740513, y: -8.714535, z: -122.56366}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1878624377}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &193966311
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 193966309}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d346b155343990941a0aef46dfaea26f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Enemies.EnemySpawner
+  spawnPoint: {fileID: 193966310}
+  roomIdentifier: 
+  showGizmo: 1
+  gizmoColor: {r: 1, g: 0.5, b: 0, a: 0.8}
+  gizmoSize: 1
+  showRoomRadius: 1
+  roomRadiusVisualization: 10
 --- !u!1001 &194806342
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2245,6 +2329,37 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1748971770594778435, guid: 7d22e7a8fa558f446af02d88fb59af93, type: 3}
   m_PrefabInstance: {fileID: 196192358}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &200398698
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 200398699}
+  m_Layer: 0
+  m_Name: EnemySpawner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &200398699
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 200398698}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -26.17902, y: -0.40904, z: -52.35321}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &200864095
 GameObject:
   m_ObjectHideFlags: 0
@@ -5925,6 +6040,57 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5454154659677734133, guid: 9e691d41f24b1234896c23364da1f7b6, type: 3}
   m_PrefabInstance: {fileID: 483775366}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &506320028
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 506320029}
+  - component: {fileID: 506320030}
+  m_Layer: 0
+  m_Name: SmallRoom2_ESpawner_1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &506320029
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 506320028}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 7.770443, y: -0.44838908, z: -25.40916}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 795038840}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &506320030
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 506320028}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d346b155343990941a0aef46dfaea26f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Enemies.EnemySpawner
+  spawnPoint: {fileID: 506320029}
+  roomIdentifier: 
+  showGizmo: 1
+  gizmoColor: {r: 1, g: 0.5, b: 0, a: 0.8}
+  gizmoSize: 1
+  showRoomRadius: 1
+  roomRadiusVisualization: 10
 --- !u!1 &510583198
 GameObject:
   m_ObjectHideFlags: 0
@@ -6579,6 +6745,57 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7695402350451730781, guid: ec1edaa25f010de4bb2d0d98d8639172, type: 3}
   m_PrefabInstance: {fileID: 589628380}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &603031798
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 603031799}
+  - component: {fileID: 603031800}
+  m_Layer: 0
+  m_Name: MedRoom1_ESpawner_2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &603031799
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 603031798}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -31.527409, y: -8.714533, z: -109.12662}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1878624377}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &603031800
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 603031798}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d346b155343990941a0aef46dfaea26f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Enemies.EnemySpawner
+  spawnPoint: {fileID: 603031799}
+  roomIdentifier: 
+  showGizmo: 1
+  gizmoColor: {r: 1, g: 0.5, b: 0, a: 0.8}
+  gizmoSize: 1
+  showRoomRadius: 1
+  roomRadiusVisualization: 10
 --- !u!1001 &604210782
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7470,6 +7687,57 @@ Transform:
   - {fileID: 1677476236}
   m_Father: {fileID: 92892584}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &668883800
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 668883801}
+  - component: {fileID: 668883802}
+  m_Layer: 0
+  m_Name: Basement_ESpawner_2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &668883801
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 668883800}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 3.4935188, y: -17.21658, z: -66.725266}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 177972200}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &668883802
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 668883800}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d346b155343990941a0aef46dfaea26f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Enemies.EnemySpawner
+  spawnPoint: {fileID: 668883801}
+  roomIdentifier: 
+  showGizmo: 1
+  gizmoColor: {r: 1, g: 0.5, b: 0, a: 0.8}
+  gizmoSize: 1
+  showRoomRadius: 1
+  roomRadiusVisualization: 10
 --- !u!1001 &670794276
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8426,7 +8694,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &748901946
 Transform:
   m_ObjectHideFlags: 0
@@ -8440,6 +8708,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 900558023}
   - {fileID: 841143748}
   - {fileID: 1503819956}
   m_Father: {fileID: 1551259764}
@@ -8541,7 +8810,7 @@ GameObject:
   - component: {fileID: 760011490}
   m_Layer: 0
   m_Name: MedRoom 3
-  m_TagString: Untagged
+  m_TagString: Room
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -8564,6 +8833,8 @@ Transform:
   - {fileID: 922772447}
   - {fileID: 1739363625}
   - {fileID: 958649858}
+  - {fileID: 985809560}
+  - {fileID: 1878107058}
   m_Father: {fileID: 92892584}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &761211468
@@ -9162,7 +9433,7 @@ GameObject:
   - component: {fileID: 795038840}
   m_Layer: 0
   m_Name: SmallRoom 2
-  m_TagString: Untagged
+  m_TagString: Room
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -9182,6 +9453,8 @@ Transform:
   m_Children:
   - {fileID: 436816810}
   - {fileID: 1682875048}
+  - {fileID: 506320029}
+  - {fileID: 1750288876}
   m_Father: {fileID: 92892584}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &800001731
@@ -9587,6 +9860,84 @@ MonoBehaviour:
   - {fileID: 638397879}
   - {fileID: 560137730}
   - {fileID: 212130758}
+--- !u!1001 &842454353
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1886436304}
+    m_Modifications:
+    - target: {fileID: 3025078776930143745, guid: 57090dfd109dc2642a434deb8b456572, type: 3}
+      propertyPath: volume
+      value: 
+      objectReference: {fileID: 1623027338}
+    - target: {fileID: 3025078776930143745, guid: 57090dfd109dc2642a434deb8b456572, type: 3}
+      propertyPath: patrolRoute
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 3679536469295908050, guid: 57090dfd109dc2642a434deb8b456572, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 7.1589985
+      objectReference: {fileID: 0}
+    - target: {fileID: 3679536469295908050, guid: 57090dfd109dc2642a434deb8b456572, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.0037326813
+      objectReference: {fileID: 0}
+    - target: {fileID: 3679536469295908050, guid: 57090dfd109dc2642a434deb8b456572, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -2.0547872
+      objectReference: {fileID: 0}
+    - target: {fileID: 3679536469295908050, guid: 57090dfd109dc2642a434deb8b456572, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3679536469295908050, guid: 57090dfd109dc2642a434deb8b456572, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3679536469295908050, guid: 57090dfd109dc2642a434deb8b456572, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3679536469295908050, guid: 57090dfd109dc2642a434deb8b456572, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3679536469295908050, guid: 57090dfd109dc2642a434deb8b456572, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3679536469295908050, guid: 57090dfd109dc2642a434deb8b456572, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3679536469295908050, guid: 57090dfd109dc2642a434deb8b456572, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3774049500881470253, guid: 57090dfd109dc2642a434deb8b456572, type: 3}
+      propertyPath: m_Name
+      value: Hanadura_Test
+      objectReference: {fileID: 0}
+    - target: {fileID: 8806621658639097980, guid: 57090dfd109dc2642a434deb8b456572, type: 3}
+      propertyPath: WasActiveDuringEdit
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8806621658639097980, guid: 57090dfd109dc2642a434deb8b456572, type: 3}
+      propertyPath: <SceneId>k__BackingField
+      value: 2010954853
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 57090dfd109dc2642a434deb8b456572, type: 3}
+--- !u!4 &842454354 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3679536469295908050, guid: 57090dfd109dc2642a434deb8b456572, type: 3}
+  m_PrefabInstance: {fileID: 842454353}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &848980196
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9769,6 +10120,179 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 854846518}
   m_Mesh: {fileID: 963843061180620152, guid: 1a6833422b7471641912289f008d8a06, type: 3}
+--- !u!1 &856160373
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 856160374}
+  - component: {fileID: 856160375}
+  m_Layer: 0
+  m_Name: Corridor3_ESpawner_2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &856160374
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 856160373}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -27.058514, y: -0.445436, z: -98.89658}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1721747426}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &856160375
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 856160373}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d346b155343990941a0aef46dfaea26f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Enemies.EnemySpawner
+  spawnPoint: {fileID: 856160374}
+  roomIdentifier: 
+  showGizmo: 1
+  gizmoColor: {r: 1, g: 0.5, b: 0, a: 0.8}
+  gizmoSize: 1
+  showRoomRadius: 1
+  roomRadiusVisualization: 10
+--- !u!1 &860656572
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 860656575}
+  - component: {fileID: 860656574}
+  - component: {fileID: 860656573}
+  m_Layer: 0
+  m_Name: PatrolPointGenerator
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &860656573
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 860656572}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26b716c41e9b56b4baafaf13a523ba2e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FishNet.Runtime::FishNet.Object.NetworkObject
+  <IsNested>k__BackingField: 0
+  WasActiveDuringEdit: 1
+  WasActiveDuringEdit_Set1: 1
+  <ComponentIndex>k__BackingField: 0
+  <PredictedSpawn>k__BackingField: {fileID: 0}
+  <PredictedOwner>k__BackingField: {fileID: 0}
+  NetworkBehaviours: []
+  InitializedParentNetworkBehaviour: {fileID: 0}
+  InitializedNestedNetworkObjects: []
+  RuntimeParentNetworkBehaviour: {fileID: 0}
+  RuntimeChildNetworkBehaviours: []
+  _isNetworked: 1
+  _isSpawnable: 1
+  _isGlobal: 0
+  _initializeOrder: 0
+  _preventDespawnOnDisconnect: 0
+  _defaultDespawnType: 0
+  NetworkObserver: {fileID: 0}
+  _enablePrediction: 0
+  _predictionType: 0
+  _graphicalObject: {fileID: 0}
+  _detachGraphicalObject: 0
+  _enableStateForwarding: 1
+  _networkTransform: {fileID: 0}
+  _ownerInterpolation: 1
+  _ownerSmoothedProperties: 255
+  _adaptiveInterpolation: 3
+  _spectatorSmoothedProperties: 255
+  _spectatorInterpolation: 2
+  _enableTeleport: 0
+  _teleportThreshold: 1
+  <PrefabId>k__BackingField: 65535
+  <SpawnableCollectionId>k__BackingField: 0
+  <AssetPathHash>k__BackingField: 0
+  <SceneId>k__BackingField: 4106024699
+  SerializedTransformProperties:
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0, w: 0}
+    Scale: {x: 0, y: 0, z: 0}
+    IsValid: 0
+--- !u!114 &860656574
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 860656572}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e0367b518ef64241b093f8f1e40f9fd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Enemies.PatrolPointGenerator
+  _componentIndexCache: 255
+  _addedNetworkObject: {fileID: 860656573}
+  _networkObjectCache: {fileID: 0}
+  mapContainerTag: Map
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 128
+  obstacleLayer:
+    serializedVersion: 2
+    m_Bits: 1
+  gridSpacing: 3
+  obstacleClearanceRadius: 1.5
+  raycastStartHeight: 50
+  maxRaycastDistance: 100
+  minHeightClearance: 2.5
+  navMeshSampleDistance: 2
+  autoCreatePatrolRoute: 1
+  waypointParent: {fileID: 0}
+  showDebugGizmos: 1
+  validPointColor: {r: 0, g: 1, b: 0, a: 1}
+  rejectedPointColor: {r: 1, g: 0, b: 0, a: 1}
+  gizmoSize: 0.3
+  showPatrolPath: 1
+  exclusionZoneTag: PatrolExclusionZone
+  showExclusionZones: 1
+--- !u!4 &860656575
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 860656572}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -14.0098, y: -0.44544, z: -67.63508}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &876252710
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10017,8 +10541,58 @@ Transform:
   m_Children:
   - {fileID: 1265407274}
   - {fileID: 420596236}
+  - {fileID: 1463743608}
   m_Father: {fileID: 92892584}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &900558022
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 900558023}
+  - component: {fileID: 900558024}
+  m_Layer: 0
+  m_Name: Hanadura_Test
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &900558023
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 900558022}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 6.3911557, y: -7.652827, z: 55.590313}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1408945629}
+  - {fileID: 75210084}
+  m_Father: {fileID: 748901946}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &900558024
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 900558022}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b0367a22a8fb3cc479c57e2ebefd9431, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Enemies.PatrolRoute
+  waypoints:
+  - {fileID: 1408945629}
+  - {fileID: 75210084}
 --- !u!1001 &901841473
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -11086,6 +11660,57 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2624577738451263936, guid: d3ea950b90656964baf35ac0cf2e7770, type: 3}
   m_PrefabInstance: {fileID: 985453366}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &985809559
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 985809560}
+  - component: {fileID: 985809561}
+  m_Layer: 0
+  m_Name: MedRoom3_ESpawner_1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &985809560
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 985809559}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 32.20707, y: -8.680836, z: -68.8846}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 760011490}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &985809561
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 985809559}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d346b155343990941a0aef46dfaea26f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Enemies.EnemySpawner
+  spawnPoint: {fileID: 985809560}
+  roomIdentifier: 
+  showGizmo: 1
+  gizmoColor: {r: 1, g: 0.5, b: 0, a: 0.8}
+  gizmoSize: 1
+  showRoomRadius: 1
+  roomRadiusVisualization: 10
 --- !u!1001 &987226676
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -11342,6 +11967,57 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1367626995394045579, guid: 63a1cc5d8bfbc9845967226194933772, type: 3}
   m_PrefabInstance: {fileID: 1021905328}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1025761645
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1025761646}
+  - component: {fileID: 1025761647}
+  m_Layer: 0
+  m_Name: MainRoom_ESpawner_2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1025761646
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1025761645}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -27.237076, y: -8.714533, z: -30.886536}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1863468729}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1025761647
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1025761645}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d346b155343990941a0aef46dfaea26f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Enemies.EnemySpawner
+  spawnPoint: {fileID: 1025761646}
+  roomIdentifier: 
+  showGizmo: 1
+  gizmoColor: {r: 1, g: 0.5, b: 0, a: 0.8}
+  gizmoSize: 1
+  showRoomRadius: 1
+  roomRadiusVisualization: 10
 --- !u!1001 &1035342009
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -12082,6 +12758,57 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5454154659677734133, guid: 9e691d41f24b1234896c23364da1f7b6, type: 3}
   m_PrefabInstance: {fileID: 1106777803}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1107248979
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1107248980}
+  - component: {fileID: 1107248981}
+  m_Layer: 0
+  m_Name: MedRoom2_ESpawner_1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1107248980
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1107248979}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -46.474644, y: -0.4454298, z: -68.39622}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1209823610}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1107248981
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1107248979}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d346b155343990941a0aef46dfaea26f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Enemies.EnemySpawner
+  spawnPoint: {fileID: 1107248980}
+  roomIdentifier: 
+  showGizmo: 1
+  gizmoColor: {r: 1, g: 0.5, b: 0, a: 0.8}
+  gizmoSize: 1
+  showRoomRadius: 1
+  roomRadiusVisualization: 10
 --- !u!1001 &1113412108
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -12450,6 +13177,57 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1147901678}
   m_Mesh: {fileID: 6182560244156782456, guid: 1a6833422b7471641912289f008d8a06, type: 3}
+--- !u!1 &1150668645
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1150668646}
+  - component: {fileID: 1150668647}
+  m_Layer: 0
+  m_Name: SmallRoom1_ESpawner_2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1150668646
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1150668645}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -60.14468, y: -8.714535, z: -49.50018}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2123234461}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1150668647
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1150668645}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d346b155343990941a0aef46dfaea26f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Enemies.EnemySpawner
+  spawnPoint: {fileID: 1150668646}
+  roomIdentifier: 
+  showGizmo: 1
+  gizmoColor: {r: 1, g: 0.5, b: 0, a: 0.8}
+  gizmoSize: 1
+  showRoomRadius: 1
+  roomRadiusVisualization: 10
 --- !u!1001 &1155146995
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -12585,7 +13363,7 @@ GameObject:
   - component: {fileID: 1157200881}
   m_Layer: 0
   m_Name: Corridor 2
-  m_TagString: Untagged
+  m_TagString: Room
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -12607,6 +13385,8 @@ Transform:
   - {fileID: 1547767639}
   - {fileID: 2099947556}
   - {fileID: 715235429}
+  - {fileID: 1673079780}
+  - {fileID: 1719069377}
   m_Father: {fileID: 92892584}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1160964957
@@ -13294,6 +14074,57 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5454154659677734133, guid: 9e691d41f24b1234896c23364da1f7b6, type: 3}
   m_PrefabInstance: {fileID: 1195586222}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1204473820
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1204473821}
+  - component: {fileID: 1204473822}
+  m_Layer: 0
+  m_Name: SmallRoom3_ESpawner_1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1204473821
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1204473820}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -18.46127, y: -8.719341, z: -97.79065}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1417097022}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1204473822
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1204473820}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d346b155343990941a0aef46dfaea26f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Enemies.EnemySpawner
+  spawnPoint: {fileID: 1204473821}
+  roomIdentifier: 
+  showGizmo: 1
+  gizmoColor: {r: 1, g: 0.5, b: 0, a: 0.8}
+  gizmoSize: 1
+  showRoomRadius: 1
+  roomRadiusVisualization: 10
 --- !u!1001 &1207406663
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -13375,7 +14206,7 @@ GameObject:
   - component: {fileID: 1209823610}
   m_Layer: 0
   m_Name: MedRoom 2
-  m_TagString: Untagged
+  m_TagString: Room
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -13395,6 +14226,8 @@ Transform:
   m_Children:
   - {fileID: 2092764797}
   - {fileID: 1465911552}
+  - {fileID: 1798545382}
+  - {fileID: 1107248980}
   m_Father: {fileID: 92892584}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1215239294
@@ -14873,6 +15706,57 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7695402350451730781, guid: ec1edaa25f010de4bb2d0d98d8639172, type: 3}
   m_PrefabInstance: {fileID: 1345648027}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1362139858
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1362139859}
+  - component: {fileID: 1362139860}
+  m_Layer: 0
+  m_Name: Corridor3_ESpawner_1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1362139859
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1362139858}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -26.75879, y: -0.44543028, z: -63.99874}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1721747426}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1362139860
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1362139858}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d346b155343990941a0aef46dfaea26f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Enemies.EnemySpawner
+  spawnPoint: {fileID: 1362139859}
+  roomIdentifier: 
+  showGizmo: 1
+  gizmoColor: {r: 1, g: 0.5, b: 0, a: 0.8}
+  gizmoSize: 1
+  showRoomRadius: 1
+  roomRadiusVisualization: 10
 --- !u!1001 &1364241265
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -15455,6 +16339,37 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7695402350451730781, guid: ec1edaa25f010de4bb2d0d98d8639172, type: 3}
   m_PrefabInstance: {fileID: 1406350437}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1408945628
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1408945629}
+  m_Layer: 0
+  m_Name: 1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1408945629
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1408945628}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.79, y: -0.0000009536743, z: 0.42859745}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 900558023}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1417097021
 GameObject:
   m_ObjectHideFlags: 0
@@ -15466,7 +16381,7 @@ GameObject:
   - component: {fileID: 1417097022}
   m_Layer: 0
   m_Name: SmallRoom 3
-  m_TagString: Untagged
+  m_TagString: Room
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -15486,6 +16401,8 @@ Transform:
   m_Children:
   - {fileID: 310672192}
   - {fileID: 1908272948}
+  - {fileID: 1204473821}
+  - {fileID: 2092223175}
   m_Father: {fileID: 92892584}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1421555135
@@ -15574,6 +16491,57 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3679536469295908050, guid: 57090dfd109dc2642a434deb8b456572, type: 3}
   m_PrefabInstance: {fileID: 1421555135}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1429232644
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1429232645}
+  - component: {fileID: 1429232646}
+  m_Layer: 0
+  m_Name: SmallRoom1_ESpawner_1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1429232645
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1429232644}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -50.480713, y: -8.714533, z: -40.488472}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2123234461}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1429232646
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1429232644}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d346b155343990941a0aef46dfaea26f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Enemies.EnemySpawner
+  spawnPoint: {fileID: 1429232645}
+  roomIdentifier: 
+  showGizmo: 1
+  gizmoColor: {r: 1, g: 0.5, b: 0, a: 0.8}
+  gizmoSize: 1
+  showRoomRadius: 1
+  roomRadiusVisualization: 10
 --- !u!1 &1436240137
 GameObject:
   m_ObjectHideFlags: 0
@@ -16299,6 +17267,110 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5654854918745850665, guid: b2c9e911b0daf7c47aa6bbfcc3977c41, type: 3}
   m_PrefabInstance: {fileID: 1461186134}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1462235659
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1462235660}
+  - component: {fileID: 1462235661}
+  m_Layer: 0
+  m_Name: Basement_ESpawner_1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1462235660
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1462235659}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -4.2919865, y: -17.21658, z: -73.74154}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 177972200}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1462235661
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1462235659}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d346b155343990941a0aef46dfaea26f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Enemies.EnemySpawner
+  spawnPoint: {fileID: 1462235660}
+  roomIdentifier: 
+  showGizmo: 1
+  gizmoColor: {r: 1, g: 0.5, b: 0, a: 0.8}
+  gizmoSize: 1
+  showRoomRadius: 1
+  roomRadiusVisualization: 10
+--- !u!1 &1463743607
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1463743608}
+  - component: {fileID: 1463743609}
+  m_Layer: 0
+  m_Name: ExclusionZone
+  m_TagString: PatrolExclusionZone
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1463743608
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1463743607}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -26.79, y: -5.63, z: 3.69}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 897086826}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &1463743609
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1463743607}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 20.81, y: 7.3, z: 34.4}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &1464115203
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -19218,6 +20290,57 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7695402350451730781, guid: ec1edaa25f010de4bb2d0d98d8639172, type: 3}
   m_PrefabInstance: {fileID: 1669812071}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1673079779
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1673079780}
+  - component: {fileID: 1673079781}
+  m_Layer: 0
+  m_Name: Corridor2_ESpawner_1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1673079780
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1673079779}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 9.768475, y: -8.719338, z: -80.335846}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1157200881}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1673079781
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1673079779}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d346b155343990941a0aef46dfaea26f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Enemies.EnemySpawner
+  spawnPoint: {fileID: 1673079780}
+  roomIdentifier: 
+  showGizmo: 1
+  gizmoColor: {r: 1, g: 0.5, b: 0, a: 0.8}
+  gizmoSize: 1
+  showRoomRadius: 1
+  roomRadiusVisualization: 10
 --- !u!1 &1677476235
 GameObject:
   m_ObjectHideFlags: 0
@@ -19620,6 +20743,57 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1702064942}
   m_Mesh: {fileID: -6186199983643814354, guid: 1a6833422b7471641912289f008d8a06, type: 3}
+--- !u!1 &1719069376
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1719069377}
+  - component: {fileID: 1719069378}
+  m_Layer: 0
+  m_Name: Corridor2_ESpawner_2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1719069377
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1719069376}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -27.214294, y: -8.719338, z: -72.98841}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1157200881}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1719069378
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1719069376}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d346b155343990941a0aef46dfaea26f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Enemies.EnemySpawner
+  spawnPoint: {fileID: 1719069377}
+  roomIdentifier: 
+  showGizmo: 1
+  gizmoColor: {r: 1, g: 0.5, b: 0, a: 0.8}
+  gizmoSize: 1
+  showRoomRadius: 1
+  roomRadiusVisualization: 10
 --- !u!1001 &1719504961
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -19693,7 +20867,7 @@ GameObject:
   - component: {fileID: 1721747426}
   m_Layer: 0
   m_Name: Corridor 3
-  m_TagString: Untagged
+  m_TagString: Room
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -19722,6 +20896,8 @@ Transform:
   - {fileID: 200864096}
   - {fileID: 1147901679}
   - {fileID: 1597800900}
+  - {fileID: 1362139859}
+  - {fileID: 856160374}
   m_Father: {fileID: 92892584}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1733921766
@@ -19839,8 +21015,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 22.58971, y: 30.018078, z: 0.22346742}
-  m_Center: {x: -5.2168064, y: 0.000030517574, z: 0.11173371}
+  m_Size: {x: 18.16, y: 30.018078, z: 0.22346742}
+  m_Center: {x: -7.7, y: 0.000030517574, z: 0.11173371}
 --- !u!23 &1739363627
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -20029,6 +21205,57 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7695402350451730781, guid: ec1edaa25f010de4bb2d0d98d8639172, type: 3}
   m_PrefabInstance: {fileID: 1746085392}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1750288875
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1750288876}
+  - component: {fileID: 1750288877}
+  m_Layer: 0
+  m_Name: SmallRoom2_ESpawner_2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1750288876
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1750288875}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -3.6907692, y: -0.44839048, z: -36.214314}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 795038840}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1750288877
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1750288875}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d346b155343990941a0aef46dfaea26f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Enemies.EnemySpawner
+  spawnPoint: {fileID: 1750288876}
+  roomIdentifier: 
+  showGizmo: 1
+  gizmoColor: {r: 1, g: 0.5, b: 0, a: 0.8}
+  gizmoSize: 1
+  showRoomRadius: 1
+  roomRadiusVisualization: 10
 --- !u!1001 &1753844211
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -20215,6 +21442,57 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1367626995394045579, guid: 63a1cc5d8bfbc9845967226194933772, type: 3}
   m_PrefabInstance: {fileID: 1779293743}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1780763313
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1780763314}
+  - component: {fileID: 1780763315}
+  m_Layer: 0
+  m_Name: MainRoom_ESpawner_1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1780763314
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1780763313}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -26.580357, y: -0.40903854, z: -51.725075}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1863468729}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1780763315
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1780763313}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d346b155343990941a0aef46dfaea26f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Enemies.EnemySpawner
+  spawnPoint: {fileID: 1780763314}
+  roomIdentifier: 
+  showGizmo: 1
+  gizmoColor: {r: 1, g: 0.5, b: 0, a: 0.8}
+  gizmoSize: 1
+  showRoomRadius: 1
+  roomRadiusVisualization: 10
 --- !u!1 &1781509512
 GameObject:
   m_ObjectHideFlags: 0
@@ -20681,6 +21959,57 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5454154659677734133, guid: 9e691d41f24b1234896c23364da1f7b6, type: 3}
   m_PrefabInstance: {fileID: 1793813076}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1798545381
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1798545382}
+  - component: {fileID: 1798545383}
+  m_Layer: 0
+  m_Name: MedRoom2_ESpawner_2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1798545382
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1798545381}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -41.44812, y: -0.44543266, z: -81.28001}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1209823610}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1798545383
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1798545381}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d346b155343990941a0aef46dfaea26f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Enemies.EnemySpawner
+  spawnPoint: {fileID: 1798545382}
+  roomIdentifier: 
+  showGizmo: 1
+  gizmoColor: {r: 1, g: 0.5, b: 0, a: 0.8}
+  gizmoSize: 1
+  showRoomRadius: 1
+  roomRadiusVisualization: 10
 --- !u!1 &1805332931
 GameObject:
   m_ObjectHideFlags: 0
@@ -21551,7 +22880,7 @@ GameObject:
   - component: {fileID: 1863468729}
   m_Layer: 0
   m_Name: MainRoom
-  m_TagString: Untagged
+  m_TagString: Room
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -21571,8 +22900,61 @@ Transform:
   m_Children:
   - {fileID: 1247241810}
   - {fileID: 675458099}
+  - {fileID: 1780763314}
+  - {fileID: 1025761646}
   m_Father: {fileID: 92892584}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1878107057
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1878107058}
+  - component: {fileID: 1878107059}
+  m_Layer: 0
+  m_Name: MedRoom3_ESpawner_2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1878107058
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1878107057}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 35.78758, y: -8.714535, z: -80.38951}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 760011490}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1878107059
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1878107057}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d346b155343990941a0aef46dfaea26f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Enemies.EnemySpawner
+  spawnPoint: {fileID: 1878107058}
+  roomIdentifier: 
+  showGizmo: 1
+  gizmoColor: {r: 1, g: 0.5, b: 0, a: 0.8}
+  gizmoSize: 1
+  showRoomRadius: 1
+  roomRadiusVisualization: 10
 --- !u!1 &1878110403
 GameObject:
   m_ObjectHideFlags: 0
@@ -21716,7 +23098,7 @@ GameObject:
   - component: {fileID: 1878624377}
   m_Layer: 0
   m_Name: MedRoom 1
-  m_TagString: Untagged
+  m_TagString: Room
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -21736,6 +23118,8 @@ Transform:
   m_Children:
   - {fileID: 1787017117}
   - {fileID: 1052154145}
+  - {fileID: 193966310}
+  - {fileID: 603031799}
   m_Father: {fileID: 92892584}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1880128721
@@ -22001,7 +23385,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1886436304
 Transform:
   m_ObjectHideFlags: 0
@@ -22015,6 +23399,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 842454354}
   - {fileID: 758029283}
   - {fileID: 1421555136}
   m_Father: {fileID: 1650974549}
@@ -23828,6 +25213,57 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4595481999434559604, guid: f1ce3a9c6d3682641b9b5bf4eda3a586, type: 3}
   m_PrefabInstance: {fileID: 2085459592}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &2092223174
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2092223175}
+  - component: {fileID: 2092223176}
+  m_Layer: 0
+  m_Name: SmallRoom3_ESpawner_2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2092223175
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2092223174}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -8.300135, y: -8.719339, z: -90.45962}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1417097022}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2092223176
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2092223174}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d346b155343990941a0aef46dfaea26f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Enemies.EnemySpawner
+  spawnPoint: {fileID: 2092223175}
+  roomIdentifier: 
+  showGizmo: 1
+  gizmoColor: {r: 1, g: 0.5, b: 0, a: 0.8}
+  gizmoSize: 1
+  showRoomRadius: 1
+  roomRadiusVisualization: 10
 --- !u!1 &2092764796
 GameObject:
   m_ObjectHideFlags: 0
@@ -24487,7 +25923,7 @@ GameObject:
   - component: {fileID: 2123234461}
   m_Layer: 0
   m_Name: SmallRoom 1
-  m_TagString: Untagged
+  m_TagString: Room
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -24507,6 +25943,8 @@ Transform:
   m_Children:
   - {fileID: 203466695}
   - {fileID: 960806011}
+  - {fileID: 1429232645}
+  - {fileID: 1150668646}
   m_Father: {fileID: 92892584}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2132442967
@@ -24905,8 +26343,10 @@ SceneRoots:
   - {fileID: 1623027339}
   - {fileID: 325811855}
   - {fileID: 92892584}
+  - {fileID: 200398699}
   - {fileID: 219132592}
   - {fileID: 2098555951}
   - {fileID: 1504524834}
   - {fileID: 1650974549}
   - {fileID: 1551259764}
+  - {fileID: 860656575}

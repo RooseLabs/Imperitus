@@ -10,6 +10,7 @@ namespace RooseLabs.Gameplay
     {
         private readonly SyncTimer m_syncTimer = new();
         private bool m_finishedTriggered;
+        private float m_startTimeValue;
 
         private void OnEnable()
         {
@@ -30,6 +31,7 @@ namespace RooseLabs.Gameplay
         public void StartTimer(float time)
         {
             m_syncTimer.StartTimer(time, sendRemainingOnStop: true);
+            m_startTimeValue = time;
             m_finishedTriggered = false;
         }
 
@@ -70,6 +72,12 @@ namespace RooseLabs.Gameplay
             this.LogInfo("Heist timer has reached zero. Ending heist as failed.");
             m_finishedTriggered = true;
             GameManager.Instance.EndHeist(false);
+        }
+
+        [Server]
+        public float GetRemainingTime()
+        {
+            return m_syncTimer.Remaining / m_startTimeValue;
         }
     }
 }
