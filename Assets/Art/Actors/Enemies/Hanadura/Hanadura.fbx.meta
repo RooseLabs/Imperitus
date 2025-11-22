@@ -3,7 +3,37 @@ guid: 40a8f7565f3902043897dd549a7663b9
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: BigCloth
+    second: {fileID: 2100000, guid: e683802e6eaed4040a3b3822b95c8f63, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Black
+    second: {fileID: 2100000, guid: c2e01161cf4919c4db2aaa0f4c750421, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Cape
+    second: {fileID: 2100000, guid: e8ecf49afee82084891429d04a3c7349, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: SmallCloth
+    second: {fileID: 2100000, guid: b4118df8eb2842c42addd197c6d8a418, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: White
+    second: {fileID: 2100000, guid: acb4e9d264cb9e041bbb1ac8dfd49057, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Yellow
+    second: {fileID: 2100000, guid: 0a0eb7bd1b0611d41916caafb04f4476, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
