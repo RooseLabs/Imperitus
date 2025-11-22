@@ -8,10 +8,13 @@ namespace RooseLabs.UI
 {
     public class HUDManager : MonoBehaviour
     {
+        #region Serialized
         [SerializeField] private Slider healthSlider;
         [SerializeField] private Slider staminaSlider;
         [SerializeField] private TMP_Text timerText;
         [SerializeField] private TMP_Text joinCodeText;
+        [SerializeField] private TMP_Text interactionText;
+        #endregion
 
         private void OnEnable()
         {
@@ -48,6 +51,15 @@ namespace RooseLabs.UI
             int minutes = Mathf.FloorToInt(time / 60f);
             int seconds = Mathf.FloorToInt(time % 60f);
             timerText.text = $"{minutes:00}:{seconds:00}";
+        }
+
+        /// <summary>
+        /// Sets the interaction text displayed on the HUD.
+        /// </summary>
+        /// <param name="text">The text to display.</param>
+        public void SetInteractionText(string text)
+        {
+            interactionText.text = text;
         }
     }
 }

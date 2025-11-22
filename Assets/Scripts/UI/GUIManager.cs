@@ -1,13 +1,17 @@
+using System.Runtime.CompilerServices;
 using RooseLabs.Core;
 using RooseLabs.Gameplay.Notebook;
 using RooseLabs.Player;
 using RooseLabs.Player.Customization;
 using UnityEngine;
+using Logger = RooseLabs.Core.Logger;
 
 namespace RooseLabs.UI
 {
     public class GUIManager : MonoBehaviour
     {
+        private static Logger Logger => Logger.GetLogger("GUIManager");
+
         public static GUIManager Instance { get; private set; }
 
         [SerializeField] private HUDManager hudManager;
@@ -16,6 +20,7 @@ namespace RooseLabs.UI
 
         private bool m_isNotebookOpen = false;
         private bool m_isCustomizationMenuOpen = false;
+        private bool WindowIsOpen => m_isNotebookOpen || m_isCustomizationMenuOpen;
 
         private void Awake()
         {
@@ -56,6 +61,15 @@ namespace RooseLabs.UI
                 {
                     ToggleNotebook();
                 }
+            }
+        }
+
+        private void LateUpdate()
+        {
+            if (WindowIsOpen)
+            {
+                // When any window is open, clear interaction text
+                hudManager.SetInteractionText(string.Empty);
             }
         }
 
@@ -111,9 +125,20 @@ namespace RooseLabs.UI
             notebookUIController.gameObject.SetActive(false);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetHUDActive(bool isActive) => hudManager.gameObject.SetActive(isActive);
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetTimerActive(bool isActive) => hudManager.SetTimerActive(isActive);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void UpdateTimer(float time) => hudManager.UpdateTimer(time);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SetInteractionText(string text)
+        {
+            if (WindowIsOpen) return;
+            hudManager.SetInteractionText(text);
+        }
     }
 }

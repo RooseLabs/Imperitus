@@ -1,5 +1,6 @@
 using RooseLabs.Gameplay.Interactables;
 using RooseLabs.Player;
+using RooseLabs.UI;
 using RooseLabs.Utils;
 using UnityEngine;
 
@@ -34,6 +35,7 @@ namespace RooseLabs.Gameplay
                 m_bestInteractable = null;
             }
             CurrentHovered = m_bestInteractable;
+            GUIManager.Instance.SetInteractionText(CurrentHovered != null ? CurrentHovered.GetInteractionText() : string.Empty);
         }
 
         private void FindBestInteractable()
