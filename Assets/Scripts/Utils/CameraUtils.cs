@@ -6,7 +6,7 @@ namespace RooseLabs.Utils
     /// Utility class providing helper methods for camera-related projections and calculations in Unity,
     /// such as converting viewport or screen coordinates to world points on a plane at a specified depth.
     /// </summary>
-    public static class CameraPlaneUtils
+    public static class CameraUtils
     {
         /// <summary>
         /// Converts a viewport coordinate to a world point on a plane parallel to the camera's viewport at the specified depth.
@@ -64,6 +64,18 @@ namespace RooseLabs.Utils
         {
             Vector3 localPosition = camera.transform.InverseTransformPoint(point);
             return localPosition.z;
+        }
+
+        /// <summary>
+        /// Determines if a given renderer is visible from the specified camera's perspective.
+        /// </summary>
+        /// <param name="camera">The camera to check visibility from.</param>
+        /// <param name="renderer">The renderer to check for visibility.</param>
+        /// <returns>True if the renderer is visible from the camera; otherwise, false.</returns>
+        public static bool VisibleFromCamera(Camera camera, Renderer renderer)
+        {
+            Plane[] planes = GeometryUtility.CalculateFrustumPlanes(camera);
+            return GeometryUtility.TestPlanesAABB(planes, renderer.bounds);
         }
 
         /// <summary>

@@ -164,7 +164,7 @@ namespace RooseLabs.Player
 
             if (!IsOwner) return;
 
-            Vector2 viewAngles = CameraPlaneUtils.ViewportToViewAngles(m_character.Camera, handViewportPos);
+            Vector2 viewAngles = CameraUtils.ViewportToViewAngles(m_character.Camera, handViewportPos);
             float yawOffset = viewAngles.x * Mathf.Rad2Deg;
             float pitchOffset = viewAngles.y * Mathf.Rad2Deg;
 

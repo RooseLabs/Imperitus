@@ -1,0 +1,131 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &2886326573433118317
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: cda9fa464382c1c4da68daf585b4c014, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: cda9fa464382c1c4da68daf585b4c014, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: cda9fa464382c1c4da68daf585b4c014, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -3241968213256342262, guid: cda9fa464382c1c4da68daf585b4c014, type: 3}
+      propertyPath: m_Layer
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: -3241968213256342262, guid: cda9fa464382c1c4da68daf585b4c014, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -2403196279248392691, guid: cda9fa464382c1c4da68daf585b4c014, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 62c63733c09d7c54cbab8977619c62d9, type: 2}
+    - target: {fileID: 919132149155446097, guid: cda9fa464382c1c4da68daf585b4c014, type: 3}
+      propertyPath: m_Name
+      value: StandingMirror
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: cda9fa464382c1c4da68daf585b4c014, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: cda9fa464382c1c4da68daf585b4c014, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1177572646044115612, guid: cda9fa464382c1c4da68daf585b4c014, type: 3}
+      propertyPath: m_Layer
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 1177572646044115612, guid: cda9fa464382c1c4da68daf585b4c014, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: cda9fa464382c1c4da68daf585b4c014, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6596722963481764474}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: cda9fa464382c1c4da68daf585b4c014, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 935299886913940384}
+    - targetCorrespondingSourceObject: {fileID: -3241968213256342262, guid: cda9fa464382c1c4da68daf585b4c014, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2337720380625448070}
+  m_SourcePrefab: {fileID: 100100000, guid: cda9fa464382c1c4da68daf585b4c014, type: 3}
+--- !u!1 &2652377635250594620 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: cda9fa464382c1c4da68daf585b4c014, type: 3}
+  m_PrefabInstance: {fileID: 2886326573433118317}
+  m_PrefabAsset: {fileID: 0}
+--- !u!65 &6596722963481764474
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2652377635250594620}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.0310216, y: 2.3013113, z: 0.04183796}
+  m_Center: {x: 0, y: 0.0955137, z: 0.020917393}
+--- !u!114 &935299886913940384
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2652377635250594620}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea5bb07142074d84997efdffa0a688f3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Gameplay.Interactables.CustomizationMirror
+--- !u!1 &8866599960464796519 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -3241968213256342262, guid: cda9fa464382c1c4da68daf585b4c014, type: 3}
+  m_PrefabInstance: {fileID: 2886326573433118317}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2337720380625448070
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8866599960464796519}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 238f856ccb9dcab47a979a90cda4214c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlanarReflectionCamera
+  reflectionNormal: 4
+  reflectionMask:
+    serializedVersion: 2
+    m_Bits: 71891
+  clipPlaneOffset: 0
+  farClipPlane: 20
+  renderTextureScale: 1
+  showHiddenCamera: 0

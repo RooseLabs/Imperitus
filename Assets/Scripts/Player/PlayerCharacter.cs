@@ -48,8 +48,6 @@ namespace RooseLabs.Player
 
         private readonly Dictionary<Collider, int> m_characterColliders = new();
 
-        public Action onPlayerCameraReady;
-
         private void Awake()
         {
             Input = GetComponent<PlayerInput>();
@@ -97,8 +95,6 @@ namespace RooseLabs.Player
 
             Camera.gameObject.SetActive(true);
             InputHandler.Instance.EnableGameplayInput();
-
-            onPlayerCameraReady?.Invoke();
         }
 
         private void Update()

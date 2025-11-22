@@ -27,6 +27,19 @@ namespace RooseLabs.UI
             var character = PlayerCharacter.LocalCharacter;
             if (!character) return;
 
+            if (character.Input.resumeWasPressed)
+            {
+                if (m_isCustomizationMenuOpen)
+                {
+                    CloseCustomizationMenu();
+                }
+                else if (m_isNotebookOpen)
+                {
+                    ToggleNotebook();
+                }
+                return;
+            }
+
             // Handle notebook toggle input based on current state
             if (m_isNotebookOpen)
             {
@@ -44,57 +57,26 @@ namespace RooseLabs.UI
                     ToggleNotebook();
                 }
             }
-
-            // Handle customization menu toggle input based on current state
-            if (m_isCustomizationMenuOpen)
-            {
-                // When customization menu is open, check for close action from UI action map
-                if (character.Input.CloseCustomizationMenu)
-                {
-                    ToggleCustomizationMenu();
-                }
-            }
-            else
-            {
-                // When customization menu is closed, check for open action from gameplay action map
-                if (character.Input.OpenCustomizationMenu)
-                {
-                    ToggleCustomizationMenu();
-                }
-            }
-        }
-
-        public void ToggleCustomizationMenu()
-        {
-            if (m_isCustomizationMenuOpen)
-            {
-                InputHandler.Instance.EnableGameplayInput();
-                CloseCustomizationMenu();
-            }
-            else
-            {
-                InputHandler.Instance.EnableMenuInput();
-                OpenCustomizationMenu();
-            }
         }
 
         public void OpenCustomizationMenu()
         {
+            if (m_isCustomizationMenuOpen) return;
             m_isCustomizationMenuOpen = true;
 
+            InputHandler.Instance.EnableMenuInput();
             // Enable the customization menu canvas GameObject
             customizationMenuController.gameObject.SetActive(true);
             customizationMenuController.OnMenuOpened();
-            Debug.Log("[GUIManager] Customization menu opened");
         }
 
         public void CloseCustomizationMenu()
         {
             m_isCustomizationMenuOpen = false;
 
+            InputHandler.Instance.EnableGameplayInput();
             // Disable the customization menu canvas GameObject
             customizationMenuController.gameObject.SetActive(false);
-            Debug.Log("[GUIManager] Customization menu closed");
         }
 
         public void ToggleNotebook()

@@ -6,6 +6,7 @@ namespace RooseLabs.Player
 {
     public class PlayerInput : MonoBehaviour
     {
+        #region Gameplay Input Actions
         private InputAction m_actionPause;
         private InputAction m_actionMove;
         private InputAction m_actionLook;
@@ -24,9 +25,6 @@ namespace RooseLabs.Player
         private InputAction m_actionScrollForward;
         private InputAction m_actionPushToTalk;
         private InputAction m_actionOpenNotebook;
-        private InputAction m_actionCloseNotebook;
-        private InputAction m_actionOpenCustomizationMenu;
-        private InputAction m_actionCloseCustomizationMenu;
 
         public bool pauseWasPressed;
         public Vector2 movementInput;
@@ -56,14 +54,19 @@ namespace RooseLabs.Player
         public bool scrollForwardIsPressed;
         public bool pushToTalkIsPressed;
         public bool openNotebookWasPressed;
+        #endregion
+
+        #region UI Input Actions
+        private InputAction m_actionResume;
+        private InputAction m_actionCloseNotebook;
+
+        public bool resumeWasPressed;
         public bool closeNotebookWasPressed;
-        public bool OpenCustomizationMenu;
-        public bool CloseCustomizationMenu;
+        #endregion
 
         private void Awake()
         {
             var gameplayActionMap = InputHandler.Instance.GameplayActions;
-            var uiActionMap = InputHandler.Instance.UIActions;
             m_actionPause = gameplayActionMap.FindAction("Pause");
             m_actionMove = gameplayActionMap.FindAction("Move");
             m_actionLook = gameplayActionMap.FindAction("Look");
@@ -82,9 +85,10 @@ namespace RooseLabs.Player
             m_actionScrollForward = gameplayActionMap.FindAction("ScrollForward");
             m_actionPushToTalk = gameplayActionMap.FindAction("PushToTalk");
             m_actionOpenNotebook = gameplayActionMap.FindAction("OpenNotebook");
+
+            var uiActionMap = InputHandler.Instance.UIActions;
+            m_actionResume = uiActionMap.FindAction("Resume");
             m_actionCloseNotebook = uiActionMap.FindAction("CloseNotebook");
-            m_actionOpenCustomizationMenu = gameplayActionMap.FindAction("OpenCustomizationMenu");
-            m_actionCloseCustomizationMenu = uiActionMap.FindAction("CloseCustomizationMenu");
         }
 
         public void Sample()
@@ -118,9 +122,8 @@ namespace RooseLabs.Player
             scrollForwardIsPressed = m_actionScrollForward.IsPressed();
             pushToTalkIsPressed = m_actionPushToTalk.IsPressed();
             openNotebookWasPressed = m_actionOpenNotebook.WasPressedThisFrame();
+            resumeWasPressed = m_actionResume.WasPressedThisFrame();
             closeNotebookWasPressed = m_actionCloseNotebook.WasPressedThisFrame();
-            OpenCustomizationMenu = m_actionOpenCustomizationMenu.WasPressedThisFrame();
-            CloseCustomizationMenu = m_actionCloseCustomizationMenu.WasPressedThisFrame();
         }
 
         private void ResetInput()
@@ -153,9 +156,8 @@ namespace RooseLabs.Player
             scrollForwardIsPressed = false;
             pushToTalkIsPressed = false;
             openNotebookWasPressed = false;
+            resumeWasPressed = false;
             closeNotebookWasPressed = false;
-            OpenCustomizationMenu = false;
-            CloseCustomizationMenu = false;
         }
     }
 }

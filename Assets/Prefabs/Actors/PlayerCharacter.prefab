@@ -2135,9 +2135,6 @@ MonoBehaviour:
   pushToTalkIsPressed: 0
   openNotebookWasPressed: 0
   closeNotebookWasPressed: 0
-  getRuneWasPressed: 0
-  OpenCustomizationMenu: 0
-  CloseCustomizationMenu: 0
 --- !u!114 &8138562761348339283
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2724,7 +2721,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 8119
+    m_Bits: 122807
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -3895,10 +3892,6 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 2546394555540158294, guid: c7d48a079d40bd94a9483826266718bb, type: 3}
-      propertyPath: m_Mesh
-      value: 
-      objectReference: {fileID: 1596533743628303504, guid: c7d48a079d40bd94a9483826266718bb, type: 3}
     - target: {fileID: 2546394555540158294, guid: c7d48a079d40bd94a9483826266718bb, type: 3}
       propertyPath: m_UpdateWhenOffscreen
       value: 1
