@@ -8,13 +8,13 @@ namespace RooseLabs.Collections
     public class SerializableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, ISerializationCallbackReceiver
         where TKey : IComparable<TKey>
     {
-        [SerializeField, HideInInspector] private List<TKey> m_keys = new();
-        [SerializeField, HideInInspector] private List<TValue> m_values = new();
+        [SerializeField, HideInInspector] private List<TKey> m_keys;
+        [SerializeField, HideInInspector] private List<TValue> m_values;
 
         public void OnBeforeSerialize()
         {
-            m_keys.Clear();
-            m_values.Clear();
+            m_keys = new List<TKey>();
+            m_values = new List<TValue>();
             foreach (var kvp in this)
             {
                 m_keys.Add(kvp.Key);
@@ -29,8 +29,8 @@ namespace RooseLabs.Collections
             {
                 Add(m_keys[i], m_values[i]);
             }
-            m_keys.Clear();
-            m_values.Clear();
+            m_keys = null;
+            m_values = null;
         }
     }
 }

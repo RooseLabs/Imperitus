@@ -1,22 +1,32 @@
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.DualShock;
 using UnityEngine.InputSystem.LowLevel;
+using UnityEngine.InputSystem.Switch;
+using UnityEngine.InputSystem.XInput;
 
 namespace RooseLabs.Core
 {
     public class InputHandler : SingletonBehaviour<InputHandler>
     {
         private InputDevice m_currentDevice;
+        private InputScheme m_currentScheme;
+        private GamepadType m_gamepadType;
+
+        public static InputDevice CurrentInputDevice => Instance.m_currentDevice;
+        public static InputScheme CurrentInputScheme => Instance.m_currentScheme;
+        public static GamepadType GamepadType => Instance.m_gamepadType;
 
         private InputActionMap m_gameplayActionMap;
         private InputActionMap m_uiActionMap;
 
-        public InputActionMap GameplayActions => m_gameplayActionMap;
-        public InputActionMap UIActions => m_uiActionMap;
+        public static InputActionMap GameplayActions => Instance.m_gameplayActionMap;
+        public static InputActionMap UIActions => Instance.m_uiActionMap;
 
         #region Event Actions
         public event Action<InputDevice> InputDeviceChanged = delegate { };
+        public event Action<InputScheme> InputSchemeChanged = delegate { };
         #endregion
 
         private void Awake()
@@ -47,7 +57,28 @@ namespace RooseLabs.Core
             // Ignore anything that isn't a state event.
             if (!eventPtr.IsA<StateEvent>() && !eventPtr.IsA<DeltaStateEvent>())
                 return;
-            CurrentDevice = device;
+
+            if (m_currentDevice != device)
+            {
+                m_currentDevice = device;
+                InputScheme scheme = InputScheme.Unknown;
+                switch (device)
+                {
+                    case Keyboard or Pointer:
+                        scheme = InputScheme.KeyboardMouse;
+                        break;
+                    case Gamepad:
+                        scheme = InputScheme.Gamepad;
+                        m_gamepadType = GetGamepadType(device);
+                        break;
+                }
+                if (m_currentScheme != scheme)
+                {
+                    m_currentScheme = scheme;
+                    InputSchemeChanged.Invoke(scheme);
+                }
+                InputDeviceChanged.Invoke(device);
+            }
         }
 
         public void EnableGameplayInput()
@@ -63,7 +94,7 @@ namespace RooseLabs.Core
             GameplayActions.Disable();
             UIActions.Enable();
             Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = IsCurrentDeviceKBM();
+            Cursor.visible = m_currentScheme == InputScheme.KeyboardMouse;
         }
 
         public void DisableAllInput()
@@ -73,27 +104,16 @@ namespace RooseLabs.Core
             Cursor.visible = false;
         }
 
-        public InputDevice CurrentDevice
+        public static GamepadType GetGamepadType(InputDevice device)
         {
-            get => m_currentDevice;
-            private set
+            return device switch
             {
-                // When updating the current device, reset the pointer move time
-                // and set the cursor visibility based on the device type.
-                if (m_currentDevice != value) InputDeviceChanged.Invoke(value);
-                m_currentDevice = value;
-                Cursor.visible = value is Keyboard or Pointer;
-            }
-        }
-
-        public bool IsCurrentDeviceKBM()
-        {
-            return m_currentDevice is Keyboard or Pointer;
-        }
-
-        public bool IsCurrentDeviceGamepad()
-        {
-            return m_currentDevice is Gamepad;
+                XInputController => GamepadType.Xbox,
+                DualSenseGamepadHID => GamepadType.DualSense,
+                DualShockGamepad => GamepadType.DualShock,
+                SwitchProControllerHID => GamepadType.SwitchPro,
+                _ => GamepadType.Unknown
+            };
         }
     }
 }

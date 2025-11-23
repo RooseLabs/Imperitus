@@ -110,7 +110,7 @@ namespace RooseLabs.Player
                 }
                 if (character.Data.isCasting) return;
                 // TODO: Switching spells needs a small cooldown (<= 1 second).
-                if (character.Input.scrollButtonWasPressed || (InputHandler.Instance.IsCurrentDeviceGamepad() && character.Input.nextIsPressed && character.Input.previousIsPressed))
+                if (character.Input.scrollButtonWasPressed || (InputHandler.CurrentInputScheme == InputScheme.Gamepad && character.Input.nextIsPressed && character.Input.previousIsPressed))
                 {
                     CurrentSpellIndex = 0;
                 }

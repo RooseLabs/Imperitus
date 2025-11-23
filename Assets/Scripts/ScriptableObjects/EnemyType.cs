@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace RooseLabs.Enemies
+namespace RooseLabs.ScriptableObjects
 {
     [CreateAssetMenu(fileName = "New Enemy Type", menuName = "Imperitus/Enemy Type")]
     public class EnemyType : ScriptableObject

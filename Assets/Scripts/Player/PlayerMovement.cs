@@ -12,7 +12,6 @@ namespace RooseLabs.Player
         private AvatarMover m_avatarMover;
         private Rigidbody m_rigidbody;
         private Animator Animator => m_character.Animations.Animator;
-        private InputHandler m_inputHandler;
         private SoundEmitter m_soundEmitter;
         private float m_nextFootstepTime;
 
@@ -57,7 +56,6 @@ namespace RooseLabs.Player
             m_character = GetComponent<PlayerCharacter>();
             m_avatarMover = GetComponent<AvatarMover>();
             m_rigidbody = GetComponent<Rigidbody>();
-            m_inputHandler = InputHandler.Instance;
             m_soundEmitter = GetComponent<SoundEmitter>();
 
             footstepIndex = m_soundEmitter.availableSounds.FindIndex(s => s.type != null && s.type.key == "Footstep");
@@ -212,7 +210,7 @@ namespace RooseLabs.Player
             {
                 m_character.Data.IsSprinting = false;
             }
-            else if (m_inputHandler.IsCurrentDeviceKBM())
+            else if (InputHandler.CurrentInputScheme == InputScheme.KeyboardMouse)
             {
                 m_character.Data.IsSprinting = m_character.Input.sprintIsPressed;
             }
@@ -277,7 +275,7 @@ namespace RooseLabs.Player
 
         private void HandleLookInput()
         {
-            float lookSensitivity = m_inputHandler.IsCurrentDeviceKBM() ? 0.1f : 0.4f;
+            float lookSensitivity = InputHandler.CurrentInputScheme == InputScheme.KeyboardMouse ? 0.1f : 0.4f;
             Vector2 delta = m_character.Input.lookInput * lookSensitivity;
             m_character.Data.lookValues += delta;
             m_character.Data.lookValues.y = Mathf.Clamp(m_character.Data.lookValues.y, -85f, 85f);

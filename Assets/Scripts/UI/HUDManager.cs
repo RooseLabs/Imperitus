@@ -13,6 +13,9 @@ namespace RooseLabs.UI
         [SerializeField] private Slider staminaSlider;
         [SerializeField] private TMP_Text timerText;
         [SerializeField] private TMP_Text joinCodeText;
+
+        [Header("Interaction Prompt")]
+        [SerializeField] private GameObject interactionPromptSprite;
         [SerializeField] private TMP_Text interactionText;
         #endregion
 
@@ -59,6 +62,13 @@ namespace RooseLabs.UI
         /// <param name="text">The text to display.</param>
         public void SetInteractionText(string text)
         {
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                interactionPromptSprite.SetActive(false);
+                interactionText.text = string.Empty;
+                return;
+            }
+            interactionPromptSprite.SetActive(true);
             interactionText.text = text;
         }
     }

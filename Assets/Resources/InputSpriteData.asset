@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f806176df957498db86b9eb0e1a01d37, type: 3}
+  m_Name: InputSpriteData
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.ScriptableObjects.InputSpriteData
+  kbmSprites: {fileID: 11400000, guid: a94a590d2188b64438bb2f9270729fc7, type: 2}
+  xboxSprites: {fileID: 11400000, guid: fed99fa3f62ac0a41ae490f97a191943, type: 2}
+  psSprites: {fileID: 11400000, guid: 9a99f371d86e3804fadf285abd371867, type: 2}

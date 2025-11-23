@@ -66,7 +66,7 @@ namespace RooseLabs.Player
 
         private void Awake()
         {
-            var gameplayActionMap = InputHandler.Instance.GameplayActions;
+            var gameplayActionMap = InputHandler.GameplayActions;
             m_actionPause = gameplayActionMap.FindAction("Pause");
             m_actionMove = gameplayActionMap.FindAction("Move");
             m_actionLook = gameplayActionMap.FindAction("Look");
@@ -86,7 +86,7 @@ namespace RooseLabs.Player
             m_actionPushToTalk = gameplayActionMap.FindAction("PushToTalk");
             m_actionOpenNotebook = gameplayActionMap.FindAction("OpenNotebook");
 
-            var uiActionMap = InputHandler.Instance.UIActions;
+            var uiActionMap = InputHandler.UIActions;
             m_actionResume = uiActionMap.FindAction("Resume");
             m_actionCloseNotebook = uiActionMap.FindAction("CloseNotebook");
         }
