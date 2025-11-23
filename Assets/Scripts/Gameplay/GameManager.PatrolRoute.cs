@@ -1,6 +1,7 @@
 using RooseLabs.Enemies;
 using RooseLabs.Utils;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -11,35 +12,29 @@ namespace RooseLabs.Gameplay
         [Header("Enemy Patrol Settings")]
         private PatrolPointGenerator patrolGenerator;
 
-        // Cache generated patrol route for spawning enemies
+        private Dictionary<string, RoomPatrolZone> roomPatrolZones;
         private PatrolRoute currentMapPatrolRoute;
 
         private void InitializeEnemyPatrolSystem()
         {
             if (!IsServerInitialized) return;
 
-            // Start coroutine to wait for NavMesh before generating
             StartCoroutine(WaitForNavMeshAndGenerate());
         }
 
-        /// <summary>
-        /// Wait for NavMesh to be ready before generating patrol points
-        /// </summary>
         private IEnumerator WaitForNavMeshAndGenerate()
         {
-            // Wait a frame to ensure scene is fully loaded
             yield return null;
 
-            // Wait for NavMesh to be built/loaded
-            int maxAttempts = 60; // 60 frames = ~1 second at 60fps
+            // Wait for NavMesh
+            int maxAttempts = 60;
             int attempts = 0;
 
             while (attempts < maxAttempts)
             {
-                // Check if NavMesh exists by sampling a position
                 if (NavMesh.SamplePosition(Vector3.zero, out NavMeshHit hit, 100f, NavMesh.AllAreas))
                 {
-                    this.LogInfo("NavMesh is ready, generating patrol points...");
+                    Debug.Log("NavMesh is ready, generating patrol zones...");
                     break;
                 }
 
@@ -52,7 +47,6 @@ namespace RooseLabs.Gameplay
                 this.LogWarning("NavMesh not ready after waiting! Attempting generation anyway...");
             }
 
-            // Additional small delay to be safe
             yield return new WaitForSeconds(0.1f);
 
             // Find or create patrol generator
@@ -66,58 +60,84 @@ namespace RooseLabs.Gameplay
                     GameObject generatorObj = new GameObject("PatrolPointGenerator");
                     patrolGenerator = generatorObj.AddComponent<PatrolPointGenerator>();
 
-                    // Configure default settings
                     patrolGenerator.mapContainerTag = "Map";
                     patrolGenerator.groundLayer = LayerMask.GetMask("Ground");
                     patrolGenerator.obstacleLayer = LayerMask.GetMask("Default");
+                    patrolGenerator.useRoomBasedPatrolling = true; // NEW
                 }
             }
 
-            // Generate patrol points
-            this.LogInfo("Generating enemy patrol points...");
-            currentMapPatrolRoute = patrolGenerator.GeneratePatrolPoints();
+            // Generate room-based patrol zones
+            Debug.Log("Generating room-based enemy patrol zones...");
+            roomPatrolZones = patrolGenerator.GenerateRoomPatrolZones();
 
-            if (currentMapPatrolRoute != null && currentMapPatrolRoute.Count > 0)
+            if (roomPatrolZones != null && roomPatrolZones.Count > 0)
             {
-                this.LogInfo($"Patrol route generated with {currentMapPatrolRoute.Count} waypoints");
+                Debug.Log($"Patrol zones generated: {roomPatrolZones.Count} rooms");
 
-                // Now assign the route to existing enemies or spawn new ones
-                AssignPatrolRoutesToEnemies();
+                // This routing is still not used
+                // Grimoires are not spawned by the spawn manager yet
+                //GenerateGrimoirePatrolRoutes();
             }
             else
             {
-                this.LogWarning("Failed to generate patrol route!");
+                this.LogWarning("Failed to generate patrol zones!");
             }
         }
 
-        /// <summary>
-        /// Assign the generated patrol route to all enemies in the scene
-        /// </summary>
-        private void AssignPatrolRoutesToEnemies()
+        private void GenerateGrimoirePatrolRoutes()
         {
-            // Find all Hanadura enemies
-            HanaduraAI[] enemies = FindObjectsByType<HanaduraAI>(FindObjectsSortMode.None);
-
-            foreach (var enemy in enemies)
-            {
-                // Assign the generated patrol route
-                enemy.patrolRoute = currentMapPatrolRoute;
-
-                // Set a random starting waypoint for variety
-                if (currentMapPatrolRoute.Count > 0)
-                {
-                    enemy.startWaypointIndex = Random.Range(0, currentMapPatrolRoute.Count);
-                }
-
-                enemy.ReinitializePatrolState();
-
-                this.LogInfo($"Assigned patrol route to {enemy.name} (starting at waypoint {enemy.startWaypointIndex})");
-            }
+            // TODO
         }
 
         /// <summary>
-        /// Get the current patrol route for the loaded map
+        /// Get patrol zone for a specific room
         /// </summary>
+        public RoomPatrolZone GetPatrolZone(string roomIdentifier)
+        {
+            if (roomPatrolZones != null && roomPatrolZones.TryGetValue(roomIdentifier, out RoomPatrolZone zone))
+            {
+                return zone;
+            }
+
+            this.LogWarning($"No patrol zone found for room: {roomIdentifier}");
+            return null;
+        }
+
+        /// <summary>
+        /// Get all patrol zones
+        /// </summary>
+        public Dictionary<string, RoomPatrolZone> GetAllPatrolZones()
+        {
+            return roomPatrolZones;
+        }
+
+        /// <summary>
+        /// Find closest patrol zone to a position
+        /// </summary>
+        public RoomPatrolZone GetClosestPatrolZone(Vector3 position)
+        {
+            if (roomPatrolZones == null || roomPatrolZones.Count == 0)
+                return null;
+
+            RoomPatrolZone closest = null;
+            float closestDist = float.MaxValue;
+
+            foreach (var zone in roomPatrolZones.Values)
+            {
+                float dist = Vector3.Distance(position, zone.roomBounds.center);
+                if (dist < closestDist)
+                {
+                    closestDist = dist;
+                    closest = zone;
+                }
+            }
+
+            return closest;
+        }
+
+        // This is in theory not going to be used, however in case i want
+        // the global patrol route for debugging or other purposes...
         public PatrolRoute GetCurrentPatrolRoute()
         {
             return currentMapPatrolRoute;

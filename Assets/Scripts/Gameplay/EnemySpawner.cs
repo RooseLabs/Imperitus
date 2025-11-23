@@ -1,3 +1,4 @@
+using RooseLabs.Utils;
 using UnityEngine;
 
 namespace RooseLabs.Enemies
@@ -91,7 +92,7 @@ namespace RooseLabs.Enemies
 
             foreach (GameObject room in rooms)
             {
-                Bounds roomBounds = CalculateRoomBounds(room);
+                Bounds roomBounds = RoomCalculations.CalculateRoomBounds(room);
 
                 if (roomBounds.size != Vector3.zero)
                 {
@@ -150,7 +151,7 @@ namespace RooseLabs.Enemies
         {
             foreach (GameObject room in rooms)
             {
-                Bounds roomBounds = CalculateRoomBounds(room);
+                Bounds roomBounds = RoomCalculations.CalculateRoomBounds(room);
 
                 if (roomBounds.size != Vector3.zero && roomBounds.Contains(transform.position))
                 {
@@ -174,49 +175,6 @@ namespace RooseLabs.Enemies
                 current = current.parent;
             }
             return false;
-        }
-
-        /// <summary>
-        /// Calculate combined bounds of a room GameObject and all its children
-        /// </summary>
-        private Bounds CalculateRoomBounds(GameObject room)
-        {
-            Renderer[] renderers = room.GetComponentsInChildren<Renderer>();
-            Collider[] colliders = room.GetComponentsInChildren<Collider>();
-
-            if (renderers.Length == 0 && colliders.Length == 0)
-                return new Bounds(room.transform.position, Vector3.zero);
-
-            Bounds bounds = new Bounds(room.transform.position, Vector3.zero);
-            bool boundsInitialized = false;
-
-            foreach (Renderer r in renderers)
-            {
-                if (!boundsInitialized)
-                {
-                    bounds = r.bounds;
-                    boundsInitialized = true;
-                }
-                else
-                {
-                    bounds.Encapsulate(r.bounds);
-                }
-            }
-
-            foreach (Collider c in colliders)
-            {
-                if (!boundsInitialized)
-                {
-                    bounds = c.bounds;
-                    boundsInitialized = true;
-                }
-                else
-                {
-                    bounds.Encapsulate(c.bounds);
-                }
-            }
-
-            return bounds;
         }
 
         /// <summary>
