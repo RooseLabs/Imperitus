@@ -43,29 +43,24 @@ namespace RooseLabs.Gameplay
         /// </summary>
         private System.Collections.IEnumerator WaitForPatrolRouteAndStartSpawning()
         {
-            // Wait for patrol route to be generated
+            // Wait for patrol zones
             int maxWait = 60;
             int waited = 0;
-
-            while (currentMapPatrolRoute == null && waited < maxWait)
+            while (roomPatrolZones == null && waited < maxWait)
             {
                 yield return null;
                 waited++;
             }
 
-            if (currentMapPatrolRoute == null)
+            if (roomPatrolZones == null)
             {
-                this.LogWarning("Patrol route not ready after waiting, spawning enemies anyway...");
-            }
-            else
-            {
-                this.LogInfo($"Patrol route ready with {currentMapPatrolRoute.Count} waypoints, starting enemy spawns");
+                this.LogWarning("Patrol zones not ready, spawning anyway...");
             }
 
-            // Start enemy spawning
+            // Start enemy spawning with zones
             if (enemySpawnManager != null)
             {
-                enemySpawnManager.OnHeistStart(currentMapPatrolRoute);
+                enemySpawnManager.OnHeistStart(roomPatrolZones);
             }
         }
 
@@ -91,7 +86,7 @@ namespace RooseLabs.Gameplay
                 }
             }
 
-            this.LogInfo($"Cached {currentRequiredRunes.Count} required runes for spawn system");
+            Debug.Log($"Cached {currentRequiredRunes.Count} required runes for spawn system");
         }
     }
 }

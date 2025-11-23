@@ -62,6 +62,7 @@ namespace RooseLabs.Enemies
         // Runtime data
         private List<EnemySpawner> allSpawners = new List<EnemySpawner>();
         private Dictionary<GameObject, EnemySpawner> activeEnemies = new Dictionary<GameObject, EnemySpawner>();
+        private Dictionary<string, List<GameObject>> roomActiveEnemies = new Dictionary<string, List<GameObject>>();
         private Queue<PendingRespawn> respawnQueue = new Queue<PendingRespawn>();
         private PatrolRoute currentPatrolRoute;
         private float lastTaskProgressSpawnTime = -999f;
@@ -114,13 +115,18 @@ namespace RooseLabs.Enemies
         /// <summary>
         /// Call this when the heist starts to spawn initial enemies
         /// </summary>
-        public void OnHeistStart(PatrolRoute patrolRoute)
+        public void OnHeistStart(Dictionary<string, RoomPatrolZone> patrolZones = null)
         {
             if (!IsServerInitialized)
                 return;
 
-            currentPatrolRoute = patrolRoute;
             heistStarted = true;
+
+            // Store reference to zones
+            if (patrolZones != null)
+            {
+                LogDebug($"Received {patrolZones.Count} patrol zones");
+            }
 
             SpawnInitialEnemies();
         }
@@ -168,20 +174,29 @@ namespace RooseLabs.Enemies
             }
 
             activeEnemies.Remove(enemyObject);
-            LogDebug($"Enemy died at spawner: {spawner.name}");
 
-            // For non-Hanadura enemies, we might implement different logic later
-            // For now, treat all deaths the same way
+            // Clean up room tracking
+            string roomId = spawner.RoomIdentifier;
+            if (roomActiveEnemies.ContainsKey(roomId))
+            {
+                roomActiveEnemies[roomId].Remove(enemyObject);
 
-            // Roll for instant respawn
+                // Release route from patrol zone
+                RoomPatrolZone zone = GameManager.Instance.GetPatrolZone(roomId);
+                zone?.ReleaseRoute(enemyObject);
+            }
+
+            LogDebug($"Enemy died at spawner: {spawner.name} (room: {roomId})");
+
+            // Roll for instant respawn (existing logic)
             if (Random.Range(0f, 100f) <= instantRespawnChance)
             {
                 LogDebug("Instant respawn triggered");
-                StartCoroutine(DelayedSpawn(spawner, 0.5f)); // Small delay to avoid confusion
+                StartCoroutine(DelayedSpawn(spawner, 0.5f));
             }
             else
             {
-                // Queue for delayed respawn
+                // Queue for delayed respawn (existing logic)
                 float heistProgress = GetHeistProgress();
                 float respawnTime = Mathf.Lerp(baseRespawnTime, minRespawnTime, heistProgress);
 
@@ -194,7 +209,7 @@ namespace RooseLabs.Enemies
                 };
 
                 respawnQueue.Enqueue(pending);
-                LogDebug($"Queued respawn in {respawnTime:F1} seconds (heist progress: {heistProgress:P0})");
+                LogDebug($"Queued respawn in {respawnTime:F1} seconds");
             }
         }
 
@@ -271,22 +286,14 @@ namespace RooseLabs.Enemies
             // Instantiate enemy
             GameObject enemyObj = Instantiate(hanaduraPrefab, spawner.SpawnPoint.position, spawner.SpawnPoint.rotation);
 
-            // Configure Hanadura
+            // Configure Hanadura with ROOM-BASED patrol
             if (enemyObj.TryGetComponent(out HanaduraAI hanadura))
             {
-                // Assign patrol route
-                hanadura.patrolRoute = currentPatrolRoute;
-
-                // Set random starting waypoint for variety
-                if (currentPatrolRoute != null && currentPatrolRoute.Count > 0)
-                {
-                    hanadura.startWaypointIndex = Random.Range(0, currentPatrolRoute.Count);
-                }
+                AssignRoomPatrolRoute(hanadura, spawner);
 
                 // If this is an alert spawn, alert the enemy to the player position
                 if (isAlert && alertPosition != default)
                 {
-                    // We need to wait for the enemy to initialize before alerting
                     StartCoroutine(AlertEnemyAfterSpawn(hanadura, alertPosition));
                 }
             }
@@ -297,6 +304,14 @@ namespace RooseLabs.Enemies
             // Track this enemy
             activeEnemies[enemyObj] = spawner;
             spawner.OnEnemySpawned(enemyObj);
+
+            // Track in room
+            string roomId = spawner.RoomIdentifier;
+            if (!roomActiveEnemies.ContainsKey(roomId))
+            {
+                roomActiveEnemies[roomId] = new List<GameObject>();
+            }
+            roomActiveEnemies[roomId].Add(enemyObj);
 
             // Subscribe to death event
             if (enemyObj.TryGetComponent(out EnemyData enemyData))
@@ -354,6 +369,54 @@ namespace RooseLabs.Enemies
 
         #region Utility Methods
 
+        /// <summary>
+        /// Assign a room-based patrol route to a Hanadura
+        /// </summary>
+        private void AssignRoomPatrolRoute(HanaduraAI hanadura, EnemySpawner spawner)
+        {
+            string roomId = spawner.RoomIdentifier;
+
+            if (string.IsNullOrEmpty(roomId) || roomId == "Unknown")
+            {
+                LogDebug($"Spawner has no room identifier, using closest zone", true);
+                roomId = FindClosestRoomToPosition(spawner.SpawnPoint.position);
+            }
+
+            // Get patrol zone for this room
+            RoomPatrolZone zone = GameManager.Instance.GetPatrolZone(roomId);
+
+            if (zone == null)
+            {
+                LogDebug($"No patrol zone found for room '{roomId}'", true);
+                return;
+            }
+
+            // Generate unique route for this enemy
+            PatrolRoute route = zone.GenerateUniqueRoute(hanadura.gameObject);
+
+            if (route != null && route.Count > 0)
+            {
+                hanadura.patrolRoute = route;
+                hanadura.startWaypointIndex = 0; // Always start at beginning of custom route
+                hanadura.ReinitializePatrolState();
+
+                LogDebug($"Assigned {route.Count}-waypoint patrol route to {hanadura.name} in room '{roomId}'");
+            }
+            else
+            {
+                LogDebug($"Failed to generate route for room '{roomId}'", true);
+            }
+        }
+
+        /// <summary>
+        /// Find closest room to a position (fallback when spawner has no room ID)
+        /// </summary>
+        private string FindClosestRoomToPosition(Vector3 position)
+        {
+            RoomPatrolZone closest = GameManager.Instance.GetClosestPatrolZone(position);
+            return closest?.roomIdentifier ?? "Unknown";
+        }
+
         private EnemySpawner GetClosestSpawnerNotInPlayerRoom(Vector3 playerPosition)
         {
             // Find which room the player is in
@@ -379,6 +442,19 @@ namespace RooseLabs.Enemies
                 .FirstOrDefault();
 
             return closest;
+        }
+
+        /// <summary>
+        /// Get number of active enemies in a specific room
+        /// </summary>
+        public int GetActiveEnemyCountInRoom(string roomId)
+        {
+            if (!roomActiveEnemies.ContainsKey(roomId))
+                return 0;
+
+            // Clean up null references
+            roomActiveEnemies[roomId].RemoveAll(e => e == null);
+            return roomActiveEnemies[roomId].Count;
         }
 
         private string GetRoomForPosition(Vector3 position)

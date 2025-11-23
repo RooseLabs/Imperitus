@@ -10269,8 +10269,9 @@ MonoBehaviour:
   maxRaycastDistance: 100
   minHeightClearance: 2.5
   navMeshSampleDistance: 2
-  autoCreatePatrolRoute: 1
   waypointParent: {fileID: 0}
+  autoCreatePatrolRoute: 1
+  useRoomBasedPatrolling: 1
   showDebugGizmos: 1
   validPointColor: {r: 0, g: 1, b: 0, a: 1}
   rejectedPointColor: {r: 1, g: 0, b: 0, a: 1}

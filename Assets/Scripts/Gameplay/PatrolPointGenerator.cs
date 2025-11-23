@@ -1,5 +1,7 @@
-using System.Collections.Generic;
 using FishNet.Object;
+using RooseLabs.Utils;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -13,6 +15,9 @@ namespace RooseLabs.Enemies
         [Header("Map Configuration")]
         [Tooltip("Tag of the GameObject(s) that contain the map. Will search within these bounds.")]
         public string mapContainerTag = "Map";
+
+        [Tooltip("Tag for individual room GameObjects (different from map container tag)")]
+        public string roomTag = "Room";
 
         [Tooltip("Layer mask for ground detection")]
         public LayerMask groundLayer;
@@ -42,12 +47,16 @@ namespace RooseLabs.Enemies
         [Tooltip("NavMesh sample distance for validation")]
         public float navMeshSampleDistance = 2f;
 
+        [Tooltip("Parent object for waypoint GameObjects (leave null to use this transform)")]
+        public Transform waypointParent;
+
         [Header("Patrol Route Setup")]
         [Tooltip("Automatically create PatrolRoute component and assign waypoints")]
         public bool autoCreatePatrolRoute = true;
 
-        [Tooltip("Parent object for waypoint GameObjects (leave null to use this transform)")]
-        public Transform waypointParent;
+        [Header("Room-Based Patrol Zones")]
+        [Tooltip("Generate separate patrol zones per room instead of single global route")]
+        public bool useRoomBasedPatrolling = true;
 
         [Header("Debug Visualization")]
         [Tooltip("Show generated waypoints as gizmos in Scene view")]
@@ -78,6 +87,8 @@ namespace RooseLabs.Enemies
 
         // Reference to created patrol route
         private PatrolRoute patrolRoute;
+
+        private Dictionary<string, RoomPatrolZone> roomPatrolZones = new Dictionary<string, RoomPatrolZone>();
 
         /// <summary>
         /// Generate patrol points across the map.
@@ -422,6 +433,210 @@ namespace RooseLabs.Enemies
             return Vector3.Distance(point, worldCenter) <= worldRadius;
         }
 
+        /// <summary>
+        /// Generate patrol zones grouped by room
+        /// </summary>
+        public Dictionary<string, RoomPatrolZone> GenerateRoomPatrolZones()
+        {
+            if (!IsServerInitialized)
+            {
+                Debug.LogWarning("[PatrolPointGenerator] GenerateRoomPatrolZones() should only be called on server!");
+                return null;
+            }
+
+            Debug.Log("[PatrolPointGenerator] Starting room-based patrol zone generation...");
+
+            // Clear previous data
+            generatedPoints.Clear();
+            rejectedPoints.Clear();
+            roomPatrolZones.Clear();
+
+            // Find map bounds
+            Bounds mapBounds = CalculateMapBounds();
+            if (mapBounds.size == Vector3.zero)
+            {
+                Debug.LogError("[PatrolPointGenerator] No map container found with tag: " + mapContainerTag);
+                return null;
+            }
+
+            Debug.Log($"[PatrolPointGenerator] Map bounds: {mapBounds.size}, Center: {mapBounds.center}");
+
+            // Generate grid of sample points (same as before)
+            int pointsGenerated = 0;
+            int pointsRejected = 0;
+
+            for (float x = mapBounds.min.x; x <= mapBounds.max.x; x += gridSpacing)
+            {
+                for (float z = mapBounds.min.z; z <= mapBounds.max.z; z += gridSpacing)
+                {
+                    Vector3 samplePoint = new Vector3(x, mapBounds.max.y + raycastStartHeight, z);
+
+                    if (TryGenerateWaypoint(samplePoint, out Vector3 validPoint))
+                    {
+                        generatedPoints.Add(validPoint);
+                        pointsGenerated++;
+                    }
+                    else
+                    {
+                        pointsRejected++;
+                    }
+                }
+            }
+
+            Debug.Log($"[PatrolPointGenerator] Waypoint generation complete! Valid: {pointsGenerated}, Rejected: {pointsRejected}");
+
+            // Group waypoints by room
+            GroupWaypointsByRoom();
+
+            Debug.Log($"[PatrolPointGenerator] Created {roomPatrolZones.Count} patrol zones");
+
+            return roomPatrolZones;
+        }
+
+        /// <summary>
+        /// Group generated waypoints into room-based patrol zones
+        /// </summary>
+        private void GroupWaypointsByRoom()
+        {
+            // Find all GameObjects tagged as "Room" (not map containers)
+            GameObject[] rooms = GameObject.FindGameObjectsWithTag(roomTag);
+
+            if (rooms.Length == 0)
+            {
+                Debug.LogWarning($"[PatrolPointGenerator] No rooms found with tag '{roomTag}', creating single patrol zone");
+                CreateSinglePatrolZone();
+                return;
+            }
+
+            Debug.Log($"[PatrolPointGenerator] Found {rooms.Length} rooms with tag '{roomTag}'");
+
+            // Create a patrol zone for each room
+            foreach (GameObject room in rooms)
+            {
+                RoomPatrolZone zone = new RoomPatrolZone
+                {
+                    roomIdentifier = room.name,
+                    roomBounds = RoomCalculations.CalculateRoomBounds(room)
+                };
+
+                roomPatrolZones[room.name] = zone;
+                Debug.Log($"[PatrolPointGenerator] Created zone for room: {room.name}");
+            }
+
+            // Assign each waypoint to nearest room
+            foreach (Vector3 waypoint in generatedPoints)
+            {
+                string closestRoom = FindClosestRoom(waypoint, rooms);
+
+                if (roomPatrolZones.ContainsKey(closestRoom))
+                {
+                    roomPatrolZones[closestRoom].waypoints.Add(waypoint);
+                }
+            }
+
+            // Log results
+            foreach (var zone in roomPatrolZones.Values)
+            {
+                Debug.Log($"[PatrolPointGenerator] Room '{zone.roomIdentifier}': {zone.waypoints.Count} waypoints");
+            }
+
+            // Remove empty zones
+            var emptyZones = roomPatrolZones.Where(kvp => kvp.Value.waypoints.Count == 0).Select(kvp => kvp.Key).ToList();
+            foreach (var emptyZone in emptyZones)
+            {
+                roomPatrolZones.Remove(emptyZone);
+                Debug.LogWarning($"[PatrolPointGenerator] Removed empty zone: {emptyZone}");
+            }
+        }
+
+        /// <summary>
+        /// Find which room a waypoint belongs to
+        /// </summary>
+        private string FindClosestRoom(Vector3 waypoint, GameObject[] rooms)
+        {
+            string closestRoom = "Unknown";
+            float closestDistance = float.MaxValue;
+
+            foreach (GameObject room in rooms)
+            {
+                Bounds roomBounds = RoomCalculations.CalculateRoomBounds(room);
+
+                // Check if point is inside room bounds
+                if (roomBounds.Contains(waypoint))
+                {
+                    return room.name;
+                }
+
+                // Otherwise, use distance to room center
+                float distance = Vector3.Distance(waypoint, roomBounds.center);
+                if (distance < closestDistance)
+                {
+                    closestDistance = distance;
+                    closestRoom = room.name;
+                }
+            }
+
+            return closestRoom;
+        }
+
+        /// <summary>
+        /// Fallback: create single patrol zone if no rooms found
+        /// </summary>
+        private void CreateSinglePatrolZone()
+        {
+            RoomPatrolZone zone = new RoomPatrolZone
+            {
+                roomIdentifier = "Global",
+                waypoints = new List<Vector3>(generatedPoints),
+                roomBounds = CalculateMapBounds()
+            };
+
+            roomPatrolZones["Global"] = zone;
+        }
+
+        /// <summary>
+        /// Get patrol zone for a specific room
+        /// </summary>
+        public RoomPatrolZone GetPatrolZone(string roomIdentifier)
+        {
+            if (roomPatrolZones.TryGetValue(roomIdentifier, out RoomPatrolZone zone))
+            {
+                return zone;
+            }
+
+            Debug.LogWarning($"[PatrolPointGenerator] No patrol zone found for room: {roomIdentifier}");
+            return null;
+        }
+
+        /// <summary>
+        /// Get all patrol zones
+        /// </summary>
+        public Dictionary<string, RoomPatrolZone> GetAllPatrolZones()
+        {
+            return roomPatrolZones;
+        }
+
+        /// <summary>
+        /// Find closest patrol zone to a position (useful for enemy respawning)
+        /// </summary>
+        public RoomPatrolZone GetClosestPatrolZone(Vector3 position)
+        {
+            RoomPatrolZone closest = null;
+            float closestDist = float.MaxValue;
+
+            foreach (var zone in roomPatrolZones.Values)
+            {
+                float dist = Vector3.Distance(position, zone.roomBounds.center);
+                if (dist < closestDist)
+                {
+                    closestDist = dist;
+                    closest = zone;
+                }
+            }
+
+            return closest;
+        }
+
         #region Debug Visualization
 
         private void OnDrawGizmos()
@@ -450,6 +665,36 @@ namespace RooseLabs.Enemies
 
                 // Draw line back to start for looping patrols
                 Gizmos.DrawLine(generatedPoints[generatedPoints.Count - 1], generatedPoints[0]);
+            }
+
+            // Draw room zones with different colors
+            if (roomPatrolZones != null && roomPatrolZones.Count > 0)
+            {
+                int colorIndex = 0;
+                Color[] zoneColors = new Color[]
+                {
+                    Color.cyan, Color.magenta, Color.yellow,
+                    new Color(1f, 0.5f, 0f), new Color(0.5f, 0f, 1f),
+                    new Color(0f, 1f, 0.5f)
+                };
+
+                foreach (var zone in roomPatrolZones.Values)
+                {
+                    Color zoneColor = zoneColors[colorIndex % zoneColors.Length];
+                    Gizmos.color = new Color(zoneColor.r, zoneColor.g, zoneColor.b, 0.3f);
+
+                    // Draw room bounds
+                    Gizmos.DrawWireCube(zone.roomBounds.center, zone.roomBounds.size);
+
+                    // Draw waypoints in this zone
+                    Gizmos.color = zoneColor;
+                    foreach (Vector3 wp in zone.waypoints)
+                    {
+                        Gizmos.DrawWireSphere(wp, gizmoSize * 0.7f);
+                    }
+
+                    colorIndex++;
+                }
             }
 
             // Draw rejected points (only visible during/after generation)
