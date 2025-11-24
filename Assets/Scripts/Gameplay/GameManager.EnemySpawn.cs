@@ -1,8 +1,8 @@
+using System.Collections;
+using System.Collections.Generic;
 using RooseLabs.Enemies;
-using RooseLabs.Network;
 using RooseLabs.ScriptableObjects;
 using RooseLabs.Utils;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace RooseLabs.Gameplay
@@ -13,7 +13,7 @@ namespace RooseLabs.Gameplay
         [SerializeField] private EnemySpawnManager enemySpawnManager;
 
         // Track which runes are required for tasks to detect task-progress
-        public HashSet<RuneSO> currentRequiredRunes = new HashSet<RuneSO>();
+        public readonly HashSet<RuneSO> currentRequiredRunes = new();
 
         /// <summary>
         /// Initialize the enemy spawn manager with the patrol route
@@ -41,7 +41,7 @@ namespace RooseLabs.Gameplay
         /// <summary>
         /// Wait for patrol route generation before starting enemy spawns
         /// </summary>
-        private System.Collections.IEnumerator WaitForPatrolRouteAndStartSpawning()
+        private IEnumerator WaitForPatrolRouteAndStartSpawning()
         {
             // Wait for patrol zones
             int maxWait = 60;

@@ -51,6 +51,11 @@ namespace RooseLabs.Gameplay
             InstanceFinder.SceneManager.OnLoadEnd += HandleSceneLoaded;
         }
 
+        private void Update()
+        {
+            UpdateHeist();
+        }
+
         private void HandleSceneLoaded(SceneLoadEndEventArgs args)
         {
             if (args.LoadedScenes.Length == 0) return;

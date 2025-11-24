@@ -16,6 +16,7 @@ namespace RooseLabs.Gameplay
         private const float HeistTimeReductionPerAdditionalPlayer = 5f * 60f; // Less 5 minutes per additional player
 
         private bool m_isEndingHeist = false;
+        private bool m_isHeistOngoing = false;
 
         private void HandleHeistSceneLoaded()
         {
@@ -32,6 +33,7 @@ namespace RooseLabs.Gameplay
                 float timeLimit = HeistMaxTime - (PlayerHandler.AllCharacters.Count - 1) * HeistTimeReductionPerAdditionalPlayer;
                 timeLimit = Mathf.Clamp(timeLimit, HeistMinTime, HeistMaxTime);
                 m_heistTimer.StartTimer(timeLimit);
+                m_isHeistOngoing = true;
             }
             else
             {
@@ -51,6 +53,16 @@ namespace RooseLabs.Gameplay
             m_isEndingHeist = false;
         }
 
+        private void UpdateHeist()
+        {
+            if (!IsServerInitialized) return;
+            if (!m_isHeistOngoing) return;
+            if (PlayerHandler.AllCharacters.All(player => player.Data.isDead))
+            {
+                EndHeist(false);
+            }
+        }
+
         /// <summary>
         /// Called to end the heist and return to the lobby.
         /// </summary>
@@ -60,6 +72,7 @@ namespace RooseLabs.Gameplay
             if (!IsServerInitialized) return;
             if (m_isEndingHeist) return;
             m_isEndingHeist = true;
+            m_isHeistOngoing = false;
             m_heistTimer.StopTimer();
             if (!successful)
             {
