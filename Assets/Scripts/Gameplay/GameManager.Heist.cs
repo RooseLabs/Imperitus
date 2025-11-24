@@ -30,7 +30,7 @@ namespace RooseLabs.Gameplay
                 InitializeEnemySpawnManager();
 
                 // Determine time limit based on number of players
-                float timeLimit = HeistMaxTime - (PlayerHandler.AllCharacters.Count - 1) * HeistTimeReductionPerAdditionalPlayer;
+                float timeLimit = HeistMaxTime - (PlayerHandler.AllConnectedPlayers.Count() - 1) * HeistTimeReductionPerAdditionalPlayer;
                 timeLimit = Mathf.Clamp(timeLimit, HeistMinTime, HeistMaxTime);
                 m_heistTimer.StartTimer(timeLimit);
                 m_isHeistOngoing = true;
@@ -57,7 +57,7 @@ namespace RooseLabs.Gameplay
         {
             if (!IsServerInitialized) return;
             if (!m_isHeistOngoing) return;
-            if (PlayerHandler.AllCharacters.All(player => player.Data.isDead))
+            if (PlayerHandler.AllConnectedCharacters.All(player => player.Data.isDead))
             {
                 EndHeist(false);
             }
@@ -100,7 +100,7 @@ namespace RooseLabs.Gameplay
                     }
                 }
             }
-            foreach (var player in PlayerHandler.AllCharacters)
+            foreach (var player in PlayerHandler.AllConnectedCharacters)
             {
                 player.ResetState();
             }

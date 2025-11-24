@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using FishNet.Connection;
 using FishNet.Object;
 using RooseLabs.Player;
@@ -41,6 +42,8 @@ namespace RooseLabs.Network
 
         public static IReadOnlyCollection<PlayerConnection> AllPlayers => Players.Values;
         public static IReadOnlyCollection<PlayerCharacter> AllCharacters => Characters.Values;
+        public static IEnumerable<PlayerConnection> AllConnectedPlayers => Players.Values.Where(p => p.Owner.IsActive);
+        public static IEnumerable<PlayerCharacter> AllConnectedCharacters => Characters.Values.Where(c => c.Owner.IsActive);
 
         public static NetworkObject[] CharacterNetworkObjects
         {

@@ -8,7 +8,7 @@ namespace RooseLabs.Gameplay.Interactables
     {
         private bool AreAllAliveCharactersNearby(float radius = 20f)
         {
-            foreach (var character in PlayerHandler.AllCharacters)
+            foreach (var character in PlayerHandler.AllConnectedCharacters)
             {
                 if (character.Data.isDead) continue;
                 float distance = Vector3.Distance(transform.position, character.transform.position);
