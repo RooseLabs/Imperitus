@@ -6,6 +6,7 @@ using UnityEngine.InputSystem;
 
 namespace RooseLabs.UI.Elements
 {
+    [AddComponentMenu("RooseLabs/UI/Button Prompt")]
     [RequireComponent(typeof(TextMeshProUGUI))]
     public class ButtonPrompt : MonoBehaviour
     {
