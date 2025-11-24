@@ -153,8 +153,11 @@ MonoBehaviour:
   WasActiveDuringEdit_Set1: 1
   <ComponentIndex>k__BackingField: 0
   <PredictedSpawn>k__BackingField: {fileID: 0}
-  <PredictedOwner>k__BackingField: {fileID: 0}
-  NetworkBehaviours: []
+  <PredictedOwner>k__BackingField: {fileID: 5922534373811243445}
+  NetworkBehaviours:
+  - {fileID: 4766535839371201746}
+  - {fileID: 5922534373811243445}
+  - {fileID: 6196262984778135795}
   InitializedParentNetworkBehaviour: {fileID: 0}
   InitializedNestedNetworkObjects: []
   RuntimeParentNetworkBehaviour: {fileID: 0}
@@ -165,6 +168,7 @@ MonoBehaviour:
   _initializeOrder: 0
   _preventDespawnOnDisconnect: 1
   _defaultDespawnType: 0
+  _initializedTimestamp: -8584376473131854154
   NetworkObserver: {fileID: 0}
   _enablePrediction: 0
   _predictionType: 0
@@ -179,15 +183,15 @@ MonoBehaviour:
   _spectatorInterpolation: 2
   _enableTeleport: 0
   _teleportThreshold: 1
-  <PrefabId>k__BackingField: 65535
+  <PrefabId>k__BackingField: 4
   <SpawnableCollectionId>k__BackingField: 0
   <AssetPathHash>k__BackingField: 8644029688798306828
-  <SceneId>k__BackingField: 0
+  SceneId: 0
   SerializedTransformProperties:
     Position: {x: 0, y: 0, z: 0}
-    Rotation: {x: 0, y: 0, z: 0, w: 0}
-    Scale: {x: 0, y: 0, z: 0}
-    IsValid: 0
+    Rotation: {x: 0, y: 0, z: 0, w: 1}
+    Scale: {x: 1, y: 1, z: 1}
+    IsValid: 1
 --- !u!114 &4766535839371201746
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -200,9 +204,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2836e36774ca1c4bbbee976e17b649c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: FishNet.Runtime::FishNet.Component.Transforming.NetworkTransform
-  _componentIndexCache: 255
+  _componentIndexCache: 0
   _addedNetworkObject: {fileID: 1105512751977791544}
-  _networkObjectCache: {fileID: 0}
+  _networkObjectCache: {fileID: 1105512751977791544}
   _componentConfiguration: 2
   _synchronizeParent: 0
   _packing:
@@ -246,9 +250,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 03002f7d324007e41b10a9dc87ed3c38, type: 3}
   m_Name: 
   m_EditorClassIdentifier: FishNet.Runtime::FishNet.Component.Ownership.PredictedOwner
-  _componentIndexCache: 255
+  _componentIndexCache: 1
   _addedNetworkObject: {fileID: 1105512751977791544}
-  _networkObjectCache: {fileID: 0}
+  _networkObjectCache: {fileID: 1105512751977791544}
   _allowTakeOwnership: 1
 --- !u!114 &6196262984778135795
 MonoBehaviour:
@@ -262,8 +266,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c970b9feac256464cab3f7ed9f1be6c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Gameplay.Interactables.DroppedNotebook
-  _componentIndexCache: 255
+  _componentIndexCache: 2
   _addedNetworkObject: {fileID: 1105512751977791544}
-  _networkObjectCache: {fileID: 0}
+  _networkObjectCache: {fileID: 1105512751977791544}
   force: 600
   damping: 50

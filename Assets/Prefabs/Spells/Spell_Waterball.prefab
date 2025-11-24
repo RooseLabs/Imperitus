@@ -71,7 +71,7 @@ MonoBehaviour:
   <PredictedOwner>k__BackingField: {fileID: 0}
   NetworkBehaviours:
   - {fileID: 222979764584488480}
-  - {fileID: 0}
+  - {fileID: 1395871979999685806}
   InitializedParentNetworkBehaviour: {fileID: 0}
   InitializedNestedNetworkObjects: []
   RuntimeParentNetworkBehaviour: {fileID: 0}
@@ -82,6 +82,7 @@ MonoBehaviour:
   _initializeOrder: 0
   _preventDespawnOnDisconnect: 0
   _defaultDespawnType: 1
+  _initializedTimestamp: -8584376473131854154
   NetworkObserver: {fileID: 0}
   _enablePrediction: 0
   _predictionType: 0
@@ -99,7 +100,7 @@ MonoBehaviour:
   <PrefabId>k__BackingField: 2
   <SpawnableCollectionId>k__BackingField: 0
   <AssetPathHash>k__BackingField: 3454870706624736604
-  <SceneId>k__BackingField: 0
+  SceneId: 0
   SerializedTransformProperties:
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0, w: 1}
@@ -117,9 +118,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f9a5aa59b758435c9d29ff8229fae4d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Gameplay.Spells.Waterball
-  _componentIndexCache: 255
+  _componentIndexCache: 1
   _addedNetworkObject: {fileID: 7572028257010240170}
-  _networkObjectCache: {fileID: 0}
+  _networkObjectCache: {fileID: 7572028257010240170}
   <SpellInfo>k__BackingField: {fileID: 11400000, guid: 5395674b563c12a4ca763b5eec6e5d3a, type: 2}
   castType: 0
   castTime: 0

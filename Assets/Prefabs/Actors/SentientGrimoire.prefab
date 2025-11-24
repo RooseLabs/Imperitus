@@ -353,7 +353,7 @@ MonoBehaviour:
   enemyData: {fileID: 3860053999190181839}
   baseDamage: 0
   damageForceThreshold: 25
-  forceToTamageMultiplier: 2
+  forceToDamageMultiplier: 2
   minimumDamageVelocity: 1.5
   damageCooldownDuration: 1
 --- !u!114 &4866373312013150636
@@ -390,6 +390,7 @@ MonoBehaviour:
   _initializeOrder: 0
   _preventDespawnOnDisconnect: 0
   _defaultDespawnType: 0
+  _initializedTimestamp: -8584376473131854154
   NetworkObserver: {fileID: 0}
   _enablePrediction: 0
   _predictionType: 0
@@ -407,7 +408,7 @@ MonoBehaviour:
   <PrefabId>k__BackingField: 0
   <SpawnableCollectionId>k__BackingField: 0
   <AssetPathHash>k__BackingField: 322763000351815331
-  <SceneId>k__BackingField: 0
+  SceneId: 0
   SerializedTransformProperties:
     Position: {x: -10.87, y: 3.72, z: -0.443}
     Rotation: {x: 0, y: 0, z: 0, w: 1}

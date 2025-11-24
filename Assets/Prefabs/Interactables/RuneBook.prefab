@@ -1038,6 +1038,7 @@ MonoBehaviour:
   <PredictedOwner>k__BackingField: {fileID: 796684813774696700}
   NetworkBehaviours:
   - {fileID: 457966357228422196}
+  - {fileID: 5122663760988559640}
   - {fileID: 796684813774696700}
   - {fileID: 5102793160355787799}
   InitializedParentNetworkBehaviour: {fileID: 0}
@@ -1050,6 +1051,7 @@ MonoBehaviour:
   _initializeOrder: 0
   _preventDespawnOnDisconnect: 1
   _defaultDespawnType: 0
+  _initializedTimestamp: -8584376473131854154
   NetworkObserver: {fileID: 0}
   _enablePrediction: 0
   _predictionType: 0
@@ -1064,10 +1066,10 @@ MonoBehaviour:
   _spectatorInterpolation: 2
   _enableTeleport: 0
   _teleportThreshold: 1
-  <PrefabId>k__BackingField: 5
+  <PrefabId>k__BackingField: 6
   <SpawnableCollectionId>k__BackingField: 0
   <AssetPathHash>k__BackingField: 9587970676867320266
-  <SceneId>k__BackingField: 0
+  SceneId: 0
   SerializedTransformProperties:
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: -0, y: -0, z: -0, w: 1}
@@ -1131,9 +1133,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8cac635f24954048aad3a6ff9110beb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: FishNet.Runtime::FishNet.Component.Animating.NetworkAnimator
-  _componentIndexCache: 255
+  _componentIndexCache: 1
   _addedNetworkObject: {fileID: 2819512474134240772}
-  _networkObjectCache: {fileID: 0}
+  _networkObjectCache: {fileID: 2819512474134240772}
   IgnoredParameters: []
   _animator: {fileID: 7182330832249752347}
   _synchronizeWhenDisabled: 0
@@ -1153,7 +1155,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 03002f7d324007e41b10a9dc87ed3c38, type: 3}
   m_Name: 
   m_EditorClassIdentifier: FishNet.Runtime::FishNet.Component.Ownership.PredictedOwner
-  _componentIndexCache: 1
+  _componentIndexCache: 2
   _addedNetworkObject: {fileID: 2819512474134240772}
   _networkObjectCache: {fileID: 2819512474134240772}
   _allowTakeOwnership: 1
@@ -1169,7 +1171,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c6322fbee26321642a0e520d20720789, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Gameplay.Interactables.Book
-  _componentIndexCache: 2
+  _componentIndexCache: 3
   _addedNetworkObject: {fileID: 2819512474134240772}
   _networkObjectCache: {fileID: 2819512474134240772}
   force: 600

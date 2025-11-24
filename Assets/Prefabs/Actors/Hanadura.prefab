@@ -134,7 +134,6 @@ MonoBehaviour:
   detection: {fileID: 0}
   patrolRoute: {fileID: 0}
   animator: {fileID: 0}
-  volume: {fileID: 0}
   weaponCollider: {fileID: 0}
   RaycastOrigin: {fileID: 286549264654445459}
   modelTransform: {fileID: 3943088723915446607}
@@ -236,6 +235,7 @@ MonoBehaviour:
   _initializeOrder: 0
   _preventDespawnOnDisconnect: 0
   _defaultDespawnType: 0
+  _initializedTimestamp: -8584376473131854154
   NetworkObserver: {fileID: 0}
   _enablePrediction: 0
   _predictionType: 0
@@ -250,10 +250,10 @@ MonoBehaviour:
   _spectatorInterpolation: 2
   _enableTeleport: 0
   _teleportThreshold: 1
-  <PrefabId>k__BackingField: 2
+  <PrefabId>k__BackingField: 3
   <SpawnableCollectionId>k__BackingField: 0
   <AssetPathHash>k__BackingField: 5580580094153033759
-  <SceneId>k__BackingField: 0
+  SceneId: 0
   SerializedTransformProperties:
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0, w: 1}
@@ -293,7 +293,7 @@ MonoBehaviour:
   enemyData: {fileID: 7904130191870220446}
   baseDamage: 10
   damageForceThreshold: 50
-  forceToTamageMultiplier: 2
+  forceToDamageMultiplier: 2
   minimumDamageVelocity: 2.5
   damageCooldownDuration: 1
 --- !u!114 &912312794422129550
