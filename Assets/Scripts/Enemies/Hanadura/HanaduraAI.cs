@@ -1,11 +1,8 @@
 using System.Collections;
-using FishNet.Connection;
 using FishNet.Object;
 using RooseLabs.ScriptableObjects;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.Rendering;
-using UnityEngine.Rendering.Universal;
 using Logger = RooseLabs.Core.Logger;
 
 namespace RooseLabs.Enemies
@@ -21,7 +18,6 @@ namespace RooseLabs.Enemies
         public EnemyDetection detection;
         public PatrolRoute patrolRoute;
         public Animator animator;
-        public Volume volume;
         public WeaponCollider weaponCollider;
         public Transform RaycastOrigin;
         public Transform modelTransform;
@@ -586,45 +582,6 @@ namespace RooseLabs.Enemies
 
             return true;
         }
-
-        public void TriggerVignetteFlash(NetworkConnection connection)
-        {
-            if (!base.IsServerInitialized) return;
-            FlashVignette_TargetRPC(connection);
-        }
-
-        [TargetRpc]
-        private void FlashVignette_TargetRPC(NetworkConnection _)
-        {
-            StartCoroutine(FlashVignette());
-        }
-
-        private bool isFlashingVignette = false;
-        private IEnumerator FlashVignette()
-        {
-            if (!volume.profile.TryGet(out Vignette vignette)) yield break;
-            if (isFlashingVignette) yield break;
-            isFlashingVignette = true;
-            float originalIntensity = vignette.intensity.value;
-            IEnumerator FadeToColor(Color targetColor, float intensity, float duration)
-            {
-                float initialIntensity = vignette.intensity.value;
-                Color initialColor = vignette.color.value;
-                float elapsed = 0f;
-                while (elapsed < duration)
-                {
-                    elapsed += Time.deltaTime;
-                    vignette.intensity.value = Mathf.Lerp(initialIntensity, intensity, elapsed / duration);
-                    vignette.color.value = Color.Lerp(initialColor, targetColor, elapsed / duration);
-                    yield return null;
-                }
-                vignette.color.value = targetColor;
-            }
-            yield return FadeToColor(Color.red, 0.35f, 0.5f);
-            yield return FadeToColor(Color.black, originalIntensity, 0.5f);
-            isFlashingVignette = false;
-        }
-
         #endregion
 
         public void SetAnimatorBool(string paramName, bool value)

@@ -137,18 +137,6 @@ namespace RooseLabs.Enemies
 
                 // Start damage cooldown
                 damageTimer = damageCooldown;
-
-                // Trigger vignette flash on hit player
-                NetworkObject targetNetObj = other.GetComponent<NetworkObject>();
-                if (targetNetObj == null)
-                {
-                    targetNetObj = other.GetComponentInParent<NetworkObject>();
-                }
-
-                if (targetNetObj != null)
-                {
-                    ownerAI.TriggerVignetteFlash(targetNetObj.LocalConnection);
-                }
             }
             else
             {

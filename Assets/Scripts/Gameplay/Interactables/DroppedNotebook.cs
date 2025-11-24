@@ -1,6 +1,8 @@
 using System.Collections.Generic;
+using FishNet.Connection;
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
+using RooseLabs.Network;
 using RooseLabs.Player;
 using RooseLabs.ScriptableObjects;
 using RooseLabs.Utils;
@@ -11,10 +13,13 @@ namespace RooseLabs.Gameplay.Interactables
     public class DroppedNotebook : Draggable, IInteractable
     {
         private readonly List<RuneSO> m_availableRunes = new();
-        private readonly SyncList<int> m_syncedRuneIndices = new();
 
         /// The character who dropped this notebook.
-        private PlayerCharacter m_character;
+        private readonly SyncVar<NetworkConnection> m_ownerConnection = new();
+
+        private readonly SyncList<int> m_syncedRuneIndices = new();
+
+        private PlayerConnection OwnerPlayer => PlayerHandler.GetPlayer(m_ownerConnection.Value);
 
         protected override void Awake()
         {
@@ -27,7 +32,7 @@ namespace RooseLabs.Gameplay.Interactables
             m_syncedRuneIndices.OnChange -= OnSyncedRuneIndicesChanged;
         }
 
-        public string GetInteractionText() => $"Recover Runes of {m_character.Player.PlayerName}";
+        public string GetInteractionText() => $"Recover Runes of {OwnerPlayer.PlayerName ?? "Unknown"}";
 
         public bool IsInteractable(PlayerCharacter interactor)
         {
@@ -75,7 +80,7 @@ namespace RooseLabs.Gameplay.Interactables
         [Server]
         public void Initialize(PlayerCharacter character)
         {
-            m_character = character;
+            m_ownerConnection.Value = character.Owner;
 
             var runeIndices = character.Notebook.GetCollectedRunes();
             m_syncedRuneIndices.Clear();
@@ -83,7 +88,7 @@ namespace RooseLabs.Gameplay.Interactables
 
             RebuildAvailableRunesFromSyncedIndices();
 
-            m_character.Notebook.RemoveAllRunes();
+            character.Notebook.RemoveAllRunes();
         }
 
         private void RebuildAvailableRunesFromSyncedIndices()

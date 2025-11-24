@@ -1,5 +1,7 @@
+using System.Collections;
 using FishNet.Object;
 using RooseLabs.Network;
+using RooseLabs.Utils;
 using TMPro;
 using UnityEngine;
 
@@ -19,9 +21,26 @@ namespace RooseLabs.Player
             PlayerConnection player = PlayerHandler.GetPlayer(Owner);
             if (player == null)
             {
-                Debug.LogError("PlayerIdentity could not find PlayerConnection for owner.");
+                StartCoroutine(WaitForPlayerConnection());
                 return;
             }
+            this.LogInfo("PlayerNameTag found PlayerConnection immediately.");
+            if (!string.IsNullOrEmpty(player.PlayerName))
+            {
+                nameTagText.text = player.PlayerName;
+                this.LogInfo($"PlayerNameTag set name to {player.PlayerName}");
+            }
+            SubscribeToNameChanges(player);
+        }
+
+        private IEnumerator WaitForPlayerConnection()
+        {
+            yield return new WaitUntil(() => (bool)PlayerHandler.GetPlayer(Owner));
+            SubscribeToNameChanges(PlayerHandler.GetPlayer(Owner));
+        }
+
+        private void SubscribeToNameChanges(PlayerConnection player)
+        {
             player.OnNameChanged += OnNameChanged;
         }
 
@@ -43,6 +62,7 @@ namespace RooseLabs.Player
 
         private void OnNameChanged(string newName)
         {
+            this.LogInfo($"PlayerNameTag changed to {newName}");
             nameTagText.text = newName;
         }
     }

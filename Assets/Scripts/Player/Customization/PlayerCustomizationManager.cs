@@ -55,6 +55,8 @@ namespace RooseLabs.Player.Customization
 
         private void Awake()
         {
+            ClearSavedCustomization();
+
             BuildRendererLookup();
             ValidateDefaultConfigurations();
         }

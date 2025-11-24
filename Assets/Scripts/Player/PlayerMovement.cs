@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace RooseLabs.Player
 {
-    [DefaultExecutionOrder(-97)]
+    [DefaultExecutionOrder(-96)]
     public class PlayerMovement : MonoBehaviour
     {
         [SerializeField] private Transform modelTransform;

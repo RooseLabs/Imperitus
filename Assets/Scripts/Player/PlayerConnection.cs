@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace RooseLabs.Player
 {
+    [DefaultExecutionOrder(-98)]
     public class PlayerConnection : NetworkBehaviour
     {
         public static PlayerConnection LocalPlayer;
@@ -40,8 +41,8 @@ namespace RooseLabs.Player
 
         public override void OnStopNetwork()
         {
-            PlayerHandler.UnregisterPlayer(Owner);
-            PlayerHandler.UnregisterCharacter(Owner);
+            // PlayerHandler.UnregisterPlayer(Owner);
+            // PlayerHandler.UnregisterCharacter(Owner);
         }
 
         public override void OnStartServer()
@@ -70,6 +71,7 @@ namespace RooseLabs.Player
         private void PlayerName_OnChange(string prev, string next, bool asServer)
         {
             OnNameChanged.Invoke(next);
+            name = $"Player ({next})";
         }
     }
 }

@@ -13,7 +13,7 @@ using UnityEngine;
 
 namespace RooseLabs.Player
 {
-    [DefaultExecutionOrder(-98)]
+    [DefaultExecutionOrder(-97)]
     [RequireComponent(typeof(PlayerInput))]
     [RequireComponent(typeof(PlayerData))]
     public class PlayerCharacter : NetworkBehaviour, IDamageable

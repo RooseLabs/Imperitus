@@ -1,4 +1,5 @@
 using FishNet.Object;
+using FishNet.Object.Synchronizing;
 using RooseLabs.ScriptableObjects;
 using UnityEngine;
 
@@ -11,7 +12,7 @@ namespace RooseLabs.Gameplay.Interactables
         [SerializeField] private Animator animator;
         #endregion
 
-        private RuneSO m_rune;
+        private readonly SyncVar<int> m_runeIndex = new(-1, new SyncTypeSettings( WritePermission.ClientUnsynchronized));
 
         public override void OnPickupStart()
         {
@@ -22,11 +23,10 @@ namespace RooseLabs.Gameplay.Interactables
         public override void OnPickupEnd()
         {
             if (!IsOwner) return;
-            if (m_rune)
+            if (m_runeIndex.Value > -1)
             {
-                HolderCharacter.Notebook.AddRune(m_rune);
-                if (IsServerInitialized) RuneCollected_ObserversRPC();
-                else RuneCollected_ServerRPC();
+                HolderCharacter.Notebook.CollectRune(m_runeIndex.Value);
+                RuneCollected_ServerRPC();
             }
         }
 
@@ -36,23 +36,17 @@ namespace RooseLabs.Gameplay.Interactables
             animator.SetBool("IsOpen", false);
         }
 
-        [ServerRpc]
+        [ServerRpc(RunLocally = true)]
         private void RuneCollected_ServerRPC()
         {
-            RuneCollected_ObserversRPC();
-        }
-
-        [ObserversRpc]
-        private void RuneCollected_ObserversRPC()
-        {
-            m_rune = null;
+            m_runeIndex.Value = -1;
         }
 
         public override string GetInteractionText() => "Open";
 
         public void SetContainedRune(RuneSO rune)
         {
-            m_rune = rune;
+            m_runeIndex.Value = GameManager.Instance.RuneDatabase.IndexOf(rune);
         }
     }
 }
