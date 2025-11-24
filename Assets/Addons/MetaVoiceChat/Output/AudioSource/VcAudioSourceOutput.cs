@@ -39,7 +39,7 @@ namespace MetaVoiceChat.Output.AudioSource
 
         private float targetLatency;
 
-        private void Awake()
+        private void Start()
         {
             // Unity implements doppler by changing the pitch of the audio clip. This interferes with our purposes.
             audioSource.dopplerLevel = 0;
