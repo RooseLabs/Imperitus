@@ -48,8 +48,8 @@ namespace RooseLabs.Player
         public override void OnStartServer()
         {
             // Spawn this player's character at this object's position and rotation
-            NetworkObject playerObject = NetworkManager.GetPooledInstantiated(playerPrefab, transform.position, transform.rotation, asServer: true);
-            Spawn(playerObject, Owner, gameObject.scene);
+            NetworkObject playerObject = Instantiate(playerPrefab, transform.position, transform.rotation);
+            Spawn(playerObject, Owner);
         }
 
         public override void OnStartClient()
@@ -65,13 +65,22 @@ namespace RooseLabs.Player
         private void SetPlayerName(string newName)
         {
             m_playerName.Value = newName;
-            name = $"Player ({newName})";
+            SetGameObjectNames(newName);
         }
 
         private void PlayerName_OnChange(string prev, string next, bool asServer)
         {
             OnNameChanged.Invoke(next);
-            name = $"Player ({next})";
+            SetGameObjectNames(next);
+        }
+
+        private void SetGameObjectNames(string str)
+        {
+            name = $"Player ({str})";
+            if (Character != null)
+            {
+                Character.name = $"Character ({str})";
+            }
         }
     }
 }

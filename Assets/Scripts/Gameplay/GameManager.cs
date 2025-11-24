@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using FishNet;
 using FishNet.Managing.Scened;
 using FishNet.Object;
@@ -8,8 +9,8 @@ using FishNet.Object.Synchronizing;
 using GameKit.Dependencies.Utilities.Types;
 using RooseLabs.Gameplay.Notebook;
 using RooseLabs.ScriptableObjects;
-using RooseLabs.Utils;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace RooseLabs.Gameplay
 {
@@ -30,6 +31,7 @@ namespace RooseLabs.Gameplay
 
         private HeistTimer m_heistTimer;
 
+        public Scene CurrentScene => SceneManagement.SceneManager.Instance.CurrentOnlineScene;
         public AssignmentData CurrentAssignment { get; private set; }
 
         private void Awake()
@@ -64,7 +66,6 @@ namespace RooseLabs.Gameplay
             bool hasLoadedHeistScene = false;
             foreach (var scene in args.LoadedScenes)
             {
-                this.LogInfo($"Loaded Scene: {scene.name}");
                 if (scene.name == GetSceneName(lobbyScene))
                     hasLoadedLobby = true;
                 else if (heistScenes.Any(heistScene => scene.name == GetSceneName(heistScene)))
@@ -136,15 +137,10 @@ namespace RooseLabs.Gameplay
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static string GetSceneName(string fullPath)
         {
             return Path.GetFileNameWithoutExtension(fullPath);
-        }
-
-        // Method that gets the current heist timer value
-        public float GetHeistTimerValue()
-        {
-            return m_heistTimer != null ? m_heistTimer.GetRemainingTime() : 0f;
         }
     }
 }

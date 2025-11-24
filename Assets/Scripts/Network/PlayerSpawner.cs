@@ -61,8 +61,8 @@ namespace RooseLabs.Network
             }
 
             SetSpawn(playerPrefab.transform, out position, out rotation);
-            NetworkObject playerObject = NetworkManager.GetPooledInstantiated(playerPrefab, position, rotation, asServer: true);
-            Spawn(playerObject, connection, gameObject.scene);
+            NetworkObject playerObject = Instantiate(playerPrefab, position, rotation);
+            Spawn(playerObject, connection);
         }
 
         private void SetSpawn(Transform prefab, out Vector3 pos, out Quaternion rot)

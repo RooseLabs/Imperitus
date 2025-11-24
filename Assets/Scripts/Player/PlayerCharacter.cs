@@ -184,7 +184,7 @@ namespace RooseLabs.Player
         {
             // Spawn dropped notebook
             GameObject droppedNotebook = Instantiate(droppedNotebookPrefab, transform.position + Vector3.up * 1.0f, Quaternion.identity);
-            Spawn(droppedNotebook, null, gameObject.scene);
+            Spawn(droppedNotebook, null, GameManager.Instance.CurrentScene);
             droppedNotebook.GetComponent<DroppedNotebook>().Initialize(this);
 
             // Trigger ragdoll

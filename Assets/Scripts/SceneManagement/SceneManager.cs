@@ -1,4 +1,5 @@
 using System.IO;
+using System.Runtime.CompilerServices;
 using FishNet.Managing;
 using FishNet.Managing.Scened;
 using FishNet.Object;
@@ -48,8 +49,39 @@ namespace RooseLabs.SceneManagement
         public static SceneManager Instance { get; private set; }
 
         private NetworkManager m_networkManager;
-        private string m_currentlyLoadedOnlineScene = string.Empty;
-        private string m_pendingUnloadAfterLoad = string.Empty;
+
+        /// <summary>
+        /// Name of the scene pending unload after the next scene load completes.
+        /// </summary>
+        private string m_pendingUnloadAfterLoadSceneName = string.Empty;
+
+        private string m_currentlyLoadedOnlineSceneName = string.Empty;
+        /// <summary>
+        /// Name of the currently loaded online scene.
+        /// </summary>
+        private string CurrentlyLoadedOnlineSceneName
+        {
+            get => m_currentlyLoadedOnlineSceneName;
+            set
+            {
+                if (m_currentlyLoadedOnlineSceneName == value) return;
+                m_currentlyLoadedOnlineSceneName = value;
+                m_currentOnlineScene = null;
+            }
+        }
+
+        private Scene? m_currentOnlineScene;
+        /// <summary>
+        /// The currently loaded online scene.
+        /// </summary>
+        public Scene CurrentOnlineScene
+        {
+            get
+            {
+                m_currentOnlineScene ??= UnitySceneManager.GetSceneByName(CurrentlyLoadedOnlineSceneName);
+                return m_currentOnlineScene.Value;
+            }
+        }
 
         private void Awake()
         {
@@ -114,7 +146,7 @@ namespace RooseLabs.SceneManagement
                 }
                 if (s.name == GetSceneName(startingOnlineScene))
                     startingOnlineSceneLoaded = true;
-                m_currentlyLoadedOnlineScene = s.name;
+                CurrentlyLoadedOnlineSceneName = s.name;
             }
 
             if (startingOnlineSceneLoaded)
@@ -126,10 +158,10 @@ namespace RooseLabs.SceneManagement
                 LoadStartingOnlineScene();
             }
 
-            if (!string.IsNullOrEmpty(m_pendingUnloadAfterLoad))
+            if (!string.IsNullOrEmpty(m_pendingUnloadAfterLoadSceneName))
             {
-                Logger.Info($"Unloading pending scene '{m_pendingUnloadAfterLoad}'.");
-                Scene pendingScene = UnitySceneManager.GetSceneByName(m_pendingUnloadAfterLoad);
+                Logger.Info($"Unloading pending scene '{m_pendingUnloadAfterLoadSceneName}'.");
+                Scene pendingScene = UnitySceneManager.GetSceneByName(m_pendingUnloadAfterLoadSceneName);
                 if (pendingScene.IsValid())
                 {
                     Logger.Info("Previous scene is valid, unloading.");
@@ -140,7 +172,7 @@ namespace RooseLabs.SceneManagement
                 {
                     Logger.Warning("Previous scene is invalid.");
                 }
-                m_pendingUnloadAfterLoad = string.Empty;
+                m_pendingUnloadAfterLoadSceneName = string.Empty;
             }
         }
 
@@ -179,6 +211,7 @@ namespace RooseLabs.SceneManagement
 
         private void LoadGameplayManagersScene()
         {
+            Logger.Info("Loading Gameplay Managers scene.");
             SceneLoadData sld = new(GetSceneName(gameplayManagersScene))
             {
                 ReplaceScenes = ReplaceOption.All
@@ -188,7 +221,9 @@ namespace RooseLabs.SceneManagement
 
         private void LoadStartingOnlineScene()
         {
-            SceneLoadData sld = new(GetSceneName(startingOnlineScene))
+            string startingOnlineSceneName = GetSceneName(startingOnlineScene);
+            Logger.Info($"Loading starting online scene '{startingOnlineSceneName}'.");
+            SceneLoadData sld = new(startingOnlineSceneName)
             {
                 ReplaceScenes = ReplaceOption.None
             };
@@ -212,11 +247,11 @@ namespace RooseLabs.SceneManagement
 
             Logger.Info($"Loading scene '{sceneName}'.");
 
-            Scene previousScene = UnitySceneManager.GetSceneByName(m_currentlyLoadedOnlineScene);
+            Scene previousScene = CurrentOnlineScene;
             if (previousScene.IsValid())
             {
-                Logger.Info($"Scheduling previous scene '{m_currentlyLoadedOnlineScene}' for unload after new scene is loaded.");
-                m_pendingUnloadAfterLoad = m_currentlyLoadedOnlineScene;
+                Logger.Info($"Scheduling previous scene '{CurrentlyLoadedOnlineSceneName}' for unload after new scene is loaded.");
+                m_pendingUnloadAfterLoadSceneName = CurrentlyLoadedOnlineSceneName;
             }
 
             SceneLoadData sld = new(sceneName);
@@ -234,6 +269,7 @@ namespace RooseLabs.SceneManagement
             if (UnitySceneManager.GetActiveScene().name == GetSceneName(offlineScene))
                 return;
             UnitySceneManager.LoadScene(offlineScene);
+            Logger.Info($"Loaded offline scene '{GetSceneName(offlineScene)}'.");
         }
 
         private void UnloadOfflineScene()
@@ -243,9 +279,27 @@ namespace RooseLabs.SceneManagement
                 return;
 
             UnitySceneManager.UnloadSceneAsync(s);
+            Logger.Info($"Unloaded offline scene '{s.name}'.");
         }
 
-        private string GetSceneName(string fullPath)
+        /// <summary>
+        /// Moves a GameObject to the currently loaded online scene.
+        /// </summary>
+        /// <param name="go">The GameObject to move.</param>
+        public void MoveGameObjectToOnlineScene(GameObject go)
+        {
+            Scene onlineScene = CurrentOnlineScene;
+            if (!onlineScene.IsValid())
+            {
+                Logger.Warning("Cannot move GameObject to online scene because no online scene is loaded.");
+                return;
+            }
+            UnitySceneManager.MoveGameObjectToScene(go, onlineScene);
+            Logger.Info($"Moved GameObject '{go.name}' to online scene '{onlineScene.name}'.");
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static string GetSceneName(string fullPath)
         {
             return Path.GetFileNameWithoutExtension(fullPath);
         }

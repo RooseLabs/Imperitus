@@ -49,7 +49,7 @@ namespace RooseLabs.Gameplay
             if (!IsServerInitialized) return;
             int randomIndex = Random.Range(0, heistScenes.Length);
             string selectedSceneName = GetSceneName(heistScenes[randomIndex]);
-            SceneManagement.SceneManager.Instance.LoadScene(selectedSceneName, PlayerHandler.CharacterNetworkObjects);
+            SceneManagement.SceneManager.Instance.LoadScene(selectedSceneName);
             m_isEndingHeist = false;
         }
 
@@ -104,7 +104,7 @@ namespace RooseLabs.Gameplay
             {
                 player.ResetState();
             }
-            SceneManagement.SceneManager.Instance.LoadScene(GetSceneName(lobbyScene), PlayerHandler.CharacterNetworkObjects);
+            SceneManagement.SceneManager.Instance.LoadScene(GetSceneName(lobbyScene));
         }
 
         private void SpawnHeistRuneContainerObjects()
@@ -245,6 +245,15 @@ namespace RooseLabs.Gameplay
         private void EndHeist_ServerRPC(bool successful)
         {
             EndHeist(successful);
+        }
+
+        /// <summary>
+        /// Retrieves the remaining time on the heist timer.
+        /// </summary>
+        /// <returns>Remaining time in seconds, or 0 if the timer is not available.</returns>
+        public float GetHeistTimerValue()
+        {
+            return (bool)m_heistTimer ? m_heistTimer.GetRemainingTime() : 0f;
         }
     }
 }

@@ -2377,10 +2377,10 @@ MonoBehaviour:
   RuntimeChildNetworkBehaviours: []
   _isNetworked: 1
   _isSpawnable: 1
-  _isGlobal: 0
+  _isGlobal: 1
   _initializeOrder: 0
   _preventDespawnOnDisconnect: 0
-  _defaultDespawnType: 1
+  _defaultDespawnType: 0
   _initializedTimestamp: -8584376473131854154
   NetworkObserver: {fileID: 0}
   _enablePrediction: 0
