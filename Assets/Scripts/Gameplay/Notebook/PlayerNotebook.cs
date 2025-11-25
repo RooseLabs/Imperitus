@@ -369,12 +369,6 @@ namespace RooseLabs.Gameplay.Notebook
             return HasRune(runeIndex);
         }
 
-        public void RemoveAllRunes()
-        {
-            m_runeCollection.collectedRuneIndices.Clear();
-            this.LogInfo("All runes removed from player's collection");
-        }
-
         #endregion
 
         #region Rune Proximity Detection
@@ -650,6 +644,14 @@ namespace RooseLabs.Gameplay.Notebook
                     return notebook;
             }
             return null;
+        }
+
+        public void ResetNotebook()
+        {
+            m_runeCollection.collectedRuneIndices.Clear();
+            m_borrowedRunes.Clear();
+            m_toggledRunes.Clear();
+            this.LogInfo("Player notebook reset");
         }
 
         #endregion

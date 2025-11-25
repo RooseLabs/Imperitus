@@ -224,6 +224,9 @@ namespace RooseLabs.Player
             {
                 CameraController.Instance.ResetPosition();
             }
+
+            // Reset the runes in the notebook
+            Notebook.ResetNotebook();
         }
 
         #region Utils

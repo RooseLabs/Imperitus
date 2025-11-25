@@ -88,7 +88,7 @@ namespace RooseLabs.Gameplay.Interactables
 
             RebuildAvailableRunesFromSyncedIndices();
 
-            character.Notebook.RemoveAllRunes();
+            character.Notebook.ResetNotebook();
         }
 
         private void RebuildAvailableRunesFromSyncedIndices()
