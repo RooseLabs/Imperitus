@@ -256,7 +256,9 @@ MonoBehaviour:
   _addedNetworkObject: {fileID: 832602293}
   _networkObjectCache: {fileID: 0}
   hanaduraPrefab: {fileID: 3774049500881470253, guid: 57090dfd109dc2642a434deb8b456572, type: 3}
-  initialSpawnCount: 3
+  grimoirePrefab: {fileID: 8490385624122815485, guid: 7d22e7a8fa558f446af02d88fb59af93, type: 3}
+  initialHanaduraCount: 10
+  initialGrimoireCount: 4
   initialSpawnerCount: 0
   grimoireAlertSpawnChance: 50
   instantRespawnChance: 30

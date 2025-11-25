@@ -20,9 +20,15 @@ namespace RooseLabs.Enemies
         [Tooltip("Prefab for Hanadura enemy")]
         [SerializeField] private GameObject hanaduraPrefab;
 
+        [Tooltip("Prefab for Grimoire enemy")]
+        [SerializeField] private GameObject grimoirePrefab;
+
         [Header("Initial Spawn Settings")]
-        [Tooltip("Number of enemies to spawn when heist starts")]
-        [SerializeField] private int initialSpawnCount = 3;
+        [Tooltip("Number of Hanadura enemies to spawn when heist starts")]
+        [SerializeField] private int initialHanaduraCount = 3;
+
+        [Tooltip("Number of Grimoire enemies to spawn when heist starts")]
+        [SerializeField] private int initialGrimoireCount = 1;
 
         [Tooltip("Number of spawners to use for initial spawn (0 = use all available)")]
         [SerializeField] private int initialSpawnerCount = 0;
@@ -55,6 +61,10 @@ namespace RooseLabs.Enemies
         [Tooltip("Maximum distance to consider a spawner as 'in' a room")]
         [SerializeField] private float roomProximityThreshold = 50f;
 
+        [Header("Room Limitations")]
+        [Tooltip("Maximum number of Hanaduras allowed per room")]
+        [SerializeField] private int maxHanaduraPerRoom = 2;
+
         [Header("Debug")]
         [SerializeField] private bool showDebugLogs = true;
         [SerializeField] private bool showDebugGizmos = true;
@@ -63,6 +73,8 @@ namespace RooseLabs.Enemies
         private List<EnemySpawner> allSpawners = new List<EnemySpawner>();
         private Dictionary<GameObject, EnemySpawner> activeEnemies = new Dictionary<GameObject, EnemySpawner>();
         private Dictionary<string, List<GameObject>> roomActiveEnemies = new Dictionary<string, List<GameObject>>();
+        private Dictionary<string, GameObject> roomActiveGrimoires = new Dictionary<string, GameObject>();
+        private Dictionary<string, List<GameObject>> roomActiveHanaduras = new Dictionary<string, List<GameObject>>();
         private Queue<PendingRespawn> respawnQueue = new Queue<PendingRespawn>();
         private PatrolRoute currentPatrolRoute;
         private float lastTaskProgressSpawnTime = -999f;
@@ -74,6 +86,7 @@ namespace RooseLabs.Enemies
             public EnemySpawner preferredSpawner;
             public Vector3 targetAlertPosition;
             public bool isAlertSpawn;
+            public bool isGrimoire;
         }
 
         #region Initialization
@@ -148,11 +161,10 @@ namespace RooseLabs.Enemies
 
                 if (spawner != null)
                 {
-                    // Spawn immediately and alert to player position
-                    GameObject enemy = SpawnEnemyAtSpawner(spawner, playerPosition, true);
+                    GameObject enemy = SpawnEnemyAtSpawner(spawner, false, playerPosition, true);
                     if (enemy != null)
                     {
-                        LogDebug($"Spawned alert enemy at {spawner.name}");
+                        LogDebug($"Spawned alert Hanadura at {spawner.name}");
                     }
                 }
             }
@@ -161,7 +173,7 @@ namespace RooseLabs.Enemies
         /// <summary>
         /// Call this when an enemy dies to handle respawn logic
         /// </summary>
-        public void OnEnemyDeath(GameObject enemyObject, bool isHanadura)
+        public void OnEnemyDeath(GameObject enemyObject, bool isGrimoire)
         {
             if (!IsServerInitialized || !heistStarted)
                 return;
@@ -186,17 +198,32 @@ namespace RooseLabs.Enemies
                 zone?.ReleaseRoute(enemyObject);
             }
 
-            LogDebug($"Enemy died at spawner: {spawner.name} (room: {roomId})");
+            // Clean up type-specific tracking
+            if (isGrimoire && roomActiveGrimoires.ContainsKey(roomId))
+            {
+                if (roomActiveGrimoires[roomId] == enemyObject)
+                {
+                    roomActiveGrimoires.Remove(roomId);
+                    LogDebug($"Grimoire removed from room '{roomId}' tracking");
+                }
+            }
+            else if (!isGrimoire && roomActiveHanaduras.ContainsKey(roomId))
+            {
+                roomActiveHanaduras[roomId].Remove(enemyObject);
+                LogDebug($"Hanadura removed from room '{roomId}' tracking (now {roomActiveHanaduras[roomId].Count}/{maxHanaduraPerRoom})");
+            }
 
-            // Roll for instant respawn (existing logic)
+            LogDebug($"{(isGrimoire ? "Grimoire" : "Hanadura")} died at spawner: {spawner.name} (room: {roomId})");
+
+            // Roll for instant respawn
             if (Random.Range(0f, 100f) <= instantRespawnChance)
             {
                 LogDebug("Instant respawn triggered");
-                StartCoroutine(DelayedSpawn(spawner, 0.5f));
+                StartCoroutine(DelayedSpawn(spawner, 0.5f, isGrimoire));
             }
             else
             {
-                // Queue for delayed respawn (existing logic)
+                // Queue for delayed respawn
                 float heistProgress = GetHeistProgress();
                 float respawnTime = Mathf.Lerp(baseRespawnTime, minRespawnTime, heistProgress);
 
@@ -205,11 +232,12 @@ namespace RooseLabs.Enemies
                     spawnTime = Time.time + respawnTime,
                     preferredSpawner = spawner,
                     targetAlertPosition = Vector3.zero,
-                    isAlertSpawn = false
+                    isAlertSpawn = false,
+                    isGrimoire = isGrimoire
                 };
 
                 respawnQueue.Enqueue(pending);
-                LogDebug($"Queued respawn in {respawnTime:F1} seconds");
+                LogDebug($"Queued {(isGrimoire ? "Grimoire" : "Hanadura")} respawn in {respawnTime:F1} seconds");
             }
         }
 
@@ -236,7 +264,7 @@ namespace RooseLabs.Enemies
 
             if (spawner != null)
             {
-                StartCoroutine(DelayedSpawn(spawner, 1f)); // 1 second delay for task progress spawns
+                StartCoroutine(DelayedSpawn(spawner, 1f, false)); // 1 second delay for task progress spawns
             }
         }
 
@@ -252,49 +280,187 @@ namespace RooseLabs.Enemies
                 return;
             }
 
-            // Determine how many spawners to use
-            int spawnersToUse = initialSpawnerCount > 0
-                ? Mathf.Min(initialSpawnerCount, allSpawners.Count)
-                : allSpawners.Count;
+            int hanaduraSpawned = 0;
+            int grimoireSpawned = 0;
 
-            // Select random spawners
-            List<EnemySpawner> selectedSpawners = allSpawners
-                .OrderBy(x => Random.value)
-                .Take(spawnersToUse)
-                .ToList();
-
-            // Spawn enemies
-            int spawned = 0;
-            for (int i = 0; i < initialSpawnCount && i < selectedSpawners.Count; i++)
+            // Spawn Hanaduras
+            for (int i = 0; i < initialHanaduraCount; i++)
             {
-                GameObject enemy = SpawnEnemyAtSpawner(selectedSpawners[i % selectedSpawners.Count]);
-                if (enemy != null)
-                    spawned++;
+                // Find best spawner across ALL spawners, prioritizing empty rooms
+                EnemySpawner bestSpawner = null;
+                int lowestHanaduraCount = int.MaxValue;
+
+                // Create a randomized list to avoid always picking the same spawner in a room
+                List<EnemySpawner> shuffledSpawners = allSpawners.OrderBy(x => Random.value).ToList();
+
+                foreach (var spawner in shuffledSpawners)
+                {
+                    string roomId = spawner.RoomIdentifier;
+
+                    if (!CanSpawnHanaduraInRoom(roomId))
+                        continue;
+
+                    int roomCount = GetHanaduraCountInRoom(roomId);
+
+                    // Strict priority: empty rooms (0) > rooms with 1 > rooms with 2 (if allowed)
+                    if (roomCount < lowestHanaduraCount)
+                    {
+                        lowestHanaduraCount = roomCount;
+                        bestSpawner = spawner;
+
+                        // If we found an empty room, use it immediately (highest priority)
+                        if (roomCount == 0)
+                            break;
+                    }
+                }
+
+                if (bestSpawner != null)
+                {
+                    GameObject hanadura = SpawnEnemyAtSpawner(bestSpawner, false);
+                    if (hanadura != null)
+                    {
+                        hanaduraSpawned++;
+                        LogDebug($"Hanadura {hanaduraSpawned}/{initialHanaduraCount} spawned in room '{bestSpawner.RoomIdentifier}' (priority: {lowestHanaduraCount} existing)");
+                    }
+                }
+                else
+                {
+                    LogDebug($"Could not find valid spawner for Hanadura {i + 1} (all rooms at max capacity)", true);
+                    break;
+                }
             }
 
-            LogDebug($"Initial spawn complete: {spawned}/{initialSpawnCount} enemies spawned across {selectedSpawners.Count} spawners");
+            // Spawn Grimoires
+            List<string> roomsWithGrimoires = new List<string>();
+
+            for (int i = 0; i < initialGrimoireCount; i++)
+            {
+                EnemySpawner validSpawner = null;
+
+                // First Grimoire is always spawned in biggest room (by volume)
+                if (i == 0)
+                {
+                    string biggestRoomId = RoomCalculations.FindBiggestRoom(roomTag);
+
+                    if (!string.IsNullOrEmpty(biggestRoomId) && biggestRoomId != "Unknown")
+                    {
+                        // Find a spawner in the biggest room
+                        List<EnemySpawner> biggestRoomSpawners = allSpawners
+                            .Where(s => s.RoomIdentifier == biggestRoomId)
+                            .OrderBy(x => Random.value)
+                            .ToList();
+
+                        if (biggestRoomSpawners.Count > 0 && CanSpawnGrimoireInRoom(biggestRoomId))
+                        {
+                            validSpawner = biggestRoomSpawners[0];
+                            roomsWithGrimoires.Add(biggestRoomId);
+                            LogDebug($"First Grimoire assigned to BIGGEST room: '{biggestRoomId}' (volume: {RoomCalculations.GetRoomVolume(biggestRoomId, roomTag):F2})");
+                        }
+                        else
+                        {
+                            LogDebug($"Biggest room '{biggestRoomId}' already has a Grimoire or no spawners available", true);
+                        }
+                    }
+                    else
+                    {
+                        LogDebug("Could not determine biggest room", true);
+                    }
+                }
+
+                // The remaining Grimoires use randomized algorithm
+                if (validSpawner == null)
+                {
+                    // Randomize to avoid always picking the same rooms
+                    List<EnemySpawner> shuffledSpawners = allSpawners.OrderBy(x => Random.value).ToList();
+
+                    foreach (var spawner in shuffledSpawners)
+                    {
+                        string roomId = spawner.RoomIdentifier;
+
+                        // Skip if this room already has a Grimoire (from this spawn session or previously)
+                        if (roomsWithGrimoires.Contains(roomId) || !CanSpawnGrimoireInRoom(roomId))
+                            continue;
+
+                        validSpawner = spawner;
+                        roomsWithGrimoires.Add(roomId);
+                        break;
+                    }
+                }
+
+                if (validSpawner != null)
+                {
+                    GameObject grimoire = SpawnEnemyAtSpawner(validSpawner, true);
+                    if (grimoire != null)
+                    {
+                        grimoireSpawned++;
+                        LogDebug($"Grimoire {grimoireSpawned}/{initialGrimoireCount} spawned in room '{validSpawner.RoomIdentifier}'");
+                    }
+                }
+                else
+                {
+                    LogDebug($"Could not find valid spawner for Grimoire {i + 1} (all rooms occupied or insufficient rooms)", true);
+                    break;
+                }
+            }
+
+            LogDebug($"Initial spawn complete: {hanaduraSpawned}/{initialHanaduraCount} Hanaduras across rooms, {grimoireSpawned}/{initialGrimoireCount} Grimoires");
+
+            // Debug room distribution
+            //DebugRoomDistribution();
         }
 
-        private GameObject SpawnEnemyAtSpawner(EnemySpawner spawner, Vector3 alertPosition = default, bool isAlert = false)
+        private GameObject SpawnEnemyAtSpawner(EnemySpawner spawner, bool isGrimoire, Vector3 alertPosition = default, bool isAlert = false)
         {
-            if (hanaduraPrefab == null)
+            GameObject prefabToSpawn = isGrimoire ? grimoirePrefab : hanaduraPrefab;
+
+            if (prefabToSpawn == null)
             {
-                LogDebug("Hanadura prefab not assigned!", true);
+                LogDebug($"{(isGrimoire ? "Grimoire" : "Hanadura")} prefab not assigned!", true);
+                return null;
+            }
+
+            string roomId = spawner.RoomIdentifier;
+
+            // Check room limitations
+            if (isGrimoire && !CanSpawnGrimoireInRoom(roomId))
+            {
+                LogDebug($"Cannot spawn Grimoire at {spawner.name} - room '{roomId}' already has one");
+                return null;
+            }
+
+            if (!isGrimoire && !CanSpawnHanaduraInRoom(roomId))
+            {
+                LogDebug($"Cannot spawn Hanadura at {spawner.name} - room '{roomId}' at max capacity ({maxHanaduraPerRoom})");
                 return null;
             }
 
             // Instantiate enemy
-            GameObject enemyObj = Instantiate(hanaduraPrefab, spawner.SpawnPoint.position, spawner.SpawnPoint.rotation);
+            GameObject enemyObj = Instantiate(prefabToSpawn, spawner.SpawnPoint.position, spawner.SpawnPoint.rotation);
 
-            // Configure Hanadura with ROOM-BASED patrol
-            if (enemyObj.TryGetComponent(out HanaduraAI hanadura))
+            if (isGrimoire)
             {
-                AssignRoomPatrolRoute(hanadura, spawner);
-
-                // If this is an alert spawn, alert the enemy to the player position
-                if (isAlert && alertPosition != default)
+                if (enemyObj.TryGetComponent(out GrimoireAI grimoire))
                 {
-                    StartCoroutine(AlertEnemyAfterSpawn(hanadura, alertPosition));
+                    AssignRoomPatrolRoute(grimoire, spawner);
+
+                    // If this is an alert spawn, alert the enemy to the player position
+                    if (isAlert && alertPosition != default)
+                    {
+                        StartCoroutine(AlertGrimoireAfterSpawn(grimoire, alertPosition));
+                    }
+                }
+            }
+            else
+            {
+                if (enemyObj.TryGetComponent(out HanaduraAI hanadura))
+                {
+                    AssignRoomPatrolRoute(hanadura, spawner);
+
+                    // If this is an alert spawn, alert the enemy to the player position
+                    if (isAlert && alertPosition != default)
+                    {
+                        StartCoroutine(AlertEnemyAfterSpawn(hanadura, alertPosition));
+                    }
                 }
             }
 
@@ -306,17 +472,32 @@ namespace RooseLabs.Enemies
             spawner.OnEnemySpawned(enemyObj);
 
             // Track in room
-            string roomId = spawner.RoomIdentifier;
             if (!roomActiveEnemies.ContainsKey(roomId))
             {
                 roomActiveEnemies[roomId] = new List<GameObject>();
             }
             roomActiveEnemies[roomId].Add(enemyObj);
 
+            // Track by enemy type
+            if (isGrimoire)
+            {
+                roomActiveGrimoires[roomId] = enemyObj;
+                LogDebug($"Grimoire spawned in room '{roomId}'");
+            }
+            else
+            {
+                if (!roomActiveHanaduras.ContainsKey(roomId))
+                {
+                    roomActiveHanaduras[roomId] = new List<GameObject>();
+                }
+                roomActiveHanaduras[roomId].Add(enemyObj);
+                LogDebug($"Hanadura spawned in room '{roomId}' (now {roomActiveHanaduras[roomId].Count}/{maxHanaduraPerRoom})");
+            }
+
             // Subscribe to death event
             if (enemyObj.TryGetComponent(out EnemyData enemyData))
             {
-                StartCoroutine(WaitForDeathSubscription(enemyObj, enemyData));
+                StartCoroutine(WaitForDeathSubscription(enemyObj, enemyData, isGrimoire));
             }
 
             return enemyObj;
@@ -333,7 +514,18 @@ namespace RooseLabs.Enemies
             LogDebug($"Alerted spawned enemy to position: {alertPosition}");
         }
 
-        private IEnumerator WaitForDeathSubscription(GameObject enemyObj, EnemyData enemyData)
+        private IEnumerator AlertGrimoireAfterSpawn(GrimoireAI grimoire, Vector3 alertPosition)
+        {
+            // Wait a frame for network initialization
+            yield return null;
+            yield return null;
+
+            // Grimoires don't have AlertToPosition method, but we can transition them to tracking state
+            // This is handled by their own detection system
+            LogDebug($"Grimoire spawned (alert spawn at position: {alertPosition})");
+        }
+
+        private IEnumerator WaitForDeathSubscription(GameObject enemyObj, EnemyData enemyData, bool isGrimoire)
         {
             // Wait for enemy to be fully initialized
             yield return new WaitForSeconds(0.5f);
@@ -351,23 +543,109 @@ namespace RooseLabs.Enemies
             // Enemy died
             if (enemyObj != null)
             {
-                OnEnemyDeath(enemyObj, enemyData.EnemyType.name.Contains("Hanadura"));
+                OnEnemyDeath(enemyObj, isGrimoire);
             }
         }
 
-        private IEnumerator DelayedSpawn(EnemySpawner spawner, float delay)
+        private IEnumerator DelayedSpawn(EnemySpawner spawner, float delay, bool isGrimoire)
         {
             yield return new WaitForSeconds(delay);
 
             if (spawner != null)
             {
-                SpawnEnemyAtSpawner(spawner);
+                SpawnEnemyAtSpawner(spawner, isGrimoire);
             }
         }
 
         #endregion
 
         #region Utility Methods
+
+        /// <summary>
+        /// Debug method to show enemy distribution across rooms
+        /// </summary>
+        private void DebugRoomDistribution()
+        {
+            if (!showDebugLogs)
+                return;
+
+            LogDebug("=== Enemy Distribution by Room ===");
+
+            // Get all unique rooms
+            HashSet<string> allRooms = new HashSet<string>();
+            foreach (var spawner in allSpawners)
+            {
+                allRooms.Add(spawner.RoomIdentifier);
+            }
+
+            foreach (string roomId in allRooms)
+            {
+                int hanaduraCount = GetHanaduraCountInRoom(roomId);
+                bool hasGrimoire = roomActiveGrimoires.ContainsKey(roomId) && roomActiveGrimoires[roomId] != null;
+
+                LogDebug($"Room '{roomId}': {hanaduraCount} Hanaduras, {(hasGrimoire ? "1" : "0")} Grimoire");
+            }
+
+            LogDebug("================================");
+        }
+
+        /// <summary>
+        /// Check if a Hanadura can spawn in this room (respects max per room limit)
+        /// </summary>
+        private bool CanSpawnHanaduraInRoom(string roomId)
+        {
+            if (!roomActiveHanaduras.ContainsKey(roomId))
+                return true;
+
+            // Clean up null references
+            roomActiveHanaduras[roomId].RemoveAll(h => h == null);
+
+            int activeCount = roomActiveHanaduras[roomId].Count;
+
+            if (activeCount >= maxHanaduraPerRoom)
+            {
+                LogDebug($"Room '{roomId}' already has {activeCount}/{maxHanaduraPerRoom} Hanaduras");
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Get number of active Hanaduras in a specific room
+        /// </summary>
+        private int GetHanaduraCountInRoom(string roomId)
+        {
+            if (!roomActiveHanaduras.ContainsKey(roomId))
+                return 0;
+
+            // Clean up null references
+            roomActiveHanaduras[roomId].RemoveAll(h => h == null);
+            return roomActiveHanaduras[roomId].Count;
+        }
+
+        /// <summary>
+        /// Check if a Grimoire can spawn in this room (max 1 per room)
+        /// </summary>
+        private bool CanSpawnGrimoireInRoom(string roomId)
+        {
+            if (roomActiveGrimoires.ContainsKey(roomId))
+            {
+                GameObject existingGrimoire = roomActiveGrimoires[roomId];
+                // Check if it's still alive (null check for destroyed objects)
+                if (existingGrimoire != null)
+                {
+                    LogDebug($"Room '{roomId}' already has an active Grimoire");
+                    return false;
+                }
+                else
+                {
+                    // Clean up null reference
+                    roomActiveGrimoires.Remove(roomId);
+                }
+            }
+            return true;
+        }
 
         /// <summary>
         /// Assign a room-based patrol route to a Hanadura
@@ -405,6 +683,45 @@ namespace RooseLabs.Enemies
             else
             {
                 LogDebug($"Failed to generate route for room '{roomId}'", true);
+            }
+        }
+
+        /// <summary>
+        /// Assign a room-based patrol route to a Grimoire
+        /// </summary>
+        private void AssignRoomPatrolRoute(GrimoireAI grimoire, EnemySpawner spawner)
+        {
+            string roomId = spawner.RoomIdentifier;
+
+            if (string.IsNullOrEmpty(roomId) || roomId == "Unknown")
+            {
+                LogDebug($"Spawner has no room identifier, using closest zone", true);
+                roomId = FindClosestRoomToPosition(spawner.SpawnPoint.position);
+            }
+
+            // Get patrol zone for this room
+            RoomPatrolZone zone = GameManager.Instance.GetPatrolZone(roomId);
+
+            if (zone == null)
+            {
+                LogDebug($"No patrol zone found for room '{roomId}'", true);
+                return;
+            }
+
+            // Generate unique route for this enemy
+            PatrolRoute route = zone.GenerateUniqueRoute(grimoire.gameObject);
+
+            if (route != null && route.Count > 0)
+            {
+                grimoire.patrolRoute = route;
+                grimoire.startWaypointIndex = 0;
+                // Grimoire doesn't have ReinitializePatrolState, it initializes in OnStartServer
+
+                LogDebug($"Assigned {route.Count}-waypoint patrol route to Grimoire {grimoire.name} in room '{roomId}'");
+            }
+            else
+            {
+                LogDebug($"Failed to generate route for Grimoire in room '{roomId}'", true);
             }
         }
 
@@ -589,14 +906,14 @@ namespace RooseLabs.Enemies
 
                 if (pending.isAlertSpawn)
                 {
-                    SpawnEnemyAtSpawner(pending.preferredSpawner, pending.targetAlertPosition, true);
+                    SpawnEnemyAtSpawner(pending.preferredSpawner, pending.isGrimoire, pending.targetAlertPosition, true);
                 }
                 else
                 {
-                    SpawnEnemyAtSpawner(pending.preferredSpawner);
+                    SpawnEnemyAtSpawner(pending.preferredSpawner, pending.isGrimoire);
                 }
 
-                LogDebug("Processed queued respawn");
+                LogDebug($"Processed queued {(pending.isGrimoire ? "Grimoire" : "Hanadura")} respawn");
             }
         }
 

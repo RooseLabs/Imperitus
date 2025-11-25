@@ -9675,131 +9675,6 @@ MonoBehaviour:
   gizmoSize: 1
   showRoomRadius: 1
   roomRadiusVisualization: 10
---- !u!1 &860656572
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 860656575}
-  - component: {fileID: 860656574}
-  - component: {fileID: 860656573}
-  m_Layer: 0
-  m_Name: PatrolPointGenerator
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &860656573
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 860656572}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 26b716c41e9b56b4baafaf13a523ba2e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: FishNet.Runtime::FishNet.Object.NetworkObject
-  <IsNested>k__BackingField: 0
-  WasActiveDuringEdit: 1
-  WasActiveDuringEdit_Set1: 1
-  <ComponentIndex>k__BackingField: 0
-  <PredictedSpawn>k__BackingField: {fileID: 0}
-  <PredictedOwner>k__BackingField: {fileID: 0}
-  NetworkBehaviours: []
-  InitializedParentNetworkBehaviour: {fileID: 0}
-  InitializedNestedNetworkObjects: []
-  RuntimeParentNetworkBehaviour: {fileID: 0}
-  RuntimeChildNetworkBehaviours: []
-  _isNetworked: 1
-  _isSpawnable: 1
-  _isGlobal: 0
-  _initializeOrder: 0
-  _preventDespawnOnDisconnect: 0
-  _defaultDespawnType: 0
-  _initializedTimestamp: 0
-  NetworkObserver: {fileID: 0}
-  _enablePrediction: 0
-  _predictionType: 0
-  _graphicalObject: {fileID: 0}
-  _detachGraphicalObject: 0
-  _enableStateForwarding: 1
-  _networkTransform: {fileID: 0}
-  _ownerInterpolation: 1
-  _ownerSmoothedProperties: 255
-  _adaptiveInterpolation: 3
-  _spectatorSmoothedProperties: 255
-  _spectatorInterpolation: 2
-  _enableTeleport: 0
-  _teleportThreshold: 1
-  <PrefabId>k__BackingField: 65535
-  <SpawnableCollectionId>k__BackingField: 0
-  <AssetPathHash>k__BackingField: 0
-  SceneId: 3168729203
-  SerializedTransformProperties:
-    Position: {x: 0, y: 0, z: 0}
-    Rotation: {x: 0, y: 0, z: 0, w: 0}
-    Scale: {x: 0, y: 0, z: 0}
-    IsValid: 0
---- !u!114 &860656574
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 860656572}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2e0367b518ef64241b093f8f1e40f9fd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Enemies.PatrolPointGenerator
-  _componentIndexCache: 255
-  _addedNetworkObject: {fileID: 860656573}
-  _networkObjectCache: {fileID: 0}
-  mapContainerTag: Map
-  roomTag: Room
-  groundLayer:
-    serializedVersion: 2
-    m_Bits: 128
-  obstacleLayer:
-    serializedVersion: 2
-    m_Bits: 1
-  gridSpacing: 3
-  obstacleClearanceRadius: 1.5
-  raycastStartHeight: 50
-  maxRaycastDistance: 100
-  minHeightClearance: 2.5
-  navMeshSampleDistance: 2
-  waypointParent: {fileID: 0}
-  autoCreatePatrolRoute: 1
-  useRoomBasedPatrolling: 1
-  showDebugGizmos: 1
-  validPointColor: {r: 0, g: 1, b: 0, a: 1}
-  rejectedPointColor: {r: 1, g: 0, b: 0, a: 1}
-  gizmoSize: 0.3
-  showPatrolPath: 1
-  exclusionZoneTag: PatrolExclusionZone
-  showExclusionZones: 1
---- !u!4 &860656575
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 860656572}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -14.0098, y: -0.44544, z: -67.63508}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &876252710
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -17947,7 +17822,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1551259764
 Transform:
   m_ObjectHideFlags: 0
@@ -19263,7 +19138,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1650974549
 Transform:
   m_ObjectHideFlags: 0
@@ -25507,6 +25382,71 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 2.7643833, y: 2.9859262, z: 0.23319054}
   m_Center: {x: -0, y: 1.4794791, z: -0.011143684}
+--- !u!1001 &7090321166669454760
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1542227136504457951, guid: a03541beb41b66e429de523a255c1055, type: 3}
+      propertyPath: SceneId
+      value: 3168729203
+      objectReference: {fileID: 0}
+    - target: {fileID: 1542227136504457951, guid: a03541beb41b66e429de523a255c1055, type: 3}
+      propertyPath: WasActiveDuringEdit
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4197236373499213708, guid: a03541beb41b66e429de523a255c1055, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -14.0098
+      objectReference: {fileID: 0}
+    - target: {fileID: 4197236373499213708, guid: a03541beb41b66e429de523a255c1055, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.44544
+      objectReference: {fileID: 0}
+    - target: {fileID: 4197236373499213708, guid: a03541beb41b66e429de523a255c1055, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -67.63508
+      objectReference: {fileID: 0}
+    - target: {fileID: 4197236373499213708, guid: a03541beb41b66e429de523a255c1055, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4197236373499213708, guid: a03541beb41b66e429de523a255c1055, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4197236373499213708, guid: a03541beb41b66e429de523a255c1055, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4197236373499213708, guid: a03541beb41b66e429de523a255c1055, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4197236373499213708, guid: a03541beb41b66e429de523a255c1055, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4197236373499213708, guid: a03541beb41b66e429de523a255c1055, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4197236373499213708, guid: a03541beb41b66e429de523a255c1055, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9100948172936266484, guid: a03541beb41b66e429de523a255c1055, type: 3}
+      propertyPath: m_Name
+      value: PatrolPointGenerator
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: a03541beb41b66e429de523a255c1055, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -25520,4 +25460,4 @@ SceneRoots:
   - {fileID: 1504524834}
   - {fileID: 1650974549}
   - {fileID: 1551259764}
-  - {fileID: 860656575}
+  - {fileID: 7090321166669454760}
