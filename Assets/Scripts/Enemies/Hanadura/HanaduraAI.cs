@@ -1,6 +1,8 @@
-using System.Collections;
 using FishNet.Object;
+using RooseLabs.Gameplay;
 using RooseLabs.ScriptableObjects;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using Logger = RooseLabs.Core.Logger;
@@ -28,6 +30,9 @@ namespace RooseLabs.Enemies
         public float attackRange = 4f;
         public float attackCooldown = 1.2f;
         public int attackDamage = 0;
+        // This is just a reference to the duration of the hanadura attack so
+        // I can lock state changes during the attack animation...
+        public float attackAnimationDuration = 2.3f;
 
         [Header("Patrol")]
         public int startWaypointIndex = 0;
@@ -39,6 +44,25 @@ namespace RooseLabs.Enemies
         public float visualLostSightGracePeriod = 6f;
 
         private float visualLostSightTimer = 0f;
+
+        [Header("Random Room Patrol")]
+        [Tooltip("Chance (0-100%) to patrol a random room outside assigned room")]
+        [Range(0f, 100f)]
+        public float randomRoomPatrolChance = 15f;
+
+        [Tooltip("How often to check if Hanadura should patrol random room (seconds)")]
+        public float randomRoomCheckInterval = 30f;
+
+        [Tooltip("How long to patrol the random room before returning (seconds)")]
+        public float randomRoomPatrolDuration = 45f;
+
+        // Random room patrol tracking
+        private float randomRoomCheckTimer = 0f;
+        private bool isPatrollingRandomRoom = false;
+        private float randomRoomPatrolTimer = 0f;
+        private PatrolRoute originalPatrolRoute;
+        private string originalRoomId;
+        private string currentRandomRoomId;
 
         // FSM states
         private IEnemyState currentState;
@@ -68,10 +92,6 @@ namespace RooseLabs.Enemies
 
         private bool isAttackLocked = false;
         private float attackLockDuration = 0f;
-
-        // This is just a reference to the duration of the hanadura attack so
-        // I can lock state changes during the attack animation...
-        public float attackAnimationDuration = 2.3f;
 
         private bool hasPlayedDeathAnimation = false;
 
@@ -217,6 +237,9 @@ namespace RooseLabs.Enemies
             investigateState = new InvestigateState(this);
 
             EnterState(patrolState);
+
+            // Initialize random room patrol timer with random offset to stagger checks
+            randomRoomCheckTimer = Random.Range(0f, randomRoomCheckInterval);
         }
 
         /// <summary>
@@ -254,14 +277,10 @@ namespace RooseLabs.Enemies
             // Check if Detected animation finished
             if (isPlayingDetectedAnimation)
             {
-                // Check if animation finished playing
                 AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
-
-                // Check if we're no longer in the Detected state (animation finished)
                 if (!stateInfo.IsName("Detected"))
                 {
                     isPlayingDetectedAnimation = false;
-                    //DebugManager.Log("[HanaduraAI] Detected animation finished");
                 }
             }
 
@@ -289,7 +308,6 @@ namespace RooseLabs.Enemies
             {
                 if (currentDetection != null && IsDetectionStale(currentDetection))
                 {
-                    //DebugManager.Log("[HanaduraAI] Current detection became stale.");
                     ClearCurrentDetection();
                 }
             }
@@ -298,6 +316,12 @@ namespace RooseLabs.Enemies
             if (!isPlayingDetectedAnimation)
             {
                 UpdateStateFromDetection();
+            }
+
+            // Handle random room patrol system (only when in patrol state and no active detection)
+            if (currentState is PatrolState && currentDetection == null)
+            {
+                UpdateRandomRoomPatrol();
             }
         }
 
@@ -684,6 +708,17 @@ namespace RooseLabs.Enemies
                 StopMovement();
                 currentState = null;
                 ClearCurrentDetection();
+
+                // Clean up random room patrol if active
+                if (isPatrollingRandomRoom && !string.IsNullOrEmpty(currentRandomRoomId))
+                {
+                    EnemySpawnManager.Instance.UnregisterRandomPatroller(gameObject, currentRandomRoomId);
+
+                    RoomPatrolZone randomZone = GameManager.Instance.GetPatrolZone(currentRandomRoomId);
+                    randomZone?.ReleaseRoute(gameObject);
+                    isPatrollingRandomRoom = false;
+                }
+
                 rb.isKinematic = true;
                 weaponCollider.DisableWeapon();
 
@@ -698,8 +733,6 @@ namespace RooseLabs.Enemies
                     navAgent.enabled = false;
 
                 Debug.Log($"{gameObject.name} death sequence executed on observer");
-
-                // StartCoroutine(DespawnAfterDeath());
             }
         }
 
@@ -721,5 +754,160 @@ namespace RooseLabs.Enemies
                 Despawn(gameObject);
             }
         }
+
+        #region Random Room Patrol System
+
+        private void UpdateRandomRoomPatrol()
+        {
+            // If currently patrolling random room
+            if (isPatrollingRandomRoom)
+            {
+                randomRoomPatrolTimer -= Time.deltaTime;
+
+                if (randomRoomPatrolTimer <= 0f)
+                {
+                    // Time to return to original room
+                    ReturnToOriginalRoom();
+                }
+            }
+            else
+            {
+                // Check if should start random room patrol
+                randomRoomCheckTimer -= Time.deltaTime;
+
+                if (randomRoomCheckTimer <= 0f)
+                {
+                    randomRoomCheckTimer = randomRoomCheckInterval;
+
+                    // Roll chance to patrol random room
+                    if (Random.Range(0f, 100f) <= randomRoomPatrolChance)
+                    {
+                        StartRandomRoomPatrol();
+                    }
+                }
+            }
+        }
+
+        private void StartRandomRoomPatrol()
+        {
+            // Get current room from spawner
+            if (!EnemySpawnManager.Instance.activeEnemies.TryGetValue(gameObject, out EnemySpawner spawner))
+            {
+                Debug.Log("[HanaduraAI] Cannot start random patrol - enemy not tracked by spawn manager");
+                return;
+            }
+
+            originalRoomId = spawner.RoomIdentifier;
+
+            // Get all available patrol zones
+            var allZones = GameManager.Instance.GetAllPatrolZones();
+            if (allZones == null || allZones.Count <= 1)
+            {
+                Debug.Log("[HanaduraAI] Not enough rooms for random patrol");
+                return;
+            }
+
+            // Filter valid rooms (not current room, has waypoints, not being randomly patrolled)
+            List<string> validRoomIds = new List<string>();
+
+            foreach (var kvp in allZones)
+            {
+                // Skip current assigned room
+                if (kvp.Key == originalRoomId)
+                    continue;
+
+                RoomPatrolZone zone = kvp.Value;
+
+                // Must have waypoints
+                if (zone.waypoints == null || zone.waypoints.Count == 0)
+                    continue;
+
+                // Skip if room already has a random patroller
+                if (EnemySpawnManager.Instance.IsRoomBeingRandomlyPatrolled(kvp.Key))
+                {
+                    Debug.Log($"[HanaduraAI] Skipping room '{kvp.Key}' - already has a random patroller");
+                    continue;
+                }
+
+                validRoomIds.Add(kvp.Key);
+            }
+
+            if (validRoomIds.Count == 0)
+            {
+                Debug.Log("[HanaduraAI] No valid rooms found for random patrol (all occupied or unavailable)");
+                return;
+            }
+
+            // Pick random room
+            currentRandomRoomId = validRoomIds[Random.Range(0, validRoomIds.Count)];
+            RoomPatrolZone randomZone = allZones[currentRandomRoomId];
+
+            // Store original patrol route
+            originalPatrolRoute = patrolRoute;
+
+            // Generate new route for random room
+            PatrolRoute newRoute = randomZone.GenerateUniqueRoute(gameObject);
+
+            if (newRoute != null && newRoute.Count > 0)
+            {
+                patrolRoute = newRoute;
+                startWaypointIndex = 0;
+                ReinitializePatrolState();
+
+                isPatrollingRandomRoom = true;
+                randomRoomPatrolTimer = randomRoomPatrolDuration;
+
+                // Register this Hanadura as randomly patrolling this room
+                EnemySpawnManager.Instance.RegisterRandomPatroller(gameObject, currentRandomRoomId);
+
+                Debug.Log($"[HanaduraAI] '{gameObject.name}' started random room patrol: '{originalRoomId}' -> '{currentRandomRoomId}' for {randomRoomPatrolDuration}s");
+            }
+            else
+            {
+                Debug.Log($"[HanaduraAI] '{gameObject.name}' failed to generate route for random room '{currentRandomRoomId}'");
+            }
+        }
+
+        private void ReturnToOriginalRoom()
+        {
+            if (originalPatrolRoute == null)
+            {
+                Debug.Log("[HanaduraAI] Cannot return to original room - no original route stored");
+                isPatrollingRandomRoom = false;
+                return;
+            }
+
+            // Unregister from random patrol tracking
+            if (!string.IsNullOrEmpty(currentRandomRoomId))
+            {
+                EnemySpawnManager.Instance.UnregisterRandomPatroller(gameObject, currentRandomRoomId);
+
+                // Release the random room route
+                RoomPatrolZone randomZone = GameManager.Instance.GetPatrolZone(currentRandomRoomId);
+                randomZone?.ReleaseRoute(gameObject);
+            }
+
+            // Restore original patrol route
+            patrolRoute = originalPatrolRoute;
+            startWaypointIndex = 0;
+            ReinitializePatrolState();
+
+            isPatrollingRandomRoom = false;
+            originalPatrolRoute = null;
+
+            Debug.Log($"[HanaduraAI] '{gameObject.name}' returned to original room: '{originalRoomId}'");
+        }
+
+        public bool IsPatrollingRandomRoom()
+        {
+            return isPatrollingRandomRoom;
+        }
+
+        public string GetCurrentPatrolRoomId()
+        {
+            return isPatrollingRandomRoom ? currentRandomRoomId : originalRoomId;
+        }
+
+        #endregion
     }
 }

@@ -142,12 +142,15 @@ MonoBehaviour:
   attackRange: 4
   attackCooldown: 2
   attackDamage: 10
+  attackAnimationDuration: 2.3
   startWaypointIndex: 0
   loopPatrol: 1
   detectionExpiryTime: 5
   minSoundIntensity: 0.1
   visualLostSightGracePeriod: 6
-  attackAnimationDuration: 2.3
+  randomRoomPatrolChance: 15
+  randomRoomCheckInterval: 30
+  randomRoomPatrolDuration: 45
 --- !u!114 &5016868397172176932
 MonoBehaviour:
   m_ObjectHideFlags: 0
