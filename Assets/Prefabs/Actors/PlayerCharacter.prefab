@@ -548,6 +548,71 @@ Transform:
   m_Children: []
   m_Father: {fileID: 3036836449846781444}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1274653581932493113
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2770159236805915910}
+  - component: {fileID: 2127355753930211377}
+  - component: {fileID: 4806069900118380372}
+  m_Layer: 8
+  m_Name: VoskSpeechToText
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2770159236805915910
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1274653581932493113}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6282181467959717603}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2127355753930211377
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1274653581932493113}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f217616079a9a74489a1ae3cd9178787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Vosk.VoskSpeechToText
+  voiceProcessor: {fileID: 2320154233376685266}
+  maxAlternatives: 3
+  maxRecordLength: 5
+  autoStart: 1
+  keyPhrases:
+  - command
+--- !u!114 &4806069900118380372
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1274653581932493113}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fee6b4a71b7fbf458b56dde749566b6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Vosk.VoskDiagnostics
+  speechToText: {fileID: 2127355753930211377}
+  voiceProcessor: {fileID: 2320154233376685266}
 --- !u!1 &1399672697706818045
 GameObject:
   m_ObjectHideFlags: 0
@@ -2019,6 +2084,7 @@ GameObject:
   - component: {fileID: 6121780074039715582}
   - component: {fileID: 7652611172026813195}
   - component: {fileID: 2911172595631321588}
+  - component: {fileID: 409391301048628981}
   m_Layer: 8
   m_Name: PlayerCharacter
   m_TagString: Player
@@ -2047,6 +2113,8 @@ Transform:
   - {fileID: 1641466989046416492}
   - {fileID: 5034291265095438977}
   - {fileID: 6970159902863460619}
+  - {fileID: 2770159236805915910}
+  - {fileID: 2439503848969265892}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!54 &1044951130762037519
@@ -2451,6 +2519,24 @@ MonoBehaviour:
     X: 0
     Y: 0
     Z: 0
+--- !u!114 &409391301048628981
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6907876458342397342}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a5a7be5f26f7ea47af87057f3b6d6a9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.VoiceSpellCaster
+  playerWand: {fileID: 6401856662307630944}
+  speechToText: {fileID: 2127355753930211377}
+  minimumConfidence: 0.8
+  voiceCastCooldown: 0.8
+  spellsWithAutoHold:
+  - Command
 --- !u!1 &6922205013769619118
 GameObject:
   m_ObjectHideFlags: 0
@@ -2521,6 +2607,54 @@ PositionConstraint:
   m_Sources:
   - sourceTransform: {fileID: 916590542665556224}
     weight: 1
+--- !u!1 &7756128473031415903
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2439503848969265892}
+  - component: {fileID: 2320154233376685266}
+  m_Layer: 8
+  m_Name: VoskVoiceProcessor
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2439503848969265892
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7756128473031415903}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6282181467959717603}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2320154233376685266
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7756128473031415903}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf39116cc6db44d47b2eaf534e0f6682, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Vosk.VoiceProcessor
+  microphoneIndex: 0
+  minimumSpeakingSampleValue: 0.05
+  silenceTimer: 1
+  autoDetect: 1
 --- !u!1 &8341259078320434640
 GameObject:
   m_ObjectHideFlags: 0

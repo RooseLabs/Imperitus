@@ -68,6 +68,9 @@ namespace RooseLabs.Vosk
         // Thread safe queue of results
         private readonly ConcurrentQueue<string> m_threadedResultQueue = new();
 
+        // Flag to request final result
+        private bool m_requestFinalResult = false;
+
         // If Auto Start is enabled, starts Vosk speech to text.
         private void Start()
         {
@@ -187,6 +190,7 @@ namespace RooseLabs.Vosk
         {
             if (m_threadedResultQueue.TryDequeue(out string voiceResult))
             {
+                Debug.Log("Transcription Result: " + voiceResult);
                 OnTranscriptionResult?.Invoke(voiceResult);
             }
         }
@@ -200,7 +204,8 @@ namespace RooseLabs.Vosk
         // Callback from the voice processor when recording stops
         private void VoiceProcessorOnOnRecordingStop()
         {
-            Debug.Log("Stopped");
+            Debug.Log("Recording Stopped - Requesting Final Result");
+            m_requestFinalResult = true;
         }
 
         private async Task ThreadedWork()
@@ -213,14 +218,16 @@ namespace RooseLabs.Vosk
                 if (string.IsNullOrEmpty(m_grammar))
                 {
                     m_recognizer = new VoskRecognizer(m_model, 16000.0f);
+                    Debug.Log("Vosk recognizer created without grammar (will recognize all words)");
                 }
                 else
                 {
                     m_recognizer = new VoskRecognizer(m_model, 16000.0f, m_grammar);
+                    Debug.Log($"Vosk recognizer created with grammar: {m_grammar}");
                 }
 
                 m_recognizer.SetMaxAlternatives(maxAlternatives);
-                // m_recognizer.SetWords(true);
+                m_recognizer.SetWords(true);
                 m_recognizerReady = true;
 
                 Debug.Log("Vosk recognizer ready");
@@ -232,15 +239,49 @@ namespace RooseLabs.Vosk
                 {
                     if (m_recognizer.AcceptWaveform(voiceResult, voiceResult.Length))
                     {
+                        // Intermediate result (sentence boundary detected)
                         var result = m_recognizer.Result();
+                        Debug.Log($"Vosk Intermediate Result: {result}");
                         m_threadedResultQueue.Enqueue(result);
                     }
+                    else
+                    {
+                        // Partial result (still processing)
+                        var partialResult = m_recognizer.PartialResult();
+                        if (!string.IsNullOrEmpty(partialResult))
+                        {
+                            Debug.Log($"Vosk Partial Result: {partialResult}");
+                        }
+                    }
+                }
+                else if (m_requestFinalResult)
+                {
+                    // Get final result when recording stops
+                    var finalResult = m_recognizer.FinalResult();
+                    Debug.Log($"Vosk Final Result: {finalResult}");
+                    m_threadedResultQueue.Enqueue(finalResult);
+                    m_requestFinalResult = false;
+
+                    // Reset recognizer for next use
+                    m_recognizer.Reset();
                 }
                 else
                 {
                     // Wait for some data
                     await Task.Delay(100);
                 }
+            }
+
+            // Cleanup when stopping
+            if (m_recognizerReady)
+            {
+                var finalResult = m_recognizer.FinalResult();
+                if (!string.IsNullOrEmpty(finalResult))
+                {
+                    Debug.Log($"Vosk Cleanup Final Result: {finalResult}");
+                    m_threadedResultQueue.Enqueue(finalResult);
+                }
+                m_recognizer.Reset();
             }
         }
     }

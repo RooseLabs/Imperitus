@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using FishNet.Object;
 using RooseLabs.Core;
@@ -272,6 +273,57 @@ namespace RooseLabs.Player
             character.Data.isAiming = isAiming;
         }
 
+        /// <summary>
+        /// Attempts to switch to a spell by its English name.
+        /// Used by the voice casting system.
+        /// </summary>
+        /// <param name="spellName">The English name of the spell (exact match required).</param>
+        /// <returns>True if the spell was found and switched to successfully.</returns>
+        public bool TrySetSpellByName(string spellName)
+        {
+            if (!IsOwner) return false;
+            if (m_availableSpells.Count == 0) return false;
+
+            // Search through available spells for exact English name match
+            for (int i = 0; i < m_availableSpells.Count; i++)
+            {
+                var spell = m_availableSpells[i];
+                if (spell && spell.SpellInfo && spell.SpellInfo.EnglishName == spellName)
+                {
+                    // Found matching spell, switch to it
+                    CurrentSpellIndex = i;
+
+                    // Force update if needed
+                    if (m_currentSpellInstanceDirty)
+                    {
+                        UpdateCurrentSpellInstance();
+                    }
+
+                    this.LogInfo($"Voice command: Switched to spell '{spellName}'");
+                    return true;
+                }
+            }
+
+            // Spell not found in available spells
+            return false;
+        }
+
+        /// <summary>
+        /// Triggers casting of the current spell.
+        /// Used by the voice casting system to initiate spell casting after switching.
+        /// </summary>
+        public void TriggerCastCurrentSpell()
+        {
+            if (!IsOwner) return;
+            if (!character.Data.isAiming) return;
+            if (!m_currentSpellInstance) return;
+            if (m_currentSpellInstance.IsCasting) return; // Already casting
+
+            // Start the cast
+            m_currentSpellInstance.StartCast();
+            this.LogInfo($"Voice command: Started casting '{m_currentSpellInstance.SpellInfo.EnglishName}'");
+        }
+
         #region Orbiting Runes
         private readonly List<OrbitingRune> m_orbitingRunes = new();
         private const float OrbitingRunesRadius = 3f;
@@ -334,6 +386,24 @@ namespace RooseLabs.Player
                 rune.SetVisible(isVisible);
             }
         }
+
         #endregion
+
+        public object[] GetAvailableSpellNames()
+        {
+            List<string> spellNames = new();
+            foreach (var spell in m_availableSpells)
+            {
+                if (spell && spell.SpellInfo)
+                {
+                    spellNames.Add(spell.SpellInfo.EnglishName);
+                }
+                else
+                {
+                    spellNames.Add("Unknown Spell");
+                }
+            }
+            return spellNames.ToArray();
+        }
     }
 }

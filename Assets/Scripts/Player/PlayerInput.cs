@@ -64,6 +64,9 @@ namespace RooseLabs.Player
         public bool closeNotebookWasPressed;
         #endregion
 
+        // Reference to voice spell caster for input injection
+        private VoiceSpellCaster m_voiceSpellCaster;
+
         private void Awake()
         {
             var gameplayActionMap = InputHandler.GameplayActions;
@@ -89,11 +92,16 @@ namespace RooseLabs.Player
             var uiActionMap = InputHandler.UIActions;
             m_actionResume = uiActionMap.FindAction("Resume");
             m_actionCloseNotebook = uiActionMap.FindAction("CloseNotebook");
+
+            // Get reference to VoiceSpellCaster (if it exists)
+            m_voiceSpellCaster = GetComponent<VoiceSpellCaster>();
         }
 
         public void Sample()
         {
             ResetInput();
+
+            // Sample all real input from the input system
             pauseWasPressed = m_actionPause.WasPressedThisFrame();
             movementInput = m_actionMove.ReadValue<Vector2>();
             lookInput = m_actionLook.ReadValue<Vector2>();
@@ -124,6 +132,12 @@ namespace RooseLabs.Player
             openNotebookWasPressed = m_actionOpenNotebook.WasPressedThisFrame();
             resumeWasPressed = m_actionResume.WasPressedThisFrame();
             closeNotebookWasPressed = m_actionCloseNotebook.WasPressedThisFrame();
+
+            // CRITICAL: Allow voice spell caster to inject simulated input AFTER sampling real input
+            if (m_voiceSpellCaster != null && m_voiceSpellCaster.IsSimulatingCastHold)
+            {
+                m_voiceSpellCaster.InjectSimulatedInput(this);
+            }
         }
 
         private void ResetInput()
