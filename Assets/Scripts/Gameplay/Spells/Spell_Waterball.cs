@@ -29,7 +29,7 @@ namespace RooseLabs.Gameplay.Spells
 
             Vector3 targetPoint = character.Camera.transform.position + character.Data.lookDirection * 100f;
             // Calculate the normalized direction vector from the cast point to the target point
-            Vector3 direction = (targetPoint - character.Wand.SpellCastPointPosition).normalized;
+            Vector3 direction = (targetPoint - transform.position).normalized;
 
             // Request the server to spawn and launch the projectile in the calculated direction
             LaunchProjectile_ServerRpc(direction);
@@ -41,8 +41,9 @@ namespace RooseLabs.Gameplay.Spells
         private void LaunchProjectile_ServerRpc(Vector3 direction)
         {
             var character = PlayerHandler.GetCharacter(Owner);
+            if (!character) return;
             NetworkObject nob = NetworkManager.GetPooledInstantiated(
-                projectilePrefab, character.Wand.SpellCastPointPosition, Quaternion.LookRotation(direction), true);
+                projectilePrefab, transform.position, Quaternion.LookRotation(direction), true);
             if (nob.TryGetComponent(out Projectile projectile))
             {
                 Spawn(nob);

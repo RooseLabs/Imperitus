@@ -6,6 +6,7 @@ using RooseLabs.Network;
 using RooseLabs.Player;
 using RooseLabs.ScriptableObjects;
 using UnityEngine;
+using UnityEngine.Animations;
 using Logger = RooseLabs.Core.Logger;
 
 namespace RooseLabs.Gameplay.Spells
@@ -54,8 +55,7 @@ namespace RooseLabs.Gameplay.Spells
         {
             PlayerCharacter ownerCharacter = PlayerHandler.GetCharacter(Owner);
             Debug.Assert(ownerCharacter != null, "[SpellBase] No owner character found for spell.");
-            transform.SetParent(ownerCharacter.Wand.AttachmentPoint);
-            transform.localPosition = ownerCharacter.Wand.SpellCastPointLocalPosition;
+            SetupParentConstraint(ownerCharacter.Wand.AttachmentPoint, ownerCharacter.Wand.SpellCastPointLocalPosition);
         }
 
         private void OnEnable()
@@ -173,10 +173,10 @@ namespace RooseLabs.Gameplay.Spells
             var localCharacter = PlayerCharacter.LocalCharacter;
             if (!localCharacter) return null;
             NetworkObject nob = nm.GetPooledInstantiated(spellPrefab.gameObject, false);
-            nob.transform.SetParent(localCharacter.Wand.AttachmentPoint);
-            nob.transform.localPosition = localCharacter.Wand.SpellCastPointLocalPosition;
+            var spellComponent = nob.GetComponent<SpellBase>();
+            spellComponent.SetupParentConstraint(localCharacter.Wand.AttachmentPoint, localCharacter.Wand.SpellCastPointLocalPosition);
             nm.ServerManager.Spawn(nob, localCharacter.Owner);
-            return nob.GetComponent<SpellBase>();
+            return spellComponent;
         }
 
         public void Destroy()
@@ -184,6 +184,23 @@ namespace RooseLabs.Gameplay.Spells
             Despawn(NetworkObject, DespawnType.Pool);
         }
         #endregion
+
+        private void SetupParentConstraint(Transform parent, Vector3 offsetPosition)
+        {
+            ParentConstraint parentConstraint = GetComponent<ParentConstraint>();
+            if (parentConstraint) return; // Already set up
+            parentConstraint = gameObject.AddComponent<ParentConstraint>();
+
+            // Add the parent source
+            ConstraintSource source = new ConstraintSource { sourceTransform = parent, weight = 1f };
+            parentConstraint.AddSource(source);
+
+            // Set the offset
+            parentConstraint.SetTranslationOffset(0, offsetPosition);
+
+            // Enable the constraint
+            parentConstraint.constraintActive = true;
+        }
 
         private void CompleteCast()
         {

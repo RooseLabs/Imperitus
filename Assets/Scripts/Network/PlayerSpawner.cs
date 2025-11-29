@@ -94,5 +94,50 @@ namespace RooseLabs.Network
             pos = prefab.position;
             rot = prefab.rotation;
         }
+
+        #if UNITY_EDITOR
+        private void OnDrawGizmos()
+        {
+            // Only draw gizmos if this object or one of its children is selected
+            GameObject selectedObject = UnityEditor.Selection.activeGameObject;
+            if (!selectedObject || (selectedObject != gameObject && (!selectedObject.transform.parent || selectedObject.transform.parent.gameObject != gameObject)))
+                return;
+            foreach (Transform spawn in spawns)
+            {
+                if (!spawn) continue;
+                DrawCapsuleGizmo(spawn.position, spawn.rotation, 0.25f, 1.7f);
+            }
+        }
+
+        private void DrawCapsuleGizmo(Vector3 position, Quaternion rotation, float radius, float height)
+        {
+            Gizmos.color = Color.green;
+            Vector3 up = rotation * Vector3.up;
+            Vector3 forward = rotation * Vector3.forward;
+            Vector3 right = rotation * Vector3.right;
+
+            // Bottom sphere center is at ground + radius (the lowest point touches ground)
+            Vector3 bottomSphereCenter = position + up * radius;
+            // Top sphere center is at height - radius (the highest point is at height)
+            Vector3 topSphereCenter = position + up * (height - radius);
+
+            // Draw bottom sphere
+            Gizmos.DrawWireSphere(bottomSphereCenter, radius);
+
+            // Draw top sphere
+            Gizmos.DrawWireSphere(topSphereCenter, radius);
+
+            // Vertical lines connecting spheres
+            Gizmos.DrawLine(bottomSphereCenter + forward * radius, topSphereCenter + forward * radius);
+            Gizmos.DrawLine(bottomSphereCenter - forward * radius, topSphereCenter - forward * radius);
+            Gizmos.DrawLine(bottomSphereCenter + right * radius, topSphereCenter + right * radius);
+            Gizmos.DrawLine(bottomSphereCenter - right * radius, topSphereCenter - right * radius);
+
+            // Draw arrow at eye level to indicate forward direction
+            Vector3 arrowPosition = position + up * (height * 0.85f);
+            Gizmos.color = Color.blue;
+            Gizmos.DrawRay(arrowPosition, forward * 0.5f);
+        }
+        #endif
     }
 }

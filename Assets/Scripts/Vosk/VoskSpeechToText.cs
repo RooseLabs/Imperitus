@@ -18,9 +18,6 @@ namespace RooseLabs.Vosk
         [SerializeField, Tooltip("The maximum number of alternatives that will be processed.")]
         private int maxAlternatives = 3;
 
-        [SerializeField, Tooltip("How long should we record before restarting?")]
-        private float maxRecordLength = 5;
-
         [SerializeField, Tooltip("Should the recognizer start automatically?")]
         private bool autoStart = true;
 

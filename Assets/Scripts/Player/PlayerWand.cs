@@ -27,7 +27,7 @@ namespace RooseLabs.Player
         public Vector3 SpellCastPointPosition { get; private set; }
 
         private SpellBase m_currentSpellInstance;
-        private bool m_currentSpellInstanceDirty = true; // Start dirty to ensure initial setup
+        private bool m_currentSpellInstanceDirty;
         private bool m_isLastAvailableSpellTemporary = false;
         private RuneSO[] m_temporarySpellRunes;
 
@@ -122,7 +122,7 @@ namespace RooseLabs.Player
                 {
                     CurrentSpellIndex--;
                 }
-                if (m_currentSpellInstanceDirty)
+                if (m_currentSpellInstanceDirty || !m_currentSpellInstance)
                 {
                     UpdateCurrentSpellInstance();
                 }
