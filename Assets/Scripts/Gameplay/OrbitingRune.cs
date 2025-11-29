@@ -21,6 +21,7 @@ namespace RooseLabs.Gameplay
             TryGetComponent(out m_spriteRenderer);
             m_spriteRenderer.flipX = true;
             m_spriteRenderer.color = new Color(1f, 1f, 1f, 0f);
+            m_spriteRenderer.sortingOrder = 100;
             m_noiseSeed = new Vector2(Random.Range(0f, 1000f), Random.Range(0f, 1000f));
         }
 

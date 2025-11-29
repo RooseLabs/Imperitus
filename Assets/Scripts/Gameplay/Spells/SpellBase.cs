@@ -45,17 +45,16 @@ namespace RooseLabs.Gameplay.Spells
         [SerializeField] private float staminaCostPerSecond = 0f;
         #endregion
 
-        #region Private Fields
         private float m_castProgress = 0f;
-        #endregion
 
+        public PlayerCharacter OwnerCharacter { get; private set; }
         public bool IsCasting { get; private set; }
 
         public override void OnStartClient()
         {
-            PlayerCharacter ownerCharacter = PlayerHandler.GetCharacter(Owner);
-            Debug.Assert(ownerCharacter != null, "[SpellBase] No owner character found for spell.");
-            SetupParentConstraint(ownerCharacter.Wand.AttachmentPoint, ownerCharacter.Wand.SpellCastPointLocalPosition);
+            OwnerCharacter = PlayerHandler.GetCharacter(Owner);
+            Debug.Assert(OwnerCharacter != null, "[SpellBase] No owner character found for spell.");
+            SetupParentConstraint(OwnerCharacter.Wand.AttachmentPoint, OwnerCharacter.Wand.SpellCastPointLocalPosition);
         }
 
         private void OnEnable()
@@ -212,8 +211,7 @@ namespace RooseLabs.Gameplay.Spells
             }
             else
             {
-                IsCasting = false;
-                m_castProgress = 0f;
+                ResetData();
             }
 
             if (successfulCast)

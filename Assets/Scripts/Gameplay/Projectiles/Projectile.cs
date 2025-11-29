@@ -1,11 +1,13 @@
 using FishNet.Object;
-using RooseLabs.Utils;
 using UnityEngine;
+using Logger = RooseLabs.Core.Logger;
 
 namespace RooseLabs.Gameplay
 {
     public class Projectile : NetworkBehaviour
     {
+        protected static Logger Logger => Logger.GetLogger("Projectile");
+
         #region Serialized
         [SerializeField]
         protected ProjectileRigidbody projectileRigidbody;
@@ -27,6 +29,7 @@ namespace RooseLabs.Gameplay
         public void Launch(Vector3 force, DamageInfo damageInfo, ForceMode mode = ForceMode.VelocityChange)
         {
             if (!IsServerInitialized) return;
+            if (!projectileRigidbody) return;
 
             m_timeSinceLaunch = 0f;
             m_hasCollided = false;
@@ -72,6 +75,7 @@ namespace RooseLabs.Gameplay
         {
             if (!CanCollideWith(col.collider))
                 return;
+            Logger.Info($"Projectile collided with {col.gameObject.name} ({LayerMask.LayerToName(col.gameObject.layer)})");
             OnProjectileCollision(col.collider);
         }
 
@@ -82,12 +86,12 @@ namespace RooseLabs.Gameplay
                 return;
             if (!CanCollideWith(other))
                 return;
+            Logger.Info($"Projectile collided with {other.gameObject.name} (trigger, {LayerMask.LayerToName(other.gameObject.layer)})");
             OnProjectileCollision(other);
         }
 
         protected virtual void OnProjectileCollision(Collider col)
         {
-            this.LogInfo("Projectile collided with " + col.gameObject.name);
             m_hasCollided = true;
             if (IsServerInitialized && col.gameObject.TryGetComponent(out IDamageable damageable))
             {
