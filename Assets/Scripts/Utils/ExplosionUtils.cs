@@ -32,6 +32,10 @@ namespace RooseLabs.Utils
             int layerMask,
             QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.Collide)
         {
+            // Cast from center
+            if (ExplosionRaycast(center, targetCollider, center, outerRadius, layerMask))
+                return true;
+
             Vector3 toTarget = (targetCollider.transform.position - center).normalized;
 
             // Calculate perpendicular basis for sphere distribution
@@ -39,10 +43,6 @@ namespace RooseLabs.Utils
             if (perpendicular1.sqrMagnitude < 0.01f)
                 perpendicular1 = Vector3.Cross(toTarget, Vector3.right).normalized;
             Vector3 perpendicular2 = Vector3.Cross(toTarget, perpendicular1).normalized;
-
-            // Cast from center
-            if (ExplosionRaycast(center, targetCollider, center, outerRadius, layerMask))
-                return true;
 
             // Cast from surface points on inner sphere
             for (int i = 0; i < RaycastCount; ++i)

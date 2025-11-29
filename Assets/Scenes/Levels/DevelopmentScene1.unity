@@ -12998,7 +12998,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6355131024404063705}
-  - component: {fileID: 8801205447449593895}
   m_Layer: 0
   m_Name: 5
   m_TagString: Untagged
@@ -13088,7 +13087,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3238071126256280680}
-  - component: {fileID: 7458654648973256587}
   m_Layer: 0
   m_Name: 6
   m_TagString: Untagged
@@ -13105,7 +13103,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6326889091104482144}
-  - component: {fileID: 3658823659514111004}
   m_Layer: 0
   m_Name: 12
   m_TagString: Untagged
@@ -13122,7 +13119,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7192644825499736575}
-  - component: {fileID: 3037398726871544100}
   m_Layer: 0
   m_Name: 8
   m_TagString: Untagged
@@ -13139,7 +13135,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 298307091845093949}
-  - component: {fileID: 3637232864134376183}
   m_Layer: 0
   m_Name: 1
   m_TagString: Untagged
@@ -13164,19 +13159,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1302565332434835936
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7482521026581545253}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aea650380fb74c3439ceac9638d37f1c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.WaypointNavMeshSnapper
-  maxDistance: 2
 --- !u!4 &1770473586301877294
 Transform:
   m_ObjectHideFlags: 0
@@ -13300,19 +13282,6 @@ Transform:
   - {fileID: 6326889091104482144}
   m_Father: {fileID: 584797313248548903}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2237247374740679537
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3327200057537580349}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aea650380fb74c3439ceac9638d37f1c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.WaypointNavMeshSnapper
-  maxDistance: 2
 --- !u!4 &2434357671246275886
 Transform:
   m_ObjectHideFlags: 0
@@ -13328,32 +13297,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 3691464623662673937}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2472403576327891003
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6481867626648510114}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aea650380fb74c3439ceac9638d37f1c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.WaypointNavMeshSnapper
-  maxDistance: 2
---- !u!114 &2549226517783748930
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8679869154440854634}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aea650380fb74c3439ceac9638d37f1c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.WaypointNavMeshSnapper
-  maxDistance: 2
 --- !u!1 &2766525010578183808
 GameObject:
   m_ObjectHideFlags: 0
@@ -13371,32 +13314,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &2918372629646545430
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7605950879088166531}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aea650380fb74c3439ceac9638d37f1c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.WaypointNavMeshSnapper
-  maxDistance: 2
---- !u!114 &3037398726871544100
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1003804042627375748}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aea650380fb74c3439ceac9638d37f1c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.WaypointNavMeshSnapper
-  maxDistance: 2
 --- !u!4 &3100284970897040405
 Transform:
   m_ObjectHideFlags: 0
@@ -13436,7 +13353,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3100284970897040405}
-  - component: {fileID: 2237247374740679537}
   m_Layer: 0
   m_Name: 2
   m_TagString: Untagged
@@ -13453,7 +13369,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2434357671246275886}
-  - component: {fileID: 5273211591691325305}
   m_Layer: 0
   m_Name: 5
   m_TagString: Untagged
@@ -13461,32 +13376,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &3637232864134376183
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1027484395544866902}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aea650380fb74c3439ceac9638d37f1c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.WaypointNavMeshSnapper
-  maxDistance: 2
---- !u!114 &3658823659514111004
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 687293047256061467}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aea650380fb74c3439ceac9638d37f1c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.WaypointNavMeshSnapper
-  maxDistance: 2
 --- !u!4 &3691464623662673937
 Transform:
   m_ObjectHideFlags: 0
@@ -13547,7 +13436,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5040498463842816389}
-  - component: {fileID: 7501565896136859344}
   m_Layer: 0
   m_Name: 10
   m_TagString: Untagged
@@ -13564,7 +13452,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1770473586301877294}
-  - component: {fileID: 6337118709378560771}
   m_Layer: 0
   m_Name: 11
   m_TagString: Untagged
@@ -13581,7 +13468,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6732224321328863692}
-  - component: {fileID: 6164562307745269407}
   m_Layer: 0
   m_Name: 3
   m_TagString: Untagged
@@ -13589,19 +13475,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &4981187037128699769
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8907042416868847392}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aea650380fb74c3439ceac9638d37f1c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.WaypointNavMeshSnapper
-  maxDistance: 2
 --- !u!4 &5040498463842816389
 Transform:
   m_ObjectHideFlags: 0
@@ -13632,32 +13505,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2163838320088498897}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5273211591691325305
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3617402436815457052}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aea650380fb74c3439ceac9638d37f1c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.WaypointNavMeshSnapper
-  maxDistance: 2
---- !u!114 &5363869429291266616
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7034175006736753118}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aea650380fb74c3439ceac9638d37f1c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.WaypointNavMeshSnapper
-  maxDistance: 2
 --- !u!1 &5670060199925144853
 GameObject:
   m_ObjectHideFlags: 0
@@ -13707,19 +13554,6 @@ MonoBehaviour:
   m_MinRegionArea: 2
   m_NavMeshData: {fileID: 23800000, guid: cfd56fec81bfef7458e7fb458d9b6cda, type: 2}
   m_BuildHeightMesh: 1
---- !u!114 &6164562307745269407
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4899875078032434528}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aea650380fb74c3439ceac9638d37f1c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.WaypointNavMeshSnapper
-  maxDistance: 2
 --- !u!4 &6326889091104482144
 Transform:
   m_ObjectHideFlags: 0
@@ -13735,19 +13569,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2163838320088498897}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6337118709378560771
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4738946898968704374}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aea650380fb74c3439ceac9638d37f1c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.WaypointNavMeshSnapper
-  maxDistance: 2
 --- !u!4 &6355131024404063705
 Transform:
   m_ObjectHideFlags: 0
@@ -13772,7 +13593,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4050212787632315935}
-  - component: {fileID: 2472403576327891003}
   m_Layer: 0
   m_Name: 4
   m_TagString: Untagged
@@ -13795,19 +13615,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2163838320088498897}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6758551104300534745
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6943456178278889446}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aea650380fb74c3439ceac9638d37f1c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.WaypointNavMeshSnapper
-  maxDistance: 2
 --- !u!1 &6943456178278889446
 GameObject:
   m_ObjectHideFlags: 0
@@ -13817,7 +13624,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9093677924110007106}
-  - component: {fileID: 6758551104300534745}
   m_Layer: 0
   m_Name: 4
   m_TagString: Untagged
@@ -13834,7 +13640,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8563354911032209058}
-  - component: {fileID: 5363869429291266616}
   m_Layer: 0
   m_Name: 3
   m_TagString: Untagged
@@ -13893,19 +13698,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2163838320088498897}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &7458654648973256587
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 625691284141328611}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aea650380fb74c3439ceac9638d37f1c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.WaypointNavMeshSnapper
-  maxDistance: 2
 --- !u!1 &7482521026581545253
 GameObject:
   m_ObjectHideFlags: 0
@@ -13915,7 +13707,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4188579439191313605}
-  - component: {fileID: 1302565332434835936}
   m_Layer: 0
   m_Name: 2
   m_TagString: Untagged
@@ -13923,19 +13714,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &7501565896136859344
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4671138843140378175}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aea650380fb74c3439ceac9638d37f1c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.WaypointNavMeshSnapper
-  maxDistance: 2
 --- !u!1 &7605950879088166531
 GameObject:
   m_ObjectHideFlags: 0
@@ -13945,7 +13723,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5236479601923475134}
-  - component: {fileID: 2918372629646545430}
   m_Layer: 0
   m_Name: 9
   m_TagString: Untagged
@@ -14098,7 +13875,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7385995191371257520}
-  - component: {fileID: 2549226517783748930}
   m_Layer: 0
   m_Name: 7
   m_TagString: Untagged
@@ -14106,19 +13882,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &8801205447449593895
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 45518068148762166}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aea650380fb74c3439ceac9638d37f1c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.WaypointNavMeshSnapper
-  maxDistance: 2
 --- !u!4 &8812746776398911718
 Transform:
   m_ObjectHideFlags: 0
@@ -14143,7 +13906,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8928797984383657686}
-  - component: {fileID: 4981187037128699769}
   m_Layer: 0
   m_Name: 1
   m_TagString: Untagged
@@ -14175,7 +13937,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9205737046974318269}
-  - component: {fileID: 9062755740262578259}
   m_Layer: 0
   m_Name: 6
   m_TagString: Untagged
@@ -14183,19 +13944,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &9062755740262578259
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8979344537926749962}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aea650380fb74c3439ceac9638d37f1c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.WaypointNavMeshSnapper
-  maxDistance: 2
 --- !u!4 &9093677924110007106
 Transform:
   m_ObjectHideFlags: 0
