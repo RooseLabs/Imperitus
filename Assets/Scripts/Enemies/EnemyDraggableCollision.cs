@@ -65,10 +65,8 @@ namespace RooseLabs.Enemies
                 {
                     DamageInfo damageInfo = new DamageInfo(
                         damage,
-                        DamageType.Melee,
-                        transform,
                         other.contacts[0].point,
-                        playerName
+                        transform
                     );
                     enemyData.ApplyDamage(damageInfo);
 

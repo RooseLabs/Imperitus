@@ -1,27 +1,22 @@
+using System;
 using UnityEngine;
 
 namespace RooseLabs.Gameplay
 {
-    public enum DamageType
-    {
-        Melee
-    }
-
+    [Serializable]
     public struct DamageInfo
     {
-        public int Amount;
-        public DamageType Type;
-        public Transform Source;
-        public Vector3 Position;
-        public string SourceName;
+        public float amount;
+        public Vector3 position;
+        public Transform source;
 
-        public DamageInfo(int amount, DamageType type, Transform source, Vector3 position, string sourceName = null)
+        public DamageInfo(float amount, Transform source = null) : this(amount, Vector3.zero, source) { }
+
+        public DamageInfo(float amount, Vector3 position, Transform source = null)
         {
-            Amount = amount;
-            Type = type;
-            Source = source;
-            Position = position;
-            SourceName = sourceName;
+            this.amount = amount;
+            this.position = position;
+            this.source = source;
         }
     }
 }

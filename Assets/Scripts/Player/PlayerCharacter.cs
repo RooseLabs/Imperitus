@@ -167,7 +167,7 @@ namespace RooseLabs.Player
         [ObserversRpc]
         private void ApplyDamage_ObserversRPC(DamageInfo damage)
         {
-            Data.Health -= damage.Amount;
+            Data.Health -= damage.amount;
             if (Data.Health <= 0)
             {
                 Data.isDead = true;

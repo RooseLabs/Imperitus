@@ -22,32 +22,32 @@ namespace RooseLabs.Enemies
         public LayerMask playerLayer;
 
         // Internal state
-        private Collider weaponCollider;
-        private float damageTimer = 0f;
-        private bool canDealDamage = false;
+        private Collider m_weaponCollider;
+        private float m_damageTimer = 0f;
+        private bool m_canDealDamage = false;
 
         private void Awake()
         {
             // Get collider from the weapon tip object
             if (weaponTipObject != null)
             {
-                weaponCollider = weaponTipObject.GetComponent<Collider>();
+                m_weaponCollider = weaponTipObject.GetComponent<Collider>();
 
-                if (weaponCollider == null)
+                if (m_weaponCollider == null)
                 {
                     //Debug.LogError("[WeaponCollider] No Collider found on weaponTipObject! Please add a collider to the weapon tip.");
                     return;
                 }
 
                 // Ensure it's a trigger
-                if (!weaponCollider.isTrigger)
+                if (!m_weaponCollider.isTrigger)
                 {
                     //Debug.LogWarning("[WeaponCollider] Collider is not a trigger! Setting isTrigger to true.");
-                    weaponCollider.isTrigger = true;
+                    m_weaponCollider.isTrigger = true;
                 }
 
                 // Disable by default
-                weaponCollider.enabled = false;
+                m_weaponCollider.enabled = false;
             }
             else
             {
@@ -60,9 +60,9 @@ namespace RooseLabs.Enemies
             if (!IsServerInitialized) return;
 
             // Countdown damage timer
-            if (damageTimer > 0f)
+            if (m_damageTimer > 0f)
             {
-                damageTimer -= Time.deltaTime;
+                m_damageTimer -= Time.deltaTime;
             }
         }
 
@@ -73,11 +73,11 @@ namespace RooseLabs.Enemies
         public void EnableWeapon()
         {
             if (!IsServerInitialized) return;
-            if (weaponCollider == null) return;
+            if (m_weaponCollider == null) return;
 
-            weaponCollider.enabled = true;
-            damageTimer = 0f; // Reset cooldown so first hit can register immediately
-            canDealDamage = true;
+            m_weaponCollider.enabled = true;
+            m_damageTimer = 0f; // Reset cooldown so first hit can register immediately
+            m_canDealDamage = true;
             //Debug.Log("[WeaponCollider] Weapon enabled for attack");
         }
 
@@ -88,10 +88,10 @@ namespace RooseLabs.Enemies
         public void DisableWeapon()
         {
             if (!IsServerInitialized) return;
-            if (weaponCollider == null) return;
+            if (m_weaponCollider == null) return;
 
-            weaponCollider.enabled = false;
-            canDealDamage = false;
+            m_weaponCollider.enabled = false;
+            m_canDealDamage = false;
             //Debug.Log("[WeaponCollider] Weapon disabled");
         }
 
@@ -101,7 +101,7 @@ namespace RooseLabs.Enemies
             if (!IsServerInitialized) return;
 
             // Can't deal damage if weapon is disabled or on cooldown
-            if (!canDealDamage || damageTimer > 0f) return;
+            if (!m_canDealDamage || m_damageTimer > 0f) return;
 
             // Check if we hit a player using layer mask
             if (((1 << other.gameObject.layer) & playerLayer) == 0) return;
@@ -123,9 +123,8 @@ namespace RooseLabs.Enemies
             // Create damage info
             DamageInfo damage = new DamageInfo(
                 ownerAI.attackDamage,
-                DamageType.Melee,
-                ownerAI.transform,
-                other.transform.position
+                other.transform.position,
+                ownerAI.transform
             );
 
             // Apply damage
@@ -136,7 +135,7 @@ namespace RooseLabs.Enemies
                 //Debug.Log($"[WeaponCollider] Hit {other.name} for {ownerAI.attackDamage} damage");
 
                 // Start damage cooldown
-                damageTimer = damageCooldown;
+                m_damageTimer = damageCooldown;
             }
             else
             {

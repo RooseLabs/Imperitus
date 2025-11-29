@@ -82,7 +82,7 @@ MonoBehaviour:
   _initializeOrder: 0
   _preventDespawnOnDisconnect: 0
   _defaultDespawnType: 1
-  _initializedTimestamp: -8584376473131854154
+  _initializedTimestamp: -8584372071486486785
   NetworkObserver: {fileID: 0}
   _enablePrediction: 0
   _predictionType: 0
@@ -97,7 +97,7 @@ MonoBehaviour:
   _spectatorInterpolation: 2
   _enableTeleport: 0
   _teleportThreshold: 1
-  <PrefabId>k__BackingField: 2
+  <PrefabId>k__BackingField: 3
   <SpawnableCollectionId>k__BackingField: 0
   <AssetPathHash>k__BackingField: 3454870706624736604
   SceneId: 0
@@ -127,5 +127,6 @@ MonoBehaviour:
   staminaCost: 10
   staminaConsumptionType: 0
   staminaCostPerSecond: 0
-  projectilePrefab: {fileID: 4420710090149408639, guid: b97cc93d1faee3c43a7d796fe13421c8, type: 3}
+  projectilePrefab: {fileID: 4420710090149408639, guid: 3180dc1da28cb25408f78fe13c471672, type: 3}
   projectileSpeed: 10
+  damage: 10

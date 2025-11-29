@@ -245,7 +245,6 @@ namespace RooseLabs.Player
             }
         }
 
-        // TODO: We probably also want to prevent using the wand when there's no active heist.
         public bool CanUseWand =>
             !character.Data.IsCrawling &&
             !character.Data.IsSprinting &&

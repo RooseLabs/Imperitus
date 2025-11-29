@@ -118,20 +118,20 @@ namespace RooseLabs.Enemies
             if (m_isDead)
                 return false;
 
-            ApplyDamage_ServerRpc(damage.Amount, damage.SourceName ?? "Unknown");
+            ApplyDamage_ServerRpc(damage.amount);
 
             return true;
         }
 
         [ServerRpc(RequireOwnership = false)]
-        private void ApplyDamage_ServerRpc(float damageAmount, string sourceName)
+        private void ApplyDamage_ServerRpc(float damageAmount)
         {
             if (m_isDead)
                 return;
 
             Health -= damageAmount;
 
-            Debug.Log($"{gameObject.name} took {damageAmount} damage from {sourceName}. Health: {Health}/{MaxHealth}");
+            Debug.Log($"{gameObject.name} took {damageAmount} damage. Health: {Health}/{MaxHealth}");
         }
     }
 }

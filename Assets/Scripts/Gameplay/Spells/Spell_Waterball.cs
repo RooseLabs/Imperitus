@@ -1,6 +1,6 @@
 using FishNet.Object;
+using RooseLabs.Network;
 using RooseLabs.Player;
-using RooseLabs.Utils;
 using UnityEngine;
 
 namespace RooseLabs.Gameplay.Spells
@@ -11,6 +11,7 @@ namespace RooseLabs.Gameplay.Spells
         [Header("Waterball Spell Data")]
         [SerializeField] private GameObject projectilePrefab;
         [SerializeField] private float projectileSpeed = 10f;
+        [SerializeField] private float damage = 10f;
         #endregion
 
         protected override bool OnCastFinished()
@@ -19,15 +20,16 @@ namespace RooseLabs.Gameplay.Spells
 
             var character = PlayerCharacter.LocalCharacter;
             // Create a ray from the camera's position in the direction it is facing
-            Ray ray = new Ray(character.Camera.transform.position, character.Camera.transform.forward);
+            // Ray ray = new Ray(character.Camera.transform.position, character.Camera.transform.forward);
 
             // Try to find the first object hit by the ray within 100 units
-            Vector3 targetPoint = character.RaycastIgnoreSelf(ray, out RaycastHit hit, 100f, HelperFunctions.AllPhysicalLayerMask)
-                ? hit.point // If something is hit, use that point as the target
-                : ray.GetPoint(100f); // Otherwise, use a point 100 units ahead
+            // Vector3 targetPoint = character.RaycastIgnoreSelf(ray, out RaycastHit hit, 100f, HelperFunctions.AllPhysicalLayerMask)
+            //     ? hit.point // If something is hit, use that point as the target
+            //     : ray.GetPoint(100f); // Otherwise, use a point 100 units ahead
 
+            Vector3 targetPoint = character.Camera.transform.position + character.Data.lookDirection * 100f;
             // Calculate the normalized direction vector from the cast point to the target point
-            Vector3 direction = (targetPoint - transform.position).normalized;
+            Vector3 direction = (targetPoint - character.Wand.SpellCastPointPosition).normalized;
 
             // Request the server to spawn and launch the projectile in the calculated direction
             LaunchProjectile_ServerRpc(direction);
@@ -38,15 +40,18 @@ namespace RooseLabs.Gameplay.Spells
         [ServerRpc(RequireOwnership = true)]
         private void LaunchProjectile_ServerRpc(Vector3 direction)
         {
-            NetworkObject nob = NetworkManager.GetPooledInstantiated(projectilePrefab, transform.position, Quaternion.identity, true);
-            if (nob.TryGetComponent(out Rigidbody rb))
+            var character = PlayerHandler.GetCharacter(Owner);
+            NetworkObject nob = NetworkManager.GetPooledInstantiated(
+                projectilePrefab, character.Wand.SpellCastPointPosition, Quaternion.LookRotation(direction), true);
+            if (nob.TryGetComponent(out Projectile projectile))
             {
                 Spawn(nob);
-                rb.AddForce(direction * projectileSpeed, ForceMode.VelocityChange);
+                DamageInfo damageInfo = new(damage, character.gameObject.transform);
+                projectile.Launch(direction * projectileSpeed, damageInfo);
             }
             else
             {
-                Logger.Warning($"[Waterball] Projectile prefab {projectilePrefab.name} is missing a Rigidbody or NetworkObject component.");
+                Logger.Warning($"[Waterball] Projectile prefab {projectilePrefab.name} is missing a Projectile or NetworkObject component.");
                 Destroy(nob);
             }
         }
