@@ -1,6 +1,7 @@
 using FishNet.Object;
 using RooseLabs.Network;
 using RooseLabs.Player;
+using System.Collections;
 using UnityEngine;
 
 namespace RooseLabs.Gameplay.Spells
@@ -12,6 +13,7 @@ namespace RooseLabs.Gameplay.Spells
         [SerializeField] private GameObject projectilePrefab;
         [SerializeField] private float projectileSpeed = 10f;
         [SerializeField] private float damage = 10f;
+        [SerializeField] private GameObject vfxGameObject;
         #endregion
 
         protected override bool OnCastFinished()
@@ -31,10 +33,21 @@ namespace RooseLabs.Gameplay.Spells
             // Calculate the normalized direction vector from the cast point to the target point
             Vector3 direction = (targetPoint - transform.position).normalized;
 
-            // Request the server to spawn and launch the projectile in the calculated direction
-            LaunchProjectile_ServerRpc(direction);
+            // Enable VFX and launch projectile after delay
+            if (vfxGameObject != null)
+            {
+                vfxGameObject.SetActive(true);
+            }
+
+            StartCoroutine(LaunchProjectileDelayed(direction, 0.2f));
 
             return true;
+        }
+
+        private IEnumerator LaunchProjectileDelayed(Vector3 direction, float delay)
+        {
+            yield return new WaitForSeconds(delay);
+            LaunchProjectile_ServerRpc(direction);
         }
 
         [ServerRpc(RequireOwnership = true)]
