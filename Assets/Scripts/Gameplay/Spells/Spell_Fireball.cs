@@ -17,6 +17,7 @@ namespace RooseLabs.Gameplay.Spells
         {
             base.OnStartCast();
             if (!vfxGameObject) return;
+            vfxGameObject.SetActive(false);
             vfxGameObject.transform.rotation = Quaternion.LookRotation(OwnerCharacter.Data.lookDirection);
             vfxGameObject.SetActive(true);
             if (IsServerInitialized)
@@ -35,7 +36,8 @@ namespace RooseLabs.Gameplay.Spells
         protected override void OnCancelCast()
         {
             base.OnCancelCast();
-            vfxGameObject?.SetActive(false);
+            if (!vfxGameObject) return;
+            vfxGameObject.SetActive(false);
             if (IsServerInitialized)
                 ToggleVFX_ServerRpc(false);
             else
@@ -63,7 +65,9 @@ namespace RooseLabs.Gameplay.Spells
         [ObserversRpc(ExcludeOwner =  true)]
         private void ToggleVFX_ObserversRpc(bool enable)
         {
-            vfxGameObject?.SetActive(enable);
+            if (enable && vfxGameObject.activeSelf)
+                vfxGameObject.SetActive(false);
+            vfxGameObject.SetActive(enable);
         }
 
         [ServerRpc(RequireOwnership = true)]

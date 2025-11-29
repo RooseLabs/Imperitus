@@ -57,11 +57,6 @@ namespace RooseLabs.Gameplay.Spells
             SetupParentConstraint(OwnerCharacter.Wand.AttachmentPoint, OwnerCharacter.Wand.SpellCastPointLocalPosition);
         }
 
-        private void OnEnable()
-        {
-            ResetData();
-        }
-
         #region Public API
         public bool CanAimToSustain => castType == SpellCastType.AimToSustain;
         public bool IsBeingSustained { get; private set; } = false;
@@ -211,7 +206,8 @@ namespace RooseLabs.Gameplay.Spells
             }
             else
             {
-                ResetData();
+                IsCasting = false;
+                m_castProgress = 0f;
             }
 
             if (successfulCast)
@@ -320,6 +316,12 @@ namespace RooseLabs.Gameplay.Spells
             IsCasting = false;
             m_castProgress = 0f;
             IsBeingSustained = false;
+        }
+
+        public override void ResetState(bool asServer)
+        {
+            ResetData();
+            base.ResetState(asServer);
         }
     }
 }
