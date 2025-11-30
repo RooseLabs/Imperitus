@@ -1,4 +1,5 @@
 using FishNet.Object;
+using RooseLabs.Player;
 using UnityEngine;
 
 namespace RooseLabs.Gameplay.Spells
@@ -16,32 +17,13 @@ namespace RooseLabs.Gameplay.Spells
         protected override void OnStartCast()
         {
             base.OnStartCast();
-            if (!vfxGameObject) return;
-            vfxGameObject.SetActive(false);
-            vfxGameObject.transform.rotation = Quaternion.LookRotation(OwnerCharacter.Data.lookDirection);
-            vfxGameObject.SetActive(true);
-            if (IsServerInitialized)
-                ToggleVFX_ServerRpc(true);
-            else
-                ToggleVFX_ObserversRpc(true);
-        }
-
-        protected override void OnContinueCast()
-        {
-            base.OnContinueCast();
-            if (!vfxGameObject) return;
-            vfxGameObject.transform.rotation = Quaternion.LookRotation(OwnerCharacter.Data.lookDirection);
+            ToggleCastVFX(true);
         }
 
         protected override void OnCancelCast()
         {
             base.OnCancelCast();
-            if (!vfxGameObject) return;
-            vfxGameObject.SetActive(false);
-            if (IsServerInitialized)
-                ToggleVFX_ServerRpc(false);
-            else
-                ToggleVFX_ObserversRpc(false);
+            ToggleCastVFX(false);
         }
 
         protected override bool OnCastFinished()
@@ -52,8 +34,34 @@ namespace RooseLabs.Gameplay.Spells
             // Calculate the normalized direction vector from the cast point to the target point
             Vector3 direction = (targetPoint - transform.position).normalized;
 
-            LaunchProjectile_ServerRpc(direction);
+            if (IsServerInitialized)
+                LaunchProjectile_ObserversRpc(direction);
+            else
+                LaunchProjectile_ServerRpc(direction);
+            LaunchProjectile(direction);
             return true;
+        }
+
+        private void Update()
+        {
+            if (!vfxGameObject) return;
+            if (!OwnerCharacter) return;
+            if (OwnerCharacter != PlayerCharacter.LocalCharacter)
+                vfxGameObject.transform.rotation = Quaternion.LookRotation(OwnerCharacter.ModelTransform.forward);
+            else
+                vfxGameObject.transform.rotation = Quaternion.LookRotation(OwnerCharacter.Data.lookDirection);
+        }
+
+        private void ToggleCastVFX(bool enable)
+        {
+            if (!vfxGameObject) return;
+            if (IsServerInitialized)
+                ToggleVFX_ObserversRpc(enable);
+            else
+                ToggleVFX_ServerRpc(enable);
+            if (enable && vfxGameObject.activeSelf)
+                vfxGameObject.SetActive(false);
+            vfxGameObject.SetActive(enable);
         }
 
         [ServerRpc(RequireOwnership = true)]
@@ -62,9 +70,10 @@ namespace RooseLabs.Gameplay.Spells
             ToggleVFX_ObserversRpc(enable);
         }
 
-        [ObserversRpc(ExcludeOwner =  true)]
+        [ObserversRpc(ExcludeOwner = true, ExcludeServer = true)]
         private void ToggleVFX_ObserversRpc(bool enable)
         {
+            // If we're enabling but it's already active, disable it first to restart the effect
             if (enable && vfxGameObject.activeSelf)
                 vfxGameObject.SetActive(false);
             vfxGameObject.SetActive(enable);
@@ -73,19 +82,28 @@ namespace RooseLabs.Gameplay.Spells
         [ServerRpc(RequireOwnership = true)]
         private void LaunchProjectile_ServerRpc(Vector3 direction)
         {
+            LaunchProjectile_ObserversRpc(direction);
+        }
+
+        [ObserversRpc(ExcludeOwner = true, ExcludeServer = true)]
+        private void LaunchProjectile_ObserversRpc(Vector3 direction)
+        {
+            LaunchProjectile(direction);
+        }
+
+        private void LaunchProjectile(Vector3 direction)
+        {
             if (!OwnerCharacter) return;
-            NetworkObject nob = NetworkManager.GetPooledInstantiated(
-                projectilePrefab, transform.position, Quaternion.LookRotation(direction), true);
-            if (nob.TryGetComponent(out Projectile projectile))
+            var pGo = Instantiate(projectilePrefab, transform.position, Quaternion.LookRotation(direction));
+            if (pGo.TryGetComponent(out Projectile projectile))
             {
-                Spawn(nob);
                 DamageInfo damageInfo = new(damage, OwnerCharacter.gameObject.transform);
                 projectile.Launch(direction * projectileSpeed, damageInfo);
             }
             else
             {
-                Logger.Warning($"[Fireball] Projectile prefab {projectilePrefab.name} is missing a Projectile or NetworkObject component.");
-                Destroy(nob);
+                Logger.Warning($"[Fireball] Projectile prefab {projectilePrefab.name} is missing a Projectile component.");
+                Destroy(pGo);
             }
         }
 

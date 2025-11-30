@@ -6,8 +6,6 @@ namespace RooseLabs.Player
     [DefaultExecutionOrder(-96)]
     public class PlayerMovement : MonoBehaviour
     {
-        [SerializeField] private Transform modelTransform;
-
         private PlayerCharacter m_character;
         private AvatarMover m_avatarMover;
         private Rigidbody m_rigidbody;
@@ -229,16 +227,16 @@ namespace RooseLabs.Player
             if (m_character.Data.isAiming)
             {
                 // While aiming, rotation should always face look direction
-                modelTransform.rotation = Quaternion.LookRotation(m_character.Data.lookDirectionFlat);
+                m_character.ModelTransform.rotation = Quaternion.LookRotation(m_character.Data.lookDirectionFlat);
             }
             else if (moveInput.sqrMagnitude <= 0.01f)
             {
                 // Not moving, rotate when look direction is above a certain threshold
-                float angle = Vector3.Angle(modelTransform.forward, m_character.Data.lookDirectionFlat);
+                float angle = Vector3.Angle(m_character.ModelTransform.forward, m_character.Data.lookDirectionFlat);
                 if (angle > 45f)
                 {
-                    modelTransform.rotation = Quaternion.Slerp(
-                        modelTransform.rotation,
+                    m_character.ModelTransform.rotation = Quaternion.Slerp(
+                        m_character.ModelTransform.rotation,
                         Quaternion.LookRotation(m_character.Data.lookDirectionFlat),
                         Mathf.InverseLerp(45f, 80f, angle) * 10f * Time.deltaTime
                     );
@@ -265,8 +263,8 @@ namespace RooseLabs.Player
                     angle *= sideSign;
                 }
 
-                modelTransform.rotation = Quaternion.Slerp(
-                    modelTransform.rotation,
+                m_character.ModelTransform.rotation = Quaternion.Slerp(
+                    m_character.ModelTransform.rotation,
                     Quaternion.LookRotation(lookDirection) * Quaternion.Euler(0f, angle, 0f),
                     Time.deltaTime * 10f
                 );

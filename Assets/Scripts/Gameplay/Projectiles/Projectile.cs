@@ -1,10 +1,10 @@
-using FishNet.Object;
+using FishNet;
 using UnityEngine;
 using Logger = RooseLabs.Core.Logger;
 
 namespace RooseLabs.Gameplay
 {
-    public class Projectile : NetworkBehaviour
+    public class Projectile : MonoBehaviour
     {
         protected static Logger Logger => Logger.GetLogger("Projectile");
 
@@ -16,9 +16,16 @@ namespace RooseLabs.Gameplay
         private float projectileLifetime = 10f;
         #endregion
 
-        protected DamageInfo m_damageInfo;
         private float m_timeSinceLaunch;
         private bool m_hasCollided;
+
+        protected bool isServer;
+        protected DamageInfo damageInfo;
+
+        private void Awake()
+        {
+            isServer = InstanceFinder.IsServerStarted;
+        }
 
         /// <summary>
         /// Launches the projectile with the specified force and damage info.
@@ -28,12 +35,11 @@ namespace RooseLabs.Gameplay
         /// <param name="mode">The force mode to use when applying the force. Default is ForceMode.VelocityChange.</param>
         public void Launch(Vector3 force, DamageInfo damageInfo, ForceMode mode = ForceMode.VelocityChange)
         {
-            if (!IsServerInitialized) return;
             if (!projectileRigidbody) return;
 
             m_timeSinceLaunch = 0f;
             m_hasCollided = false;
-            m_damageInfo = damageInfo;
+            this.damageInfo = damageInfo;
             projectileRigidbody.Rigidbody.AddForce(force, mode);
         }
 
@@ -51,7 +57,6 @@ namespace RooseLabs.Gameplay
 
         private void Update()
         {
-            if (!IsServerInitialized) return;
             if (m_hasCollided) return;
 
             m_timeSinceLaunch += Time.deltaTime;
@@ -63,7 +68,8 @@ namespace RooseLabs.Gameplay
 
         private bool CanCollideWith(Collider col)
         {
-            if (m_timeSinceLaunch < 0.1f && col.transform.IsChildOf(m_damageInfo.source))
+            if (!damageInfo.source) return true;
+            if (m_timeSinceLaunch < 0.1f && col.transform.IsChildOf(damageInfo.source))
             {
                 // Ignore collision with the source for a brief moment after launch
                 return false;
@@ -93,17 +99,16 @@ namespace RooseLabs.Gameplay
         protected virtual void OnProjectileCollision(Collider col)
         {
             m_hasCollided = true;
-            if (IsServerInitialized && col.gameObject.TryGetComponent(out IDamageable damageable))
+            if (isServer && col.gameObject.TryGetComponent(out IDamageable damageable))
             {
-                m_damageInfo.position = col.ClosestPointOnBounds(projectileRigidbody.Rigidbody.position);
-                damageable.ApplyDamage(m_damageInfo);
+                damageInfo.position = col.ClosestPointOnBounds(projectileRigidbody.Rigidbody.position);
+                damageable.ApplyDamage(damageInfo);
             }
 
             projectileRigidbody.gameObject.SetActive(false);
 
             // Default behavior is to despawn the projectile on collision
-            if (IsServerInitialized)
-                Despawn(gameObject);
+            Destroy(gameObject);
         }
 
         /// <summary>
@@ -112,18 +117,7 @@ namespace RooseLabs.Gameplay
         /// </summary>
         protected virtual void OnProjectileLifetimeExpired()
         {
-            if (IsServerInitialized)
-                Despawn(gameObject);
-        }
-
-        public override void ResetState(bool asServer)
-        {
-            m_damageInfo = default;
-            m_timeSinceLaunch = 0f;
-            m_hasCollided = false;
-            projectileRigidbody.ResetState();
-            projectileRigidbody.gameObject.SetActive(true);
-            base.ResetState(asServer);
+            Destroy(gameObject);
         }
     }
 }

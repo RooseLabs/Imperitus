@@ -23,6 +23,7 @@ namespace RooseLabs.Player
         public PlayerConnection Player => PlayerHandler.GetPlayer(Owner);
 
         #region Serialized
+        [field: SerializeField] public Transform ModelTransform { get; private set; }
         [field: SerializeField] public Camera Camera { get; private set; }
 
         [Tooltip("Meshes to hide from the local player (e.g. body, head, accessories)")]

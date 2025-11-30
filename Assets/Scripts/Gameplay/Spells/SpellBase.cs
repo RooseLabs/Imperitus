@@ -321,6 +321,9 @@ namespace RooseLabs.Gameplay.Spells
         public override void ResetState(bool asServer)
         {
             ResetData();
+            // Remove Parent Constraint
+            if (TryGetComponent(out ParentConstraint parentConstraint))
+                Destroy(parentConstraint);
             base.ResetState(asServer);
         }
     }

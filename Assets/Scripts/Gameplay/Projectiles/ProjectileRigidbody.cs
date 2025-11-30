@@ -22,14 +22,6 @@ namespace RooseLabs.Gameplay
             Rigidbody = GetComponent<Rigidbody>();
         }
 
-        public void ResetState()
-        {
-            Rigidbody.linearVelocity = Vector3.zero;
-            Rigidbody.angularVelocity = Vector3.zero;
-            transform.rotation = Quaternion.identity;
-            transform.position = Vector3.zero;
-        }
-
         private void OnCollisionEnter(Collision collision) => CollisionEnter?.Invoke(collision);
         private void OnCollisionStay(Collision collision) => CollisionStay?.Invoke(collision);
         private void OnCollisionExit(Collision collision) => CollisionExit?.Invoke(collision);

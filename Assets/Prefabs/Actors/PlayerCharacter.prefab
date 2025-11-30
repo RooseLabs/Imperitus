@@ -2151,6 +2151,7 @@ MonoBehaviour:
   _componentIndexCache: 0
   _addedNetworkObject: {fileID: 7652611172026813195}
   _networkObjectCache: {fileID: 7652611172026813195}
+  <ModelTransform>k__BackingField: {fileID: 6279997357253256316}
   <Camera>k__BackingField: {fileID: 5566422381978464674}
   meshesToHide:
   - {fileID: 61080722737630050}
@@ -2236,7 +2237,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d344182ae2f341838d6060e555d10cb3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Player.PlayerMovementAV
-  modelTransform: {fileID: 6279997357253256316}
   walkSpeed: 1.5
   sprintSpeed: 5
   crouchSpeed: 0.75

@@ -54,7 +54,7 @@ namespace RooseLabs.Gameplay
                 }
             }
 
-            if (!IsServerInitialized)
+            if (!isServer)
             {
                 // Schedule destruction of the explosion effect
                 Invoke(nameof(ExplosionEnd), explosionLifetime);
@@ -81,8 +81,8 @@ namespace RooseLabs.Gameplay
                     damageMultiplier = 1f - ((distance - innerRadius) / (outerRadius - innerRadius));
                     damageMultiplier = Mathf.Clamp(damageMultiplier, 0.05f, 1f);
                 }
-                DamageInfo adjustedDamageInfo = m_damageInfo;
-                adjustedDamageInfo.amount = m_damageInfo.amount * damageMultiplier;
+                DamageInfo adjustedDamageInfo = damageInfo;
+                adjustedDamageInfo.amount = damageInfo.amount * damageMultiplier;
                 adjustedDamageInfo.position = closestPoint;
                 damageable.ApplyDamage(adjustedDamageInfo);
             }
@@ -93,41 +93,26 @@ namespace RooseLabs.Gameplay
         private void ExplosionEnd()
         {
             m_explosionInstance?.SetActive(false);
-            // Despawn the entire projectile object after explosion effect duration
-            if (IsServerInitialized)
-                Despawn(gameObject);
+            Destroy(gameObject);
         }
 
-        private void OnDrawGizmosSelected()
+        #if UNITY_EDITOR
+        private void OnDrawGizmos()
         {
+            // Only draw gizmos if this object or one of its children is selected
+            GameObject selectedObject = UnityEditor.Selection.activeGameObject;
+            if (!selectedObject || (selectedObject != gameObject && (!selectedObject.transform.parent || selectedObject.transform.parent.gameObject != gameObject)))
+                return;
+            var position = explosionVFX?.transform.position
+                ?? projectileRigidbody?.transform.position
+                ?? transform.position;
             // Draw explosion inner radius
             Gizmos.color = Color.black;
-            Gizmos.DrawWireSphere(transform.position, innerRadius);
+            Gizmos.DrawWireSphere(position, innerRadius);
             // Draw explosion outer radius
             Gizmos.color = Color.cyan;
-            Gizmos.DrawWireSphere(transform.position, outerRadius);
+            Gizmos.DrawWireSphere(position, outerRadius);
         }
-
-        public override void ResetState(bool asServer)
-        {
-            if (m_explosionInstance)
-            {
-                if (string.IsNullOrEmpty(explosionVFX.scene.name))
-                {
-                    // If we instantiated the explosion VFX, destroy it
-                    Destroy(m_explosionInstance);
-                }
-                else
-                {
-                    // If it's a scene object, deactivate it and reset its position and rotation
-                    m_explosionInstance.transform.localPosition = Vector3.zero;
-                    m_explosionInstance.transform.localRotation = Quaternion.identity;
-                    m_explosionInstance.SetActive(false);
-                }
-                m_explosionInstance = null;
-            }
-
-            base.ResetState(asServer);
-        }
+        #endif
     }
 }

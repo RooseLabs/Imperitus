@@ -48,6 +48,7 @@ namespace RooseLabs.Gameplay
             TryGetComponent(out predictedOwner);
             TryGetComponent(out rb);
             Collider = GetComponent<Collider>();
+            rb.Sleep();
         }
 
         public void HandleDragBegin(Vector3 hitPoint)
