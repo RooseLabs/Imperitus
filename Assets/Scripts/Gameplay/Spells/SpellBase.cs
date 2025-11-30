@@ -32,29 +32,35 @@ namespace RooseLabs.Gameplay.Spells
         protected static Logger Logger => Logger.GetLogger("SpellCasting");
 
         #region Serialized
-        [field: SerializeField] public SpellSO SpellInfo { get; private set; }
-        [Tooltip("Type of spell casting behavior.")]
-        [SerializeField] private SpellCastType castType = SpellCastType.OneShot;
-        [Tooltip("Time in seconds required to cast the spell.")]
-        [SerializeField] private float castTime = 0f;
-        [Tooltip("Stamina cost for casting the spell.")]
-        [SerializeField] private float staminaCost = 0f;
-        [Tooltip("When and how the stamina cost is applied.")]
-        [SerializeField] private StaminaConsumptionType staminaConsumptionType = StaminaConsumptionType.LinearlyDuringCast;
-        [Tooltip("For sustained spells: extra stamina cost per second while the spell is being sustained.")]
-        [SerializeField] private float staminaCostPerSecond = 0f;
+        [field: SerializeField]
+        public SpellSO SpellInfo { get; private set; }
+
+        [SerializeField, Tooltip("Type of spell casting behavior.")]
+        private SpellCastType castType = SpellCastType.OneShot;
+
+        [SerializeField, Tooltip("Time in seconds required to cast the spell.")]
+        private float castTime = 0f;
+
+        [SerializeField, Tooltip("Stamina cost for casting the spell.")]
+        private float staminaCost = 0f;
+
+        [SerializeField, Tooltip("When and how the stamina cost is applied.")]
+        private StaminaConsumptionType staminaConsumptionType = StaminaConsumptionType.LinearlyDuringCast;
+
+        [SerializeField, Tooltip("For sustained spells: extra stamina cost per second while the spell is sustained.")]
+        private float staminaCostPerSecond = 0f;
         #endregion
 
         private float m_castProgress = 0f;
 
-        public PlayerCharacter OwnerCharacter { get; private set; }
+        public PlayerCharacter CasterCharacter { get; private set; }
         public bool IsCasting { get; private set; }
 
         public override void OnStartClient()
         {
-            OwnerCharacter = PlayerHandler.GetCharacter(Owner);
-            Debug.Assert(OwnerCharacter != null, "[SpellBase] No owner character found for spell.");
-            SetupParentConstraint(OwnerCharacter.Wand.AttachmentPoint, OwnerCharacter.Wand.SpellCastPointLocalPosition);
+            CasterCharacter = PlayerHandler.GetCharacter(Owner);
+            Debug.Assert(CasterCharacter != null, "[SpellBase] No owner character found for spell.");
+            SetupParentConstraint(CasterCharacter.Wand.AttachmentPoint, CasterCharacter.Wand.SpellCastPointLocalPosition);
         }
 
         #region Public API
@@ -64,6 +70,7 @@ namespace RooseLabs.Gameplay.Spells
         public void StartCast()
         {
             if (IsCasting) return;
+            if (PlayerCharacter.LocalCharacter.Data.Stamina <= 0f) return;
             if (staminaConsumptionType == StaminaConsumptionType.OnCastStart)
             {
                 if (PlayerCharacter.LocalCharacter.Data.Stamina < staminaCost) return;

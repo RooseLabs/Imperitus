@@ -16,7 +16,7 @@ namespace RooseLabs.Gameplay.Spells
         {
             base.OnCastFinished();
 
-            Vector3 targetPoint = OwnerCharacter.Camera.transform.position + OwnerCharacter.Data.lookDirection * 100f;
+            Vector3 targetPoint = CasterCharacter.Camera.transform.position + CasterCharacter.Data.lookDirection * 100f;
             // Calculate the normalized direction vector from the cast point to the target point
             Vector3 direction = (targetPoint - transform.position).normalized;
 
@@ -42,11 +42,11 @@ namespace RooseLabs.Gameplay.Spells
 
         private void LaunchProjectile(Vector3 direction)
         {
-            if (!OwnerCharacter) return;
+            if (!CasterCharacter) return;
             var pGo = Instantiate(projectilePrefab, transform.position, Quaternion.LookRotation(direction));
             if (pGo.TryGetComponent(out Projectile projectile))
             {
-                DamageInfo damageInfo = new(damage, OwnerCharacter.gameObject.transform);
+                DamageInfo damageInfo = new(damage, CasterCharacter.gameObject.transform);
                 projectile.Launch(direction * projectileSpeed, damageInfo);
             }
             else

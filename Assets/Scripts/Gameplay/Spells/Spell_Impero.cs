@@ -1,3 +1,4 @@
+using FishNet.Object;
 using RooseLabs.Player;
 using RooseLabs.Utils;
 using UnityEngine;
@@ -59,17 +60,17 @@ namespace RooseLabs.Gameplay.Spells
 
             hitDraggable.HandleDragBegin(hitInfo.point);
             m_currentGrabbedLocalHitPoint = hitDraggable.transform.InverseTransformPoint(hitInfo.point);
-            m_currentGrabbedObject = hitDraggable;
             m_currentDragDistance = hitInfo.distance;
             m_targetDragDistance = Mathf.Clamp(m_currentDragDistance, m_minSafeDragDistance, maxDistance);
-
-            // Create visuals if material assigned
-            if (tubeMaterial)
+            if (IsServerInitialized)
             {
-                CreateVisuals();
-                UpdateVisuals(character);
+                SetGrabbedObject_ObserversRpc(hitDraggable, m_currentGrabbedLocalHitPoint);
             }
-
+            else
+            {
+                SetGrabbedObject_ServerRpc(hitDraggable, m_currentGrabbedLocalHitPoint);
+                m_currentGrabbedObject = hitDraggable;
+            }
             return true;
         }
 
@@ -117,6 +118,17 @@ namespace RooseLabs.Gameplay.Spells
             // Release the dragged object
             m_currentGrabbedObject?.HandleDragEnd();
 
+            if (IsServerInitialized)
+            {
+                SetGrabbedObject_ObserversRpc(null, Vector3.zero);
+            }
+            else
+            {
+                SetGrabbedObject_ServerRpc(null, Vector3.zero);
+                m_currentGrabbedObject = null;
+                m_currentGrabbedLocalHitPoint = Vector3.zero;
+            }
+
             // Destroy visuals
             DestroyVisuals();
         }
@@ -135,6 +147,22 @@ namespace RooseLabs.Gameplay.Spells
         {
             if (!m_currentGrabbedObject) return;
             m_targetDragDistance = Mathf.Clamp(m_targetDragDistance + value, m_minSafeDragDistance, maxDistance);
+        }
+
+        private void LateUpdate()
+        {
+            if ((bool)tubeMaterial && (bool)m_currentGrabbedObject)
+            {
+                if (m_tubeSegments == null)
+                {
+                    CreateVisuals();
+                }
+                UpdateVisuals(CasterCharacter);
+            }
+            else if (m_tubeSegments != null)
+            {
+                DestroyVisuals();
+            }
         }
 
         private void CreateVisuals()
@@ -256,6 +284,21 @@ namespace RooseLabs.Gameplay.Spells
                 m_endCap = null;
             }
         }
+
+        #region Network Sync
+        [ServerRpc(RequireOwnership = true)]
+        private void SetGrabbedObject_ServerRpc(Draggable draggable, Vector3 localHitPoint)
+        {
+            SetGrabbedObject_ObserversRpc(draggable, localHitPoint);
+        }
+
+        [ObserversRpc(ExcludeOwner = true, ExcludeServer = true, RunLocally = true)]
+        private void SetGrabbedObject_ObserversRpc(Draggable draggable, Vector3 localHitPoint)
+        {
+            m_currentGrabbedObject = draggable;
+            m_currentGrabbedLocalHitPoint = localHitPoint;
+        }
+        #endregion
 
         protected override void ResetData()
         {
