@@ -1,4 +1,3 @@
-using RooseLabs.Core;
 using RooseLabs.Vosk;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -37,8 +36,19 @@ namespace RooseLabs.Player
         private bool m_isSimulatingCastHold = false;
         private string m_currentVoiceActivatedSpell = null;
 
-        // Track first frame of simulation
-        private bool m_isFirstFrameOfSimulation = false;
+        // Simulation state machine
+        private enum SimulationState
+        {
+            Inactive,
+            WaitingForSpell,
+            PressFrame,      
+            HoldFrame,       
+            ReleaseFrame     
+        }
+
+        private SimulationState m_simulationState = SimulationState.Inactive;
+        private int m_waitFrameCount = 0;
+        private const int MAX_WAIT_FRAMES = 60;
 
         private void Start()
         {
@@ -96,11 +106,75 @@ namespace RooseLabs.Player
             // Handle simulated cast hold
             if (m_isSimulatingCastHold)
             {
-                // Check if player stopped aiming (released right mouse button)
-                if (!m_character.Data.isAiming)
+                // Check if this is an auto-hold spell
+                bool isAutoHoldSpell = System.Array.Exists(spellsWithAutoHold,
+                    s => s.Equals(m_currentVoiceActivatedSpell, System.StringComparison.OrdinalIgnoreCase));
+
+                if (m_simulationState == SimulationState.WaitingForSpell)
                 {
-                    // Player released aim button - stop the spell
-                    StopSimulatedCastHold();
+                    // Check if the wand is ready and has the correct spell selected
+                    var availableSpells = playerWand.GetAvailableSpellNames();
+                    bool spellIsReady = false;
+
+                    foreach (var spellName in availableSpells)
+                    {
+                        if (spellName.ToString().Equals(m_currentVoiceActivatedSpell, System.StringComparison.OrdinalIgnoreCase))
+                        {
+                            spellIsReady = true;
+                            break;
+                        }
+                    }
+
+                    m_waitFrameCount++;
+
+                    if (spellIsReady)
+                    {
+                        Debug.Log($"[VoiceSpellCaster] Spell '{m_currentVoiceActivatedSpell}' is ready after {m_waitFrameCount} frames");
+                        m_simulationState = SimulationState.PressFrame;
+                        m_waitFrameCount = 0;
+                    }
+                    else if (m_waitFrameCount >= MAX_WAIT_FRAMES)
+                    {
+                        Debug.LogWarning($"[VoiceSpellCaster] Timeout waiting for spell '{m_currentVoiceActivatedSpell}' to be ready");
+                        StopSimulatedCastHold();
+                    }
+                    else
+                    {
+                        Debug.Log($"[VoiceSpellCaster] Waiting for spell to be ready... ({m_waitFrameCount}/{MAX_WAIT_FRAMES})");
+                    }
+
+                    return; // Don't process other states while waiting
+                }
+
+                if (isAutoHoldSpell)
+                {
+                    // Check if player stopped aiming (released right mouse button)
+                    if (!m_character.Data.isAiming)
+                    {
+                        // Player released aim button - stop the spell
+                        StopSimulatedCastHold();
+                    }
+                    // For auto-hold, we don't advance the state machine, stay in current state...
+                }
+                else
+                {
+                    // For instant spells, progress through the state machine
+                    switch (m_simulationState)
+                    {
+                        case SimulationState.PressFrame:
+                            m_simulationState = SimulationState.HoldFrame;
+                            Debug.Log($"[VoiceSpellCaster] State transition: PressFrame -> HoldFrame");
+                            break;
+                        case SimulationState.HoldFrame:
+                            m_simulationState = SimulationState.ReleaseFrame;
+                            Debug.Log($"[VoiceSpellCaster] State transition: HoldFrame -> ReleaseFrame");
+                            break;
+                        case SimulationState.ReleaseFrame:
+                            // Simulation complete
+                            Debug.Log($"[VoiceSpellCaster] State transition: ReleaseFrame -> Stopping");
+                            StopSimulatedCastHold();
+                            break;
+                    }
                 }
             }
         }
@@ -169,6 +243,12 @@ namespace RooseLabs.Player
         /// <returns>True if the spell was found and activated successfully.</returns>
         private bool TryActivateSpellByVoice(string spellName, float confidence)
         {
+            Debug.Log($"[VoiceSpellCaster] Voice command recognized: '{spellName}' (confidence: {confidence:F2})");
+
+            // Check if this spell requires auto-hold behavior
+            bool requiresAutoHold = System.Array.Exists(spellsWithAutoHold,
+                s => s.Equals(spellName, System.StringComparison.OrdinalIgnoreCase));
+
             // Try to switch to the spell by name
             if (!playerWand.TrySetSpellByName(spellName))
             {
@@ -176,26 +256,10 @@ namespace RooseLabs.Player
                 return false;
             }
 
-            Debug.Log($"[VoiceSpellCaster] Voice command recognized: '{spellName}' (confidence: {confidence:F2})");
+            bool needsWaitFrames = !requiresAutoHold;
 
-            // Check if this spell requires auto-hold behavior
-            bool requiresAutoHold = System.Array.Exists(spellsWithAutoHold,
-                s => s.Equals(spellName, System.StringComparison.OrdinalIgnoreCase));
-
-            if (requiresAutoHold)
-            {
-                // Start simulating cast hold for this spell
-                StartSimulatedCastHold(spellName);
-            }
-            else
-            {
-                // Normal spell - trigger a single cast
-                Debug.Log($"[VoiceSpellCaster] Triggering normal cast for '{spellName}'.");
-                // For instant spells, we just need to trigger one frame of input
-                m_isSimulatingCastHold = true;
-                m_isFirstFrameOfSimulation = true;
-                m_currentVoiceActivatedSpell = spellName;
-            }
+            // Start simulating cast for this spell
+            StartSimulatedCastHold(spellName, requiresAutoHold, needsWaitFrames);
 
             return true;
         }
@@ -204,7 +268,7 @@ namespace RooseLabs.Player
         /// Starts simulating a cast hold (as if left mouse button is being held).
         /// This is done by directly interfacing with PlayerInput AFTER it samples.
         /// </summary>
-        private void StartSimulatedCastHold(string spellName)
+        private void StartSimulatedCastHold(string spellName, bool isAutoHold, bool needsWaitForSpell)
         {
             if (m_isSimulatingCastHold)
             {
@@ -213,10 +277,11 @@ namespace RooseLabs.Player
             }
 
             m_isSimulatingCastHold = true;
-            m_isFirstFrameOfSimulation = true;
+            m_simulationState = needsWaitForSpell ? SimulationState.WaitingForSpell : SimulationState.PressFrame;
             m_currentVoiceActivatedSpell = spellName;
+            m_waitFrameCount = 0;
 
-            Debug.Log($"[VoiceSpellCaster] Started simulated cast hold for '{spellName}'. Player can aim freely and release RMB to stop.");
+            Debug.Log($"[VoiceSpellCaster] Started simulated cast for '{spellName}'. AutoHold={isAutoHold}, WaitForSpell={needsWaitForSpell}");
         }
 
         /// <summary>
@@ -230,7 +295,7 @@ namespace RooseLabs.Player
             Debug.Log($"[VoiceSpellCaster] Stopped simulated cast hold for '{m_currentVoiceActivatedSpell}'.");
 
             m_isSimulatingCastHold = false;
-            m_isFirstFrameOfSimulation = false;
+            m_simulationState = SimulationState.Inactive;
             m_currentVoiceActivatedSpell = null;
         }
 
@@ -243,31 +308,65 @@ namespace RooseLabs.Player
             if (!m_isSimulatingCastHold)
                 return;
 
+            // Don't inject input while waiting for spell to be ready
+            if (m_simulationState == SimulationState.WaitingForSpell)
+                return;
+
             // Check if this is an auto-hold spell or instant cast
             bool isAutoHoldSpell = System.Array.Exists(spellsWithAutoHold,
                 s => s.Equals(m_currentVoiceActivatedSpell, System.StringComparison.OrdinalIgnoreCase));
 
-            if (m_isFirstFrameOfSimulation)
+            if (isAutoHoldSpell)
             {
-                // First frame: simulate button press
-                input.castWasPressed = true;
-                input.castIsPressed = true;
-                input.castWasReleased = false;
-                m_isFirstFrameOfSimulation = false;
-
-                // If it's not an auto-hold spell, stop after one frame
-                if (!isAutoHoldSpell)
+                // Auto-hold spells: first frame is press, subsequent frames are hold
+                if (m_simulationState == SimulationState.PressFrame)
                 {
-                    m_isSimulatingCastHold = false;
-                    m_currentVoiceActivatedSpell = null;
+                    input.castWasPressed = true;
+                    input.castIsPressed = true;
+                    input.castWasReleased = false;
+                    Debug.Log($"[VoiceSpellCaster] FRAME {Time.frameCount}: Auto-hold PRESS for '{m_currentVoiceActivatedSpell}'");
+
+                    // Immediately advance to hold state for next frame
+                    m_simulationState = SimulationState.HoldFrame;
+                }
+                else
+                {
+                    // Keep holding in all subsequent frames
+                    input.castWasPressed = false;
+                    input.castIsPressed = true;
+                    input.castWasReleased = false;
+                    Debug.Log($"[VoiceSpellCaster] FRAME {Time.frameCount}: Auto-hold HOLDING for '{m_currentVoiceActivatedSpell}'");
                 }
             }
-            else if (isAutoHoldSpell)
+            else
             {
-                // Subsequent frames for auto-hold spells: keep button pressed
-                input.castWasPressed = false;
-                input.castIsPressed = true;
-                input.castWasReleased = false;
+                // Instant cast spells: simulate a complete button press cycle
+                switch (m_simulationState)
+                {
+                    case SimulationState.PressFrame:
+                        // Button pressed
+                        input.castWasPressed = true;
+                        input.castIsPressed = true;
+                        input.castWasReleased = false;
+                        Debug.Log($"[VoiceSpellCaster] FRAME {Time.frameCount}: Instant PRESS for '{m_currentVoiceActivatedSpell}'");
+                        break;
+
+                    case SimulationState.HoldFrame:
+                        // Button held (spell casting should complete here for instant spells)
+                        input.castWasPressed = false;
+                        input.castIsPressed = true;
+                        input.castWasReleased = false;
+                        Debug.Log($"[VoiceSpellCaster] FRAME {Time.frameCount}: Instant HOLD for '{m_currentVoiceActivatedSpell}'");
+                        break;
+
+                    case SimulationState.ReleaseFrame:
+                        // Button released
+                        input.castWasPressed = false;
+                        input.castIsPressed = false;
+                        input.castWasReleased = true;
+                        Debug.Log($"[VoiceSpellCaster] FRAME {Time.frameCount}: Instant RELEASE for '{m_currentVoiceActivatedSpell}'");
+                        break;
+                }
             }
         }
 

@@ -78,6 +78,7 @@ namespace RooseLabs.Player
             {
                 SyncAimingState(character.Data.isAiming);
             }
+            //Debug.Log($"[PlayerWand] castWasPressed={character.Input.castWasPressed}, castIsPressed={character.Input.castIsPressed}");
             if (character.Data.isAiming)
             {
                 if (m_currentSpellInstance)
@@ -288,12 +289,12 @@ namespace RooseLabs.Player
             for (int i = 0; i < m_availableSpells.Count; i++)
             {
                 var spell = m_availableSpells[i];
-                if (spell && spell.SpellInfo && spell.SpellInfo.EnglishName == spellName)
+                if (spell && spell.SpellInfo && spell.SpellInfo.EnglishName.Equals(spellName, System.StringComparison.OrdinalIgnoreCase))
                 {
                     // Found matching spell, switch to it
                     CurrentSpellIndex = i;
 
-                    // Force update if needed
+                    // Force immediate update if spell instance is dirty
                     if (m_currentSpellInstanceDirty)
                     {
                         UpdateCurrentSpellInstance();

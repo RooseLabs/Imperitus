@@ -128,6 +128,8 @@ namespace RooseLabs.Gameplay.Notebook
             {
                 StartContinuousProximityCheck();
             }
+
+            AddRandomUncollectedRune(true);
         }
 
         public override void OnStopClient()
@@ -248,7 +250,7 @@ namespace RooseLabs.Gameplay.Notebook
         /// Adds a random uncollected rune to this player's collection.
         /// Useful for testing or special game events.
         /// </summary>
-        public void AddRandomUncollectedRune()
+        public void AddRandomUncollectedRune(bool all = false)
         {
             // Get list of uncollected rune indices
             List<int> uncollectedIndices = new List<int>();
@@ -268,13 +270,24 @@ namespace RooseLabs.Gameplay.Notebook
                 return;
             }
 
-            // Pick a random uncollected rune and add it
-            int randomIndex = Random.Range(0, uncollectedIndices.Count);
-            int runeIndexToAdd = uncollectedIndices[randomIndex];
+            // If 'all' is true, collect all uncollected runes
+            if (all)
+            {
+                foreach (int runeIndex in uncollectedIndices)
+                {
+                    CollectRune(runeIndex);
+                }
+                this.LogInfo($"Added all uncollected runes: {uncollectedIndices.Count} runes added");
+                return;
+            } else
+            {
+                // Pick a random uncollected rune and add it
+                int randomIndex = Random.Range(0, uncollectedIndices.Count);
+                int runeIndexToAdd = uncollectedIndices[randomIndex];
 
-            CollectRune(runeIndexToAdd);
-
-            this.LogInfo($"Added random rune: {GameManager.Instance.RuneDatabase[runeIndexToAdd].name}");
+                CollectRune(runeIndexToAdd);
+                this.LogInfo($"Added random rune: {GameManager.Instance.RuneDatabase[runeIndexToAdd].name}");
+            }
         }
 
         /// <summary>
