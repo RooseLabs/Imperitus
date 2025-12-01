@@ -140,6 +140,7 @@ namespace RooseLabs.Player.Customization
             // Add Image component (this will display the icon)
             Image buttonImage = buttonObj.AddComponent<Image>();
             buttonImage.sprite = item.icon;
+            buttonImage.useSpriteMesh = true;
             buttonImage.preserveAspect = true;
 
             // Add Button component
