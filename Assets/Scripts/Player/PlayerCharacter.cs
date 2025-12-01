@@ -198,20 +198,26 @@ namespace RooseLabs.Player
             {
                 ResetState_ObserversRPC();
             }
-            else
+            else if (IsOwner)
             {
                 ResetState_ServerRPC();
+                ResetState_Internal();
             }
         }
 
-        [ServerRpc(RequireOwnership = false)]
+        [ServerRpc(RequireOwnership = true)]
         private void ResetState_ServerRPC()
         {
             ResetState_ObserversRPC();
         }
 
-        [ObserversRpc]
+        [ObserversRpc(ExcludeOwner = true, ExcludeServer = true, RunLocally = true)]
         private void ResetState_ObserversRPC()
+        {
+            ResetState_Internal();
+        }
+
+        private void ResetState_Internal()
         {
             Data.Health = Data.MaxHealth;
             Data.Stamina = Data.MaxStamina;
@@ -224,8 +230,8 @@ namespace RooseLabs.Player
             if (IsOwner)
             {
                 CameraController.Instance.ResetPosition();
+                Wand.RemoveTemporarySpell();
             }
-
             // Reset the runes in the notebook
             Notebook.ResetNotebook();
         }

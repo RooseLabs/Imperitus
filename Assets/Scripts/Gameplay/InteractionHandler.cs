@@ -1,3 +1,4 @@
+using RooseLabs.Core;
 using RooseLabs.Gameplay.Interactables;
 using RooseLabs.Player;
 using RooseLabs.UI;
@@ -25,6 +26,11 @@ namespace RooseLabs.Gameplay
         {
             CurrentHovered = null;
             if (!PlayerCharacter.LocalCharacter) return;
+            if (!InputHandler.GameplayActions.enabled)
+            {
+                GUIManager.Instance.SetInteractionText(string.Empty);
+                return;
+            }
             if (CanInteract)
             {
                 FindBestInteractable();

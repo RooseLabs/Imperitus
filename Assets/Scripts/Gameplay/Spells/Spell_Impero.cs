@@ -222,7 +222,10 @@ namespace RooseLabs.Gameplay.Spells
                 return;
             }
 
-            Vector3 midPoint = castPos + character.Data.lookDirection * (dist * 0.5f);
+            Vector3 lookDir = CasterCharacter == PlayerCharacter.LocalCharacter
+                ? character.Data.lookDirection
+                : character.ModelTransform.forward;
+            Vector3 midPoint = castPos + lookDir * (dist * 0.5f);
 
             int numPoints = numSegments + 1;
             Vector3[] points = new Vector3[numPoints];
