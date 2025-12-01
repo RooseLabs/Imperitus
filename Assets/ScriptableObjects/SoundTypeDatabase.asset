@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3ce4f2cae46029644b502cb0d125aa0b, type: 3}
+  m_Name: SoundTypeDatabase
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.ScriptableObjects.SoundTypeDatabase
+  soundTypes:
+  - {fileID: 11400000, guid: 33e38525bf72b9c47906476556cf6b11, type: 2}
+  - {fileID: 11400000, guid: 64fc0e7fe7c7e8440aca02ddc5dec609, type: 2}
+  - {fileID: 11400000, guid: 4c9c40f51a13a7249a98a753346b8743, type: 2}
+  - {fileID: 11400000, guid: ba721dd56b8fcb54a86a42331ad37b18, type: 2}

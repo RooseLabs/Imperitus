@@ -127,8 +127,8 @@ namespace RooseLabs.Player
             {
                 m_soundEmitter.RequestEmitFromClient(soundIndex);
 
-                float interval = m_character.Data.IsSprinting ? 0.1f :
-                                 m_character.Data.IsCrouching ? 0.5f : 0.4f;
+                float interval = m_character.Data.IsSprinting ? 0.3f :
+                                 m_character.Data.IsCrouching ? 0.7f : 0.55f;
                 m_nextFootstepTime = Time.time + interval;
             }
         }
