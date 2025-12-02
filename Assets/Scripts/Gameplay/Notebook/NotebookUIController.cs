@@ -530,7 +530,7 @@ namespace RooseLabs.Gameplay.Notebook
                     nameLabel.transform.SetParent(slotTransform, false);
 
                     TextMeshProUGUI nameText = nameLabel.AddComponent<TextMeshProUGUI>();
-                    nameText.text = borrowedRune.ownerName; 
+                    nameText.text = borrowedRune.ownerName;
                     nameText.fontSize = 30;
                     nameText.color = Color.white;
                     nameText.alignment = TextAlignmentOptions.Center;
@@ -812,6 +812,8 @@ namespace RooseLabs.Gameplay.Notebook
 
         private void RefreshSpellsPage()
         {
+            Debug.Log("[NotebookUI] Refreshing spells page");
+
             if (m_localPlayerNotebook == null || spellsContainer == null)
                 return;
 
@@ -823,16 +825,28 @@ namespace RooseLabs.Gameplay.Notebook
 
             List<SpellSO> equippedSpells = m_localPlayerNotebook.GetEquippedSpells();
 
+            Debug.Log("Equipped Spells Count: " + equippedSpells.Count);
+
             // Populate equipped spells
             foreach (SpellSO spell in equippedSpells)
             {
                 if (spellSlotPrefab == null)
                     continue;
 
+                Debug.Log("[NotebookUI] Creating spell slot for spell: " + spell.Name);
+
                 GameObject spellSlot = Instantiate(spellSlotPrefab, spellsContainer);
 
                 // Find the runes container within the spell slot prefab
                 Transform runesTransform = spellSlot.transform.Find("Runes");
+                if (runesTransform.TryGetComponent<Toggle>(out var spellToggle))
+                {
+                    spellToggle.onValueChanged.AddListener(isOn =>
+                    {
+                        Debug.Log("[NotebookUI] Spell toggle changed: " + spell.Name + " is now " + (isOn ? "ON" : "OFF"));
+                    });
+                }
+
                 if (runesTransform != null && spell.Runes != null)
                 {
                     // Create rune icons for this spell

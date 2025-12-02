@@ -1,11 +1,13 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using FishNet.Connection;
 using FishNet.Object;
+using NUnit.Framework;
 using RooseLabs.Player;
 using RooseLabs.ScriptableObjects;
 using RooseLabs.Utils;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -74,6 +76,11 @@ namespace RooseLabs.Gameplay.Notebook
         /// Invoked when toggled runes change, providing the actual RuneSO objects.
         /// </summary>
         public event Action<List<RuneSO>> OnToggledRuneObjectsChanged;
+
+        /// <summary>
+        /// Invoked when toggled spells change, providing the selected spells indices
+        /// </summary>
+        public event Action<List<int>> OnToggledSpellsChanged;
         #endregion
 
         #region Player-Specific Data
@@ -128,6 +135,8 @@ namespace RooseLabs.Gameplay.Notebook
             {
                 StartContinuousProximityCheck();
             }
+
+            AddRandomUncollectedRune(true);
         }
 
         public override void OnStopClient()
@@ -158,6 +167,7 @@ namespace RooseLabs.Gameplay.Notebook
                 foreach (int spellIndex in GameManager.Instance.LearnedSpellsIndices)
                 {
                     m_spellLoadout.equippedSpellIndices.Add(spellIndex);
+
                 }
 
                 this.LogInfo($"Initialized with {m_spellLoadout.equippedSpellIndices.Count} learned spells");
@@ -196,8 +206,11 @@ namespace RooseLabs.Gameplay.Notebook
             if (GameManager.Instance == null)
                 return spells;
 
-            foreach (int spellIndex in m_spellLoadout.equippedSpellIndices)
+            var merged = m_spellLoadout.equippedSpellIndices.Union(GameManager.Instance.LearnedSpellsIndices).ToList();
+
+            foreach (int spellIndex in merged)
             {
+                Debug.Log("Equipped Spell Name: " + GameManager.Instance.SpellDatabase[spellIndex].SpellInfo.Name);
                 if (spellIndex >= 0 && spellIndex < GameManager.Instance.SpellDatabase.Count)
                 {
                     spells.Add(GameManager.Instance.SpellDatabase[spellIndex].SpellInfo);
@@ -248,7 +261,7 @@ namespace RooseLabs.Gameplay.Notebook
         /// Adds a random uncollected rune to this player's collection.
         /// Useful for testing or special game events.
         /// </summary>
-        public void AddRandomUncollectedRune()
+        public void AddRandomUncollectedRune(bool all = false)
         {
             // Get list of uncollected rune indices
             List<int> uncollectedIndices = new List<int>();
@@ -268,13 +281,25 @@ namespace RooseLabs.Gameplay.Notebook
                 return;
             }
 
-            // Pick a random uncollected rune and add it
-            int randomIndex = Random.Range(0, uncollectedIndices.Count);
-            int runeIndexToAdd = uncollectedIndices[randomIndex];
+            // If 'all' is true, collect all uncollected runes
+            if (all)
+            {
+                foreach (int runeIndex in uncollectedIndices)
+                {
+                    CollectRune(runeIndex);
+                }
+                this.LogInfo($"Added all uncollected runes: {uncollectedIndices.Count} runes added");
+                return;
+            }
+            else
+            {
+                // Pick a random uncollected rune and add it
+                int randomIndex = Random.Range(0, uncollectedIndices.Count);
+                int runeIndexToAdd = uncollectedIndices[randomIndex];
 
-            CollectRune(runeIndexToAdd);
-
-            this.LogInfo($"Added random rune: {GameManager.Instance.RuneDatabase[runeIndexToAdd].name}");
+                CollectRune(runeIndexToAdd);
+                this.LogInfo($"Added random rune: {GameManager.Instance.RuneDatabase[runeIndexToAdd].name}");
+            }
         }
 
         /// <summary>

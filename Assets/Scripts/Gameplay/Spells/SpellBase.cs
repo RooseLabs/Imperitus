@@ -219,7 +219,7 @@ namespace RooseLabs.Gameplay.Spells
 
             if (successfulCast)
             {
-                GameManager.Instance.OnSpellCast(SpellInfo);
+                GameManager.Instance.OnSpellCast(SpellInfo.Signature);
             }
         }
 

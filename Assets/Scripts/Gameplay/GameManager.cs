@@ -8,6 +8,7 @@ using FishNet.Object;
 using FishNet.Object.Synchronizing;
 using GameKit.Dependencies.Utilities.Types;
 using RooseLabs.Gameplay.Notebook;
+using RooseLabs.Gameplay.Spells;
 using RooseLabs.ScriptableObjects;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -27,7 +28,7 @@ namespace RooseLabs.Gameplay
         [field: SerializeField] public TaskDatabase TaskDatabase { get; private set; }
         #endregion
 
-        public readonly SyncList<int> LearnedSpellsIndices = new();
+        public SyncList<int> LearnedSpellsIndices { get; } = new() { 0 };
 
         private HeistTimer m_heistTimer;
 
@@ -121,8 +122,9 @@ namespace RooseLabs.Gameplay
         }
 
         [ServerRpc(RequireOwnership = false)]
-        public void OnSpellCast(SpellSO spell)
+        public void OnSpellCast(int signature)
         {
+            SpellSO spell = SpellDatabase.GetSpellBySignature(signature).SpellInfo;
             foreach (var taskId in CurrentAssignment.tasks)
             {
                 var task = TaskDatabase[taskId];
