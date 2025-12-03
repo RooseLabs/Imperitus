@@ -48,6 +48,10 @@ namespace RooseLabs.Enemies
         public float reinforcementSearchRadius = 50f;
         public int maxReinforcementsToCall = 3;
         public float trackingSpeed = 1.5f;
+        [Tooltip("How often to send position updates to alerted Hanaduras (seconds)")]
+        public float reinforcementUpdateInterval = 1f;
+        private float reinforcementUpdateTimer = 0f;
+        private List<HanaduraAI> alertedHanaduras = new List<HanaduraAI>();
 
         [Header("Alert Visual")]
         public Color normalSpotlightColor = Color.white;
@@ -220,12 +224,20 @@ namespace RooseLabs.Enemies
             // Server logic only
             detectionTimer -= Time.deltaTime;
             reinforcementTimer -= Time.deltaTime;
+            reinforcementUpdateTimer -= Time.deltaTime;
 
             // Periodic detection check
             if (detectionTimer <= 0f)
             {
                 detectionTimer = detectionCheckInterval;
                 CheckSpotlightDetection();
+            }
+
+            // Send position updates to alerted Hanaduras
+            if (reinforcementUpdateTimer <= 0f)
+            {
+                reinforcementUpdateTimer = reinforcementUpdateInterval;
+                UpdateAlertedHanaduras();
             }
 
             // Tick current state
@@ -421,7 +433,6 @@ namespace RooseLabs.Enemies
         {
             if (!base.IsServerInitialized)
             {
-                //Debug.LogWarning("[GrimoireAI] Tried to call reinforcements on client - ignored");
                 return;
             }
 
@@ -440,7 +451,6 @@ namespace RooseLabs.Enemies
 
             if (availableHanaduras.Count == 0)
             {
-                //Debug.Log("[GrimoireAI] No Hanadura reinforcements found nearby");
                 return;
             }
 
@@ -452,6 +462,8 @@ namespace RooseLabs.Enemies
                 return distA.CompareTo(distB);
             });
 
+            alertedHanaduras.Clear();
+
             int called = 0;
             foreach (HanaduraAI hanadura in availableHanaduras)
             {
@@ -460,20 +472,49 @@ namespace RooseLabs.Enemies
                 if (detectedPlayer != null)
                 {
                     hanadura.AlertToPosition(detectedPlayer.position);
+                    alertedHanaduras.Add(hanadura);
                     called++;
-                }   
+                }
             }
 
             if (detectedPlayer != null && EnemySpawnManager.Instance != null)
             {
                 EnemySpawnManager.Instance.OnGrimoireAlert(detectedPlayer.position);
-                //Debug.Log("[GrimoireAI] Notified spawn manager of alert");
             }
-
-            //Debug.Log($"[GrimoireAI] Called {called} Hanadura reinforcements!");
 
             // Notify all clients of reinforcement call
             RPC_PlayReinforcementCallEffect();
+        }
+
+        /// <summary>
+        /// Updates alerted Hanaduras with the current player position
+        /// </summary>
+        private void UpdateAlertedHanaduras()
+        {
+            if (!base.IsServerInitialized) return;
+
+            if (detectedPlayer == null || currentState is GrimoirePatrolState)
+            {
+                // Clear the list if we're not tracking anymore
+                if (alertedHanaduras.Count > 0)
+                {
+                    alertedHanaduras.Clear();
+                }
+                return;
+            }
+
+            // Remove any dead or null Hanaduras from the list
+            alertedHanaduras.RemoveAll(h => h == null || h.enemyData.IsDead);
+
+            // Send updated position to all alerted Hanaduras
+            foreach (HanaduraAI hanadura in alertedHanaduras)
+            {
+                if (hanadura != null && !hanadura.enemyData.IsDead)
+                {
+                    hanadura.AlertToPosition(detectedPlayer.position, detectedPlayer);
+                    Debug.Log($"[GrimoireAI] Updated Hanadura {hanadura.gameObject.name} with new player position.");
+                }
+            }
         }
 
         #endregion

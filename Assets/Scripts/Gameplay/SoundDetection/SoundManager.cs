@@ -450,7 +450,7 @@ namespace RooseLabs
             pooled.isPlaying = true;
             pooled.playStartTime = Time.time;
 
-            Debug.Log($"Playing 3D sound '{soundType.key}' at {position}");
+            //Debug.Log($"Playing 3D sound '{soundType.key}' at {position}");
         }
 
         /// <summary>
