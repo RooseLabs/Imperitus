@@ -109,6 +109,11 @@ namespace RooseLabs.Gameplay
                     GenerateNewAssignment();
                 }
             }
+
+            if (NotebookManager.Instance != null)
+            {
+                NotebookManager.Instance.UnlockSpellLoadout();
+            }
         }
 
         private void GenerateNewAssignment()

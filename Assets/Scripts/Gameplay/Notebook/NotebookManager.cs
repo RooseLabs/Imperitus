@@ -17,6 +17,9 @@ namespace RooseLabs.Gameplay.Notebook
         #region Events
         /// <summary>Invoked when assignment data is initialized or changed</summary>
         public event Action OnAssignmentDataChanged;
+
+        /// <summary>Invoked when spell loadout lock state changes</summary>
+        public event Action<bool> OnSpellLoadoutLockChanged;
         #endregion
 
         #region Network Synced Data
@@ -25,6 +28,12 @@ namespace RooseLabs.Gameplay.Notebook
         /// Clients will automatically receive updates through FishNet's SyncVar system.
         /// </summary>
         private readonly SyncVar<AssignmentData> m_networkAssignment = new();
+
+        /// <summary>
+        /// Network-synchronized spell loadout lock state.
+        /// When true, players cannot modify their spell selections.
+        /// </summary>
+        private readonly SyncVar<bool> m_spellLoadoutLocked = new(new SyncTypeSettings(WritePermission.ServerOnly));
         #endregion
 
         #region Assignment Data
@@ -47,6 +56,7 @@ namespace RooseLabs.Gameplay.Notebook
 
             // Subscribe to SyncVar changes
             m_networkAssignment.OnChange += OnAssignmentSynced;
+            m_spellLoadoutLocked.OnChange += OnSpellLoadoutLockSynced;
         }
 
         public override void OnStopNetwork()
@@ -55,6 +65,7 @@ namespace RooseLabs.Gameplay.Notebook
 
             // Unsubscribe from SyncVar changes
             m_networkAssignment.OnChange -= OnAssignmentSynced;
+            m_spellLoadoutLocked.OnChange -= OnSpellLoadoutLockSynced;
         }
 
         public override void OnStartClient()
@@ -65,6 +76,9 @@ namespace RooseLabs.Gameplay.Notebook
             {
                 // Get assignment data from the synced variable
                 m_assignmentData = m_networkAssignment.Value;
+
+                // Notify about initial lock state
+                OnSpellLoadoutLockChanged?.Invoke(m_spellLoadoutLocked.Value);
             }
         }
 
@@ -82,12 +96,10 @@ namespace RooseLabs.Gameplay.Notebook
             }
 
             m_networkAssignment.Value = assignmentData;
-
             // Also set it locally on the server
             m_assignmentData = assignmentData;
 
             this.LogInfo($"Assignment {assignmentData.assignmentNumber} initialized with {assignmentData.tasks.Count} tasks");
-
             OnAssignmentDataChanged?.Invoke();
         }
 
@@ -101,6 +113,65 @@ namespace RooseLabs.Gameplay.Notebook
         }
         #endregion
 
+        #region Spell Loadout Lock Management
+
+        /// <summary>
+        /// Gets whether the spell loadout is currently locked.
+        /// </summary>
+        public bool IsSpellLoadoutLocked => m_spellLoadoutLocked.Value;
+
+        /// <summary>
+        /// Locks the spell loadout for all players (SERVER ONLY).
+        /// </summary>
+        [Server]
+        public void LockSpellLoadout()
+        {
+            if (!IsServerInitialized)
+            {
+                this.LogError("LockSpellLoadout called but server is not initialized!");
+                return;
+            }
+
+            if (m_spellLoadoutLocked.Value)
+            {
+                this.LogWarning("Spell loadout is already locked");
+                return;
+            }
+
+            m_spellLoadoutLocked.Value = true;
+            this.LogInfo("Spell loadout locked for all players");
+
+            // Invoke locally on server
+            OnSpellLoadoutLockChanged?.Invoke(true);
+        }
+
+        /// <summary>
+        /// Unlocks the spell loadout for all players (SERVER ONLY).
+        /// </summary>
+        [Server]
+        public void UnlockSpellLoadout()
+        {
+            if (!IsServerInitialized)
+            {
+                this.LogError("UnlockSpellLoadout called but server is not initialized!");
+                return;
+            }
+
+            if (!m_spellLoadoutLocked.Value)
+            {
+                this.LogWarning("Spell loadout is already unlocked");
+                return;
+            }
+
+            m_spellLoadoutLocked.Value = false;
+            this.LogInfo("Spell loadout unlocked for all players");
+
+            // Invoke locally on server
+            OnSpellLoadoutLockChanged?.Invoke(false);
+        }
+
+        #endregion
+
         #region SyncVar Callbacks
         /// <summary>
         /// Called automatically by FishNet when m_networkAssignment changes.
@@ -110,8 +181,19 @@ namespace RooseLabs.Gameplay.Notebook
             if (asServer) return;
 
             this.LogInfo("Received assignment sync from server");
-            // ConvertNetworkDataToLocal(next);
+            m_assignmentData = next;
             OnAssignmentDataChanged?.Invoke();
+        }
+
+        /// <summary>
+        /// Called automatically by FishNet when m_spellLoadoutLocked changes.
+        /// </summary>
+        private void OnSpellLoadoutLockSynced(bool prev, bool next, bool asServer)
+        {
+            if (asServer) return;
+
+            this.LogInfo($"Received spell loadout lock sync from server: {next}");
+            OnSpellLoadoutLockChanged?.Invoke(next);
         }
         #endregion
     }

@@ -34,6 +34,13 @@ namespace RooseLabs.Gameplay.Notebook
         [SerializeField] private Transform spellsContainer;
         [SerializeField] private GameObject spellSlotPrefab;
 
+        [Header("Spell Toggle Visual Settings")]
+        [SerializeField] private Color spellToggledColor = new Color(1f, 1f, 1f, 1f); // White/full opacity when toggled
+        [SerializeField] private Color spellUntoggledColor = new Color(0.5f, 0.5f, 0.5f, 0.5f); // Gray/semi-transparent when not toggled
+
+        [Header("Spell Loadout Lock")]
+        [SerializeField] private Color spellLockedOverlayColor = new Color(0.3f, 0.3f, 0.3f, 0.3f); // Dark overlay when locked
+
         private enum NotebookTab
         {
             Assignment,
@@ -51,13 +58,13 @@ namespace RooseLabs.Gameplay.Notebook
 
         private void OnEnable()
         {
-            Debug.Log("[NotebookUI] OnEnable called!");
+            //Debug.Log("[NotebookUI] OnEnable called!");
 
             // Get reference to local player's notebook
             m_localPlayerNotebook = PlayerNotebook.GetLocalPlayerNotebook();
             if (m_localPlayerNotebook == null)
             {
-                Debug.LogError("[NotebookUI] Could not find local player notebook!");
+                //Debug.LogError("[NotebookUI] Could not find local player notebook!");
                 return;
             }
 
@@ -65,6 +72,7 @@ namespace RooseLabs.Gameplay.Notebook
             if (NotebookManager.Instance != null)
             {
                 NotebookManager.Instance.OnAssignmentDataChanged += RefreshAssignmentPage;
+                NotebookManager.Instance.OnSpellLoadoutLockChanged += OnSpellLoadoutLockChanged; // Add this
             }
 
             if (m_localPlayerNotebook != null)
@@ -82,12 +90,13 @@ namespace RooseLabs.Gameplay.Notebook
 
         private void OnDisable()
         {
-            Debug.Log("[NotebookUI] OnDisable called!");
+            //Debug.Log("[NotebookUI] OnDisable called!");
 
             // Unsubscribe from events
             if (NotebookManager.Instance != null)
             {
                 NotebookManager.Instance.OnAssignmentDataChanged -= RefreshAssignmentPage;
+                NotebookManager.Instance.OnSpellLoadoutLockChanged -= OnSpellLoadoutLockChanged; // Add this
             }
 
             if (m_localPlayerNotebook != null)
@@ -104,7 +113,7 @@ namespace RooseLabs.Gameplay.Notebook
         /// </summary>
         public void ShowAssignmentTab()
         {
-            Debug.Log("[NotebookUI] ShowAssignmentTab called via Unity Event");
+            //Debug.Log("[NotebookUI] ShowAssignmentTab called via Unity Event");
             SwitchTab(NotebookTab.Assignment);
         }
 
@@ -113,7 +122,7 @@ namespace RooseLabs.Gameplay.Notebook
         /// </summary>
         public void ShowRunesTab()
         {
-            Debug.Log("[NotebookUI] ShowRunesTab called via Unity Event");
+            //Debug.Log("[NotebookUI] ShowRunesTab called via Unity Event");
 
             // Request proximity check when opening runes page (for OnDemand mode)
             if (m_localPlayerNotebook != null)
@@ -129,7 +138,7 @@ namespace RooseLabs.Gameplay.Notebook
         /// </summary>
         public void ShowSpellsTab()
         {
-            Debug.Log("[NotebookUI] ShowSpellsTab called via Unity Event");
+            //Debug.Log("[NotebookUI] ShowSpellsTab called via Unity Event");
             SwitchTab(NotebookTab.Spells);
         }
 
@@ -159,7 +168,7 @@ namespace RooseLabs.Gameplay.Notebook
 
         private void SwitchTab(NotebookTab tab)
         {
-            Debug.Log($"[NotebookUI] Switching to tab: {tab}");
+            //Debug.Log($"[NotebookUI] Switching to tab: {tab}");
             m_currentTab = tab;
 
             // Hide all pages
@@ -197,7 +206,7 @@ namespace RooseLabs.Gameplay.Notebook
             var assignmentData = NotebookManager.Instance.GetCurrentAssignment();
             if (assignmentData == null)
             {
-                Debug.LogWarning("[NotebookUI] No assignment data available");
+                //Debug.LogWarning("[NotebookUI] No assignment data available");
                 return;
             }
 
@@ -255,7 +264,7 @@ namespace RooseLabs.Gameplay.Notebook
                 }
             }
 
-            Debug.Log($"[NotebookUI] Assignment page refreshed with {assignmentData.tasks.Count} tasks");
+            //Debug.Log($"[NotebookUI] Assignment page refreshed with {assignmentData.tasks.Count} tasks");
         }
 
         #endregion
@@ -292,7 +301,7 @@ namespace RooseLabs.Gameplay.Notebook
                 }
             }
 
-            Debug.Log($"[NotebookUI] Initialized {slotCount} rune slots");
+            //Debug.Log($"[NotebookUI] Initialized {slotCount} rune slots");
         }
 
         /// <summary>
@@ -405,7 +414,7 @@ namespace RooseLabs.Gameplay.Notebook
             // Display borrowed runes (this will now re-enable slots that were disabled)
             DisplayBorrowedRunes();
 
-            Debug.Log($"[NotebookUI] Runes page refreshed with {collectedRunes.Count} collected runes");
+            //Debug.Log($"[NotebookUI] Runes page refreshed with {collectedRunes.Count} collected runes");
         }
 
         /// <summary>
@@ -426,7 +435,7 @@ namespace RooseLabs.Gameplay.Notebook
                 UpdateRuneToggleVisual(slotObject, m_localPlayerNotebook.IsRuneToggled(runeIndex));
             }
 
-            Debug.Log($"[NotebookUI] Rune {runeIndex} clicked");
+            //Debug.Log($"[NotebookUI] Rune {runeIndex} clicked");
         }
 
         /// <summary>
@@ -547,7 +556,7 @@ namespace RooseLabs.Gameplay.Notebook
                 }
             }
 
-            Debug.Log($"[NotebookUI] Displayed {borrowedRunes.Count} borrowed runes");
+            //Debug.Log($"[NotebookUI] Displayed {borrowedRunes.Count} borrowed runes");
         }
 
         /// <summary>
@@ -629,7 +638,7 @@ namespace RooseLabs.Gameplay.Notebook
                 }
             }
 
-            Debug.Log($"[NotebookUI] New rune collected and placed in slot {slotIndex}");
+            //Debug.Log($"[NotebookUI] New rune collected and placed in slot {slotIndex}");
         }
 
         /// <summary>
@@ -803,7 +812,7 @@ namespace RooseLabs.Gameplay.Notebook
                 }
             }
 
-            Debug.Log($"[NotebookUI] Borrowed runes updated incrementally");
+            //Debug.Log($"[NotebookUI] Borrowed runes updated incrementally");
         }
 
         #endregion
@@ -812,7 +821,7 @@ namespace RooseLabs.Gameplay.Notebook
 
         private void RefreshSpellsPage()
         {
-            Debug.Log("[NotebookUI] Refreshing spells page");
+            //Debug.Log("[NotebookUI] Refreshing spells page");
 
             if (m_localPlayerNotebook == null || spellsContainer == null)
                 return;
@@ -825,7 +834,10 @@ namespace RooseLabs.Gameplay.Notebook
 
             List<SpellSO> equippedSpells = m_localPlayerNotebook.GetEquippedSpells();
 
-            Debug.Log("Equipped Spells Count: " + equippedSpells.Count);
+            //Debug.Log("Equipped Spells Count: " + equippedSpells.Count);
+
+            // Get lock state from NotebookManager
+            bool isLocked = NotebookManager.Instance != null && NotebookManager.Instance.IsSpellLoadoutLocked;
 
             // Populate equipped spells
             foreach (SpellSO spell in equippedSpells)
@@ -833,19 +845,50 @@ namespace RooseLabs.Gameplay.Notebook
                 if (spellSlotPrefab == null)
                     continue;
 
-                Debug.Log("[NotebookUI] Creating spell slot for spell: " + spell.Name);
+                //Debug.Log("[NotebookUI] Creating spell slot for spell: " + spell.Name);
 
                 GameObject spellSlot = Instantiate(spellSlotPrefab, spellsContainer);
 
+                // Get the spell index
+                int spellIndex = GameManager.Instance.SpellDatabase.FindIndex(s => s.SpellInfo == spell);
+
+                // Find the toggle component within the spell slot prefab
+                Toggle spellToggle = spellSlot.GetComponent<Toggle>();
+                if (spellToggle == null)
+                {
+                    spellToggle = spellSlot.GetComponentInChildren<Toggle>();
+                }
+
+                if (spellToggle != null)
+                {
+                    // Set initial toggle state
+                    bool isToggled = m_localPlayerNotebook.IsSpellToggled(spellIndex);
+                    spellToggle.isOn = isToggled;
+
+                    // Apply initial visual state
+                    UpdateSpellToggleVisual(spellSlot, isToggled, spellIndex == 0);
+
+                    // Disable toggle for Impero (index 0) or if loadout is locked
+                    if (spellIndex == 0)
+                    {
+                        spellToggle.interactable = false;
+                        spellToggle.isOn = true; // Impero is always on
+                    }
+                    else
+                    {
+                        spellToggle.interactable = !isLocked; // Disable if locked
+
+                        // Add listener for toggle changes
+                        int capturedSpellIndex = spellIndex; // Capture for closure
+                        spellToggle.onValueChanged.AddListener(isOn =>
+                        {
+                            OnSpellToggleChanged(capturedSpellIndex, isOn, spellSlot);
+                        });
+                    }
+                }
+
                 // Find the runes container within the spell slot prefab
                 Transform runesTransform = spellSlot.transform.Find("Runes");
-                if (runesTransform.TryGetComponent<Toggle>(out var spellToggle))
-                {
-                    spellToggle.onValueChanged.AddListener(isOn =>
-                    {
-                        Debug.Log("[NotebookUI] Spell toggle changed: " + spell.Name + " is now " + (isOn ? "ON" : "OFF"));
-                    });
-                }
 
                 if (runesTransform != null && spell.Runes != null)
                 {
@@ -862,7 +905,200 @@ namespace RooseLabs.Gameplay.Notebook
                 }
             }
 
-            Debug.Log($"[NotebookUI] Spells page refreshed with {equippedSpells.Count} spells");
+            //Debug.Log($"[NotebookUI] Spells page refreshed with {equippedSpells.Count} spells (Locked: {isLocked})");
+        }
+
+        /// <summary>
+        /// Called when a spell toggle is changed in the UI.
+        /// </summary>
+        private void OnSpellToggleChanged(int spellIndex, bool isOn, GameObject spellSlot)
+        {
+            if (m_localPlayerNotebook == null)
+                return;
+
+            // If trying to toggle on
+            if (isOn)
+            {
+                bool success = m_localPlayerNotebook.ToggleSpell(spellIndex);
+
+                // If toggle failed (limit reached or locked), revert the UI toggle
+                if (!success)
+                {
+                    Toggle toggle = spellSlot.GetComponent<Toggle>();
+                    if (toggle == null)
+                        toggle = spellSlot.GetComponentInChildren<Toggle>();
+
+                    if (toggle != null)
+                    {
+                        // Temporarily remove listener to avoid recursive calls
+                        toggle.onValueChanged.RemoveAllListeners();
+                        toggle.isOn = false;
+
+                        // Re-add listener
+                        toggle.onValueChanged.AddListener(on => OnSpellToggleChanged(spellIndex, on, spellSlot));
+
+                        // Update visual to show it's not toggled
+                        UpdateSpellToggleVisual(spellSlot, false, false);
+                    }
+
+                    //Debug.Log($"[NotebookUI] Failed to toggle spell {spellIndex}");
+                    return;
+                }
+
+                // Update visual to show it's toggled
+                UpdateSpellToggleVisual(spellSlot, true, false);
+            }
+            else
+            {
+                // Toggle off
+                m_localPlayerNotebook.ToggleSpell(spellIndex);
+
+                // Update visual to show it's not toggled
+                UpdateSpellToggleVisual(spellSlot, false, false);
+            }
+
+            //Debug.Log($"[NotebookUI] Spell {spellIndex} toggle changed to {isOn}");
+        }
+
+        /// <summary>
+        /// Updates the visual state of a spell slot to show if it's toggled.
+        /// </summary>
+        /// <param name="spellSlot">The spell slot GameObject</param>
+        /// <param name="isToggled">Whether the spell is toggled on</param>
+        /// <param name="isImpero">Whether this is the Impero spell (always on)</param>
+        private void UpdateSpellToggleVisual(GameObject spellSlot, bool isToggled, bool isImpero)
+        {
+            // Find all Image components in the spell slot (including runes)
+            Image[] images = spellSlot.GetComponentsInChildren<Image>();
+
+            Color targetColor = isToggled ? spellToggledColor : spellUntoggledColor;
+
+            // If it's Impero, always use toggled color since it's always active
+            if (isImpero)
+            {
+                targetColor = spellToggledColor;
+            }
+
+            foreach (Image img in images)
+            {
+                // Skip the Toggle's background/checkmark images if you want to keep them unchanged
+                if (img.gameObject.name == "Background" || img.gameObject.name == "Checkmark")
+                    continue;
+
+                img.color = targetColor;
+            }
+        }
+
+        /// <summary>
+        /// Helper method to get spell index from a spell slot transform.
+        /// </summary>
+        private int GetSpellIndexFromToggle(Transform spellSlot)
+        {
+            int siblingIndex = spellSlot.GetSiblingIndex();
+            List<SpellSO> equippedSpells = m_localPlayerNotebook.GetEquippedSpells();
+
+            if (siblingIndex >= 0 && siblingIndex < equippedSpells.Count)
+            {
+                SpellSO spell = equippedSpells[siblingIndex];
+                return GameManager.Instance.SpellDatabase.FindIndex(s => s.SpellInfo == spell);
+            }
+
+            return -1;
+        }
+
+        #endregion
+
+        #region Spell Loadout Lock
+
+        /// <summary>
+        /// Called when the spell loadout lock state changes.
+        /// </summary>
+        private void OnSpellLoadoutLockChanged(bool isLocked)
+        {
+            UpdateSpellTogglesInteractivity(isLocked);
+        }
+
+        /// <summary>
+        /// Updates the interactivity of spell toggles based on lock state.
+        /// </summary>
+        private void UpdateSpellTogglesInteractivity(bool isLocked)
+        {
+            if (spellsContainer == null)
+                return;
+
+            foreach (Transform child in spellsContainer)
+            {
+                Toggle toggle = child.GetComponent<Toggle>();
+                if (toggle == null)
+                    toggle = child.GetComponentInChildren<Toggle>();
+
+                if (toggle != null)
+                {
+                    // Get spell index to check if it's Impero
+                    int spellIndex = GetSpellIndexFromToggle(child);
+
+                    // Impero should always be non-interactable (it's always on)
+                    if (spellIndex == 0)
+                    {
+                        toggle.interactable = false;
+                    }
+                    else
+                    {
+                        // Other spells are interactable only when unlocked
+                        toggle.interactable = !isLocked;
+                    }
+                }
+
+                // Add visual overlay when locked
+                if (isLocked)
+                {
+                    AddLockedOverlay(child.gameObject);
+                }
+                else
+                {
+                    RemoveLockedOverlay(child.gameObject);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Adds a visual overlay to indicate the spell is locked.
+        /// </summary>
+        private void AddLockedOverlay(GameObject spellSlot)
+        {
+            // Check if overlay already exists
+            Transform existingOverlay = spellSlot.transform.Find("LockedOverlay");
+            if (existingOverlay != null)
+                return;
+
+            // Create overlay
+            GameObject overlay = new GameObject("LockedOverlay");
+            overlay.transform.SetParent(spellSlot.transform, false);
+
+            Image overlayImage = overlay.AddComponent<Image>();
+            overlayImage.color = spellLockedOverlayColor;
+
+            // Set RectTransform to fill parent
+            RectTransform rectTransform = overlay.GetComponent<RectTransform>();
+            rectTransform.anchorMin = Vector2.zero;
+            rectTransform.anchorMax = Vector2.one;
+            rectTransform.sizeDelta = Vector2.zero;
+            rectTransform.anchoredPosition = Vector2.zero;
+
+            // Make sure overlay is on top
+            overlay.transform.SetAsLastSibling();
+        }
+
+        /// <summary>
+        /// Removes the locked overlay from a spell slot.
+        /// </summary>
+        private void RemoveLockedOverlay(GameObject spellSlot)
+        {
+            Transform existingOverlay = spellSlot.transform.Find("LockedOverlay");
+            if (existingOverlay != null)
+            {
+                Destroy(existingOverlay.gameObject);
+            }
         }
 
         #endregion

@@ -105,7 +105,16 @@ namespace RooseLabs.Gameplay.Notebook
         /// Set of rune indices that are currently toggled/selected by the player.
         /// </summary>
         private readonly HashSet<int> m_toggledRunes = new();
+
+        /// <summary>
+        /// Set of spell indices that are currently toggled/selected by the player.
+        /// Note: Impero (index 0) is always implicitly included and cannot be toggled off.
+        /// </summary>
+        private readonly HashSet<int> m_toggledSpells = new();
         #endregion
+
+        private const int MAX_TOGGLED_SPELLS = 3;
+        private const int IMPERO_SPELL_INDEX = 0;
 
         #region Coroutines
         private Coroutine m_continuousCheckCoroutine;
@@ -210,7 +219,7 @@ namespace RooseLabs.Gameplay.Notebook
 
             foreach (int spellIndex in merged)
             {
-                Debug.Log("Equipped Spell Name: " + GameManager.Instance.SpellDatabase[spellIndex].SpellInfo.Name);
+                //Debug.Log("Equipped Spell Name: " + GameManager.Instance.SpellDatabase[spellIndex].SpellInfo.Name);
                 if (spellIndex >= 0 && spellIndex < GameManager.Instance.SpellDatabase.Count)
                 {
                     spells.Add(GameManager.Instance.SpellDatabase[spellIndex].SpellInfo);
@@ -654,6 +663,180 @@ namespace RooseLabs.Gameplay.Notebook
 
         #endregion
 
+        #region Spell Toggle Management
+
+        /// <summary>
+        /// Toggles a spell's selection state.
+        /// </summary>
+        /// <param name="spellIndex">The index of the spell to toggle</param>
+        /// <returns>True if toggle was successful, false if limit reached, locked, or spell is Impero</returns>
+        public bool ToggleSpell(int spellIndex)
+        {
+            // Check if loadout is locked via NotebookManager
+            if (NotebookManager.Instance != null && NotebookManager.Instance.IsSpellLoadoutLocked)
+            {
+                this.LogWarning("Cannot toggle spell - loadout is locked");
+                return false;
+            }
+
+            // Prevent toggling Impero (it's always active)
+            if (spellIndex == IMPERO_SPELL_INDEX)
+            {
+                this.LogWarning("Cannot toggle Impero spell - it's always active");
+                return false;
+            }
+
+            if (m_toggledSpells.Contains(spellIndex))
+            {
+                // Deselect spell
+                m_toggledSpells.Remove(spellIndex);
+                this.LogInfo($"Spell {spellIndex} deselected");
+
+                // Broadcast the change
+                OnToggledSpellsChanged?.Invoke(GetToggledSpellsWithImpero());
+                return true;
+            }
+            else
+            {
+                // Check if we've reached the limit
+                if (m_toggledSpells.Count >= MAX_TOGGLED_SPELLS)
+                {
+                    this.LogWarning($"Cannot select more than {MAX_TOGGLED_SPELLS} spells (excluding Impero)");
+                    return false;
+                }
+
+                // Select spell
+                m_toggledSpells.Add(spellIndex);
+                this.LogInfo($"Spell {spellIndex} selected");
+
+                // Broadcast the change
+                OnToggledSpellsChanged?.Invoke(GetToggledSpellsWithImpero());
+                return true;
+            }
+        }
+
+        /// <summary>
+        /// Gets all currently toggled spell indices, including Impero.
+        /// </summary>
+        private List<int> GetToggledSpellsWithImpero()
+        {
+            List<int> spells = new List<int> { IMPERO_SPELL_INDEX }; // Always include Impero
+            spells.AddRange(m_toggledSpells);
+            return spells;
+        }
+
+        /// <summary>
+        /// Gets all currently toggled spells (excluding Impero).
+        /// </summary>
+        public List<int> GetToggledSpells()
+        {
+            return new List<int>(m_toggledSpells);
+        }
+
+        /// <summary>
+        /// Gets all currently toggled spells including Impero.
+        /// </summary>
+        public List<int> GetAllActiveSpells()
+        {
+            return GetToggledSpellsWithImpero();
+        }
+
+        /// <summary>
+        /// Checks if a specific spell is toggled.
+        /// Note: Impero is always considered "toggled" (active).
+        /// </summary>
+        public bool IsSpellToggled(int spellIndex)
+        {
+            if (spellIndex == IMPERO_SPELL_INDEX)
+                return true; // Impero is always active
+
+            return m_toggledSpells.Contains(spellIndex);
+        }
+
+        /// <summary>
+        /// Checks if a specific SpellSO is toggled.
+        /// </summary>
+        public bool IsSpellToggled(SpellSO spell)
+        {
+            if (GameManager.Instance == null)
+                return false;
+
+            int spellIndex = GameManager.Instance.SpellDatabase.FindIndex(s => s.SpellInfo == spell);
+            return IsSpellToggled(spellIndex);
+        }
+
+        /// <summary>
+        /// Sets multiple spells as toggled. Used when loading from save or initializing.
+        /// </summary>
+        /// <param name="spellIndices">Spell indices to set as toggled (Impero will be added automatically)</param>
+        public void SetToggledSpells(List<int> spellIndices)
+        {
+            m_toggledSpells.Clear();
+
+            int count = 0;
+            foreach (int spellIndex in spellIndices)
+            {
+                // Skip Impero (it's always active)
+                if (spellIndex == IMPERO_SPELL_INDEX)
+                    continue;
+
+                // Respect the limit
+                if (count >= MAX_TOGGLED_SPELLS)
+                {
+                    this.LogWarning($"Cannot set more than {MAX_TOGGLED_SPELLS} spells (excluding Impero)");
+                    break;
+                }
+
+                m_toggledSpells.Add(spellIndex);
+                count++;
+            }
+
+            this.LogInfo($"Set {m_toggledSpells.Count} toggled spells");
+
+            // Broadcast the change
+            OnToggledSpellsChanged?.Invoke(GetToggledSpellsWithImpero());
+        }
+
+        /// <summary>
+        /// Clears all toggled spells except Impero.
+        /// </summary>
+        public void ClearToggledSpells()
+        {
+            m_toggledSpells.Clear();
+            OnToggledSpellsChanged?.Invoke(GetToggledSpellsWithImpero());
+            this.LogInfo("All spells deselected (Impero remains active)");
+        }
+
+        /// <summary>
+        /// Gets the actual SpellSO objects for toggled spells (including Impero).
+        /// </summary>
+        public List<SpellSO> GetToggledSpellObjects()
+        {
+            var toggledSpells = new List<SpellSO>();
+
+            if (GameManager.Instance == null)
+            {
+                this.LogWarning("GameManager.Instance is null, cannot get toggled spells");
+                return toggledSpells;
+            }
+
+            foreach (int spellIndex in GetToggledSpellsWithImpero())
+            {
+                if (spellIndex >= 0 && spellIndex < GameManager.Instance.SpellDatabase.Count)
+                {
+                    toggledSpells.Add(GameManager.Instance.SpellDatabase[spellIndex].SpellInfo);
+                }
+                else
+                {
+                    this.LogWarning($"Invalid toggled spell index: {spellIndex}");
+                }
+            }
+
+            return toggledSpells;
+        }
+
+        #endregion
+
         #region Utility Methods
 
         /// <summary>
@@ -676,6 +859,7 @@ namespace RooseLabs.Gameplay.Notebook
             m_runeCollection.collectedRuneIndices.Clear();
             m_borrowedRunes.Clear();
             m_toggledRunes.Clear();
+            m_toggledSpells.Clear();
             this.LogInfo("Player notebook reset");
         }
 

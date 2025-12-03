@@ -1,10 +1,11 @@
-using System.Collections.Generic;
-using System.Linq;
 using FishNet.Object;
 using RooseLabs.Enemies;
+using RooseLabs.Gameplay.Notebook;
 using RooseLabs.Network;
 using RooseLabs.ScriptableObjects;
 using RooseLabs.Utils;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace RooseLabs.Gameplay
@@ -51,6 +52,12 @@ namespace RooseLabs.Gameplay
             string selectedSceneName = GetSceneName(heistScenes[randomIndex]);
             SceneManagement.SceneManager.Instance.LoadScene(selectedSceneName);
             m_isEndingHeist = false;
+
+            // Lock spell loadouts for all players when heist starts
+            if (NotebookManager.Instance != null)
+            {
+                NotebookManager.Instance.LockSpellLoadout();
+            }
         }
 
         private void UpdateHeist()
@@ -105,6 +112,12 @@ namespace RooseLabs.Gameplay
                 player.ResetState();
             }
             SceneManagement.SceneManager.Instance.LoadScene(GetSceneName(lobbyScene));
+
+            // Unlock spell loadouts for all players when heist starts
+            if (NotebookManager.Instance != null)
+            {
+                NotebookManager.Instance.UnlockSpellLoadout();
+            }
         }
 
         private void SpawnHeistRuneContainerObjects()
