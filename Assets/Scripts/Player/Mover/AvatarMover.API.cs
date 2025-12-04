@@ -38,7 +38,7 @@ namespace RooseLabs.Player
         /// <param name="height"></param>
         public void SetColliderHeight(float height)
         {
-            if (_height == height) return;
+            if (Mathf.Approximately(_height, height)) return;
             _height = height;
             InitColliderDimensions();
         }

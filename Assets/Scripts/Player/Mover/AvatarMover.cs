@@ -88,7 +88,7 @@ namespace RooseLabs.Player
         private Vector3 _velocityGravity = Vector3.zero;
         private Vector3 _velocityHover = Vector3.zero;
         private Vector3 _velocityConstForce = Vector3.zero;
-        public Vector3 _velocityLeaveGround = Vector3.zero;
+        private Vector3 _velocityLeaveGround = Vector3.zero;
         private Vector3 _velocityInput = Vector3.zero;
 
         #endregion

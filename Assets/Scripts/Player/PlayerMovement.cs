@@ -18,7 +18,7 @@ namespace RooseLabs.Player
         [SerializeField] private float sprintSpeed = 5.00f; // Average speed from animation: 5.83f;
         [SerializeField] private float crouchSpeed = 0.75f; // Average speed from animation: 0.67f;
         [SerializeField] private float crawlSpeed  = 0.50f; // Average speed from animation: 0.25f;
-        [SerializeField] private float jumpHeight  = 0.50f;
+        [SerializeField] private float jumpHeight = 0.5f;
         [SerializeField] private float sprintStaminaUsage = 25f;
 
         [Header("Object Colliders")]
@@ -40,14 +40,15 @@ namespace RooseLabs.Player
         private float m_movementValue; // -1 to 1, where negative is backwards, positive is forwards, and 0 is idle
         private float m_lastVerticalInputSignal = 1f;
 
-        private bool m_jumpIsQueued;
-        private bool m_isJumping;
+        private const float Gravity = 9.81f;
+        private bool m_isJumping = false;
+        private float m_jumpVelocity = 0f;
 
         private bool m_isNearTable;
 
-        private int footstepIndex = -1;
-        private int runningIndex = -1;
-        private int crouchingIndex = -1;
+        private int m_footstepIndex = -1;
+        private int m_runningIndex = -1;
+        private int m_crouchingIndex = -1;
 
         private void Start()
         {
@@ -56,9 +57,9 @@ namespace RooseLabs.Player
             m_rigidbody = GetComponent<Rigidbody>();
             m_soundEmitter = GetComponent<SoundEmitter>();
 
-            footstepIndex = m_soundEmitter.availableSounds.FindIndex(s => s.type != null && s.type.key == "Footstep");
-            runningIndex = m_soundEmitter.availableSounds.FindIndex(s => s.type != null && s.type.key == "Running");
-            crouchingIndex = m_soundEmitter.availableSounds.FindIndex(s => s.type != null && s.type.key == "Crouching");
+            m_footstepIndex = m_soundEmitter.availableSounds.FindIndex(s => s.type != null && s.type.key == "Footstep");
+            m_runningIndex = m_soundEmitter.availableSounds.FindIndex(s => s.type != null && s.type.key == "Running");
+            m_crouchingIndex = m_soundEmitter.availableSounds.FindIndex(s => s.type != null && s.type.key == "Crouching");
         }
 
         private void Update()
@@ -82,11 +83,7 @@ namespace RooseLabs.Player
             if (m_character.Data.IsRagdollActive)
             {
                 m_character.Data.CurrentSpeed = 0.0f;
-                if (m_isJumping)
-                {
-                    m_avatarMover.EndLeaveGround();
-                    m_isJumping = false;
-                }
+                if (m_isJumping) EndJump();
                 return;
             }
 
@@ -97,29 +94,16 @@ namespace RooseLabs.Player
             Vector3 moveDirection = (lookRight * moveInput.x + lookForward * moveInput.y).normalized;
             Vector3 deltaMovement = moveDirection * m_character.Data.CurrentSpeed;
 
-            if (m_isJumping)
-            {
-                m_avatarMover.EndLeaveGround();
-                m_isJumping = false;
-            }
-            if (m_jumpIsQueued)
-            {
-                m_avatarMover.LeaveGround();
-                float jumpVelocity = Mathf.Sqrt(2f * jumpHeight * 9.81f);
-                m_avatarMover._velocityLeaveGround = m_avatarMover.Up * jumpVelocity;
-                m_isJumping = true;
-                m_jumpIsQueued = false;
-            }
-
-            m_avatarMover.Move(deltaMovement);
+            Vector3 velocityJump = UpdateJump(Time.deltaTime);
+            m_avatarMover.Move(deltaMovement + velocityJump);
 
             int soundIndex = -1;
             if (m_character.Data.IsSprinting)
-                soundIndex = runningIndex;
+                soundIndex = m_runningIndex;
             else if (m_character.Data.IsCrouching)
-                soundIndex = crouchingIndex;
+                soundIndex = m_crouchingIndex;
             else
-                soundIndex = footstepIndex;
+                soundIndex = m_footstepIndex;
 
             bool isMoving = m_character.Data.CurrentSpeed > 0.01f && m_movementValue != 0f && !m_character.Data.IsCrawling;
 
@@ -220,7 +204,7 @@ namespace RooseLabs.Player
 
             if (m_character.Input.jumpWasPressed && CanJump())
             {
-                m_jumpIsQueued = true;
+                StartJump(jumpHeight);
             }
 
             // Handle rotation
@@ -310,6 +294,37 @@ namespace RooseLabs.Player
         }
 
         private bool CanJump() => m_avatarMover.IsOnGround && !m_character.Data.IsCrouching && !m_character.Data.IsCrawling;
+
+        private void StartJump(float height)
+        {
+            m_jumpVelocity = Mathf.Sqrt(2f * Gravity * height);
+            m_isJumping = true;
+            m_avatarMover.LeaveGround();
+        }
+
+        private Vector3 UpdateJump(float deltaTime)
+        {
+            if (!m_isJumping) return Vector3.zero;
+
+            if (m_avatarMover.IsTouchingCeiling)
+            {
+                EndJump();
+                return Vector3.zero;
+            }
+
+            Vector3 velocityThisFrame = new Vector3(0f, m_jumpVelocity, 0f);
+            m_jumpVelocity -= Gravity * deltaTime;
+            if (m_jumpVelocity <= 0f) EndJump();
+
+            return velocityThisFrame;
+        }
+
+        private void EndJump()
+        {
+            m_isJumping = false;
+            m_jumpVelocity = 0f;
+            m_avatarMover.EndLeaveGround();
+        }
 
         public void SetNearTable(bool value)
         {
