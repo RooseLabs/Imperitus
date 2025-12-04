@@ -154,5 +154,17 @@ namespace RooseLabs.Network
                 return false;
             }
         }
+
+        public void Disconnect()
+        {
+            if (networkManager.IsServerStarted)
+            {
+                m_multipass.ClientTransport.StopConnection(true);
+            }
+            else
+            {
+                networkManager.ClientManager.StopConnection();
+            }
+        }
     }
 }

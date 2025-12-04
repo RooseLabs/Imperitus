@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using RooseLabs.ScriptableObjects;
+using RooseLabs.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,7 +11,7 @@ namespace RooseLabs.Player.Customization
     /// <summary>
     /// Manages the customization menu UI, displaying and filtering customization items.
     /// </summary>
-    public class CustomizationMenu : MonoBehaviour
+    public class CustomizationMenu : MonoBehaviour, IWindow
     {
         [Header("References")]
         [Tooltip("Database containing all available customization items.")]
@@ -50,7 +51,7 @@ namespace RooseLabs.Player.Customization
         {
             if (customizationManager == null)
             {
-                customizationManager = PlayerConnection.LocalPlayer.Character.GetComponentInChildren<PlayerCustomizationManager>();
+                customizationManager = PlayerCharacter.LocalCharacter.GetComponentInChildren<PlayerCustomizationManager>();
 
                 if (customizationManager == null)
                 {
@@ -59,13 +60,16 @@ namespace RooseLabs.Player.Customization
             }
         }
 
-        /// <summary>
-        /// Called when the menu is opened. Finds the local player and shows all items.
-        /// </summary>
-        public void OnMenuOpened()
+        public void Open()
         {
             FindCustomizationManager();
             ShowAllItems();
+            gameObject.SetActive(true);
+        }
+
+        public void Close()
+        {
+            gameObject.SetActive(false);
         }
 
         /// <summary>

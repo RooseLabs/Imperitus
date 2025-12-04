@@ -29,6 +29,8 @@ namespace RooseLabs.Gameplay
         [field: SerializeField] public TaskDatabase TaskDatabase { get; private set; }
         #endregion
 
+        public static bool IsSinglePlayer => NetworkConnector.Instance.CurrentSessionJoinCode == null;
+
         public SyncList<int> LearnedSpellsIndices { get; } = new() { 0 };
 
         private HeistTimer m_heistTimer;

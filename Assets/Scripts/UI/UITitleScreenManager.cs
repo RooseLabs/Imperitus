@@ -8,7 +8,7 @@ namespace RooseLabs.UI
 {
     public class UITitleScreenManager : MonoBehaviour
     {
-        [SerializeField] private UIMainMenuManager mainMenuPanel;
+        [SerializeField] private UIMainMenu mainMenuPanel;
         [SerializeField] private GameObject usernamePanel;
         [SerializeField] private TMP_Text currentUsernameGO;
         // [SerializeField] private UISettingsManager settingsPanel;
@@ -29,28 +29,28 @@ namespace RooseLabs.UI
 
         private void SubscribeToEvents()
         {
-            mainMenuPanel.HostLocalGameButtonAction += HostLocalGameButtonClicked;
-            mainMenuPanel.HostOnlineGameButtonAction += HostOnlineGameButtonClicked;
-            mainMenuPanel.JoinGameButtonAction += OpenJoinGameScreen;
-            mainMenuPanel.SettingsButtonAction += OpenSettingsScreen;
-            mainMenuPanel.CreditsButtonAction += OpenCreditsScreen;
-            mainMenuPanel.QuitGameButtonAction += QuitGame;
-            mainMenuPanel.UsernameButtonAction += OpenUsernameScreen;
-            mainMenuPanel.CloseUsernameAction += CloseUsernameScreen;
-            mainMenuPanel.SaveUsernameAction += SaveUsername;
+            mainMenuPanel.OnHostGameButtonPressed += OnHostGameButtonClicked;
+            mainMenuPanel.OnJoinGameButtonPressed += OpenJoinGameScreen;
+            mainMenuPanel.OnPlayOfflineButtonPressed += OnPlayOfflineButtonClicked;
+            mainMenuPanel.OnSettingsButtonPressed += OpenSettingsScreen;
+            mainMenuPanel.OnCreditsButtonPressed += OpenCreditsScreen;
+            mainMenuPanel.OnQuitGameButtonPressed += QuitGame;
+            mainMenuPanel.OnUsernameButtonPressed += OpenUsernameScreen;
+            mainMenuPanel.OnCloseUsernameButtonPressed += CloseUsernameScreen;
+            mainMenuPanel.OnSaveUsernameButtonPressed += SaveUsername;
         }
 
         private void UnsubscribeFromEvents()
         {
-            mainMenuPanel.HostLocalGameButtonAction -= HostLocalGameButtonClicked;
-            mainMenuPanel.HostOnlineGameButtonAction -= HostOnlineGameButtonClicked;
-            mainMenuPanel.JoinGameButtonAction -= OpenJoinGameScreen;
-            mainMenuPanel.SettingsButtonAction -= OpenSettingsScreen;
-            mainMenuPanel.CreditsButtonAction -= OpenCreditsScreen;
-            mainMenuPanel.QuitGameButtonAction -= QuitGame;
-            mainMenuPanel.UsernameButtonAction -= OpenUsernameScreen;
-            mainMenuPanel.CloseUsernameAction -= CloseUsernameScreen;
-            mainMenuPanel.SaveUsernameAction -= SaveUsername;
+            mainMenuPanel.OnHostGameButtonPressed -= OnHostGameButtonClicked;
+            mainMenuPanel.OnJoinGameButtonPressed -= OpenJoinGameScreen;
+            mainMenuPanel.OnPlayOfflineButtonPressed -= OnPlayOfflineButtonClicked;
+            mainMenuPanel.OnSettingsButtonPressed -= OpenSettingsScreen;
+            mainMenuPanel.OnCreditsButtonPressed -= OpenCreditsScreen;
+            mainMenuPanel.OnQuitGameButtonPressed -= QuitGame;
+            mainMenuPanel.OnUsernameButtonPressed -= OpenUsernameScreen;
+            mainMenuPanel.OnCloseUsernameButtonPressed -= CloseUsernameScreen;
+            mainMenuPanel.OnSaveUsernameButtonPressed -= SaveUsername;
         }
 
         private void SetPlayerName()
@@ -68,13 +68,13 @@ namespace RooseLabs.UI
             PlayerPrefs.Save();
         }
 
-        private void HostLocalGameButtonClicked()
+        private void OnPlayOfflineButtonClicked()
         {
             UnsubscribeFromEvents();
             NetworkConnector.Instance.StartHostLocally();
         }
 
-        private async void HostOnlineGameButtonClicked()
+        private async void OnHostGameButtonClicked()
         {
             UnsubscribeFromEvents();
             var result = await NetworkConnector.Instance.StartHostWithRelay();

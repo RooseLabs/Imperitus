@@ -3,6 +3,7 @@ using RooseLabs.Player;
 using RooseLabs.ScriptableObjects;
 using RooseLabs.Utils;
 using System.Collections.Generic;
+using RooseLabs.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,9 +13,8 @@ namespace RooseLabs.Gameplay.Notebook
     /// <summary>
     /// Controls the Notebook UI display.
     /// Subscribes to NotebookManager and PlayerNotebook events and updates UI elements accordingly.
-    /// Opening/closing is handled by GUIManager.
     /// </summary>
-    public class NotebookUIController : MonoBehaviour
+    public class NotebookUIController : MonoBehaviour, IWindow
     {
         [Header("Page Containers")]
         [SerializeField] private GameObject assignmentPage;
@@ -52,9 +52,9 @@ namespace RooseLabs.Gameplay.Notebook
         private PlayerNotebook m_localPlayerNotebook;
 
         // Track which rune slots have been filled (indices of Image components in runesContainer)
-        private List<int> m_availableRuneSlots = new List<int>();
-        private Dictionary<int, int> m_runeIndexToSlotIndex = new Dictionary<int, int>(); // Maps rune index to slot index
-        private Dictionary<int, GameObject> m_borrowedRuneSlots = new Dictionary<int, GameObject>(); // Maps slot index to the Image GameObject for borrowed runes
+        private List<int> m_availableRuneSlots = new();
+        private Dictionary<int, int> m_runeIndexToSlotIndex = new(); // Maps rune index to slot index
+        private Dictionary<int, GameObject> m_borrowedRuneSlots = new(); // Maps slot index to the Image GameObject for borrowed runes
 
         private void OnEnable()
         {
@@ -107,6 +107,15 @@ namespace RooseLabs.Gameplay.Notebook
         }
 
         #region Public Methods
+        public void Open()
+        {
+            gameObject.SetActive(true);
+        }
+
+        public void Close()
+        {
+            gameObject.SetActive(false);
+        }
 
         /// <summary>
         /// Switches to the Assignment tab. Call this from Unity Events.

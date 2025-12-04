@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using RooseLabs.Core;
 using RooseLabs.Gameplay.Notebook;
@@ -12,117 +13,81 @@ namespace RooseLabs.UI
     {
         private static Logger Logger => Logger.GetLogger("GUIManager");
 
-        public static GUIManager Instance { get; private set; }
-
         [SerializeField] private HUDManager hudManager;
+        [SerializeField] private UIPauseScreenManager pauseScreenManager;
         [SerializeField] private NotebookUIController notebookUIController;
         [SerializeField] private CustomizationMenu customizationMenuController;
 
-        private bool m_isNotebookOpen = false;
-        private bool m_isCustomizationMenuOpen = false;
-        private bool WindowIsOpen => m_isNotebookOpen || m_isCustomizationMenuOpen;
+        public static GUIManager Instance { get; private set; }
+        public readonly static List<IWindow> ActiveWindows = new();
 
         private void Awake()
         {
             Instance = this;
+            ActiveWindows.Clear();
         }
 
-        private void Update()
+        #if !UNITY_EDITOR
+        private void OnApplicationFocus(bool hasFocus)
+        {
+            if (!hasFocus && ActiveWindows.Count == 0)
+                OpenWindow(pauseScreenManager);
+        }
+        #endif
+
+        private void LateUpdate()
         {
             var character = PlayerCharacter.LocalCharacter;
             if (!character) return;
 
             if (character.Input.resumeWasPressed)
             {
-                if (m_isCustomizationMenuOpen)
+                // Close the topmost window
+                if (ActiveWindows.Count > 0)
                 {
-                    CloseCustomizationMenu();
-                }
-                else if (m_isNotebookOpen)
-                {
-                    ToggleNotebook();
-                }
-                return;
-            }
-
-            // Handle notebook toggle input based on current state
-            if (m_isNotebookOpen)
-            {
-                // When notebook is open, check for close action from UI action map
-                if (character.Input.closeNotebookWasPressed)
-                {
-                    ToggleNotebook();
+                    CloseWindow(ActiveWindows[^1]);
                 }
             }
-            else
+            else if (character.Input.closeNotebookWasPressed)
             {
-                // When notebook is closed, check for open action from gameplay action map
-                if (character.Input.openNotebookWasPressed)
+                // Close the notebook if it's open
+                if (ActiveWindows.Contains(notebookUIController))
                 {
-                    ToggleNotebook();
+                    CloseWindow(notebookUIController);
                 }
+            }
+            else if (character.Input.openNotebookWasPressed)
+            {
+                OpenWindow(notebookUIController);
+            }
+            else if (character.Input.pauseWasPressed)
+            {
+                OpenWindow(pauseScreenManager);
             }
         }
 
-        private void LateUpdate()
+        public static void OpenWindow(IWindow window)
         {
-            if (WindowIsOpen)
+            if (ActiveWindows.Contains(window))
+                return;
+            window.Open();
+            ActiveWindows.Add(window);
+            InputHandler.Instance.EnableMenuInput();
+        }
+
+        public static void CloseWindow(IWindow window)
+        {
+            window.Close();
+            ActiveWindows.Remove(window);
+            if (ActiveWindows.Count == 0)
             {
-                // When any window is open, clear interaction text
-                hudManager.SetInteractionText(string.Empty);
+                InputHandler.Instance.EnableGameplayInput();
             }
         }
 
         public void OpenCustomizationMenu()
         {
-            if (m_isCustomizationMenuOpen) return;
-            m_isCustomizationMenuOpen = true;
-
-            InputHandler.Instance.EnableMenuInput();
-            // Enable the customization menu canvas GameObject
-            customizationMenuController.gameObject.SetActive(true);
-            customizationMenuController.OnMenuOpened();
-        }
-
-        public void CloseCustomizationMenu()
-        {
-            m_isCustomizationMenuOpen = false;
-
-            InputHandler.Instance.EnableGameplayInput();
-            // Disable the customization menu canvas GameObject
-            customizationMenuController.gameObject.SetActive(false);
-        }
-
-        public void ToggleNotebook()
-        {
-            if (m_isNotebookOpen)
-            {
-                InputHandler.Instance.EnableGameplayInput();
-                CloseNotebook();
-            }
-            else
-            {
-                InputHandler.Instance.EnableMenuInput();
-                OpenNotebook();
-            }
-        }
-
-        public void OpenNotebook()
-        {
-            m_isNotebookOpen = true;
-
-            // Enable the notebook canvas GameObject
-            notebookUIController.gameObject.SetActive(true);
-            // Refresh the content of the notebook's current tab
-            notebookUIController.RefreshCurrentTab();
-        }
-
-        public void CloseNotebook()
-        {
-            m_isNotebookOpen = false;
-
-            // Disable the notebook canvas GameObject
-            notebookUIController.gameObject.SetActive(false);
+            OpenWindow(customizationMenuController);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -135,10 +100,6 @@ namespace RooseLabs.UI
         public void UpdateTimer(float time) => hudManager.UpdateTimer(time);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetInteractionText(string text)
-        {
-            if (WindowIsOpen) return;
-            hudManager.SetInteractionText(text);
-        }
+        public void SetInteractionText(string text) => hudManager.SetInteractionText(text);
     }
 }
