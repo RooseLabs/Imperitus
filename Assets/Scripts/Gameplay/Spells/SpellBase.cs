@@ -31,6 +31,8 @@ namespace RooseLabs.Gameplay.Spells
     {
         protected static Logger Logger => Logger.GetLogger("SpellCasting");
 
+        public static event Action<SpellSO> OnSpellCast = delegate { };
+
         #region Serialized
         [field: SerializeField]
         public SpellSO SpellInfo { get; private set; }
@@ -219,7 +221,7 @@ namespace RooseLabs.Gameplay.Spells
 
             if (successfulCast)
             {
-                GameManager.Instance.OnSpellCast(SpellInfo.Signature);
+                OnSpellCast.Invoke(SpellInfo);
             }
         }
 

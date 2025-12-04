@@ -9,6 +9,7 @@ using FishNet.Object.Synchronizing;
 using GameKit.Dependencies.Utilities.Types;
 using RooseLabs.Gameplay.Notebook;
 using RooseLabs.Gameplay.Spells;
+using RooseLabs.Network;
 using RooseLabs.ScriptableObjects;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -39,6 +40,16 @@ namespace RooseLabs.Gameplay
         {
             Instance = this;
             TryGetComponent(out m_heistTimer);
+        }
+
+        private void OnEnable()
+        {
+            SpellBase.OnSpellCast += OnSpellCast;
+        }
+
+        private void OnDisable()
+        {
+            SpellBase.OnSpellCast -= OnSpellCast;
         }
 
         private void OnDestroy()
@@ -126,10 +137,22 @@ namespace RooseLabs.Gameplay
             NotebookManager.Instance.InitializeAssignment(CurrentAssignment);
         }
 
-        [ServerRpc(RequireOwnership = false)]
-        public void OnSpellCast(int signature)
+        private void OnSpellCast(SpellSO spell)
         {
-            SpellSO spell = SpellDatabase.GetSpellBySignature(signature).SpellInfo;
+            if (CurrentAssignment == null) return;
+            if (IsServerInitialized)
+            {
+                OnSpellCast_Internal(spell);
+            }
+            else
+            {
+                OnSpellCast_ServerRpc(spell.Signature);
+            }
+        }
+
+        private void OnSpellCast_Internal(SpellSO spell)
+        {
+            if (CurrentAssignment == null) return;
             foreach (var taskId in CurrentAssignment.tasks)
             {
                 var task = TaskDatabase[taskId];
@@ -142,6 +165,14 @@ namespace RooseLabs.Gameplay
                     }
                 }
             }
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        private void OnSpellCast_ServerRpc(int spellSignature)
+        {
+            var spell = SpellDatabase.GetSpellBySignature(spellSignature);
+            if (!spell) return;
+            OnSpellCast_Internal(spell.SpellInfo);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

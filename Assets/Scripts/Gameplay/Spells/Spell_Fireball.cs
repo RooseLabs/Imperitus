@@ -46,7 +46,7 @@ namespace RooseLabs.Gameplay.Spells
             return true;
         }
 
-        private void Update()
+        private void LateUpdate()
         {
             if (!vfxGameObject) return;
             if (!CasterCharacter) return;

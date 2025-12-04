@@ -2135,7 +2135,6 @@ MonoBehaviour:
   _debugSlopeApproximation: 0
   _rigidbody: {fileID: 1044951130762037519}
   _collider: {fileID: 9038549086451317049}
-  _velocityLeaveGround: {x: 0, y: 0, z: 0}
 --- !u!114 &2298069713334961550
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2242,7 +2241,7 @@ MonoBehaviour:
   crouchSpeed: 0.75
   crawlSpeed: 0.5
   jumpHeight: 0.5
-  sprintStaminaUsage: 25
+  sprintStaminaUsage: 20
   standingCollider: {fileID: 910997788957776308}
   crouchingCollider: {fileID: 1079084056669295952}
   crawlingCollider: {fileID: 5542213905719861265}
@@ -2381,7 +2380,7 @@ MonoBehaviour:
   _initializeOrder: 0
   _preventDespawnOnDisconnect: 0
   _defaultDespawnType: 0
-  _initializedTimestamp: -8584372071486486785
+  _initializedTimestamp: -8584367189863762007
   NetworkObserver: {fileID: 0}
   _enablePrediction: 0
   _predictionType: 1

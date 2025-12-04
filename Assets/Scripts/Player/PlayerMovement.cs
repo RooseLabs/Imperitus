@@ -17,8 +17,8 @@ namespace RooseLabs.Player
         [SerializeField] private float sprintSpeed = 5.00f; // Average speed from animation: 5.83f;
         [SerializeField] private float crouchSpeed = 0.75f; // Average speed from animation: 0.67f;
         [SerializeField] private float crawlSpeed  = 0.50f; // Average speed from animation: 0.25f;
-        [SerializeField] private float jumpHeight  = 0.5f;
-        [SerializeField] private float sprintStaminaUsage = 25f;
+        [SerializeField] private float jumpHeight  = 0.50f;
+        [SerializeField] private float sprintStaminaUsage = 20f;
 
         [Header("Object Colliders")]
         [SerializeField] private Collider standingCollider;

@@ -1,6 +1,5 @@
 using FishNet.Connection;
 using FishNet.Object;
-using NUnit.Framework;
 using RooseLabs.Player;
 using RooseLabs.ScriptableObjects;
 using RooseLabs.Utils;
@@ -70,17 +69,17 @@ namespace RooseLabs.Gameplay.Notebook
         /// Invoked when the set of toggled runes changes.
         /// Provides the complete list of currently toggled rune indices.
         /// </summary>
-        public event Action<List<int>> OnToggledRunesChanged;
+        public event Action<ICollection<int>> OnToggledRunesChanged;
 
         /// <summary>
         /// Invoked when toggled runes change, providing the actual RuneSO objects.
         /// </summary>
-        public event Action<List<RuneSO>> OnToggledRuneObjectsChanged;
+        public event Action<ICollection<RuneSO>> OnToggledRuneObjectsChanged;
 
         /// <summary>
         /// Invoked when toggled spells change, providing the selected spells indices
         /// </summary>
-        public event Action<List<int>> OnToggledSpellsChanged;
+        public event Action<ICollection<int>> OnToggledSpellsChanged;
         #endregion
 
         #region Player-Specific Data
@@ -113,8 +112,8 @@ namespace RooseLabs.Gameplay.Notebook
         private readonly HashSet<int> m_toggledSpells = new();
         #endregion
 
-        private const int MAX_TOGGLED_SPELLS = 3;
-        private const int IMPERO_SPELL_INDEX = 0;
+        private const int MaxToggledSpells = 3;
+        private const int ImperoSpellIndex = 0;
 
         #region Coroutines
         private Coroutine m_continuousCheckCoroutine;
@@ -144,8 +143,6 @@ namespace RooseLabs.Gameplay.Notebook
             {
                 StartContinuousProximityCheck();
             }
-
-            AddRandomUncollectedRune(true);
         }
 
         public override void OnStopClient()
@@ -680,7 +677,7 @@ namespace RooseLabs.Gameplay.Notebook
             }
 
             // Prevent toggling Impero (it's always active)
-            if (spellIndex == IMPERO_SPELL_INDEX)
+            if (spellIndex == ImperoSpellIndex)
             {
                 this.LogWarning("Cannot toggle Impero spell - it's always active");
                 return false;
@@ -693,15 +690,15 @@ namespace RooseLabs.Gameplay.Notebook
                 this.LogInfo($"Spell {spellIndex} deselected");
 
                 // Broadcast the change
-                OnToggledSpellsChanged?.Invoke(GetToggledSpellsWithImpero());
+                OnToggledSpellsChanged?.Invoke(m_toggledSpells);
                 return true;
             }
             else
             {
                 // Check if we've reached the limit
-                if (m_toggledSpells.Count >= MAX_TOGGLED_SPELLS)
+                if (m_toggledSpells.Count >= MaxToggledSpells)
                 {
-                    this.LogWarning($"Cannot select more than {MAX_TOGGLED_SPELLS} spells (excluding Impero)");
+                    this.LogWarning($"Cannot select more than {MaxToggledSpells} spells (excluding Impero)");
                     return false;
                 }
 
@@ -710,7 +707,7 @@ namespace RooseLabs.Gameplay.Notebook
                 this.LogInfo($"Spell {spellIndex} selected");
 
                 // Broadcast the change
-                OnToggledSpellsChanged?.Invoke(GetToggledSpellsWithImpero());
+                OnToggledSpellsChanged?.Invoke(m_toggledSpells);
                 return true;
             }
         }
@@ -720,7 +717,7 @@ namespace RooseLabs.Gameplay.Notebook
         /// </summary>
         private List<int> GetToggledSpellsWithImpero()
         {
-            List<int> spells = new List<int> { IMPERO_SPELL_INDEX }; // Always include Impero
+            List<int> spells = new List<int> { ImperoSpellIndex }; // Always include Impero
             spells.AddRange(m_toggledSpells);
             return spells;
         }
@@ -747,7 +744,7 @@ namespace RooseLabs.Gameplay.Notebook
         /// </summary>
         public bool IsSpellToggled(int spellIndex)
         {
-            if (spellIndex == IMPERO_SPELL_INDEX)
+            if (spellIndex == ImperoSpellIndex)
                 return true; // Impero is always active
 
             return m_toggledSpells.Contains(spellIndex);
@@ -777,13 +774,13 @@ namespace RooseLabs.Gameplay.Notebook
             foreach (int spellIndex in spellIndices)
             {
                 // Skip Impero (it's always active)
-                if (spellIndex == IMPERO_SPELL_INDEX)
+                if (spellIndex == ImperoSpellIndex)
                     continue;
 
                 // Respect the limit
-                if (count >= MAX_TOGGLED_SPELLS)
+                if (count >= MaxToggledSpells)
                 {
-                    this.LogWarning($"Cannot set more than {MAX_TOGGLED_SPELLS} spells (excluding Impero)");
+                    this.LogWarning($"Cannot set more than {MaxToggledSpells} spells (excluding Impero)");
                     break;
                 }
 
@@ -794,7 +791,7 @@ namespace RooseLabs.Gameplay.Notebook
             this.LogInfo($"Set {m_toggledSpells.Count} toggled spells");
 
             // Broadcast the change
-            OnToggledSpellsChanged?.Invoke(GetToggledSpellsWithImpero());
+            OnToggledSpellsChanged?.Invoke(m_toggledSpells);
         }
 
         /// <summary>
@@ -803,7 +800,7 @@ namespace RooseLabs.Gameplay.Notebook
         public void ClearToggledSpells()
         {
             m_toggledSpells.Clear();
-            OnToggledSpellsChanged?.Invoke(GetToggledSpellsWithImpero());
+            OnToggledSpellsChanged?.Invoke(m_toggledSpells);
             this.LogInfo("All spells deselected (Impero remains active)");
         }
 

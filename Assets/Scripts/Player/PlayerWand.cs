@@ -85,7 +85,7 @@ namespace RooseLabs.Player
         {
             if (!Owner.IsLocalClient) return;
 
-            Initialize();
+            InitializeSpellLoadout();
             character.Notebook.OnToggledRuneObjectsChanged += OnRuneSelectionChanged;
             character.Notebook.OnToggledSpellsChanged += OnSpellSelectionChanged;
         }
@@ -176,6 +176,7 @@ namespace RooseLabs.Player
                 orbitingRunesContainer.position - PlayerCharacter.LocalCharacter.Camera.transform.position);
         }
 
+        #region Event Handlers
         private void OnRuneSelectionChanged(ICollection<RuneSO> selectedRunes)
         {
             // Handle empty selection
@@ -198,112 +199,36 @@ namespace RooseLabs.Player
             }
         }
 
-        #region Spell Management
-        private void Initialize()
+        private void OnSpellSelectionChanged(ICollection<int> selectedSpellIndices)
         {
-            m_spellSlots.Clear();
+            InitializeSpellLoadout();
 
-            // Get the toggled spells from notebook (which includes Impero automatically)
-            List<int> activeSpells = character.Notebook.GetAllActiveSpells();
-
-            // If no spells are toggled, use defaults: Impero (0) and the second spell (2)
-            if (activeSpells.Count <= 1) // Only Impero
-            {
-                m_spellSlots.Add(new SpellSlot(GameManager.Instance.SpellDatabase[0])); // Impero
-                //m_spellSlots.Add(new SpellSlot(GameManager.Instance.SpellDatabase[2])); // Default second spell
-            }
-            else
-            {
-                // Add all toggled spells as permanent spells
-                foreach (int spellIndex in activeSpells)
-                {
-                    if (spellIndex >= 0 && spellIndex < GameManager.Instance.SpellDatabase.Count)
-                    {
-                        SpellBase spellPrefab = GameManager.Instance.SpellDatabase[spellIndex];
-                        m_spellSlots.Add(new SpellSlot(spellPrefab, isTemporary: false));
-                    }
-                }
-            }
-
-            this.LogInfo($"Initialized wand with {m_spellSlots.Count} permanent spells");
-        }
-
-        /// <summary>
-        /// Called when spell selection changes in the notebook.
-        /// Updates the permanent spell loadout incrementally while preserving temporary spells.
-        /// </summary>
-        private void OnSpellSelectionChanged(List<int> selectedSpellIndices)
-        {
-            if (GameManager.Instance == null)
-                return;
-
-            // Get current permanent spells (excluding temporary)
-            HashSet<SpellBase> currentPermanentSpells = new HashSet<SpellBase>();
-            foreach (var slot in m_spellSlots)
-            {
-                if (!slot.IsTemporary)
-                {
-                    currentPermanentSpells.Add(slot.SpellPrefab);
-                }
-            }
-
-            // Convert selected indices to SpellBase objects
-            HashSet<SpellBase> newPermanentSpells = new HashSet<SpellBase>();
             foreach (int spellIndex in selectedSpellIndices)
             {
-                if (spellIndex >= 0 && spellIndex < GameManager.Instance.SpellDatabase.Count)
-                {
-                    newPermanentSpells.Add(GameManager.Instance.SpellDatabase[spellIndex]);
-                }
-            }
-
-            // Find spells to remove (in current but not in new)
-            List<SpellBase> spellsToRemove = new List<SpellBase>();
-            foreach (var spell in currentPermanentSpells)
-            {
-                if (!newPermanentSpells.Contains(spell))
-                {
-                    spellsToRemove.Add(spell);
-                }
-            }
-
-            // Find spells to add (in new but not in current)
-            List<SpellBase> spellsToAdd = new List<SpellBase>();
-            foreach (var spell in newPermanentSpells)
-            {
-                if (!currentPermanentSpells.Contains(spell))
-                {
-                    spellsToAdd.Add(spell);
-                }
-            }
-
-            // Remove spells that are no longer selected
-            foreach (var spell in spellsToRemove)
-            {
-                RemovePermanentSpell(spell);
-                this.LogInfo($"Removed permanent spell: {spell.SpellInfo.EnglishName}");
-            }
-
-            // Add newly selected spells
-            foreach (var spell in spellsToAdd)
-            {
-                AddPermanentSpell(spell);
-                this.LogInfo($"Added permanent spell: {spell.SpellInfo.EnglishName}");
+                var spell = spellDatabase[spellIndex];
+                SpellSlot permanentSlot = new SpellSlot(spell, isTemporary: false);
+                m_spellSlots.Add(permanentSlot);
             }
 
             // Ensure current spell index is valid
             if (m_currentSpellIndex >= m_spellSlots.Count)
             {
-                m_currentSpellIndex = 0;
+                CurrentSpellIndex = 0;
             }
-
-            // Mark spell instance as dirty if any changes were made
-            if (spellsToAdd.Count > 0 || spellsToRemove.Count > 0)
+            else if (m_currentSpellInstance.SpellInfo != m_spellSlots[m_currentSpellIndex].SpellPrefab.SpellInfo)
             {
+                // If the current spell is now different, mark spell instance as dirty and reset spell switch cooldown
                 m_currentSpellInstanceDirty = true;
+                m_spellSwitchCooldownTimer = SpellSwitchCooldownDuration;
             }
+        }
+        #endregion
 
-            this.LogInfo($"Spell loadout updated: Added {spellsToAdd.Count}, Removed {spellsToRemove.Count}. Total: {m_spellSlots.Count} spells");
+        #region Spell Management
+        private void InitializeSpellLoadout()
+        {
+            m_spellSlots.Clear();
+            m_spellSlots.Add(new SpellSlot(GameManager.Instance.SpellDatabase[0])); // 0 = Impero (default spell)
         }
 
         private void HandleValidSpellSelection(SpellBase spell, ICollection<RuneSO> selectedRunes)
@@ -359,6 +284,11 @@ namespace RooseLabs.Player
             }
         }
 
+        // Note: AddPermanentSpell and RemovePermanentSpell are currently unused.
+        // They are implemented in a way that is better suited to add/remove individual spells during a heist,
+        // as they handle the existence of temporary spells, removing them in favor of permanent ones when necessary.
+        // However, such a feature is not currently planned, as the spell loadout must be set before starting a heist.
+        // Nonetheless, for the sake of completeness and uncertainty about future design changes, they are kept here.
         private void AddPermanentSpell(SpellBase spell)
         {
             // Check if the spell is already present in the spell slots
@@ -393,22 +323,17 @@ namespace RooseLabs.Player
         private void RemovePermanentSpell(SpellBase spell)
         {
             int existingIndex = m_spellSlots.FindIndex(slot => slot.SpellPrefab == spell);
-            if (existingIndex < 0)
+            if (existingIndex <= 0)
             {
-                // Spell not present, do nothing
-                return;
-            }
-
-            // Prevent removing Impero (first spell)
-            if (existingIndex == 0)
-            {
-                this.LogWarning("Cannot remove Impero spell - it's always active");
+                // Spell not present or is the default spell at index 0 (that cannot be removed), do nothing
                 return;
             }
 
             if (m_spellSlots[existingIndex].IsTemporary)
             {
                 // Spell is temporary, do nothing.
+                // Note that we can't have the same spell as both permanent and temporary, so if we found it as
+                // a temporary, we know there isn't a permanent copy of it that we can remove.
                 return;
             }
 
@@ -417,7 +342,7 @@ namespace RooseLabs.Player
 
             if (wasSelected && m_spellSlots.Count > 0)
             {
-                // If we removed the selected spell, switch to first spell (Impero)
+                // If we removed the selected spell, switch to first spell
                 CurrentSpellIndex = 0;
             }
         }
