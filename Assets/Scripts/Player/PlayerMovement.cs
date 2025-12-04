@@ -8,7 +8,6 @@ namespace RooseLabs.Player
     {
         private PlayerCharacter m_character;
         private AvatarMover m_avatarMover;
-        private Rigidbody m_rigidbody;
         private Animator Animator => m_character.Animations.Animator;
         private SoundEmitter m_soundEmitter;
         private float m_nextFootstepTime;
@@ -18,7 +17,7 @@ namespace RooseLabs.Player
         [SerializeField] private float sprintSpeed = 5.00f; // Average speed from animation: 5.83f;
         [SerializeField] private float crouchSpeed = 0.75f; // Average speed from animation: 0.67f;
         [SerializeField] private float crawlSpeed  = 0.50f; // Average speed from animation: 0.25f;
-        [SerializeField] private float jumpHeight = 0.5f;
+        [SerializeField] private float jumpHeight  = 0.5f;
         [SerializeField] private float sprintStaminaUsage = 25f;
 
         [Header("Object Colliders")]
@@ -43,6 +42,7 @@ namespace RooseLabs.Player
         private const float Gravity = 9.81f;
         private bool m_isJumping = false;
         private float m_jumpVelocity = 0f;
+        private float m_midAirSpeed = 0f;
 
         private bool m_isNearTable;
 
@@ -50,16 +50,25 @@ namespace RooseLabs.Player
         private int m_runningIndex = -1;
         private int m_crouchingIndex = -1;
 
-        private void Start()
+        private void Awake()
         {
             m_character = GetComponent<PlayerCharacter>();
             m_avatarMover = GetComponent<AvatarMover>();
-            m_rigidbody = GetComponent<Rigidbody>();
             m_soundEmitter = GetComponent<SoundEmitter>();
 
             m_footstepIndex = m_soundEmitter.availableSounds.FindIndex(s => s.type != null && s.type.key == "Footstep");
             m_runningIndex = m_soundEmitter.availableSounds.FindIndex(s => s.type != null && s.type.key == "Running");
             m_crouchingIndex = m_soundEmitter.availableSounds.FindIndex(s => s.type != null && s.type.key == "Crouching");
+        }
+
+        private void OnEnable()
+        {
+            m_avatarMover.OnIsOnGroundChanged += IsOnGroundStateChanged;
+        }
+
+        private void OnDisable()
+        {
+            m_avatarMover.OnIsOnGroundChanged -= IsOnGroundStateChanged;
         }
 
         private void Update()
@@ -88,7 +97,10 @@ namespace RooseLabs.Player
             }
 
             Vector2 moveInput = m_character.Input.movementInput;
-            m_character.Data.CurrentSpeed = moveInput.sqrMagnitude <= 0.01f ? 0.0f : CurrentStateSpeed;
+
+            float horizontalMovementSpeed = !m_avatarMover.IsOnGround ? m_midAirSpeed : CurrentStateSpeed;
+            m_character.Data.CurrentSpeed = moveInput.sqrMagnitude <= 0.01f ? 0.0f : horizontalMovementSpeed;
+
             Vector3 lookForward = m_character.Data.lookDirectionFlat;
             Vector3 lookRight = Vector3.Cross(Vector3.up, lookForward).normalized;
             Vector3 moveDirection = (lookRight * moveInput.x + lookForward * moveInput.y).normalized;
@@ -160,11 +172,6 @@ namespace RooseLabs.Player
             #region Crawl Logic
             if (m_character.Data.IsCrouching && m_isNearTable && !m_character.Data.IsCrawling)
             {
-                // Drop any held item
-                // if (m_pickup != null && m_pickup.HasItemInHand())
-                // {
-                //     m_pickup.Drop();
-                // }
                 m_character.Data.IsCrawling = true;
                 m_character.Data.IsCrouching = false;
             }
@@ -179,9 +186,6 @@ namespace RooseLabs.Player
             if (m_character.Input.crouchWasPressed && !m_character.Data.IsCrawling)
             {
                 m_character.Data.IsCrouching = !m_character.Data.IsCrouching;
-                // Move pickup spot for crouching
-                // if (m_pickup != null)
-                //     m_pickup.SetPickupPositionForCrouch(m_character.Data.IsCrouching);
             }
             #endregion
 
@@ -324,6 +328,13 @@ namespace RooseLabs.Player
             m_isJumping = false;
             m_jumpVelocity = 0f;
             m_avatarMover.EndLeaveGround();
+        }
+
+        private void IsOnGroundStateChanged(bool isGrounded)
+        {
+            if (isGrounded) return;
+            // Player just left the ground, take a snapshot of the current horizontal movement speed
+            m_midAirSpeed = CurrentStateSpeed;
         }
 
         public void SetNearTable(bool value)
