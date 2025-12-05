@@ -34,7 +34,7 @@ namespace RooseLabs.UI
 
         private void Update()
         {
-            var character = PlayerCharacter.LocalCharacter;
+            var character = PlayerCharacter.ObservedCharacter;
             healthSlider.value = character.Data.Health / character.Data.MaxHealth;
             float targetStaminaValue = character.Data.Stamina / character.Data.MaxStamina;
             staminaSlider.value = Mathf.MoveTowards(staminaSlider.value, targetStaminaValue, Time.deltaTime * 2f);

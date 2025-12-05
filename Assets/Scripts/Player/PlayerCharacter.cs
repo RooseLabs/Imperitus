@@ -18,10 +18,6 @@ namespace RooseLabs.Player
     [RequireComponent(typeof(PlayerData))]
     public class PlayerCharacter : NetworkBehaviour, IDamageable
     {
-        public static PlayerCharacter LocalCharacter;
-
-        public PlayerConnection Player => PlayerHandler.GetPlayer(Owner);
-
         #region Serialized
         [field: SerializeField] public Transform ModelTransform { get; private set; }
         [field: SerializeField] public Camera Camera { get; private set; }
@@ -46,6 +42,11 @@ namespace RooseLabs.Player
 
         private Rigidbody m_rigidbody;
         #endregion
+
+        public static PlayerCharacter LocalCharacter { get; private set; }
+        public static PlayerCharacter ObservedCharacter => CameraController.SpectatedCharacter ?? LocalCharacter;
+
+        public PlayerConnection Player => PlayerHandler.GetPlayer(Owner);
 
         private readonly Dictionary<Collider, int> m_characterColliders = new();
 
@@ -81,11 +82,7 @@ namespace RooseLabs.Player
             UpdateLookDirection();
 
             // Hide renderers for local player
-            int layer = LayerMask.NameToLayer("CameraCull");
-            foreach (var m in meshesToHide)
-            {
-                m.layer = layer;
-            }
+            ToggleMeshesVisibility(false);
 
             // Populate character colliders dictionary, storing their original layers
             Collider[] colliders = GetComponentsInChildren<Collider>(true);
@@ -143,6 +140,15 @@ namespace RooseLabs.Player
         private bool CanRegenStamina()
         {
             return Data.sinceUseStamina >= (Data.Stamina > 0.0f ? 1.0f : 2.0f);
+        }
+
+        public void ToggleMeshesVisibility(bool visible)
+        {
+            int layer = visible ? LayerMask.NameToLayer("Default") : LayerMask.NameToLayer("CameraCull");
+            foreach (var m in meshesToHide)
+            {
+                m.layer = layer;
+            }
         }
 
         public bool ApplyDamage(DamageInfo damage)
@@ -211,7 +217,7 @@ namespace RooseLabs.Player
             ResetState_ObserversRPC();
         }
 
-        [ObserversRpc(ExcludeOwner = true, ExcludeServer = true, RunLocally = true)]
+        [ObserversRpc(ExcludeServer = true, RunLocally = true)]
         private void ResetState_ObserversRPC()
         {
             ResetState_Internal();

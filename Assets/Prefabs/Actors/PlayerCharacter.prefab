@@ -2871,6 +2871,13 @@ MonoBehaviour:
   sprintPosition: {fileID: 8933597474329572650}
   crouchPosition: {fileID: 3835543907381643120}
   crawlPosition: {fileID: 7002881426695329816}
+  spectateMinDistance: 0.75
+  spectateMaxDistance: 3
+  spectateDefaultDistance: 2
+  spectateZoomSpeed: 3
+  spectateDelayAfterDeath: 3
+  spectateMinVerticalAngle: -60
+  spectateMaxVerticalAngle: 40
 --- !u!1001 &419060412221709197
 PrefabInstance:
   m_ObjectHideFlags: 0

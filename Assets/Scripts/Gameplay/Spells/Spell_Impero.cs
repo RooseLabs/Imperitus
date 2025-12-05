@@ -151,6 +151,7 @@ namespace RooseLabs.Gameplay.Spells
 
         private void LateUpdate()
         {
+            if (!CasterCharacter) return;
             if ((bool)tubeMaterial && (bool)m_currentGrabbedObject)
             {
                 if (m_tubeSegments == null)
@@ -222,7 +223,7 @@ namespace RooseLabs.Gameplay.Spells
                 return;
             }
 
-            Vector3 lookDir = CasterCharacter == PlayerCharacter.LocalCharacter
+            Vector3 lookDir = character == PlayerCharacter.LocalCharacter
                 ? character.Data.lookDirection
                 : character.ModelTransform.forward;
             Vector3 midPoint = castPos + lookDir * (dist * 0.5f);
