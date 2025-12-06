@@ -44,7 +44,7 @@ Material:
     - _AlphaToMask: 0
     - _Blend: 0
     - _CastShadows: 0
-    - _Cull: 2
+    - _Cull: 0
     - _DstBlend: 0
     - _DstBlendAlpha: 0
     - _Float: -0.88
@@ -56,7 +56,7 @@ Material:
     - _Surface: 0
     - _ZTest: 4
     - _ZWrite: 1
-    - _ZWriteControl: 0
+    - _ZWriteControl: 1
     m_Colors:
     - _BaseColor: {r: 0, g: 0.13731419, b: 0.0015456711, a: 0}
     - _Color: {r: 0.0153962085, g: 0.38490558, b: 0, a: 0}
