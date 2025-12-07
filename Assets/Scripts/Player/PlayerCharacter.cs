@@ -35,12 +35,10 @@ namespace RooseLabs.Player
         public PlayerData Data { get; private set; }
         public PlayerMovement Movement { get; private set; }
         public PlayerWand Wand { get; private set; }
-        public PlayerItems Items  { get; private set; }
+        public PlayerItems Items { get; private set; }
         public PlayerAnimations Animations { get; private set; }
         public PlayerRagdoll Ragdoll { get; private set; }
         public PlayerNotebook Notebook { get; private set; }
-
-        private Rigidbody m_rigidbody;
         #endregion
 
         public static PlayerCharacter LocalCharacter { get; private set; }
@@ -48,6 +46,8 @@ namespace RooseLabs.Player
 
         public PlayerConnection Player => PlayerHandler.GetPlayer(Owner);
 
+        private Rigidbody m_rigidbody;
+        private readonly Dictionary<HumanBodyBones, Bodypart> m_bodyparts = new();
         private readonly Dictionary<Collider, int> m_characterColliders = new();
 
         private void Awake()
@@ -62,6 +62,22 @@ namespace RooseLabs.Player
             Notebook = GetComponentInChildren<PlayerNotebook>();
 
             m_rigidbody = GetComponent<Rigidbody>();
+
+            // Populate bodyparts dictionary
+            foreach (HumanBodyBones bone in Enum.GetValues(typeof(HumanBodyBones)))
+            {
+                if (bone == HumanBodyBones.LastBone) continue;
+                Transform boneTransform = Animations.Animator.GetBoneTransform(bone);
+                if (!boneTransform) continue;
+                m_bodyparts[bone] = new Bodypart(bone, boneTransform);
+            }
+
+            // Populate character colliders dictionary, storing their original layers
+            Collider[] colliders = GetComponentsInChildren<Collider>(true);
+            foreach (var col in colliders)
+            {
+                m_characterColliders[col] = col.gameObject.layer;
+            }
         }
 
         public override void OnStartNetwork()
@@ -69,7 +85,6 @@ namespace RooseLabs.Player
             PlayerHandler.RegisterCharacter(Owner, this);
         }
 
-        // Called on each client when this object becomes visible to them.
         public override void OnStartClient()
         {
             if (!IsOwner) return;
@@ -83,13 +98,6 @@ namespace RooseLabs.Player
 
             // Hide renderers for local player
             ToggleMeshesVisibility(false);
-
-            // Populate character colliders dictionary, storing their original layers
-            Collider[] colliders = GetComponentsInChildren<Collider>(true);
-            foreach (var col in colliders)
-            {
-                m_characterColliders[col] = col.gameObject.layer;
-            }
 
             Camera.gameObject.SetActive(true);
             InputHandler.Instance.EnableGameplayInput();
@@ -171,23 +179,23 @@ namespace RooseLabs.Player
             ApplyDamage_ObserversRPC(damage);
         }
 
-        [ObserversRpc]
+        [ObserversRpc(ExcludeServer = true, RunLocally = true)]
         private void ApplyDamage_ObserversRPC(DamageInfo damage)
         {
             Data.Health -= damage.amount;
             if (Data.Health <= 0)
             {
-                Data.isDead = true;
-                if (IsServerInitialized)
+                if (IsServerInitialized && !Data.isDead)
                 {
-                    HandlePlayerDeath();
+                    HandlePlayerDeath(damage);
                 }
+                Data.isDead = true;
                 this.LogInfo($"Player '{Player.PlayerName}' died!");
             }
         }
 
         [Server]
-        private void HandlePlayerDeath()
+        private void HandlePlayerDeath(DamageInfo? damage = null)
         {
             // Spawn dropped notebook
             GameObject droppedNotebook = Instantiate(droppedNotebookPrefab, transform.position + Vector3.up * 1.0f, Quaternion.identity);
@@ -195,7 +203,11 @@ namespace RooseLabs.Player
             droppedNotebook.GetComponent<DroppedNotebook>().Initialize(this);
 
             // Trigger ragdoll
-            Ragdoll.TriggerRagdoll(Vector3.back * 500f, Ragdoll.HipsBone.position, false);
+            Ragdoll.TriggerRagdoll(
+                (damage?.hitDirection ?? -ModelTransform.forward) * 500f,
+                damage?.hitPoint ?? Center,
+                false
+            );
         }
 
         public void ResetState()
@@ -243,7 +255,10 @@ namespace RooseLabs.Player
         }
 
         #region Utils
-        public Transform GetBodypart(HumanBodyBones bone) => Ragdoll.partDict[bone];
+        public Vector3 Center => GetBodypart(HumanBodyBones.Spine).Position;
+
+        public Bodypart GetBodypart(HumanBodyBones type) => m_bodyparts[type];
+        public ICollection<Bodypart> GetAllBodyparts() => m_bodyparts.Values;
 
         public bool RaycastIgnoreSelf(Ray ray, out RaycastHit hitInfo, float maxDistance = Mathf.Infinity, int layerMask = Physics.DefaultRaycastLayers, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
         {

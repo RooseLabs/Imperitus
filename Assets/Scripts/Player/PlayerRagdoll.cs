@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using FishNet.Object;
 using FishNet.Transporting;
 using UnityEngine;
@@ -24,8 +25,7 @@ namespace RooseLabs.Player
         private PlayerCharacter m_character;
         private Rigidbody m_rigidbody;
         private CapsuleCollider m_collider;
-        private Rigidbody[] m_ragdollRigidbodies;
-        private Collider[] m_ragdollColliders;
+        private Bodypart[] m_ragdollBodyparts;
         private Transform[] m_bones;
         private Rigidbody[] m_boneRigidbodies;
         private static bool s_standUpAnimationsSampled;
@@ -35,12 +35,10 @@ namespace RooseLabs.Player
         private BoneTransform[] m_interpolatedBoneTransforms;
         private BoneTransform[] m_previousBoneTransforms;
 
-        public readonly Dictionary<HumanBodyBones, Transform> partDict = new();
-        public Transform HipsBone => partDict[HumanBodyBones.Hips];
-        private Rigidbody HipsRigidbody => m_ragdollRigidbodies[0];
+        private Transform HipsBone => m_character.GetBodypart(HumanBodyBones.Hips).Transform;
+        private Rigidbody HipsRigidbody => m_character.GetBodypart(HumanBodyBones.Hips).Rigidbody;
         private Animator Animator => m_character.Animations.Animator;
-        private GameObject ModelGameObject => Animator.gameObject;
-        private Transform ModelTransform => ModelGameObject.transform;
+        private Transform ModelTransform => m_character.ModelTransform;
 
         private bool m_isFacingUp;
         private bool m_isWaitingForRagdollToSettle;
@@ -62,17 +60,7 @@ namespace RooseLabs.Player
             m_rigidbody = GetComponent<Rigidbody>();
             m_collider = GetComponent<CapsuleCollider>();
 
-            // Initialize bone dictionary
-            foreach (HumanBodyBones bone in Enum.GetValues(typeof(HumanBodyBones)))
-            {
-                if (bone == HumanBodyBones.LastBone) continue;
-                Transform boneTransform = Animator.GetBoneTransform(bone);
-                if (boneTransform != null)
-                    partDict[bone] = boneTransform;
-            }
-
-            m_ragdollRigidbodies = HipsBone.parent.GetComponentsInChildren<Rigidbody>();
-            m_ragdollColliders = HipsBone.parent.GetComponentsInChildren<Collider>();
+            m_ragdollBodyparts = m_character.GetAllBodyparts().Where(bp => (bool)bp.Rigidbody).ToArray();
             m_bones = HipsBone.parent.GetComponentsInChildren<Transform>();
 
             int boneCount = m_bones.Length;
@@ -351,10 +339,11 @@ namespace RooseLabs.Player
 
         private void SetRagdollPhysicsActive(bool active)
         {
-            foreach (var rb in m_ragdollRigidbodies)
-                rb.isKinematic = !active;
-            foreach (var col in m_ragdollColliders)
-                col.isTrigger = !active;
+            foreach (var part in m_ragdollBodyparts)
+            {
+                part.Rigidbody.isKinematic = !active;
+                part.Collider.isTrigger = !active;
+            }
         }
 
         private IEnumerator WaitForRagdollToSettle()
@@ -417,13 +406,13 @@ namespace RooseLabs.Player
         {
             Rigidbody closestRigidbody = null;
             float closestDistance = float.MaxValue;
-            foreach (Rigidbody rb in m_ragdollRigidbodies)
+            foreach (var part in m_ragdollBodyparts)
             {
-                float distance = Vector3.Distance(rb.position, hitPoint);
+                float distance = Vector3.Distance(part.Rigidbody.position, hitPoint);
                 if (distance < closestDistance)
                 {
                     closestDistance = distance;
-                    closestRigidbody = rb;
+                    closestRigidbody = part.Rigidbody;
                 }
             }
             return closestRigidbody;
@@ -442,7 +431,7 @@ namespace RooseLabs.Player
         {
             AnimationClip clip = GetStandUpAnimation(faceUp);
             if (clip == null) return;
-            clip.SampleAnimation(ModelGameObject, 0);
+            clip.SampleAnimation(ModelTransform.gameObject, 0);
             SampleBoneTransforms(boneTransforms);
         }
 

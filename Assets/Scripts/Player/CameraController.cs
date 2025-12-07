@@ -89,7 +89,7 @@ namespace RooseLabs.Player
             if (character.Data.IsRagdollActive)
             {
                 // When ragdoll is active, camera should follow head position and orientation
-                Transform headTransform = character.GetBodypart(HumanBodyBones.Head);
+                Transform headTransform = character.GetBodypart(HumanBodyBones.Head).Transform;
                 Vector3 targetPosition = new Vector3(headTransform.position.x, headTransform.position.y + 0.1f, headTransform.position.z);
                 transform.position = Vector3.MoveTowards(transform.position, targetPosition, Time.deltaTime * 10f);
                 Quaternion targetRotation = Quaternion.LookRotation(headTransform.forward);
@@ -131,8 +131,8 @@ namespace RooseLabs.Player
             m_spectateClampedLookValues.y = Mathf.Clamp(m_spectateClampedLookValues.y, spectateMinVerticalAngle, spectateMaxVerticalAngle);
             Vector3 clampedLookDirection = HelperFunctions.LookToDirection(m_spectateClampedLookValues, Vector3.forward).normalized;
 
-            Vector3 chestPosition = targetCharacter.GetBodypart(HumanBodyBones.Chest).position;
-            Vector3 headPosition = targetCharacter.GetBodypart(HumanBodyBones.Head).position + Vector3.up * 0.1f;
+            Vector3 chestPosition = targetCharacter.GetBodypart(HumanBodyBones.Chest).Position;
+            Vector3 headPosition = targetCharacter.GetBodypart(HumanBodyBones.Head).Position + Vector3.up * 0.1f;
 
             // Lerp between chest and head based on distance
             float lerpFactor = Mathf.InverseLerp(2f, 1f, m_spectateDistance);
@@ -203,7 +203,7 @@ namespace RooseLabs.Player
             m_spectateIndex = m_spectatableCharacters.IndexOf(SpectatedCharacter);
             m_spectateDistance = spectateDefaultDistance;
             // Initialize spectate target position and look values to prevent initial snapping
-            m_currentSpecTargetPosition = SpectatedCharacter.GetBodypart(HumanBodyBones.Chest).position;
+            m_currentSpecTargetPosition = SpectatedCharacter.GetBodypart(HumanBodyBones.Chest).Position;
             PlayerCharacter character = PlayerCharacter.LocalCharacter;
             m_spectateClampedLookValues = character.Data.lookValues;
             m_prevSpecLookValues = character.Data.lookValues;

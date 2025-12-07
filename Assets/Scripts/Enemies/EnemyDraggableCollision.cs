@@ -63,11 +63,7 @@ namespace RooseLabs.Enemies
                 int damage = CalculateDamageFromCollision(other);
                 if (damage > 0)
                 {
-                    DamageInfo damageInfo = new DamageInfo(
-                        damage,
-                        other.contacts[0].point,
-                        transform
-                    );
+                    DamageInfo damageInfo = new DamageInfo(damage, transform);
                     enemyData.ApplyDamage(damageInfo);
 
                     // Set cooldown for this player

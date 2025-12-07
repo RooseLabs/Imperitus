@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using RooseLabs.Utils;
 using UnityEngine;
 
@@ -8,7 +9,7 @@ namespace RooseLabs.Gameplay
         #region Serialized
         [SerializeField, Tooltip("Inner radius of the explosion after projectile impact. Entities within this radius will take full damage.")]
         private float innerRadius = 1f;
-        [SerializeField, Tooltip("Outer radius of the explosion after projectile impact. Entities within this radius will damage with falloff.")]
+        [SerializeField, Tooltip("Outer radius of the explosion after projectile impact. Entities within this radius will take reduced damage based on distance.")]
         private float outerRadius = 2f;
 
         [SerializeField, Tooltip("Time in seconds before the explosion is destroyed")]
@@ -18,21 +19,21 @@ namespace RooseLabs.Gameplay
         private GameObject explosionVFX;
         #endregion
 
+        private const float MinExplosionDamageMultiplier = 0.25f;
+
         private GameObject m_explosionInstance;
 
         protected override void OnProjectileCollision(Collider col)
         {
-            // Activate explosion effect at the projectile's position
-            ActivateExplosion(projectileRigidbody.Rigidbody.position);
+            PerformExplosion(projectileRigidbody.Rigidbody.position);
         }
 
         protected override void OnProjectileLifetimeExpired()
         {
-            // Activate explosion effect at the projectile's position
-            ActivateExplosion(projectileRigidbody.Rigidbody.position);
+            PerformExplosion(projectileRigidbody.Rigidbody.position);
         }
 
-        private void ActivateExplosion(Vector3 position)
+        private void PerformExplosion(Vector3 position)
         {
             // Disable projectile visuals and collider
             projectileRigidbody.gameObject.SetActive(false);
@@ -63,28 +64,44 @@ namespace RooseLabs.Gameplay
 
             // Get all IDamageable objects within the explosion radius
             var hitColliders = Physics.OverlapSphere(position, outerRadius, HelperFunctions.AllPhysicalLayerMask, QueryTriggerInteraction.Collide);
+            // Group colliders by their IDamageable component and track the highest damage for each
+            var damageTargets = new Dictionary<IDamageable, DamageInfo>();
             // Do a sphere cast from the explosion center to each object to check if there's any obstruction in between
             foreach (var col in hitColliders)
             {
-                if (!col.gameObject.TryGetComponent(out IDamageable damageable))
+                if (!col.TryGetComponentInParent(out IDamageable damageable))
                     continue;
 
                 if (!ExplosionUtils.IsColliderHitByExplosion(position, col, innerRadius, outerRadius, HelperFunctions.AllPhysicalLayerMask))
                     continue;
 
-                // Calculate distance-based damage falloff, clamped to a minimum of 5% of the full damage
+                // Calculate distance-based damage falloff
+                // Linear interpolation: 1.0 at innerRadius, MinExplosionDamageMultiplier at outerRadius
                 Vector3 closestPoint = col.ClosestPoint(position);
                 float distance = Vector3.Distance(position, closestPoint);
                 float damageMultiplier = 1f;
                 if (distance > innerRadius)
                 {
-                    damageMultiplier = 1f - ((distance - innerRadius) / (outerRadius - innerRadius));
-                    damageMultiplier = Mathf.Clamp(damageMultiplier, 0.05f, 1f);
+                    float normalizedDistance = Mathf.InverseLerp(innerRadius, outerRadius, distance);
+                    damageMultiplier = Mathf.Lerp(1f, MinExplosionDamageMultiplier, normalizedDistance);
                 }
+
                 DamageInfo adjustedDamageInfo = damageInfo;
                 adjustedDamageInfo.amount = damageInfo.amount * damageMultiplier;
-                adjustedDamageInfo.position = closestPoint;
-                damageable.ApplyDamage(adjustedDamageInfo);
+                adjustedDamageInfo.hitPoint = closestPoint;
+                adjustedDamageInfo.hitDirection = (closestPoint - position).normalized;
+
+                // Only store this damage if it's higher than any previously calculated damage for this damageable
+                if (!damageTargets.ContainsKey(damageable) || adjustedDamageInfo.amount > damageTargets[damageable].amount)
+                {
+                    damageTargets[damageable] = adjustedDamageInfo;
+                }
+            }
+
+            // Apply the highest damage to each unique damageable
+            foreach (var kvp in damageTargets)
+            {
+                kvp.Key.ApplyDamage(kvp.Value);
             }
 
             Invoke(nameof(ExplosionEnd), explosionLifetime);

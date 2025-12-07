@@ -123,7 +123,8 @@ namespace RooseLabs.Enemies
             // Create damage info
             DamageInfo damage = new DamageInfo(
                 ownerAI.attackDamage,
-                other.transform.position,
+                other.ClosestPoint(weaponTipObject.transform.position),
+                (other.transform.position - weaponTipObject.transform.position).normalized,
                 ownerAI.transform
             );
 

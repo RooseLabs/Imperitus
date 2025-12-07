@@ -85,6 +85,7 @@ namespace RooseLabs.Gameplay.Spells
             if (pGo.TryGetComponent(out Projectile projectile))
             {
                 DamageInfo damageInfo = new(damage, CasterCharacter.gameObject.transform);
+                damageInfo.hitDirection = direction;
                 projectile.Launch(direction * projectileSpeed, damageInfo);
             }
             else

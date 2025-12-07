@@ -1,4 +1,5 @@
 using FishNet;
+using RooseLabs.Utils;
 using UnityEngine;
 using Logger = RooseLabs.Core.Logger;
 
@@ -99,9 +100,9 @@ namespace RooseLabs.Gameplay
         protected virtual void OnProjectileCollision(Collider col)
         {
             m_hasCollided = true;
-            if (isServer && col.gameObject.TryGetComponent(out IDamageable damageable))
+            if (isServer && col.TryGetComponentInParent(out IDamageable damageable))
             {
-                damageInfo.position = col.ClosestPointOnBounds(projectileRigidbody.Rigidbody.position);
+                damageInfo.hitPoint = col.ClosestPointOnBounds(projectileRigidbody.Rigidbody.position);
                 damageable.ApplyDamage(damageInfo);
             }
 
