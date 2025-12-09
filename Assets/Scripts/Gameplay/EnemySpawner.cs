@@ -51,7 +51,7 @@ namespace RooseLabs.Enemies
             if (rooms.Length == 0)
             {
                 roomIdentifier = "Unknown";
-                Debug.LogWarning($"[EnemySpawner] No GameObjects found with tag '{roomTag}'. Spawner: {gameObject.name}");
+                this.LogWarning($"No GameObjects found with tag '{roomTag}'. Spawner: {gameObject.name}");
                 return;
             }
 
@@ -62,7 +62,7 @@ namespace RooseLabs.Enemies
                 if (parent.CompareTag(roomTag))
                 {
                     roomIdentifier = parent.gameObject.name;
-                    Debug.Log($"[EnemySpawner] {gameObject.name} assigned to room '{parent.gameObject.name}' (hierarchy-based)");
+                    this.LogInfo($"{gameObject.name} assigned to room '{parent.gameObject.name}' (hierarchy-based)");
                     return;
                 }
                 parent = parent.parent;
@@ -73,7 +73,7 @@ namespace RooseLabs.Enemies
             if (roomBelow != null)
             {
                 roomIdentifier = roomBelow.name;
-                Debug.Log($"[EnemySpawner] {gameObject.name} assigned to room '{roomBelow.name}' (raycast-based)");
+                this.LogInfo($"{gameObject.name} assigned to room '{roomBelow.name}' (raycast-based)");
                 return;
             }
 
@@ -82,7 +82,7 @@ namespace RooseLabs.Enemies
             if (roomByBounds != null)
             {
                 roomIdentifier = roomByBounds.name;
-                Debug.Log($"[EnemySpawner] {gameObject.name} assigned to room '{roomByBounds.name}' (bounds-based)");
+                this.LogInfo($"{gameObject.name} assigned to room '{roomByBounds.name}' (bounds-based)");
                 return;
             }
 
@@ -110,12 +110,12 @@ namespace RooseLabs.Enemies
             if (closestRoom != null && closestDistance < proximityThreshold)
             {
                 roomIdentifier = closestRoom.name;
-                Debug.Log($"[EnemySpawner] {gameObject.name} assigned to room '{closestRoom.name}' (proximity: {closestDistance:F1}m)");
+                this.LogInfo($"{gameObject.name} assigned to room '{closestRoom.name}' (proximity: {closestDistance:F1}m)");
             }
             else
             {
                 roomIdentifier = "Unknown";
-                Debug.LogWarning($"[EnemySpawner] {gameObject.name} couldn't find nearby room. Closest: {closestDistance:F1}m. Please assign manually.");
+                this.LogWarning($"{gameObject.name} couldn't find nearby room. Closest: {closestDistance:F1}m. Please assign manually.");
             }
         }
 
@@ -231,12 +231,12 @@ namespace RooseLabs.Enemies
             }
 
             // Draw label
-#if UNITY_EDITOR
+            #if UNITY_EDITOR
             UnityEditor.Handles.Label(
                 spawnTransform.position + Vector3.up * (gizmoSize + 0.5f),
                 $"Spawner\n{(string.IsNullOrEmpty(roomIdentifier) ? "Room: Auto" : $"Room: {roomIdentifier}")}"
             );
-#endif
+            #endif
         }
 
         private void OnDrawGizmosSelected()

@@ -1,17 +1,20 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Logger = RooseLabs.Core.Logger;
 
 namespace RooseLabs.Enemies
 {
     public class RoomPatrolZone
     {
+        private static Logger Logger => Logger.GetLogger("RoomPatrolZone");
+
         public string roomIdentifier;
-        public List<Vector3> waypoints = new List<Vector3>();
+        public List<Vector3> waypoints = new();
         public Bounds roomBounds;
 
         // Track active routes to avoid assigning same route to multiple enemies
-        private List<PatrolRouteAssignment> activeAssignments = new List<PatrolRouteAssignment>();
+        private readonly List<PatrolRouteAssignment> m_activeAssignments = new();
 
         // Different route strategies for the same room
         public enum RouteStrategy
@@ -35,7 +38,7 @@ namespace RooseLabs.Enemies
         public PatrolRoute GenerateUniqueRoute(GameObject enemy, RouteStrategy? preferredStrategy = null)
         {
             // Clean up null references
-            activeAssignments.RemoveAll(a => a.enemy == null);
+            m_activeAssignments.RemoveAll(a => a.enemy == null);
 
             // Determine strategy based on how many enemies already patrol here
             RouteStrategy strategy = preferredStrategy ?? DetermineStrategy();
@@ -47,14 +50,14 @@ namespace RooseLabs.Enemies
             PatrolRoute route = CreatePatrolRoute(routeWaypoints);
 
             // Track assignment
-            activeAssignments.Add(new PatrolRouteAssignment
+            m_activeAssignments.Add(new PatrolRouteAssignment
             {
                 enemy = enemy,
                 route = route,
                 strategy = strategy
             });
 
-            Debug.Log($"[RoomPatrolZone] Generated {strategy} route for room '{roomIdentifier}' with {routeWaypoints.Count} waypoints");
+            Logger.Info($"Generated {strategy} route for room '{roomIdentifier}' with {routeWaypoints.Count} waypoints");
 
             return route;
         }
@@ -64,7 +67,7 @@ namespace RooseLabs.Enemies
         /// </summary>
         public void ReleaseRoute(GameObject enemy)
         {
-            activeAssignments.RemoveAll(a => a.enemy == enemy);
+            m_activeAssignments.RemoveAll(a => a.enemy == enemy);
         }
 
         /// <summary>
@@ -72,8 +75,8 @@ namespace RooseLabs.Enemies
         /// </summary>
         public int GetActiveEnemyCount()
         {
-            activeAssignments.RemoveAll(a => a.enemy == null);
-            return activeAssignments.Count;
+            m_activeAssignments.RemoveAll(a => a.enemy == null);
+            return m_activeAssignments.Count;
         }
 
         /// <summary>
@@ -109,7 +112,7 @@ namespace RooseLabs.Enemies
         {
             if (waypoints.Count == 0)
             {
-                Debug.LogWarning($"[RoomPatrolZone] No waypoints in room '{roomIdentifier}'");
+                Logger.Warning($"No waypoints in room '{roomIdentifier}'");
                 return new List<Vector3>();
             }
 

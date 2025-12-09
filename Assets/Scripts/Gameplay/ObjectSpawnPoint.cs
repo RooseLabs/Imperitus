@@ -96,7 +96,7 @@ namespace RooseLabs.Gameplay
             Vector3 worldCenter = transform.TransformPoint(center);
             int layerMask = LayerMask.GetMask("Default", "Ground", "Draggable");
 
-            int nOverlaps = Physics.OverlapBoxNonAlloc(worldCenter, halfExtents, m_overlaps, transform.rotation, layerMask);
+            int nOverlaps = Physics.OverlapBoxNonAlloc(worldCenter, halfExtents, m_overlaps, transform.rotation, layerMask, QueryTriggerInteraction.Ignore);
 
             // First overlap is always self, so we check for more than 1
             Gizmos.color = nOverlaps > 1 ? new Color(1, 0, 0, 0.3f) : new Color(0, 1, 0, 0.3f);

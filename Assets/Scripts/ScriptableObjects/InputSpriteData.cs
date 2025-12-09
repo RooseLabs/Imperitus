@@ -53,8 +53,10 @@ namespace RooseLabs.ScriptableObjects
             {
                 switch (InputHandler.GetGamepadType(device))
                 {
+                    default:
                     case GamepadType.Unknown:
                     case GamepadType.Xbox:
+                    case GamepadType.SwitchPro:
                         return xboxSprites;
                     case GamepadType.DualShock:
                     case GamepadType.DualSense:

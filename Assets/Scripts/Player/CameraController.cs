@@ -145,7 +145,7 @@ namespace RooseLabs.Player
             Vector3 desiredPosition = m_currentSpecTargetPosition + distanceOffset;
 
             // Raycast to prevent camera clipping through walls
-            if (targetCharacter.RaycastIgnoreSelf(m_currentSpecTargetPosition, distanceOffset.normalized, out RaycastHit hit, m_spectateDistance))
+            if (targetCharacter.RaycastIgnoreSelf(m_currentSpecTargetPosition, distanceOffset.normalized, out RaycastHit hit, m_spectateDistance, HelperFunctions.AllPhysicalLayerMask, QueryTriggerInteraction.Ignore))
             {
                 desiredPosition = hit.point + hit.normal * 0.2f;
             }

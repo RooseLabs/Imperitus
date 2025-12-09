@@ -1,7 +1,7 @@
-using FishNet.Object;
-using RooseLabs.Utils;
 using System.Collections.Generic;
 using System.Linq;
+using FishNet.Object;
+using RooseLabs.Utils;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -97,11 +97,11 @@ namespace RooseLabs.Enemies
         {
             if (!IsServerInitialized)
             {
-                Debug.LogWarning("[PatrolPointGenerator] GeneratePatrolPoints() should only be called on server!");
+                this.LogWarning("GeneratePatrolPoints() should only be called on server!");
                 return null;
             }
 
-            Debug.Log("[PatrolPointGenerator] Starting patrol point generation...");
+            this.LogInfo("Starting patrol point generation...");
 
             // Clear previous data
             generatedPoints.Clear();
@@ -111,11 +111,11 @@ namespace RooseLabs.Enemies
             Bounds mapBounds = CalculateMapBounds();
             if (mapBounds.size == Vector3.zero)
             {
-                Debug.LogError("[PatrolPointGenerator] No map container found with tag: " + mapContainerTag);
+                this.LogError("No map container found with tag: " + mapContainerTag);
                 return null;
             }
 
-            Debug.Log($"[PatrolPointGenerator] Map bounds: {mapBounds.size}, Center: {mapBounds.center}");
+            this.LogInfo($"Map bounds: {mapBounds.size}, Center: {mapBounds.center}");
 
             // Generate grid of sample points
             int pointsGenerated = 0;
@@ -139,7 +139,7 @@ namespace RooseLabs.Enemies
                 }
             }
 
-            Debug.Log($"[PatrolPointGenerator] Generation complete! Valid points: {pointsGenerated}, Rejected: {pointsRejected}");
+            this.LogInfo($"Generation complete! Valid points: {pointsGenerated}, Rejected: {pointsRejected}");
 
             // Optimize waypoint order for efficient patrol routes
             if (generatedPoints.Count > 1)
@@ -283,7 +283,7 @@ namespace RooseLabs.Enemies
             }
 
             generatedPoints = optimized;
-            Debug.Log("[PatrolPointGenerator] Waypoint order optimized for smoother patrol paths");
+            this.LogInfo("Waypoint order optimized for smoother patrol paths");
         }
 
         /// <summary>
@@ -325,7 +325,7 @@ namespace RooseLabs.Enemies
                 route.waypoints.Add(waypointObj.transform);
             }
 
-            Debug.Log($"[PatrolPointGenerator] Created PatrolRoute with {route.waypoints.Count} waypoints");
+            this.LogInfo($"Created PatrolRoute with {route.waypoints.Count} waypoints");
             return route;
         }
 
@@ -355,7 +355,7 @@ namespace RooseLabs.Enemies
             generatedPoints.Clear();
             rejectedPoints.Clear();
 
-            Debug.Log("[PatrolPointGenerator] Cleared all patrol points");
+            this.LogInfo("Cleared all patrol points");
         }
 
         /// <summary>
@@ -440,11 +440,11 @@ namespace RooseLabs.Enemies
         {
             if (!IsServerInitialized)
             {
-                Debug.LogWarning("[PatrolPointGenerator] GenerateRoomPatrolZones() should only be called on server!");
+                this.LogWarning("GenerateRoomPatrolZones() should only be called on server!");
                 return null;
             }
 
-            Debug.Log("[PatrolPointGenerator] Starting room-based patrol zone generation...");
+            this.LogInfo("Starting room-based patrol zone generation...");
 
             // Clear previous data
             generatedPoints.Clear();
@@ -455,11 +455,11 @@ namespace RooseLabs.Enemies
             Bounds mapBounds = CalculateMapBounds();
             if (mapBounds.size == Vector3.zero)
             {
-                Debug.LogError("[PatrolPointGenerator] No map container found with tag: " + mapContainerTag);
+                this.LogError("No map container found with tag: " + mapContainerTag);
                 return null;
             }
 
-            Debug.Log($"[PatrolPointGenerator] Map bounds: {mapBounds.size}, Center: {mapBounds.center}");
+            this.LogInfo($"Map bounds: {mapBounds.size}, Center: {mapBounds.center}");
 
             // Generate grid of sample points (same as before)
             int pointsGenerated = 0;
@@ -483,12 +483,12 @@ namespace RooseLabs.Enemies
                 }
             }
 
-            Debug.Log($"[PatrolPointGenerator] Waypoint generation complete! Valid: {pointsGenerated}, Rejected: {pointsRejected}");
+            this.LogInfo($"Waypoint generation complete! Valid: {pointsGenerated}, Rejected: {pointsRejected}");
 
             // Group waypoints by room
             GroupWaypointsByRoom();
 
-            Debug.Log($"[PatrolPointGenerator] Created {roomPatrolZones.Count} patrol zones");
+            this.LogInfo($"Created {roomPatrolZones.Count} patrol zones");
 
             return roomPatrolZones;
         }
@@ -503,12 +503,12 @@ namespace RooseLabs.Enemies
 
             if (rooms.Length == 0)
             {
-                Debug.LogWarning($"[PatrolPointGenerator] No rooms found with tag '{roomTag}', creating single patrol zone");
+                this.LogWarning($"No rooms found with tag '{roomTag}', creating single patrol zone");
                 CreateSinglePatrolZone();
                 return;
             }
 
-            Debug.Log($"[PatrolPointGenerator] Found {rooms.Length} rooms with tag '{roomTag}'");
+            this.LogInfo($"Found {rooms.Length} rooms with tag '{roomTag}'");
 
             // Create a patrol zone for each room
             foreach (GameObject room in rooms)
@@ -520,7 +520,7 @@ namespace RooseLabs.Enemies
                 };
 
                 roomPatrolZones[room.name] = zone;
-                Debug.Log($"[PatrolPointGenerator] Created zone for room: {room.name}");
+                this.LogInfo($"Created zone for room: {room.name}");
             }
 
             // Assign each waypoint to nearest room
@@ -537,7 +537,7 @@ namespace RooseLabs.Enemies
             // Log results
             foreach (var zone in roomPatrolZones.Values)
             {
-                Debug.Log($"[PatrolPointGenerator] Room '{zone.roomIdentifier}': {zone.waypoints.Count} waypoints");
+                this.LogInfo($"Room '{zone.roomIdentifier}': {zone.waypoints.Count} waypoints");
             }
 
             // Remove empty zones
@@ -545,7 +545,7 @@ namespace RooseLabs.Enemies
             foreach (var emptyZone in emptyZones)
             {
                 roomPatrolZones.Remove(emptyZone);
-                Debug.LogWarning($"[PatrolPointGenerator] Removed empty zone: {emptyZone}");
+                this.LogWarning($"Removed empty zone: {emptyZone}");
             }
         }
 
@@ -604,7 +604,7 @@ namespace RooseLabs.Enemies
                 return zone;
             }
 
-            Debug.LogWarning($"[PatrolPointGenerator] No patrol zone found for room: {roomIdentifier}");
+            this.LogWarning($"No patrol zone found for room: {roomIdentifier}");
             return null;
         }
 
@@ -773,11 +773,11 @@ namespace RooseLabs.Enemies
             Bounds mapBounds = CalculateMapBounds();
             if (mapBounds.size == Vector3.zero)
             {
-                Debug.LogError("[PatrolPointGenerator] No map container found with tag: " + mapContainerTag);
+                this.LogError("No map container found with tag: " + mapContainerTag);
                 return false;
             }
 
-            Debug.Log($"[PatrolPointGenerator] Map bounds: {mapBounds.size}, Center: {mapBounds.center}");
+            this.LogInfo($"Map bounds: {mapBounds.size}, Center: {mapBounds.center}");
 
             int pointsGenerated = 0;
             int pointsRejected = 0;
@@ -800,7 +800,7 @@ namespace RooseLabs.Enemies
                 }
             }
 
-            Debug.Log($"[PatrolPointGenerator] Generation complete! Valid points: {pointsGenerated}, Rejected: {pointsRejected}");
+            this.LogInfo($"Generation complete! Valid points: {pointsGenerated}, Rejected: {pointsRejected}");
 
             // Optimize waypoint order
             if (generatedPoints.Count > 1)

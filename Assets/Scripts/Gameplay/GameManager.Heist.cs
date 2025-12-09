@@ -200,12 +200,12 @@ namespace RooseLabs.Gameplay
 
         private void SpawnRuneContainerObjectAtPoint(RuneObjectSpawnPoint spawnPoint, RuneSO rune = null)
         {
-            if (spawnPoint.AllowedObjects == null || spawnPoint.AllowedObjects.Length == 0)
+            if (spawnPoint.AllowedObjects.Length == 0)
             {
                 this.LogWarning($"Rune Object Spawn point '{spawnPoint.name}' has no AllowedObjects assigned!");
                 return;
             }
-            GameObject[] validObjects = spawnPoint.AllowedObjects.Where(obj => obj != null).ToArray();
+            GameObject[] validObjects = spawnPoint.AllowedObjects.Where(obj => (bool)obj).ToArray();
             if (validObjects.Length == 0)
             {
                 this.LogWarning($"Rune Object Spawn point '{spawnPoint.name}' has only null AllowedObjects!");
