@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Logger = RooseLabs.Core.Logger;
 
 namespace RooseLabs.Vosk
 {
@@ -10,6 +11,7 @@ namespace RooseLabs.Vosk
     /// </summary>
     public class VoiceProcessor : MonoBehaviour
     {
+        private static Logger Logger => Logger.GetLogger("SpeechToText");
         /// <summary>
         /// Indicates whether microphone is capturing or not
         /// </summary>
@@ -110,7 +112,7 @@ namespace RooseLabs.Vosk
             if (Devices == null || Devices.Count == 0)
             {
                 CurrentDeviceIndex = -1;
-                Debug.LogWarning("There is no valid recording device connected");
+                Logger.Warning("There is no valid recording device connected");
                 return;
             }
 
@@ -125,7 +127,7 @@ namespace RooseLabs.Vosk
         {
             if (deviceIndex < 0 || deviceIndex >= Devices.Count)
             {
-                Debug.LogWarning($"Specified device index {deviceIndex} is not a valid recording device");
+                Logger.Warning($"Specified device index {deviceIndex} is not a valid recording device");
                 return;
             }
 

@@ -1,17 +1,18 @@
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
 using Vosk;
+using Logger = RooseLabs.Core.Logger;
 
 namespace RooseLabs.Vosk
 {
     public class VoskSpeechToText : MonoBehaviour
     {
+        private static Logger Logger => Logger.GetLogger("SpeechToText");
         [SerializeField, Tooltip("The source of the microphone input.")]
         private VoiceProcessor voiceProcessor;
 
@@ -22,7 +23,7 @@ namespace RooseLabs.Vosk
         private bool autoStart = true;
 
         [SerializeField, Tooltip("The phrases that will be detected. If left empty, all words will be detected.")]
-        private List<string> keyPhrases = new();
+        private string[] keyPhrases = Array.Empty<string>();
 
         // The path to the model folder relative to StreamingAssets.
         private string m_modelPath = "LanguageModels/en-US";
@@ -59,6 +60,11 @@ namespace RooseLabs.Vosk
         // Flag to signal we are ending
         private bool m_running;
 
+        /// <summary>
+        /// Indicates whether speech recognition is currently active
+        /// </summary>
+        public bool IsRecording => m_running;
+
         // Thread safe queue of microphone data.
         private readonly ConcurrentQueue<short[]> m_threadedBufferQueue = new();
 
@@ -77,19 +83,19 @@ namespace RooseLabs.Vosk
         /// </summary>
         /// <param name="keyPhrases">A list of keywords/phrases. Keywords need to exist in the models dictionary, so some words like "webview" are better detected as two more common words "web view".</param>
         /// <param name="modelPath">The path to the model folder relative to StreamingAssets.</param>
-        /// <param name="startMicrophone">"Should the microphone after vosk initializes?</param>
+        /// <param name="startRecording">Should start recording immediately after initialization?</param>
         /// <param name="maxAlternatives">The maximum number of alternative phrases detected</param>
-        public void StartVoskStt(List<string> keyPhrases = null, string modelPath = null, bool startMicrophone = false, int maxAlternatives = 3)
+        public void StartVoskStt(string[] keyPhrases = null, string modelPath = null, bool startRecording = false, int maxAlternatives = 3)
         {
             if (m_isInitializing)
             {
-                Debug.LogError("Initializing in progress!");
+                Logger.Error("Initialization in progress!");
                 return;
             }
 
             if (m_didInit)
             {
-                Debug.LogError("Vosk has already been initialized!");
+                Logger.Error("Vosk has already been initialized!");
                 return;
             }
 
@@ -104,11 +110,11 @@ namespace RooseLabs.Vosk
             }
 
             this.maxAlternatives = maxAlternatives;
-            StartCoroutine(DoStartVoskStt(startMicrophone));
+            StartCoroutine(DoStartVoskStt(startRecording));
         }
 
-        // Load model and start Vosk with optional microphone start
-        private IEnumerator DoStartVoskStt(bool startMicrophone)
+        // Load model and start Vosk with optional recording start
+        private IEnumerator DoStartVoskStt(bool startRecording)
         {
             m_isInitializing = true;
             yield return WaitForMicrophoneInput();
@@ -124,19 +130,17 @@ namespace RooseLabs.Vosk
             voiceProcessor.OnFrameCaptured += VoiceProcessorOnOnFrameCaptured;
             voiceProcessor.OnRecordingStop += VoiceProcessorOnOnRecordingStop;
 
-            if (startMicrophone)
-                voiceProcessor.StartRecording();
-
             m_isInitializing = false;
             m_didInit = true;
 
-            ToggleRecording();
+            if (startRecording)
+                StartRecording();
         }
 
         // Translates the keyPhrases into a JSON array and appends the `[unk]` keyword at the end to tell Vosk to filter other phrases.
         private void UpdateGrammar()
         {
-            if (keyPhrases.Count == 0)
+            if (keyPhrases.Length == 0)
             {
                 m_grammar = "";
                 return;
@@ -160,22 +164,48 @@ namespace RooseLabs.Vosk
                 yield return null;
         }
 
-        // Can be called from a script or a GUI button to start detection.
+        /// <summary>
+        /// Starts recording and speech recognition
+        /// </summary>
+        public void StartRecording()
+        {
+            if (!m_didInit)
+            {
+                Logger.Warning("VoskSpeechToText has not been initialized yet!");
+                return;
+            }
+
+            if (m_running) return;
+
+            Logger.Info("Started Recording");
+            m_running = true;
+            voiceProcessor.StartRecording();
+            Task.Run(ThreadedWork).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Stops recording and speech recognition
+        /// </summary>
+        public void StopRecording()
+        {
+            if (!m_running) return;
+            Logger.Info("Stopped Recording");
+            m_running = false;
+            voiceProcessor.StopRecording();
+        }
+
+        /// <summary>
+        /// Toggles recording on/off
+        /// </summary>
         public void ToggleRecording()
         {
-            Debug.Log("Toggle Recording");
-            if (!voiceProcessor.IsRecording)
+            if (voiceProcessor.IsRecording)
             {
-                Debug.Log("Start Recording");
-                m_running = true;
-                voiceProcessor.StartRecording();
-                Task.Run(ThreadedWork).ConfigureAwait(false);
+                StopRecording();
             }
             else
             {
-                Debug.Log("Stop Recording");
-                m_running = false;
-                voiceProcessor.StopRecording();
+                StartRecording();
             }
         }
 
@@ -197,7 +227,7 @@ namespace RooseLabs.Vosk
         // Callback from the voice processor when recording stops
         private void VoiceProcessorOnOnRecordingStop()
         {
-            Debug.Log("Stopped");
+            m_running = false;
         }
 
         private async Task ThreadedWork()
@@ -220,7 +250,7 @@ namespace RooseLabs.Vosk
                 // m_recognizer.SetWords(true);
                 m_recognizerReady = true;
 
-                Debug.Log("Vosk recognizer ready");
+                Logger.Info("Vosk Recognizer Ready");
             }
 
             while (m_running)

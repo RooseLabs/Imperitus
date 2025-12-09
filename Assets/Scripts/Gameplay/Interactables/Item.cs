@@ -176,6 +176,6 @@ namespace RooseLabs.Gameplay.Interactables
             RequestPickup(interactor);
         }
 
-        public virtual string GetInteractionText() => string.Empty;
+        public virtual string GetInteractionText() => "Pick up";
     }
 }
