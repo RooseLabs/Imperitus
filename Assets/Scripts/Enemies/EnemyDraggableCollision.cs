@@ -100,7 +100,7 @@ namespace RooseLabs.Enemies
         {
             var expiredPlayers = m_playerCooldowns
                 .Where(kvp => Time.time > kvp.Value)
-                .Select(kvp => kvp.Key);
+                .Select(kvp => kvp.Key).ToList();
 
             foreach (var playerID in expiredPlayers)
             {
