@@ -59,7 +59,6 @@ namespace RooseLabs.Gameplay
             "The cauldron never sleeps",
             "Werewolves skip full moons",
             "Enchantment smells like cinnamon",
-            "The oracle joined drama club",
             "Gnomes argue about snacks",
             "The potion glows nervously",
             "Spirits whisper test answers",
