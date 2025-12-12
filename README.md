@@ -2,10 +2,19 @@
 
 ## Project Overview
 
-**Made by**: 
-José Miguel Pereira Silva Cunha (A22550)
+### Group
 
-The project explores the following AI techniques in game development:
+- José Miguel Pereira Silva Cunha (A22550)
+
+---
+
+### Introduction
+
+The project explores some AI techniques commonly used in game development, most specifically in our game **Imperitus**. 
+
+**Imperitus** is a solo or co-op first-person game where players take on the role of students at a prestigious, yet unforgiving magical academy. The players must solve puzzles, avoid enemies, and collect runes to learn the spells required for their classes.
+
+This project will explore the following AI techniques:
 
 1. **NavMesh Pathfinding** - Unity's A* algorithm implementation for enemy navigation
 2. **Finite State Machine (FSM)** - Behavior management system for enemy AI
@@ -910,7 +919,7 @@ The `RecognitionResult` class handles three types of Vosk responses:
 - **Result**: Single final result without alternatives
 - **Partial**: Real-time transcription while the user is still speaking
 
-Each phrase includes both the recognized text and a confidence score (0.0 to 1.0), allowing the system to filter out uncertain recognitions.
+Each phrase includes both the recognized text and a confidence score, allowing the system to filter out uncertain recognitions.
 
 #### VoiceSpellCaster
 
