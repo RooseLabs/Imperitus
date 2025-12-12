@@ -1,0 +1,186 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="956pt" height="873pt" viewBox="0.00 0.00 956.00 873.00">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 868.8)">
+<title>HanaduraStateMachine</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-868.8 951.93,-868.8 951.93,4 -4,4"/>
+<g id="clust1" class="cluster">
+<title>cluster_legend</title>
+<polygon fill="white" stroke="black" points="648.82,-644 648.82,-856.8 886.82,-856.8 886.82,-644 648.82,-644"/>
+<text xml:space="preserve" text-anchor="middle" x="767.82" y="-842" font-family="Times,serif" font-size="12.00">Detection Priority System</text>
+</g>
+<!-- start -->
+<g id="node1" class="node">
+<title>start</title>
+<ellipse fill="black" stroke="black" cx="309.82" cy="-739.2" rx="31.43" ry="31.43"/>
+<text xml:space="preserve" text-anchor="middle" x="309.82" y="-735" font-family="Arial" font-size="14.00" fill="white">Start</text>
+</g>
+<!-- Patrol -->
+<g id="node2" class="node">
+<title>Patrol</title>
+<path fill="lightgreen" stroke="black" d="M626.32,-813.2C626.32,-813.2 441.33,-813.2 441.33,-813.2 435.33,-813.2 429.33,-807.2 429.33,-801.2 429.33,-801.2 429.33,-677.2 429.33,-677.2 429.33,-671.2 435.33,-665.2 441.33,-665.2 441.33,-665.2 626.32,-665.2 626.32,-665.2 632.32,-665.2 638.32,-671.2 638.32,-677.2 638.32,-677.2 638.32,-801.2 638.32,-801.2 638.32,-807.2 632.32,-813.2 626.32,-813.2"/>
+<text xml:space="preserve" text-anchor="start" x="494.92" y="-797.6" font-family="Arial" font-weight="bold" font-size="14.00">Patrol State</text>
+<text xml:space="preserve" text-anchor="start" x="481.69" y="-769.6" font-family="Arial" font-size="14.00">        </text>
+<text xml:space="preserve" text-anchor="start" x="512.81" y="-769.6" font-family="Arial" font-style="italic" font-size="14.00">Animations:</text>
+<text xml:space="preserve" text-anchor="start" x="460.68" y="-755.6" font-family="Arial" font-size="14.00">        • IsChasing: false</text>
+<text xml:space="preserve" text-anchor="start" x="439.27" y="-741.6" font-family="Arial" font-size="14.00">        • IsLookingAround: false</text>
+<text xml:space="preserve" text-anchor="start" x="488.69" y="-713.6" font-family="Arial" font-size="14.00">        </text>
+<text xml:space="preserve" text-anchor="start" x="519.81" y="-713.6" font-family="Arial" font-style="italic" font-size="14.00">Behavior:</text>
+<text xml:space="preserve" text-anchor="start" x="449.4" y="-699.6" font-family="Arial" font-size="14.00">        • Follows patrol route</text>
+<text xml:space="preserve" text-anchor="start" x="446.68" y="-685.6" font-family="Arial" font-size="14.00">        • Random room patrol</text>
+<text xml:space="preserve" text-anchor="start" x="437.33" y="-671.6" font-family="Arial" font-size="14.00">        • Responds to detections</text>
+</g>
+<!-- start&#45;&gt;Patrol -->
+<g id="edge1" class="edge">
+<title>start-&gt;Patrol</title>
+<path fill="none" stroke="black" d="M341.44,-739.2C361.78,-739.2 389.58,-739.2 417.74,-739.2"/>
+<polygon fill="black" stroke="black" points="417.43,-742.7 427.43,-739.2 417.43,-735.7 417.43,-742.7"/>
+<text xml:space="preserve" text-anchor="middle" x="385.29" y="-745.2" font-family="Arial" font-size="10.00">OnStartServer()</text>
+</g>
+<!-- Chase -->
+<g id="node3" class="node">
+<title>Chase</title>
+<path fill="lightyellow" stroke="black" d="M285.04,-592C285.04,-592 94.61,-592 94.61,-592 88.61,-592 82.61,-586 82.61,-580 82.61,-580 82.61,-456 82.61,-456 82.61,-450 88.61,-444 94.61,-444 94.61,-444 285.04,-444 285.04,-444 291.04,-444 297.04,-450 297.04,-456 297.04,-456 297.04,-580 297.04,-580 297.04,-586 291.04,-592 285.04,-592"/>
+<text xml:space="preserve" text-anchor="start" x="149.75" y="-576.4" font-family="Arial" font-weight="bold" font-size="14.00">Chase State</text>
+<text xml:space="preserve" text-anchor="start" x="137.69" y="-548.4" font-family="Arial" font-size="14.00">        </text>
+<text xml:space="preserve" text-anchor="start" x="168.81" y="-548.4" font-family="Arial" font-style="italic" font-size="14.00">Animations:</text>
+<text xml:space="preserve" text-anchor="start" x="119.41" y="-534.4" font-family="Arial" font-size="14.00">        • IsChasing: true</text>
+<text xml:space="preserve" text-anchor="start" x="95.27" y="-520.4" font-family="Arial" font-size="14.00">        • IsLookingAround: false</text>
+<text xml:space="preserve" text-anchor="start" x="144.69" y="-492.4" font-family="Arial" font-size="14.00">        </text>
+<text xml:space="preserve" text-anchor="start" x="175.81" y="-492.4" font-family="Arial" font-style="italic" font-size="14.00">Behavior:</text>
+<text xml:space="preserve" text-anchor="start" x="90.61" y="-478.4" font-family="Arial" font-size="14.00">        • Updates path every 0.2s</text>
+<text xml:space="preserve" text-anchor="start" x="110.07" y="-464.4" font-family="Arial" font-size="14.00">        • Moves to target or</text>
+<text xml:space="preserve" text-anchor="start" x="111.23" y="-450.4" font-family="Arial" font-size="14.00">          last known position</text>
+</g>
+<!-- Patrol&#45;&gt;Chase -->
+<g id="edge3" class="edge">
+<title>Patrol-&gt;Chase</title>
+<path fill="none" stroke="orange" d="M428.86,-675.07C403.76,-662.66 376.49,-651.25 349.82,-644 331.16,-638.93 189.31,-648.06 176.03,-634 168.01,-625.5 164.34,-614.93 163.46,-603.67"/>
+<polygon fill="orange" stroke="orange" points="166.96,-603.75 163.45,-593.75 159.96,-603.75 166.96,-603.75"/>
+<text xml:space="preserve" text-anchor="middle" x="245.93" y="-625" font-family="Arial" font-size="10.00">Visual/Alert Detection</text>
+<text xml:space="preserve" text-anchor="middle" x="245.93" y="-613" font-family="Arial" font-size="10.00">(has target, dist &gt; attackRange)</text>
+</g>
+<!-- Attack -->
+<g id="node4" class="node">
+<title>Attack</title>
+<path fill="lightcoral" stroke="black" d="M530.15,-176C530.15,-176 347.5,-176 347.5,-176 341.5,-176 335.5,-170 335.5,-164 335.5,-164 335.5,-12 335.5,-12 335.5,-6 341.5,0 347.5,0 347.5,0 530.15,0 530.15,0 536.15,0 542.15,-6 542.15,-12 542.15,-12 542.15,-164 542.15,-164 542.15,-170 536.15,-176 530.15,-176"/>
+<text xml:space="preserve" text-anchor="start" x="398.37" y="-160.4" font-family="Arial" font-weight="bold" font-size="14.00">Attack State</text>
+<text xml:space="preserve" text-anchor="start" x="386.69" y="-132.4" font-family="Arial" font-size="14.00">        </text>
+<text xml:space="preserve" text-anchor="start" x="417.81" y="-132.4" font-family="Arial" font-style="italic" font-size="14.00">Animations:</text>
+<text xml:space="preserve" text-anchor="start" x="365.68" y="-118.4" font-family="Arial" font-size="14.00">        • IsChasing: false</text>
+<text xml:space="preserve" text-anchor="start" x="344.27" y="-104.4" font-family="Arial" font-size="14.00">        • IsLookingAround: false</text>
+<text xml:space="preserve" text-anchor="start" x="365" y="-90.4" font-family="Arial" font-size="14.00">        • Trigger: "Attack"</text>
+<text xml:space="preserve" text-anchor="start" x="393.69" y="-62.4" font-family="Arial" font-size="14.00">        </text>
+<text xml:space="preserve" text-anchor="start" x="424.81" y="-62.4" font-family="Arial" font-style="italic" font-size="14.00">Behavior:</text>
+<text xml:space="preserve" text-anchor="start" x="362.96" y="-48.4" font-family="Arial" font-size="14.00">        • Stops movement</text>
+<text xml:space="preserve" text-anchor="start" x="348.56" y="-34.4" font-family="Arial" font-size="14.00">        • Rotates to face target</text>
+<text xml:space="preserve" text-anchor="start" x="350.51" y="-20.4" font-family="Arial" font-size="14.00">        • Aims model at hitbox</text>
+<text xml:space="preserve" text-anchor="start" x="343.5" y="-6.4" font-family="Arial" font-size="14.00">        • Locks during animation</text>
+</g>
+<!-- Patrol&#45;&gt;Attack -->
+<g id="edge4" class="edge">
+<title>Patrol-&gt;Attack</title>
+<path fill="none" stroke="red" d="M621.97,-664.88C651.62,-638.05 679.17,-609.9 686.82,-592 712.69,-531.52 703.84,-507.54 686.82,-444 660.39,-345.28 592.1,-251.3 533.86,-184.87"/>
+<polygon fill="red" stroke="red" points="536.7,-182.8 527.45,-177.63 531.46,-187.44 536.7,-182.8"/>
+<text xml:space="preserve" text-anchor="middle" x="767.29" y="-417" font-family="Arial" font-size="10.00">Visual Detection</text>
+<text xml:space="preserve" text-anchor="middle" x="767.29" y="-405" font-family="Arial" font-size="10.00">(has target, dist ≤ attackRange + LOS)</text>
+</g>
+<!-- Investigate -->
+<g id="node5" class="node">
+<title>Investigate</title>
+<path fill="lightsteelblue" stroke="black" d="M545.71,-384C545.71,-384 331.94,-384 331.94,-384 325.94,-384 319.94,-378 319.94,-372 319.94,-372 319.94,-248 319.94,-248 319.94,-242 325.94,-236 331.94,-236 331.94,-236 545.71,-236 545.71,-236 551.71,-236 557.71,-242 557.71,-248 557.71,-248 557.71,-372 557.71,-372 557.71,-378 551.71,-384 545.71,-384"/>
+<text xml:space="preserve" text-anchor="start" x="383.19" y="-368.4" font-family="Arial" font-weight="bold" font-size="14.00">Investigate State</text>
+<text xml:space="preserve" text-anchor="start" x="386.69" y="-340.4" font-family="Arial" font-size="14.00">        </text>
+<text xml:space="preserve" text-anchor="start" x="417.81" y="-340.4" font-family="Arial" font-style="italic" font-size="14.00">Animations:</text>
+<text xml:space="preserve" text-anchor="start" x="365.68" y="-326.4" font-family="Arial" font-size="14.00">        • IsChasing: false</text>
+<text xml:space="preserve" text-anchor="start" x="347" y="-312.4" font-family="Arial" font-size="14.00">        • IsLookingAround: true</text>
+<text xml:space="preserve" text-anchor="start" x="393.69" y="-284.4" font-family="Arial" font-size="14.00">        </text>
+<text xml:space="preserve" text-anchor="start" x="424.81" y="-284.4" font-family="Arial" font-style="italic" font-size="14.00">Behavior:</text>
+<text xml:space="preserve" text-anchor="start" x="329.1" y="-270.4" font-family="Arial" font-size="14.00">        • Moves to investigation point</text>
+<text xml:space="preserve" text-anchor="start" x="327.94" y="-256.4" font-family="Arial" font-size="14.00">        • Stops and looks around (6s)</text>
+<text xml:space="preserve" text-anchor="start" x="363.74" y="-242.4" font-family="Arial" font-size="14.00">        • Returns to patrol</text>
+</g>
+<!-- Patrol&#45;&gt;Investigate -->
+<g id="edge2" class="edge">
+<title>Patrol-&gt;Investigate</title>
+<path fill="none" stroke="blue" d="M562.48,-664.77C581.82,-603.56 598.99,-515.18 569.82,-444 562.26,-425.53 550.74,-408.25 537.63,-392.65"/>
+<polygon fill="blue" stroke="blue" points="540.41,-390.51 531.19,-385.3 535.15,-395.13 540.41,-390.51"/>
+<text xml:space="preserve" text-anchor="middle" x="634.07" y="-521" font-family="Arial" font-size="10.00">Sound/Alert Detection</text>
+<text xml:space="preserve" text-anchor="middle" x="634.07" y="-509" font-family="Arial" font-size="10.00">(no direct target)</text>
+</g>
+<!-- Chase&#45;&gt;Patrol -->
+<g id="edge7" class="edge">
+<title>Chase-&gt;Patrol</title>
+<path fill="none" stroke="green" d="M294.85,-592.48C302.07,-598.25 309.13,-604.13 315.82,-610 326.84,-619.67 326.79,-625.1 338.43,-634 363.05,-652.82 391.53,-670.12 419.01,-684.99"/>
+<polygon fill="green" stroke="green" points="417.27,-688.03 427.74,-689.64 420.56,-681.85 417.27,-688.03"/>
+<text xml:space="preserve" text-anchor="middle" x="395.13" y="-619" font-family="Arial" font-size="10.00">Detection expired/cleared</text>
+</g>
+<!-- Chase&#45;&gt;Attack -->
+<g id="edge5" class="edge">
+<title>Chase-&gt;Attack</title>
+<path fill="none" stroke="red" d="M82.17,-453.17C59.19,-434.04 37.99,-410.86 25.16,-384 -3.2,-324.65 -12.78,-289.74 25.16,-236 92.28,-140.92 226.51,-106.96 323.91,-95.04"/>
+<polygon fill="red" stroke="red" points="324.26,-98.53 333.8,-93.9 323.46,-91.57 324.26,-98.53"/>
+<text xml:space="preserve" text-anchor="middle" x="86.99" y="-313" font-family="Arial" font-size="10.00">Target in range</text>
+<text xml:space="preserve" text-anchor="middle" x="86.99" y="-301" font-family="Arial" font-size="10.00">(dist ≤ attackRange + LOS)</text>
+</g>
+<!-- Chase&#45;&gt;Investigate -->
+<g id="edge6" class="edge">
+<title>Chase-&gt;Investigate</title>
+<path fill="none" stroke="blue" d="M285.74,-443.63C292.64,-437.79 299.4,-431.87 305.82,-426 316.64,-416.12 317.72,-412.01 328.42,-402 332.03,-398.61 335.76,-395.2 339.55,-391.79"/>
+<polygon fill="blue" stroke="blue" points="341.66,-394.6 346.81,-385.34 337.01,-389.36 341.66,-394.6"/>
+<text xml:space="preserve" text-anchor="middle" x="390.12" y="-417" font-family="Arial" font-size="10.00">Lost target,</text>
+<text xml:space="preserve" text-anchor="middle" x="390.12" y="-405" font-family="Arial" font-size="10.00">reached last known position</text>
+</g>
+<!-- Attack&#45;&gt;Patrol -->
+<g id="edge9" class="edge">
+<title>Attack-&gt;Patrol</title>
+<path fill="none" stroke="green" d="M542.51,-132.56C643.95,-181.48 792.43,-271.51 857.82,-402 916.18,-518.43 788.25,-563.38 678.82,-634 665.59,-642.54 658.69,-636.52 644.82,-644 637,-648.22 629.22,-653.07 621.64,-658.28"/>
+<polygon fill="green" stroke="green" points="619.83,-655.27 613.72,-663.92 623.89,-660.97 619.83,-655.27"/>
+<text xml:space="preserve" text-anchor="middle" x="907.63" y="-417" font-family="Arial" font-size="10.00">Detection expired/</text>
+<text xml:space="preserve" text-anchor="middle" x="907.63" y="-405" font-family="Arial" font-size="10.00">target lost</text>
+</g>
+<!-- Attack&#45;&gt;Chase -->
+<g id="edge8" class="edge">
+<title>Attack-&gt;Chase</title>
+<path fill="none" stroke="orange" d="M335.15,-130.59C288.84,-154.51 238.05,-189.24 207.99,-236 170.81,-293.86 169.01,-372.99 174.93,-432.53"/>
+<polygon fill="orange" stroke="orange" points="171.43,-432.73 176,-442.29 178.39,-431.97 171.43,-432.73"/>
+<text xml:space="preserve" text-anchor="middle" x="259.41" y="-313" font-family="Arial" font-size="10.00">Target out of range OR</text>
+<text xml:space="preserve" text-anchor="middle" x="259.41" y="-301" font-family="Arial" font-size="10.00">no line of sight</text>
+</g>
+<!-- Investigate&#45;&gt;Patrol -->
+<g id="edge10" class="edge">
+<title>Investigate-&gt;Patrol</title>
+<path fill="none" stroke="green" d="M449.74,-384.45C450.49,-390.38 451.2,-396.29 451.82,-402 461.04,-486.19 445.01,-510.03 466.32,-592 471.77,-612.97 480.11,-634.64 489.09,-654.66"/>
+<polygon fill="green" stroke="green" points="485.84,-655.97 493.19,-663.6 492.2,-653.05 485.84,-655.97"/>
+<text xml:space="preserve" text-anchor="middle" x="516.07" y="-521" font-family="Arial" font-size="10.00">Investigation complete</text>
+<text xml:space="preserve" text-anchor="middle" x="516.07" y="-509" font-family="Arial" font-size="10.00">(timer expired)</text>
+</g>
+<!-- Investigate&#45;&gt;Chase -->
+<g id="edge11" class="edge">
+<title>Investigate-&gt;Chase</title>
+<path fill="none" stroke="orange" d="M319.86,-368.04C305.85,-373.83 291.62,-379.3 277.82,-384 244.71,-395.28 224.25,-375.69 201.2,-402 193.54,-410.75 188.76,-421.43 185.96,-432.73"/>
+<polygon fill="orange" stroke="orange" points="182.59,-431.73 184.13,-442.21 189.46,-433.06 182.59,-431.73"/>
+<text xml:space="preserve" text-anchor="middle" x="251.51" y="-417" font-family="Arial" font-size="10.00">Target detected during</text>
+<text xml:space="preserve" text-anchor="middle" x="251.51" y="-405" font-family="Arial" font-size="10.00">investigation</text>
+</g>
+<!-- Investigate&#45;&gt;Attack -->
+<g id="edge12" class="edge">
+<title>Investigate-&gt;Attack</title>
+<path fill="none" stroke="red" d="M438.82,-235.74C438.82,-220.31 438.82,-203.78 438.82,-187.58"/>
+<polygon fill="red" stroke="red" points="442.32,-187.96 438.82,-177.96 435.32,-187.96 442.32,-187.96"/>
+<text xml:space="preserve" text-anchor="middle" x="487.46" y="-209" font-family="Arial" font-size="10.00">Target in attack range</text>
+<text xml:space="preserve" text-anchor="middle" x="487.46" y="-197" font-family="Arial" font-size="10.00">during investigation</text>
+</g>
+<!-- legend -->
+<g id="node6" class="node">
+<title>legend</title>
+<path fill="white" stroke="none" d="M866.98,-826.4C866.98,-826.4 668.67,-826.4 668.67,-826.4 662.67,-826.4 656.67,-820.4 656.67,-814.4 656.67,-814.4 656.67,-664 656.67,-664 656.67,-658 662.67,-652 668.67,-652 668.67,-652 866.98,-652 866.98,-652 872.98,-652 878.98,-658 878.98,-664 878.98,-664 878.98,-814.4 878.98,-814.4 878.98,-820.4 872.98,-826.4 866.98,-826.4"/>
+<text xml:space="preserve" text-anchor="start" x="666.67" y="-808.8" font-family="Arial" font-weight="bold" font-size="14.00">Priority Levels (Low → High):</text>
+<text xml:space="preserve" text-anchor="start" x="666.67" y="-787" font-family="Arial" font-size="14.00">1. None (Patrol)</text>
+<text xml:space="preserve" text-anchor="start" x="666.67" y="-766.2" font-family="Arial" font-size="14.00">2. SoundOther (footsteps, items)</text>
+<text xml:space="preserve" text-anchor="start" x="666.67" y="-745.4" font-family="Arial" font-size="14.00">3. AlertFromAI (Grimoire alert)</text>
+<text xml:space="preserve" text-anchor="start" x="666.67" y="-724.6" font-family="Arial" font-size="14.00">4. SoundVoice (player voice)</text>
+<text xml:space="preserve" text-anchor="start" x="666.67" y="-703.8" font-family="Arial" font-size="14.00">5. Visual (direct LOS)</text>
+<text xml:space="preserve" text-anchor="start" x="666.67" y="-683" font-family="Arial" font-size="14.00"> </text>
+<text xml:space="preserve" text-anchor="start" x="666.67" y="-663.2" font-family="Arial" font-style="italic" font-size="14.00">Higher priority overrides lower</text>
+</g>
+</g>
+</svg>
