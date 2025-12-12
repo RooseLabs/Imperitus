@@ -2,14 +2,14 @@ using UnityEngine;
 
 namespace RooseLabs.Enemies
 {
-    public class PatrolState : IEnemyState
+    public class HanaduraPatrolState : IEnemyState
     {
         private HanaduraAI ai;
         private PatrolRoute route;
         private int currentIndex;
         private bool loop;
 
-        public PatrolState(HanaduraAI ai, PatrolRoute route, bool loop, int startIndex = 0)
+        public HanaduraPatrolState(HanaduraAI ai, PatrolRoute route, bool loop, int startIndex = 0)
         {
             this.ai = ai;
             this.route = route;
@@ -17,7 +17,7 @@ namespace RooseLabs.Enemies
             this.currentIndex = startIndex;
         }
 
-        public void Enter()
+        public void OnEnter()
         {
             ai.SetAnimatorBool("IsChasing", false);
             ai.SetAnimatorBool("IsLookingAround", false);
@@ -50,11 +50,11 @@ namespace RooseLabs.Enemies
             MoveToCurrentWaypoint();
         }
 
-        public void Exit()
+        public void OnExit()
         {
         }
 
-        public void Tick()
+        public void Update()
         {
             if (route == null || route.Count == 0) return;
 

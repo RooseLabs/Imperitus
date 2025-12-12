@@ -17,7 +17,7 @@ namespace RooseLabs.Enemies
             this.alertDuration = alertDuration;
         }
 
-        public void Enter()
+        public void OnEnter()
         {
             ai.navAgent.isStopped = true;
             alertTimer = alertDuration;
@@ -25,21 +25,21 @@ namespace RooseLabs.Enemies
             // RPC to show visual alert to all clients
             ai.RPC_ShowAlert();
 
-            //Debug.Log("[GrimoireAlertState] Player detected! Entering Alert state");
+            // Debug.Log("[GrimoireAlertState] Player detected! Entering Alert state");
         }
 
-        public void Exit()
+        public void OnExit()
         {
 
         }
 
-        public void Tick()
+        public void Update()
         {
             alertTimer -= Time.deltaTime;
 
             // Rotate spotlight to track player
             Transform detectedPlayer = ai.DetectedPlayer;
-            if (detectedPlayer != null)
+            if (detectedPlayer)
             {
                 ai.RotateSpotlightToTarget(detectedPlayer, 5f);
             }
@@ -47,15 +47,15 @@ namespace RooseLabs.Enemies
             // After alert duration, transition
             if (alertTimer <= 0f)
             {
-                if (detectedPlayer != null)
+                if (detectedPlayer)
                 {
                     // Still have target, go to tracking
-                    ai.EnterState(ai.trackingState);
+                    ai.ChangeState(ai.TrackingState);
                 }
                 else
                 {
                     // Lost target, return to patrol
-                    ai.EnterState(ai.patrolState);
+                    ai.ChangeState(ai.PatrolState);
                 }
             }
         }

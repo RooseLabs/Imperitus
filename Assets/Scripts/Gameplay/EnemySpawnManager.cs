@@ -542,7 +542,7 @@ namespace RooseLabs.Enemies
                 this.LogInfo($"Hanadura spawned in room '{roomId}' as '{enemyObj.name}' (now {roomActiveHanaduras[roomId].Count}/{maxHanaduraPerRoom})");
             }
             // Subscribe to death event
-            if (enemyObj.TryGetComponent(out EnemyData enemyData))
+            if (enemyObj.TryGetComponent(out BaseEnemy enemyData))
             {
                 StartCoroutine(WaitForDeathSubscription(enemyObj, enemyData, isGrimoire));
             }
@@ -571,7 +571,7 @@ namespace RooseLabs.Enemies
             this.LogInfo($"Grimoire spawned (alert spawn at position: {alertPosition})");
         }
 
-        private IEnumerator WaitForDeathSubscription(GameObject enemyObj, EnemyData enemyData, bool isGrimoire)
+        private IEnumerator WaitForDeathSubscription(GameObject enemyObj, BaseEnemy baseEnemy, bool isGrimoire)
         {
             // Wait for enemy to be fully initialized
             yield return new WaitForSeconds(0.5f);
@@ -581,7 +581,7 @@ namespace RooseLabs.Enemies
                 yield break;
 
             // Monitor for death
-            while (enemyObj != null && !enemyData.IsDead)
+            while (enemyObj != null && !baseEnemy.IsDead)
             {
                 yield return new WaitForSeconds(0.5f);
             }

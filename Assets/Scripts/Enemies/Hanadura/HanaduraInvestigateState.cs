@@ -3,7 +3,7 @@ using Logger = RooseLabs.Core.Logger;
 
 namespace RooseLabs.Enemies
 {
-    public class InvestigateState : IEnemyState
+    public class HanaduraInvestigateState : IEnemyState
     {
         private static Logger Logger => Logger.GetLogger("Hanadura");
 
@@ -17,12 +17,12 @@ namespace RooseLabs.Enemies
 
         public bool IsInvestigationComplete => investigationComplete;
 
-        public InvestigateState(HanaduraAI owner)
+        public HanaduraInvestigateState(HanaduraAI owner)
         {
             this.owner = owner;
         }
 
-        public void Enter()
+        public void OnEnter()
         {
             owner.SetAnimatorBool("IsChasing", false);
             owner.SetAnimatorBool("IsLookingAround", false);
@@ -44,13 +44,13 @@ namespace RooseLabs.Enemies
             Logger.Info($"[InvestigateState] Starting investigation at {investigatePoint}");
         }
 
-        public void Exit()
+        public void OnExit()
         {
             owner.SetAnimatorBool("IsLookingAround", false);
             Logger.Info("[InvestigateState] Finished investigating.");
         }
 
-        public void Tick()
+        public void Update()
         {
             // Check if reached investigation point
             if (!hasReachedPoint)

@@ -22,7 +22,7 @@ namespace RooseLabs.Enemies
             this.waypointReachThreshold = reachThreshold;
         }
 
-        public void Enter()
+        public void OnEnter()
         {
             if (route == null || route.Count == 0)
             {
@@ -34,16 +34,22 @@ namespace RooseLabs.Enemies
             FindNearestWaypoint();
             MoveToWaypoint(currentWaypointIndex);
 
-            //Debug.Log("[GrimoirePatrolState] Entered - starting patrol");
+            // Debug.Log("[GrimoirePatrolState] Entered - starting patrol");
         }
 
-        public void Exit()
+        public void OnExit()
         {
 
         }
 
-        public void Tick()
+        public void Update()
         {
+            if (ai.DetectedPlayer)
+            {
+                ai.ChangeState(ai.AlertState);
+                return;
+            }
+
             if (route == null || route.Count == 0) return;
 
             // Check if reached current waypoint

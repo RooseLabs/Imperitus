@@ -1,8 +1,8 @@
+using System.Collections;
+using System.Collections.Generic;
 using FishNet.Object;
 using RooseLabs.Gameplay;
 using RooseLabs.ScriptableObjects;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using Logger = RooseLabs.Core.Logger;
@@ -10,8 +10,7 @@ using Logger = RooseLabs.Core.Logger;
 namespace RooseLabs.Enemies
 {
     [RequireComponent(typeof(NavMeshAgent))]
-    [RequireComponent(typeof(NetworkObject))]
-    public class HanaduraAI : NetworkBehaviour, ISoundListener, IEnemyAI
+    public class HanaduraAI : BaseEnemy
     {
         private static Logger Logger => Logger.GetLogger("Hanadura");
 
@@ -23,13 +22,11 @@ namespace RooseLabs.Enemies
         public WeaponCollider weaponCollider;
         public Transform RaycastOrigin;
         public Transform modelTransform;
-        public EnemyData enemyData;
         public Rigidbody rb;
 
         [Header("Combat")]
         public float attackRange = 4f;
         public float attackCooldown = 1.2f;
-        public int attackDamage = 0;
         // This is just a reference to the duration of the hanadura attack so
         // I can lock state changes during the attack animation...
         public float attackAnimationDuration = 2.3f;
@@ -65,17 +62,10 @@ namespace RooseLabs.Enemies
         private string currentRandomRoomId;
 
         // FSM states
-        private IEnemyState currentState;
-        private PatrolState patrolState;
-        private ChaseState chaseState;
-        private AttackState attackState;
-        private InvestigateState investigateState;
-
-        public IEnemyState CurrentState => currentState;
-        public PatrolState PatrolState => patrolState;
-        public ChaseState ChaseState => chaseState;
-        public AttackState AttackState => attackState;
-        public InvestigateState InvestigateState => investigateState;
+        public HanaduraPatrolState PatrolState { get; private set; }
+        public HanaduraChaseState ChaseState { get; private set; }
+        public HanaduraAttackState AttackState { get; private set; }
+        public HanaduraInvestigateState InvestigateState { get; private set; }
 
         // Server-controlled target reference (only used server-side)
         public Transform CurrentTarget { get; private set; }
@@ -96,7 +86,6 @@ namespace RooseLabs.Enemies
         private bool hasPlayedDeathAnimation = false;
 
         #region Detection Priority System
-
         public enum DetectionPriority
         {
             None = 0,
@@ -125,19 +114,6 @@ namespace RooseLabs.Enemies
             }
         }
 
-        private void Start()
-        {
-            animator = GetComponentInChildren<Animator>();
-            weaponCollider = GetComponentInChildren<WeaponCollider>();
-            enemyData = GetComponent<EnemyData>();
-            rb = GetComponent<Rigidbody>();
-
-            if (enemyData != null)
-            {
-                attackDamage = enemyData.AttackDamage;
-            }
-        }
-
         private bool ShouldSwitchToNewDetection(DetectionInfo newDetection)
         {
             // No current detection, always switch
@@ -147,14 +123,14 @@ namespace RooseLabs.Enemies
             // Check if current detection has expired
             if (IsDetectionStale(currentDetection))
             {
-                //DebugManager.Log("[HanaduraAI] Current detection expired, switching to new detection.");
+                // Logger.Info("Current detection expired, switching to new detection.");
                 return true;
             }
 
             // Higher priority always wins
             if (newDetection.priority > currentDetection.priority)
             {
-                //DebugManager.Log($"[HanaduraAI] New detection priority ({newDetection.priority}) > current ({currentDetection.priority}), switching.");
+                // Logger.Info($"New detection priority ({newDetection.priority}) > current ({currentDetection.priority}), switching.");
                 return true;
             }
 
@@ -171,7 +147,7 @@ namespace RooseLabs.Enemies
 
                 if (newDist < currentDist)
                 {
-                    //DebugManager.Log($"[HanaduraAI] Same priority, new detection closer ({newDist:F2}m vs {currentDist:F2}m), switching.");
+                    //Logger.Info($"Same priority, new detection closer ({newDist:F2}m vs {currentDist:F2}m), switching.");
                     return true;
                 }
                 return false;
@@ -182,7 +158,7 @@ namespace RooseLabs.Enemies
                 // Use intensity for sounds (higher intensity wins)
                 if (newDetection.metric > currentDetection.metric)
                 {
-                    //DebugManager.Log($"[HanaduraAI] Same priority, new sound louder ({newDetection.metric:F2} vs {currentDetection.metric:F2}), switching.");
+                    // Logger.Info($"Same priority, new sound louder ({newDetection.metric:F2} vs {currentDetection.metric:F2}), switching.");
                     return true;
                 }
                 return false;
@@ -212,31 +188,28 @@ namespace RooseLabs.Enemies
             LastKnownTargetPosition = null;
             hasTriggeredDetectedAnimation = false;
             isPlayingDetectedAnimation = false;
-            //DebugManager.Log("[HanaduraAI] Cleared current detection.");
+            //Logger.Info("Cleared current detection.");
         }
-
         #endregion
 
-        private void Reset()
+        protected override void Initialize()
         {
-            navAgent = GetComponent<NavMeshAgent>();
+            modelTransform.TryGetComponent(out animator);
+            TryGetComponent(out weaponCollider);
+            TryGetComponent(out rb);
+            TryGetComponent(out navAgent);
+            TryGetComponent(out detection);
         }
 
         public override void OnStartServer()
         {
-            base.OnStartServer();
-
-            // Ensure components exist
-            if (navAgent == null) navAgent = GetComponent<NavMeshAgent>();
-            if (detection == null) detection = GetComponent<EnemyDetection>();
-
             // Create states
-            patrolState = new PatrolState(this, patrolRoute, loopPatrol, startWaypointIndex);
-            chaseState = new ChaseState(this);
-            attackState = new AttackState(this);
-            investigateState = new InvestigateState(this);
+            PatrolState = new HanaduraPatrolState(this, patrolRoute, loopPatrol, startWaypointIndex);
+            ChaseState = new HanaduraChaseState(this);
+            AttackState = new HanaduraAttackState(this);
+            InvestigateState = new HanaduraInvestigateState(this);
 
-            EnterState(patrolState);
+            ChangeState(PatrolState);
 
             // Initialize random room patrol timer with random offset to stagger checks
             randomRoomCheckTimer = Random.Range(0f, randomRoomCheckInterval);
@@ -250,29 +223,21 @@ namespace RooseLabs.Enemies
             if (!IsServerInitialized) return;
 
             // Recreate patrol state with new route
-            patrolState = new PatrolState(this, patrolRoute, loopPatrol, startWaypointIndex);
+            PatrolState = new HanaduraPatrolState(this, patrolRoute, loopPatrol, startWaypointIndex);
 
             // If currently patrolling, re-enter the state to apply changes
-            if (currentState is PatrolState)
+            if (currentState is HanaduraPatrolState)
             {
-                EnterState(patrolState);
+                ChangeState(PatrolState);
             }
 
-            Logger.Info($"[HanaduraAI] Patrol state reinitialized with {patrolRoute?.Count ?? 0} waypoints");
+            Logger.Info($"Patrol state reinitialized with {patrolRoute?.Count ?? 0} waypoints");
         }
 
         private void Update()
         {
-            if (!base.IsServerInitialized)
-                return;
-
-            if (!hasPlayedDeathAnimation && enemyData.IsDead)
-            {
-                HandleDeath_ServerRPC();
-                return;
-            }
-            else if (enemyData.IsDead)
-                return;
+            if (!IsServerInitialized) return;
+            if (IsDead) return;
 
             // Check if Detected animation finished
             if (isPlayingDetectedAnimation)
@@ -287,7 +252,7 @@ namespace RooseLabs.Enemies
             // Only tick state and update if not playing detected animation
             if (!isPlayingDetectedAnimation)
             {
-                currentState?.Tick();
+                currentState?.Update();
             }
 
             attackTimer -= Time.deltaTime;
@@ -304,7 +269,7 @@ namespace RooseLabs.Enemies
             ProcessVisualDetection();
 
             // Only check for stale detections if NOT currently investigating
-            if (!(currentState is InvestigateState))
+            if (!(currentState is HanaduraInvestigateState))
             {
                 if (currentDetection != null && IsDetectionStale(currentDetection))
                 {
@@ -319,7 +284,7 @@ namespace RooseLabs.Enemies
             }
 
             // Handle random room patrol system (only when in patrol state and no active detection)
-            if (currentState is PatrolState && currentDetection == null)
+            if (currentState is HanaduraPatrolState && currentDetection == null)
             {
                 UpdateRandomRoomPatrol();
             }
@@ -329,15 +294,15 @@ namespace RooseLabs.Enemies
         {
             Transform detected = detection.DetectedTarget;
 
-            if (detected != null)
+            if (detected)
             {
-                if (!hasTriggeredDetectedAnimation && currentState is PatrolState)
+                if (!hasTriggeredDetectedAnimation && currentState is HanaduraPatrolState)
                 {
                     SetAnimatorTrigger("Detected");
                     hasTriggeredDetectedAnimation = true;
                     isPlayingDetectedAnimation = true;
                     StopMovement(); // Stop the enemy
-                    Logger.Info("[HanaduraAI] First visual detection - playing Detected animation");
+                    Logger.Info("First visual detection - playing Detected animation");
                 }
 
                 // Reset lost sight timer
@@ -385,9 +350,9 @@ namespace RooseLabs.Enemies
             if (currentDetection == null)
             {
                 // No detection, return to patrol
-                if (!(currentState is PatrolState))
+                if (currentState is not HanaduraPatrolState)
                 {
-                    EnterState(patrolState);
+                    ChangeState(PatrolState);
                 }
                 return;
             }
@@ -398,7 +363,6 @@ namespace RooseLabs.Enemies
                 case DetectionPriority.Visual:
                     HandleVisualDetection();
                     break;
-
                 case DetectionPriority.SoundVoice:
                 case DetectionPriority.SoundOther:
                 case DetectionPriority.AlertFromAI:
@@ -420,14 +384,14 @@ namespace RooseLabs.Enemies
 
             if (canAttack)
             {
-                if (!(currentState is AttackState))
-                    EnterState(attackState);
+                if (currentState is not HanaduraAttackState)
+                    ChangeState(AttackState);
             }
             else
             {
                 // Either too far OR no line of sight -> chase
-                if (!(currentState is ChaseState))
-                    EnterState(chaseState);
+                if (currentState is not HanaduraChaseState)
+                    ChangeState(ChaseState);
             }
         }
 
@@ -442,13 +406,13 @@ namespace RooseLabs.Enemies
                 float dist = Vector3.Distance(transform.position, CurrentTarget.position);
                 if (dist <= attackRange)
                 {
-                    if (!(currentState is AttackState))
-                        EnterState(attackState);
+                    if (currentState is not HanaduraAttackState)
+                        ChangeState(AttackState);
                 }
                 else
                 {
-                    if (!(currentState is ChaseState))
-                        EnterState(chaseState);
+                    if (currentState is not HanaduraChaseState)
+                        ChangeState(ChaseState);
                 }
             }
             else
@@ -459,29 +423,15 @@ namespace RooseLabs.Enemies
 
                 // Only transition to investigate if not already investigating, 
                 // or if already investigating and it's complete
-                if (!(currentState is InvestigateState))
+                if (currentState is not HanaduraInvestigateState)
                 {
-                    EnterState(investigateState);
+                    ChangeState(InvestigateState);
                 }
-                else if (investigateState.IsInvestigationComplete)
+                else if (InvestigateState.IsInvestigationComplete)
                 {
                     // Investigation complete, clear detection to return to patrol
                     ClearCurrentDetection();
                 }
-            }
-        }
-
-        public void EnterState(IEnemyState newState)
-        {
-            if (currentState != null)
-                currentState.Exit();
-
-            currentState = newState;
-
-            if (currentState != null)
-            {
-                Logger.Info($"[HanaduraAI] Entered state: {currentState.GetType().Name}");
-                currentState.Enter();
             }
         }
 
@@ -490,7 +440,7 @@ namespace RooseLabs.Enemies
         /// </summary>
         public void AlertToPosition(Vector3 position, Transform target = null)
         {
-            if (!base.IsServerInitialized) return;
+            if (!IsServerInitialized) return;
 
             float dist = Vector3.Distance(transform.position, position);
             DetectionInfo alertDetection = new DetectionInfo(
@@ -504,18 +454,18 @@ namespace RooseLabs.Enemies
             {
                 currentDetection = alertDetection;
 
-                if (target != null)
+                if (target)
                 {
-                    //DebugManager.Log($"[HanaduraAI] AI Alert with target: {target.name} at {position}");
+                    // Logger.Info($"AI Alert with target: {target.name} at {position}");
                 }
                 else
                 {
-                    //DebugManager.Log($"[HanaduraAI] AI Alert to investigate: {position}");
+                    // Logger.Info($"AI Alert to investigate: {position}");
                 }
             }
             else
             {
-                //DebugManager.Log($"[HanaduraAI] AI Alert ignored (current priority: {currentDetection?.priority})");
+                // Logger.Info($"AI Alert ignored (current priority: {currentDetection?.priority})");
             }
         }
 
@@ -533,7 +483,7 @@ namespace RooseLabs.Enemies
         /// </summary>
         public void OnSoundHeard(Vector3 position, SoundType type, float intensity)
         {
-            if (!base.IsServerInitialized) return;
+            if (!IsServerInitialized) return;
 
             // Only react to sufficiently strong sounds
             if (intensity < minSoundIntensity)
@@ -554,40 +504,40 @@ namespace RooseLabs.Enemies
             if (ShouldSwitchToNewDetection(soundDetection))
             {
                 currentDetection = soundDetection;
-                //DebugManager.Log($"[HanaduraAI] Sound detected: '{type.key}' ({priority}) with intensity {intensity:F2} at {position}");
+                // Logger.Info($"Sound detected: '{type.key}' ({priority}) with intensity {intensity:F2} at {position}");
             }
             else
             {
-                //DebugManager.Log($"[HanaduraAI] Sound '{type.key}' ignored (current priority: {currentDetection?.priority}, intensity: {intensity:F2})");
+                // Logger.Info($"Sound '{type.key}' ignored (current priority: {currentDetection?.priority}, intensity: {intensity:F2})");
             }
         }
 
         #region Movement & Attack APIs (Server-side)
-
         public void MoveTo(Vector3 position)
         {
-            if (!base.IsServerInitialized) return;
+            if (!IsServerInitialized) return;
             navAgent.isStopped = false;
             navAgent.SetDestination(position);
         }
 
         public void StopMovement()
         {
-            if (!base.IsServerInitialized) return;
+            if (!IsServerInitialized) return;
             navAgent.isStopped = true;
         }
+
         public bool TryPerformAttack()
         {
-            if (!base.IsServerInitialized) return false;
+            if (!IsServerInitialized) return false;
             if (attackTimer > 0f) return false;
-            if (CurrentTarget == null) return false;
+            if (!CurrentTarget) return false;
 
             float dist = Vector3.Distance(transform.position, CurrentTarget.position);
             if (dist > attackRange) return false;
 
             if (!detection.HasLineOfSightOfHitbox(CurrentTarget, RaycastOrigin))
             {
-                //Debug.Log("[HanaduraAI] Cannot attack - no current line of sight to target hitbox");
+                Logger.Info("Cannot attack - no current line of sight to target hitbox");
                 return false;
             }
 
@@ -601,7 +551,7 @@ namespace RooseLabs.Enemies
             }
             else
             {
-                Debug.LogWarning("[HanaduraAI] WeaponCollider reference is missing!");
+                Logger.Warning("WeaponCollider reference is missing!");
             }
 
             return true;
@@ -610,26 +560,12 @@ namespace RooseLabs.Enemies
 
         public void SetAnimatorBool(string paramName, bool value)
         {
-            if (animator != null)
-            {
-                animator.SetBool(paramName, value);
-                //DebugManager.Log($"[HanaduraAI] Set animator bool '{paramName}' to {value}");
-            }
-
-            // Sync to all clients
-            if (IsServerInitialized)
-            {
-                Rpc_SetAnimatorBool(paramName, value);
-            }
+            animator?.SetBool(paramName, value);
         }
 
         public void SetAnimatorTrigger(string paramName)
         {
-            if (animator != null)
-            {
-                animator.SetTrigger(paramName);
-                //DebugManager.Log($"[HanaduraAI] Triggered animator '{paramName}'");
-            }
+            animator?.SetTrigger(paramName);
 
             // Sync to all clients
             if (IsServerInitialized)
@@ -638,29 +574,16 @@ namespace RooseLabs.Enemies
             }
         }
 
-        [ObserversRpc]
-        private void Rpc_SetAnimatorBool(string paramName, bool value)
-        {
-            if (animator != null && !base.IsServerInitialized) // Only clients execute this
-            {
-                animator.SetBool(paramName, value);
-            }
-        }
-
-        [ObserversRpc]
+        [ObserversRpc(ExcludeServer = true)]
         private void Rpc_SetAnimatorTrigger(string paramName)
         {
-            if (animator != null && !base.IsServerInitialized) // Only clients execute this
-            {
-                animator.SetTrigger(paramName);
-            }
+            animator?.SetTrigger(paramName);
         }
-
 
         public void SyncModelRotation(Quaternion localRotation)
         {
-            if (!base.IsServerInitialized) return;
-            if (modelTransform != null)
+            if (!IsServerInitialized) return;
+            if (modelTransform)
             {
                 modelTransform.localRotation = localRotation;
 
@@ -668,10 +591,10 @@ namespace RooseLabs.Enemies
             }
         }
 
-        [ObserversRpc]
+        [ObserversRpc(ExcludeServer = true)]
         private void Rpc_SyncModelRotation(Quaternion localRotation)
         {
-            if (!base.IsServerInitialized && modelTransform != null)
+            if (modelTransform)
             {
                 modelTransform.localRotation = localRotation;
             }
@@ -683,65 +606,51 @@ namespace RooseLabs.Enemies
             attackLockDuration = attackAnimationDuration;
         }
 
-        [ServerRpc(RequireOwnership = false)]
-        public void HandleDeath_ServerRPC()
+        protected override void OnDeath()
         {
-            if (!IsServerInitialized) 
-                return;
-
-            if (animator != null)
+            if (animator)
             {
                 HandleDeath_ObserversRPC();
             }
             else
             {
-                Debug.LogWarning($"No Animator found on {gameObject.name}, cannot play death animation.");
+                Logger.Warning($"No Animator found on {gameObject.name}, cannot play death animation.");
                 Despawn(gameObject);
             }
         }
 
-        [ObserversRpc]
+        [ObserversRpc(ExcludeServer = true, RunLocally = true)]
         private void HandleDeath_ObserversRPC()
         {
-            if (animator != null && !hasPlayedDeathAnimation)
+            if (!animator || hasPlayedDeathAnimation) return;
+            StopMovement();
+            currentState = null;
+            ClearCurrentDetection();
+
+            // Clean up random room patrol if active
+            if (isPatrollingRandomRoom && !string.IsNullOrEmpty(currentRandomRoomId))
             {
-                StopMovement();
-                currentState = null;
-                ClearCurrentDetection();
+                EnemySpawnManager.Instance.UnregisterRandomPatroller(gameObject, currentRandomRoomId);
 
-                // Clean up random room patrol if active
-                if (isPatrollingRandomRoom && !string.IsNullOrEmpty(currentRandomRoomId))
-                {
-                    EnemySpawnManager.Instance.UnregisterRandomPatroller(gameObject, currentRandomRoomId);
-
-                    RoomPatrolZone randomZone = GameManager.Instance.GetPatrolZone(currentRandomRoomId);
-                    randomZone?.ReleaseRoute(gameObject);
-                    isPatrollingRandomRoom = false;
-                }
-
-                rb.isKinematic = true;
-                weaponCollider.DisableWeapon();
-
-                Collider col = gameObject.GetComponent<Collider>();
-                if (col != null)
-                    col.enabled = false;
-
-                animator.Play("Death");
-                hasPlayedDeathAnimation = true;
-
-                if (navAgent != null)
-                    navAgent.enabled = false;
-
-                Debug.Log($"{gameObject.name} death sequence executed on observer");
+                RoomPatrolZone randomZone = GameManager.Instance.GetPatrolZone(currentRandomRoomId);
+                randomZone?.ReleaseRoute(gameObject);
+                isPatrollingRandomRoom = false;
             }
-        }
 
-        public void OnEnemyDeath()
-        {
-            if (IsServerInitialized)
-            {
-                HandleDeath_ServerRPC();
-            }
+            rb.isKinematic = true;
+            weaponCollider.DisableWeapon();
+
+            Collider col = gameObject.GetComponent<Collider>();
+            if (col != null)
+                col.enabled = false;
+
+            animator.Play("Death");
+            hasPlayedDeathAnimation = true;
+
+            if (navAgent != null)
+                navAgent.enabled = false;
+
+            Logger.Info($"{gameObject.name} death sequence executed on observer");
         }
 
         private IEnumerator DespawnAfterDeath()
@@ -756,7 +665,6 @@ namespace RooseLabs.Enemies
         }
 
         #region Random Room Patrol System
-
         private void UpdateRandomRoomPatrol()
         {
             // If currently patrolling random room
@@ -793,7 +701,7 @@ namespace RooseLabs.Enemies
             // Get current room from spawner
             if (!EnemySpawnManager.Instance.activeEnemies.TryGetValue(gameObject, out EnemySpawner spawner))
             {
-                Debug.Log("[HanaduraAI] Cannot start random patrol - enemy not tracked by spawn manager");
+                Logger.Info("Cannot start random patrol - enemy not tracked by spawn manager");
                 return;
             }
 
@@ -803,7 +711,7 @@ namespace RooseLabs.Enemies
             var allZones = GameManager.Instance.GetAllPatrolZones();
             if (allZones == null || allZones.Count <= 1)
             {
-                Debug.Log("[HanaduraAI] Not enough rooms for random patrol");
+                Logger.Info("Not enough rooms for random patrol");
                 return;
             }
 
@@ -825,7 +733,7 @@ namespace RooseLabs.Enemies
                 // Skip if room already has a random patroller
                 if (EnemySpawnManager.Instance.IsRoomBeingRandomlyPatrolled(kvp.Key))
                 {
-                    Debug.Log($"[HanaduraAI] Skipping room '{kvp.Key}' - already has a random patroller");
+                    Logger.Info($"Skipping room '{kvp.Key}' - already has a random patroller");
                     continue;
                 }
 
@@ -834,7 +742,7 @@ namespace RooseLabs.Enemies
 
             if (validRoomIds.Count == 0)
             {
-                Debug.Log("[HanaduraAI] No valid rooms found for random patrol (all occupied or unavailable)");
+                Logger.Info("No valid rooms found for random patrol (all occupied or unavailable)");
                 return;
             }
 
@@ -860,11 +768,11 @@ namespace RooseLabs.Enemies
                 // Register this Hanadura as randomly patrolling this room
                 EnemySpawnManager.Instance.RegisterRandomPatroller(gameObject, currentRandomRoomId);
 
-                Debug.Log($"[HanaduraAI] '{gameObject.name}' started random room patrol: '{originalRoomId}' -> '{currentRandomRoomId}' for {randomRoomPatrolDuration}s");
+                Logger.Info($"'{gameObject.name}' started random room patrol: '{originalRoomId}' -> '{currentRandomRoomId}' for {randomRoomPatrolDuration}s");
             }
             else
             {
-                Debug.Log($"[HanaduraAI] '{gameObject.name}' failed to generate route for random room '{currentRandomRoomId}'");
+                Logger.Info($"'{gameObject.name}' failed to generate route for random room '{currentRandomRoomId}'");
             }
         }
 
@@ -872,7 +780,7 @@ namespace RooseLabs.Enemies
         {
             if (originalPatrolRoute == null)
             {
-                Debug.Log("[HanaduraAI] Cannot return to original room - no original route stored");
+                Logger.Info("Cannot return to original room - no original route stored");
                 isPatrollingRandomRoom = false;
                 return;
             }
@@ -895,7 +803,7 @@ namespace RooseLabs.Enemies
             isPatrollingRandomRoom = false;
             originalPatrolRoute = null;
 
-            Debug.Log($"[HanaduraAI] '{gameObject.name}' returned to original room: '{originalRoomId}'");
+            Logger.Info($"'{gameObject.name}' returned to original room: '{originalRoomId}'");
         }
 
         public bool IsPatrollingRandomRoom()
@@ -907,7 +815,14 @@ namespace RooseLabs.Enemies
         {
             return isPatrollingRandomRoom ? currentRandomRoomId : originalRoomId;
         }
-
         #endregion
+
+        #if UNITY_EDITOR
+        protected override void Reset()
+        {
+            base.Reset();
+            TryGetComponent(out navAgent);
+        }
+        #endif
     }
 }

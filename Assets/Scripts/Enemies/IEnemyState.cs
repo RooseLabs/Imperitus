@@ -2,8 +2,8 @@ namespace RooseLabs.Enemies
 {
     public interface IEnemyState
     {
-        void Enter();
-        void Exit();
-        void Tick();
+        void OnEnter();
+        void Update();
+        void OnExit();
     }
 }

@@ -3,19 +3,19 @@ using UnityEngine;
 
 namespace RooseLabs.Enemies
 {
-    public class AttackState : IEnemyState
+    public class HanaduraAttackState : IEnemyState
     {
         private HanaduraAI ai;
         private bool hasAttacked = false;
         private float rotationSpeed = 8f; 
         private float minRotationThreshold = 5f;
 
-        public AttackState(HanaduraAI ai)
+        public HanaduraAttackState(HanaduraAI ai)
         {
             this.ai = ai;
         }
 
-        public void Enter()
+        public void OnEnter()
         {
             ai.StopMovement();
             ai.SetAnimatorBool("IsChasing", false);
@@ -23,7 +23,7 @@ namespace RooseLabs.Enemies
             hasAttacked = false;
         }
 
-        public void Exit()
+        public void OnExit()
         {
             if (ai.weaponCollider != null)
             {
@@ -40,7 +40,7 @@ namespace RooseLabs.Enemies
             }
         }
 
-        public void Tick()
+        public void Update()
         {
             if (ai.CurrentTarget == null) return;
 

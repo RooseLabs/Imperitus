@@ -1,5 +1,6 @@
 using FishNet.Object;
 using RooseLabs.Gameplay;
+using RooseLabs.Utils;
 using UnityEngine;
 
 namespace RooseLabs.Enemies
@@ -107,22 +108,12 @@ namespace RooseLabs.Enemies
             if (((1 << other.gameObject.layer) & playerLayer) == 0) return;
 
             // Try to get IDamageable component
-            IDamageable damageable = other.GetComponent<IDamageable>();
-            if (damageable == null)
-            {
-                // Try getting it from parent (in case collider is on a child object)
-                damageable = other.GetComponentInParent<IDamageable>();
-            }
-
-            if (damageable == null)
-            {
-                //Debug.LogWarning($"[WeaponCollider] Hit {other.name} but no IDamageable found!");
+            if (!other.TryGetComponentInParent(out IDamageable damageable))
                 return;
-            }
 
             // Create damage info
             DamageInfo damage = new DamageInfo(
-                ownerAI.attackDamage,
+                ownerAI.AttackDamage,
                 other.ClosestPoint(weaponTipObject.transform.position),
                 (other.transform.position - weaponTipObject.transform.position).normalized,
                 ownerAI.transform
@@ -133,14 +124,8 @@ namespace RooseLabs.Enemies
 
             if (damageApplied)
             {
-                //Debug.Log($"[WeaponCollider] Hit {other.name} for {ownerAI.attackDamage} damage");
-
                 // Start damage cooldown
                 m_damageTimer = damageCooldown;
-            }
-            else
-            {
-                //Debug.Log($"[WeaponCollider] Hit {other.name} but damage was not applied (target may be dead or invincible)");
             }
         }
     }

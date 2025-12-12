@@ -14,7 +14,7 @@ namespace RooseLabs.Enemies
             this.ai = ai;
         }
 
-        public void Enter()
+        public void OnEnter()
         {
             ai.navAgent.isStopped = false;
             ai.navAgent.speed = ai.trackingSpeed;
@@ -22,17 +22,17 @@ namespace RooseLabs.Enemies
             //Debug.Log("[GrimoireTrackingState] Entered - actively tracking player");
         }
 
-        public void Exit()
+        public void OnExit()
         {
             ai.navAgent.speed = ai.patrolSpeed;
         }
 
-        public void Tick()
+        public void Update()
         {
             Transform detectedPlayer = ai.DetectedPlayer;
 
             // Continue tracking player while in sight
-            if (detectedPlayer != null)
+            if (detectedPlayer)
             {
                 ai.RotateSpotlightToTarget(detectedPlayer, 5f);
                 ai.navAgent.SetDestination(detectedPlayer.position);
@@ -40,7 +40,7 @@ namespace RooseLabs.Enemies
             else
             {
                 // Lost player, return to patrol
-                ai.EnterState(ai.patrolState);
+                ai.ChangeState(ai.PatrolState);
             }
         }
     }

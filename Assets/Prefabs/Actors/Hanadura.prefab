@@ -15,9 +15,8 @@ GameObject:
   - component: {fileID: 3025078776930143745}
   - component: {fileID: 5016868397172176932}
   - component: {fileID: 1005745351957962536}
-  - component: {fileID: 8806621658639097980}
-  - component: {fileID: 7904130191870220446}
   - component: {fileID: 2753149022113849445}
+  - component: {fileID: 8806621658639097980}
   - component: {fileID: 912312794422129550}
   - component: {fileID: 6208631941009141882}
   m_Layer: 14
@@ -130,6 +129,8 @@ MonoBehaviour:
   _componentIndexCache: 0
   _addedNetworkObject: {fileID: 8806621658639097980}
   _networkObjectCache: {fileID: 8806621658639097980}
+  maxHealth: 1
+  attackDamage: 10
   navAgent: {fileID: 0}
   detection: {fileID: 0}
   patrolRoute: {fileID: 0}
@@ -137,11 +138,9 @@ MonoBehaviour:
   weaponCollider: {fileID: 0}
   RaycastOrigin: {fileID: 286549264654445459}
   modelTransform: {fileID: 3943088723915446607}
-  enemyData: {fileID: 0}
   rb: {fileID: 0}
   attackRange: 4
   attackCooldown: 2
-  attackDamage: 10
   attackAnimationDuration: 2.3
   startWaypointIndex: 0
   loopPatrol: 1
@@ -203,6 +202,27 @@ MonoBehaviour:
   playerLayer:
     serializedVersion: 2
     m_Bits: 512
+--- !u!114 &2753149022113849445
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3774049500881470253}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 04fc5ee9a77b5374ea3513761396c31f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.EnemyDraggableCollision
+  _componentIndexCache: 3
+  _addedNetworkObject: {fileID: 8806621658639097980}
+  _networkObjectCache: {fileID: 8806621658639097980}
+  baseDamage: 10
+  damageForceThreshold: 50
+  forceToDamageMultiplier: 2
+  minimumDamageVelocity: 2.5
+  damageCooldownDuration: 1
+  baseEnemy: {fileID: 3025078776930143745}
 --- !u!114 &8806621658639097980
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -224,7 +244,7 @@ MonoBehaviour:
   NetworkBehaviours:
   - {fileID: 3025078776930143745}
   - {fileID: 1005745351957962536}
-  - {fileID: 7904130191870220446}
+  - {fileID: 0}
   - {fileID: 2753149022113849445}
   - {fileID: 912312794422129550}
   - {fileID: 6208631941009141882}
@@ -262,43 +282,6 @@ MonoBehaviour:
     Rotation: {x: 0, y: 0, z: 0, w: 1}
     Scale: {x: 1, y: 1, z: 1}
     IsValid: 1
---- !u!114 &7904130191870220446
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3774049500881470253}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 99e126251eeef9a44981e710dd568cc8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.EnemyData
-  _componentIndexCache: 2
-  _addedNetworkObject: {fileID: 8806621658639097980}
-  _networkObjectCache: {fileID: 8806621658639097980}
-  m_enemyType: {fileID: 11400000, guid: 8f85016ba8b7f1e4e9fc00909fbb49a3, type: 2}
---- !u!114 &2753149022113849445
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3774049500881470253}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 04fc5ee9a77b5374ea3513761396c31f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.EnemyDraggableCollision
-  _componentIndexCache: 3
-  _addedNetworkObject: {fileID: 8806621658639097980}
-  _networkObjectCache: {fileID: 8806621658639097980}
-  enemyData: {fileID: 7904130191870220446}
-  baseDamage: 10
-  damageForceThreshold: 50
-  forceToDamageMultiplier: 2
-  minimumDamageVelocity: 2.5
-  damageCooldownDuration: 1
 --- !u!114 &912312794422129550
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -406,34 +389,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 3679536469295908050}
     m_Modifications:
-    - target: {fileID: -8679921383154817045, guid: 40a8f7565f3902043897dd549a7663b9, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 40a8f7565f3902043897dd549a7663b9, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 40a8f7565f3902043897dd549a7663b9, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 40a8f7565f3902043897dd549a7663b9, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 40a8f7565f3902043897dd549a7663b9, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 40a8f7565f3902043897dd549a7663b9, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 40a8f7565f3902043897dd549a7663b9, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 40a8f7565f3902043897dd549a7663b9, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: 0

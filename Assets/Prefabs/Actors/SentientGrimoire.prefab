@@ -50,7 +50,7 @@ Light:
   m_InnerSpotAngle: 60
   m_CookieSize: 10
   m_Shadows:
-    m_Type: 0
+    m_Type: 2
     m_Resolution: -1
     m_CustomResolution: -1
     m_Strength: 1
@@ -172,11 +172,9 @@ GameObject:
   - component: {fileID: 16683904257332987}
   - component: {fileID: 2039317095261099087}
   - component: {fileID: 237211371112094711}
-  - component: {fileID: 3860053999190181839}
   - component: {fileID: 8735231212856205354}
   - component: {fileID: 4866373312013150636}
   - component: {fileID: 2923893137017715159}
-  - component: {fileID: 5557008658885784378}
   - component: {fileID: 6459826222640076540}
   m_Layer: 0
   m_Name: SentientGrimoire
@@ -194,7 +192,7 @@ Transform:
   m_GameObject: {fileID: 8490385624122815485}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -10.87, y: 3.72, z: -0.443}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -287,13 +285,14 @@ MonoBehaviour:
   _componentIndexCache: 0
   _addedNetworkObject: {fileID: 4866373312013150636}
   _networkObjectCache: {fileID: 4866373312013150636}
+  maxHealth: 1
+  attackDamage: 0
   navAgent: {fileID: 2039317095261099087}
   patrolRoute: {fileID: 0}
   animator: {fileID: 0}
   spotlight: {fileID: 3310447793082394167}
   spotlightTransform: {fileID: 7769504255186393303}
   modelTransform: {fileID: 584479379418611331}
-  enemyData: {fileID: 0}
   rb: {fileID: 0}
   startWaypointIndex: 0
   loopPatrol: 1
@@ -313,28 +312,13 @@ MonoBehaviour:
   reinforcementSearchRadius: 50
   maxReinforcementsToCall: 3
   trackingSpeed: 1.5
+  reinforcementUpdateInterval: 1
   normalSpotlightColor: {r: 1, g: 1, b: 1, a: 1}
   alertSpotlightColor: {r: 1, g: 0, b: 0, a: 1}
   colorTransitionSpeed: 2
   modelRotationSpeed: 5
   showDebugRay: 1
   debugRayLength: 3
---- !u!114 &3860053999190181839
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8490385624122815485}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 99e126251eeef9a44981e710dd568cc8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Enemies.EnemyData
-  _componentIndexCache: 1
-  _addedNetworkObject: {fileID: 4866373312013150636}
-  _networkObjectCache: {fileID: 4866373312013150636}
-  m_enemyType: {fileID: 11400000, guid: 03d0c3d266dd0984b9d5449c2c8a14eb, type: 2}
 --- !u!114 &8735231212856205354
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -350,12 +334,12 @@ MonoBehaviour:
   _componentIndexCache: 2
   _addedNetworkObject: {fileID: 4866373312013150636}
   _networkObjectCache: {fileID: 4866373312013150636}
-  enemyData: {fileID: 3860053999190181839}
   baseDamage: 0
   damageForceThreshold: 25
   forceToDamageMultiplier: 2
   minimumDamageVelocity: 1.5
   damageCooldownDuration: 1
+  baseEnemy: {fileID: 237211371112094711}
 --- !u!114 &4866373312013150636
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -376,7 +360,7 @@ MonoBehaviour:
   <PredictedOwner>k__BackingField: {fileID: 0}
   NetworkBehaviours:
   - {fileID: 237211371112094711}
-  - {fileID: 3860053999190181839}
+  - {fileID: 0}
   - {fileID: 8735231212856205354}
   - {fileID: 2923893137017715159}
   - {fileID: 6459826222640076540}
@@ -460,28 +444,6 @@ MonoBehaviour:
     X: 0
     Y: 0
     Z: 0
---- !u!95 &5557008658885784378
-Animator:
-  serializedVersion: 7
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8490385624122815485}
-  m_Enabled: 1
-  m_Avatar: {fileID: 9000000, guid: 87a8f0a71cca913419f624fb53986985, type: 3}
-  m_Controller: {fileID: 9100000, guid: fc20f756b1c60c942b45d47809e1e015, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
 --- !u!114 &6459826222640076540
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -498,7 +460,7 @@ MonoBehaviour:
   _addedNetworkObject: {fileID: 4866373312013150636}
   _networkObjectCache: {fileID: 4866373312013150636}
   IgnoredParameters: []
-  _animator: {fileID: 5557008658885784378}
+  _animator: {fileID: 0}
   _synchronizeWhenDisabled: 0
   _smoothFloats: 1
   _interpolation: 2
@@ -512,34 +474,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1748971770594778435}
     m_Modifications:
-    - target: {fileID: -8679921383154817045, guid: 87a8f0a71cca913419f624fb53986985, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 87a8f0a71cca913419f624fb53986985, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 87a8f0a71cca913419f624fb53986985, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 87a8f0a71cca913419f624fb53986985, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 87a8f0a71cca913419f624fb53986985, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 87a8f0a71cca913419f624fb53986985, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 87a8f0a71cca913419f624fb53986985, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 87a8f0a71cca913419f624fb53986985, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: 0
@@ -556,6 +490,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: GrimoireModel
       objectReference: {fileID: 0}
+    - target: {fileID: 5866666021909216657, guid: 87a8f0a71cca913419f624fb53986985, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: fc20f756b1c60c942b45d47809e1e015, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

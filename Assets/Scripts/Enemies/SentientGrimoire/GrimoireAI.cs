@@ -1,8 +1,9 @@
+using System.Collections;
+using System.Collections.Generic;
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
 using RooseLabs.Player;
-using System.Collections;
-using System.Collections.Generic;
+using RooseLabs.Utils;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -13,8 +14,7 @@ namespace RooseLabs.Enemies
     /// and calls Hanadura reinforcements when a player is spotted
     /// </summary>
     [RequireComponent(typeof(NavMeshAgent))]
-    [RequireComponent(typeof(NetworkObject))]
-    public class GrimoireAI : NetworkBehaviour, IEnemyAI
+    public class GrimoireAI : BaseEnemy
     {
         [Header("References")]
         public NavMeshAgent navAgent;
@@ -23,10 +23,8 @@ namespace RooseLabs.Enemies
         public Light spotlight;
         public Transform spotlightTransform;
         private Quaternion defaultSpotlightRotation;
-        private Collider detectedPlayerCollider;
         public Transform modelTransform;
         private Quaternion defaultModelRotation;
-        public EnemyData enemyData;
         public Rigidbody rb;
 
         [Header("Patrol")]
@@ -51,7 +49,7 @@ namespace RooseLabs.Enemies
         [Tooltip("How often to send position updates to alerted Hanaduras (seconds)")]
         public float reinforcementUpdateInterval = 1f;
         private float reinforcementUpdateTimer = 0f;
-        private List<HanaduraAI> alertedHanaduras = new List<HanaduraAI>();
+        private List<HanaduraAI> alertedHanaduras = new();
 
         [Header("Alert Visual")]
         public Color normalSpotlightColor = Color.white;
@@ -63,64 +61,41 @@ namespace RooseLabs.Enemies
         public bool showDebugRay = true;
         public float debugRayLength = 3f;
 
+        #region Animation Parameters
+        private static readonly int AnimParamIsPatrolling = Animator.StringToHash("isPatrolling");
+        private static readonly int AnimParamIsAlert = Animator.StringToHash("isAlert");
+        #endregion
+
         // FSM States
-        private IEnemyState currentState;
-        public GrimoirePatrolState patrolState;
-        public GrimoireAlertState alertState;
-        public GrimoireTrackingState trackingState;
+        public GrimoirePatrolState PatrolState { get; private set; }
+        public GrimoireAlertState AlertState { get; private set; }
+        public GrimoireTrackingState TrackingState { get; private set; }
 
         // Detection
         private Transform detectedPlayer;
+        private PlayerCharacter detectedPlayerCharacter;
         private float reinforcementTimer = 0f;
         private float detectionTimer = 0f;
 
         // Network synchronized variables
-        private readonly SyncVar<Color> syncedSpotlightColor = new SyncVar<Color>(new SyncTypeSettings(WritePermission.ServerOnly, ReadPermission.Observers));
-        private readonly SyncVar<Quaternion> syncedSpotlightRotation = new SyncVar<Quaternion>(new SyncTypeSettings(WritePermission.ServerOnly, ReadPermission.Observers));
-        private readonly SyncVar<Quaternion> syncedModelRotation = new SyncVar<Quaternion>(new SyncTypeSettings(WritePermission.ServerOnly, ReadPermission.Observers));
+        private readonly SyncVar<Color> syncedSpotlightColor = new();
+        private readonly SyncVar<Quaternion> syncedSpotlightRotation = new();
+        private readonly SyncVar<Quaternion> syncedModelRotation = new();
 
         // Public properties for states to access
         public Transform DetectedPlayer => detectedPlayer;
-        public Animator Animator => animator;
 
-        private string whatWasPreviousState = "";
+        private bool m_hasHandledDeath = false;
 
-        private bool hasHandledDeath = false;
-
-        private void Awake()
+        protected override void Initialize()
         {
-            if (animator == null)
-            {
-                animator = GetComponentInChildren<Animator>();
-            }
-
-            if (modelTransform == null && animator != null)
-            {
-                modelTransform = animator.transform;
-            }
-
-            if (enemyData == null)
-            {
-                enemyData = GetComponent<EnemyData>();
-            }
-
-            if (rb == null)
-            {
-                rb = GetComponent<Rigidbody>();
-            }
-        }
-
-        private void Reset()
-        {
-            navAgent = GetComponent<NavMeshAgent>();
+            TryGetComponent(out navAgent);
+            modelTransform.TryGetComponent(out animator);
+            TryGetComponent(out rb);
         }
 
         public override void OnStartServer()
         {
-            base.OnStartServer();
-
-            if (navAgent == null) navAgent = GetComponent<NavMeshAgent>();
-
             navAgent.speed = patrolSpeed;
 
             // Store initial spotlight rotation
@@ -136,7 +111,6 @@ namespace RooseLabs.Enemies
                 syncedModelRotation.Value = defaultModelRotation;
             }
 
-
             syncedSpotlightColor.Value = normalSpotlightColor;
 
             // Subscribe to SyncVar changes
@@ -145,46 +119,35 @@ namespace RooseLabs.Enemies
             syncedModelRotation.OnChange += OnModelRotationChanged;
 
             // Create states
-            patrolState = new GrimoirePatrolState(this, patrolRoute, loopPatrol, startWaypointIndex, waypointReachThreshold);
-            alertState = new GrimoireAlertState(this, alertDuration);
-            trackingState = new GrimoireTrackingState(this);
+            PatrolState = new GrimoirePatrolState(this, patrolRoute, loopPatrol, startWaypointIndex, waypointReachThreshold);
+            AlertState = new GrimoireAlertState(this, alertDuration);
+            TrackingState = new GrimoireTrackingState(this);
 
             // Start in patrol state
-            EnterState(patrolState);
-
-            //Debug.Log("[GrimoireAI] OnStartServer complete - beginning patrol");
+            ChangeState(PatrolState);
         }
 
         public override void OnStartClient()
         {
-            base.OnStartClient();
-
             // Subscribe to SyncVar changes on clients
-            if (!base.IsServerInitialized)
-            {
-                syncedSpotlightColor.OnChange += OnSpotlightColorChanged;
-                syncedSpotlightRotation.OnChange += OnSpotlightRotationChanged;
-                syncedModelRotation.OnChange += OnModelRotationChanged;
+            if (IsServerInitialized) return;
+            syncedSpotlightColor.OnChange += OnSpotlightColorChanged;
+            syncedSpotlightRotation.OnChange += OnSpotlightRotationChanged;
+            syncedModelRotation.OnChange += OnModelRotationChanged;
 
-                // Apply initial synced values
-                if (spotlight != null)
-                    spotlight.color = syncedSpotlightColor.Value;
+            // Apply initial synced values
+            if (spotlight != null)
+                spotlight.color = syncedSpotlightColor.Value;
 
-                if (spotlightTransform != null)
-                    spotlightTransform.rotation = syncedSpotlightRotation.Value;
+            if (spotlightTransform != null)
+                spotlightTransform.rotation = syncedSpotlightRotation.Value;
 
-                if (modelTransform != null)
-                    modelTransform.localRotation = syncedModelRotation.Value;
-
-                //Debug.Log("[GrimoireAI] OnStartClient - applied initial spotlight state");
-            }
+            if (modelTransform != null)
+                modelTransform.localRotation = syncedModelRotation.Value;
         }
 
         public override void OnStopClient()
         {
-            base.OnStopClient();
-
-            // Unsubscribe from events to prevent memory leaks
             syncedSpotlightColor.OnChange -= OnSpotlightColorChanged;
             syncedSpotlightRotation.OnChange -= OnSpotlightRotationChanged;
             syncedModelRotation.OnChange -= OnModelRotationChanged;
@@ -192,9 +155,6 @@ namespace RooseLabs.Enemies
 
         public override void OnStopServer()
         {
-            base.OnStopServer();
-
-            // Unsubscribe from events
             syncedSpotlightColor.OnChange -= OnSpotlightColorChanged;
             syncedSpotlightRotation.OnChange -= OnSpotlightRotationChanged;
             syncedModelRotation.OnChange -= OnModelRotationChanged;
@@ -202,15 +162,9 @@ namespace RooseLabs.Enemies
 
         private void Update()
         {
-            if (!hasHandledDeath && enemyData.IsDead)
-            {
-                HandleDeath_ServerRPC();
-                return;
-            }
-            else if (enemyData.IsDead)
-                return;
+            if (IsDead) return;
 
-            if (!base.IsServerInitialized)
+            if (!IsServerInitialized)
             {
                 UpdateSpotlightVisualsClient();
                 return;
@@ -226,6 +180,9 @@ namespace RooseLabs.Enemies
             reinforcementTimer -= Time.deltaTime;
             reinforcementUpdateTimer -= Time.deltaTime;
 
+            // Update current state
+            currentState?.Update();
+
             // Periodic detection check
             if (detectionTimer <= 0f)
             {
@@ -240,16 +197,6 @@ namespace RooseLabs.Enemies
                 UpdateAlertedHanaduras();
             }
 
-            // Tick current state
-            currentState?.Tick();
-
-            //if (whatWasPreviousState != (currentState != null ? currentState.GetType().Name : "null"))
-            //{
-            //    Debug.Log("currentState is " + (currentState != null ? currentState.GetType().Name : "null"));
-            //}
-
-            whatWasPreviousState = currentState != null ? currentState.GetType().Name : "null";
-               
             // Update spotlight visuals and sync to network
             UpdateSpotlightVisualsServer();
 
@@ -259,48 +206,27 @@ namespace RooseLabs.Enemies
             UpdateAnimatorParameters();
         }
 
-        #region State Management
-
-        public void EnterState(IEnemyState newState)
-        {
-            if (currentState != null)
-                currentState.Exit();
-
-            currentState = newState;
-
-            if (currentState != null)
-            {
-                //Debug.Log($"[GrimoireAI] Entered state: {currentState.GetType().Name}");
-                currentState.Enter();
-            }
-        }
-
-        #endregion
-
         #region Animation Control
-
         /// <summary>
         /// Updates animator parameters based on current state.
         /// </summary>
         private void UpdateAnimatorParameters()
         {
-            if (animator == null) return;
+            if (!animator) return;
 
             // Set state bools based on current state
             bool isInPatrolState = currentState is GrimoirePatrolState;
-            bool isInAlertOrTracking = currentState is GrimoireAlertState || currentState is GrimoireTrackingState;
+            bool isInAlertOrTracking = currentState is GrimoireAlertState or GrimoireTrackingState;
 
-            animator.SetBool("isPatrolling", isInPatrolState);
-            animator.SetBool("isAlert", isInAlertOrTracking);
+            animator.SetBool(AnimParamIsPatrolling, isInPatrolState);
+            animator.SetBool(AnimParamIsAlert, isInAlertOrTracking);
         }
-
         #endregion
 
         #region Detection
-
         private void CheckSpotlightDetection()
         {
-            if (spotlight == null || spotlightTransform == null) return;
+            if (!spotlight || !spotlightTransform) return;
 
             Vector3 spotlightPos = spotlightTransform.position;
             Vector3 spotlightDir = spotlightTransform.forward;
@@ -325,15 +251,14 @@ namespace RooseLabs.Enemies
                     float dist = Vector3.Distance(spotlightPos, targetPoint);
 
                     // Raycast to check line of sight
-                    RaycastHit hit;
-                    if (Physics.Raycast(spotlightPos, dirToTarget, out hit, dist, obstructionMask))
+                    if (Physics.Raycast(spotlightPos, dirToTarget, out var hit, dist, obstructionMask))
                     {
-                        //Debug.Log($"[GrimoireAI] Line of sight BLOCKED by: {hit.collider.name}, Layer: {LayerMask.LayerToName(hit.collider.gameObject.layer)}, Distance: {hit.distance}");
+                        // this.LogInfo($"Line of sight BLOCKED by: {hit.collider.name}, Layer: {LayerMask.LayerToName(hit.collider.gameObject.layer)}, Distance: {hit.distance}");
                         Debug.DrawRay(spotlightPos, dirToTarget * hit.distance, Color.red, 0.5f);
                     }
                     else
                     {
-                        //Debug.Log("[GrimoireAI] Line of sight CLEAR!");
+                        // this.LogInfo("Line of sight CLEAR!");
                         Debug.DrawRay(spotlightPos, dirToTarget * dist, Color.green, 0.5f);
 
                         if (dist < closestDist)
@@ -347,53 +272,43 @@ namespace RooseLabs.Enemies
             }
 
             // If player detected
-            if (closestPlayer != null)
+            if ((bool)closestPlayer)
             {
-                OnPlayerDetected(closestPlayer, closestPlayerCollider);
+                OnPlayerDetected(closestPlayer);
             }
-            else if (detectedPlayer != null && !(currentState is GrimoirePatrolState))
+            else if ((bool)detectedPlayer && currentState is not GrimoirePatrolState)
             {
                 // Lost sight of player
                 detectedPlayer = null;
             }
         }
 
-        private void OnPlayerDetected(Transform player, Collider playerCollider)
+        private void OnPlayerDetected(Transform player)
         {
-            bool wasNewDetection = (detectedPlayer == null);
+            bool isNewDetection = !detectedPlayer;
             detectedPlayer = player;
-            detectedPlayerCollider = playerCollider;
-
-            //Debug.Log("[GrimoireAI] Player detected!");
-
-            // Transition to alert state if currently patrolling
-            if (currentState is GrimoirePatrolState)
-            {
-                EnterState(alertState);
-            }
+            player.TryGetComponentInParent(out detectedPlayerCharacter);
 
             // Call reinforcements if cooldown is ready
-            if (wasNewDetection && reinforcementTimer <= 0f)
+            if (isNewDetection && reinforcementTimer <= 0f)
             {
                 CallReinforcements();
                 reinforcementTimer = callReinforcementsCooldown;
             }
         }
-
         #endregion
 
         #region Spotlight Control (Helper methods for states)
-
         /// <summary>
         /// Rotate spotlight to track a target (SERVER ONLY)
         /// </summary>
         public void RotateSpotlightToTarget(Transform target, float speed)
         {
-            if (!base.IsServerInitialized) return;
-            if (target == null || spotlightTransform == null) return;
+            if (!IsServerInitialized) return;
+            if (!target || !spotlightTransform) return;
 
-            Vector3 targetPoint = detectedPlayerCollider != null
-                ? detectedPlayerCollider.bounds.center
+            Vector3 targetPoint = (bool)detectedPlayerCharacter
+                ? detectedPlayerCharacter.Center
                 : target.position + Vector3.up * 1f;
 
             Vector3 dirToTarget = (targetPoint - spotlightTransform.position).normalized;
@@ -412,7 +327,7 @@ namespace RooseLabs.Enemies
         /// </summary>
         public void RotateSpotlightToDefault(float speed)
         {
-            if (!base.IsServerInitialized) return;
+            if (!IsServerInitialized) return;
             if (spotlightTransform == null) return;
 
             spotlightTransform.rotation = Quaternion.Slerp(
@@ -424,35 +339,24 @@ namespace RooseLabs.Enemies
             // Update synced rotation
             syncedSpotlightRotation.Value = spotlightTransform.rotation;
         }
-
         #endregion
 
         #region Reinforcements
-
         private void CallReinforcements()
         {
-            if (!base.IsServerInitialized)
-            {
-                return;
-            }
-
             // Find all Hanadura enemies in range
             Collider[] nearbyColliders = Physics.OverlapSphere(transform.position, reinforcementSearchRadius);
             List<HanaduraAI> availableHanaduras = new List<HanaduraAI>();
 
             foreach (Collider col in nearbyColliders)
             {
-                HanaduraAI hanadura = col.GetComponent<HanaduraAI>();
-                if (hanadura != null)
+                if (col.TryGetComponent(out HanaduraAI hanadura))
                 {
                     availableHanaduras.Add(hanadura);
                 }
             }
 
-            if (availableHanaduras.Count == 0)
-            {
-                return;
-            }
+            if (availableHanaduras.Count == 0) return;
 
             // Sort by distance and call the closest ones
             availableHanaduras.Sort((a, b) =>
@@ -468,19 +372,12 @@ namespace RooseLabs.Enemies
             foreach (HanaduraAI hanadura in availableHanaduras)
             {
                 if (called >= maxReinforcementsToCall) break;
-
-                if (detectedPlayer != null)
-                {
-                    hanadura.AlertToPosition(detectedPlayer.position);
-                    alertedHanaduras.Add(hanadura);
-                    called++;
-                }
+                hanadura.AlertToPosition(detectedPlayer.position);
+                alertedHanaduras.Add(hanadura);
+                called++;
             }
 
-            if (detectedPlayer != null && EnemySpawnManager.Instance != null)
-            {
-                EnemySpawnManager.Instance.OnGrimoireAlert(detectedPlayer.position);
-            }
+            EnemySpawnManager.Instance?.OnGrimoireAlert(detectedPlayer.position);
 
             // Notify all clients of reinforcement call
             RPC_PlayReinforcementCallEffect();
@@ -491,9 +388,7 @@ namespace RooseLabs.Enemies
         /// </summary>
         private void UpdateAlertedHanaduras()
         {
-            if (!base.IsServerInitialized) return;
-
-            if (detectedPlayer == null || currentState is GrimoirePatrolState)
+            if (!detectedPlayer || currentState is GrimoirePatrolState)
             {
                 // Clear the list if we're not tracking anymore
                 if (alertedHanaduras.Count > 0)
@@ -504,29 +399,24 @@ namespace RooseLabs.Enemies
             }
 
             // Remove any dead or null Hanaduras from the list
-            alertedHanaduras.RemoveAll(h => h == null || h.enemyData.IsDead);
+            alertedHanaduras.RemoveAll(h => !h || h.IsDead);
 
             // Send updated position to all alerted Hanaduras
             foreach (HanaduraAI hanadura in alertedHanaduras)
             {
-                if (hanadura != null && !hanadura.enemyData.IsDead)
-                {
-                    hanadura.AlertToPosition(detectedPlayer.position, detectedPlayer);
-                    Debug.Log($"[GrimoireAI] Updated Hanadura {hanadura.gameObject.name} with new player position.");
-                }
+                hanadura.AlertToPosition(detectedPlayer.position, detectedPlayer);
+                this.LogInfo($"Updated Hanadura {hanadura.gameObject.name} with new player position.");
             }
         }
-
         #endregion
 
         #region Visual Effects & Network Sync
-
         /// <summary>
         /// Server: Update spotlight visuals and sync to network
         /// </summary>
         private void UpdateSpotlightVisualsServer()
         {
-            if (spotlight == null) return;
+            if (!spotlight) return;
 
             Color targetColor = (currentState is GrimoirePatrolState)
                 ? normalSpotlightColor
@@ -543,12 +433,12 @@ namespace RooseLabs.Enemies
         /// </summary>
         private void UpdateSpotlightVisualsClient()
         {
-            if (spotlight != null)
+            if (spotlight)
             {
                 spotlight.color = Color.Lerp(spotlight.color, syncedSpotlightColor.Value, Time.deltaTime * colorTransitionSpeed);
             }
 
-            if (spotlightTransform != null)
+            if (spotlightTransform)
             {
                 spotlightTransform.rotation = Quaternion.Slerp(
                     spotlightTransform.rotation,
@@ -557,7 +447,7 @@ namespace RooseLabs.Enemies
                 );
             }
 
-            if (modelTransform != null)
+            if (modelTransform)
             {
                 modelTransform.localRotation = Quaternion.Slerp(
                     modelTransform.localRotation,
@@ -596,7 +486,7 @@ namespace RooseLabs.Enemies
         {
             // Play alert sound, particle effects, etc.
             // Animation is handled by NetworkAnimator automatically
-            //Debug.Log("[GrimoireAI] Alert RPC received");
+            // this.LogInfo("Alert RPC received");
         }
 
         [ObserversRpc]
@@ -604,19 +494,18 @@ namespace RooseLabs.Enemies
         {
             // Play special effect when reinforcements are called
             // e.g., magic circle, sound effect, screen shake, etc.
-            //Debug.Log("[GrimoireAI] Reinforcement call effect RPC received");
+            // this.LogInfo("Reinforcement call effect RPC received");
         }
 
         private void UpdateModelRotation()
         {
-            if (!base.IsServerInitialized) return;
-            if (modelTransform == null) return;
+            if (!modelTransform) return;
 
             Quaternion targetRotation;
 
-            if ((currentState is GrimoireAlertState || currentState is GrimoireTrackingState) && detectedPlayer != null)
+            if (currentState is GrimoireAlertState or GrimoireTrackingState && (bool)detectedPlayer)
             {
-                Vector3 directionToPlayer = (detectedPlayer.GetComponentInParent<PlayerCharacter>().RaycastTarget.position - transform.position);
+                Vector3 directionToPlayer = detectedPlayerCharacter.Center - transform.position;
                 directionToPlayer.y = 0;
 
                 if (directionToPlayer != Vector3.zero)
@@ -650,52 +539,37 @@ namespace RooseLabs.Enemies
                 modelTransform.localRotation = next;
             }
         }
-
         #endregion
 
-        [ServerRpc(RequireOwnership = false)]
-        public void HandleDeath_ServerRPC()
+        protected override void OnDeath()
         {
-            if (!IsServerInitialized)
-                return;
-
-            if (animator != null)
+            if (animator)
             {
                 HandleDeath_ObserversRPC();
             }
             else
             {
-                Debug.LogWarning($"No Animator found on {gameObject.name}, cannot play death animation.");
+                this.LogWarning($"No Animator found on {gameObject.name}, cannot play death animation.");
                 Despawn(gameObject);
             }
         }
 
-        [ObserversRpc]
+        [ObserversRpc(ExcludeServer = true, RunLocally = true)]
         private void HandleDeath_ObserversRPC()
         {
-            if (animator != null && !hasHandledDeath)
-            {
-                currentState = null;
-                navAgent.isStopped = true;
-                navAgent.velocity = Vector3.zero;
-                navAgent.enabled = false;
-                rb.useGravity = true;
-                rb.isKinematic = false;
-                animator.Play("Death");
-                hasHandledDeath = true;
+            if (!animator || m_hasHandledDeath) return;
+            currentState = null;
+            navAgent.isStopped = true;
+            navAgent.velocity = Vector3.zero;
+            navAgent.enabled = false;
+            rb.useGravity = true;
+            rb.isKinematic = false;
+            animator.Play("Death");
+            m_hasHandledDeath = true;
 
-                Debug.Log($"{gameObject.name} death sequence executed on observer");
+            this.LogWarning($"{gameObject.name} death sequence executed on observer");
 
-                // StartCoroutine(DespawnAfterDeath());
-            }
-        }
-
-        public void OnEnemyDeath()
-        {
-            if (IsServerInitialized)
-            {
-                HandleDeath_ServerRPC();
-            }
+            // StartCoroutine(DespawnAfterDeath());
         }
 
         private IEnumerator DespawnAfterDeath()
@@ -709,11 +583,17 @@ namespace RooseLabs.Enemies
             }
         }
 
-        #region Debug
+        #if UNITY_EDITOR
+        protected override void Reset()
+        {
+            base.Reset();
+            TryGetComponent(out navAgent);
+        }
 
+        #region Debug
         private void OnDrawGizmosSelected()
         {
-            if (spotlightTransform == null) return;
+            if (!spotlightTransform) return;
 
             // Draw spotlight cone
             bool isPatrolling = (currentState is GrimoirePatrolState);
@@ -734,7 +614,7 @@ namespace RooseLabs.Enemies
             Gizmos.color = Color.cyan;
             Gizmos.DrawWireSphere(transform.position, reinforcementSearchRadius);
         }
-
         #endregion
+        #endif
     }
 }

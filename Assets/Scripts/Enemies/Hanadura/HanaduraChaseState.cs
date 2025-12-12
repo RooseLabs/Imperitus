@@ -3,7 +3,7 @@ using Logger = RooseLabs.Core.Logger;
 
 namespace RooseLabs.Enemies
 {
-    public class ChaseState : IEnemyState
+    public class HanaduraChaseState : IEnemyState
     {
         private static Logger Logger => Logger.GetLogger("Hanadura");
 
@@ -11,24 +11,24 @@ namespace RooseLabs.Enemies
         private float updateInterval = 0.2f;
         private float updateTimer = 0f;
 
-        public ChaseState(HanaduraAI ai)
+        public HanaduraChaseState(HanaduraAI ai)
         {
             this.ai = ai;
         }
 
-        public void Enter()
+        public void OnEnter()
         {
             updateTimer = 0f;
             ai.SetAnimatorBool("IsChasing", true);
             ai.SetAnimatorBool("IsLookingAround", false);
         }
 
-        public void Exit()
+        public void OnExit()
         {
             ai.SetAnimatorBool("IsChasing", false);
         }
 
-        public void Tick()
+        public void Update()
         {
             // Determine target position
             Vector3? targetPos = ai.CurrentTarget != null

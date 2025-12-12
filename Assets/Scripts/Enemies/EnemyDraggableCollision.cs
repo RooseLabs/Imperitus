@@ -9,8 +9,6 @@ namespace RooseLabs.Enemies
 {
     public class EnemyDraggableCollision : NetworkBehaviour
     {
-        [SerializeField] private EnemyData enemyData;
-
         [Header("Damage Settings")]
         [SerializeField] private int baseDamage = 10;
         [SerializeField] private float damageForceThreshold = 50f;
@@ -22,6 +20,15 @@ namespace RooseLabs.Enemies
 
         // Track cooldowns per player for this specific enemy
         private readonly Dictionary<int, float> m_playerCooldowns = new();
+
+        [Header("References")]
+        [SerializeField] private BaseEnemy baseEnemy;
+
+        private void Awake()
+        {
+            if (!baseEnemy)
+                TryGetComponent(out baseEnemy);
+        }
 
         private void OnCollisionEnter(Collision other)
         {
@@ -64,7 +71,7 @@ namespace RooseLabs.Enemies
                 if (damage > 0)
                 {
                     DamageInfo damageInfo = new DamageInfo(damage, transform);
-                    enemyData.ApplyDamage(damageInfo);
+                    baseEnemy.ApplyDamage(damageInfo);
 
                     // Set cooldown for this player
                     m_playerCooldowns[playerID] = Time.time + damageCooldownDuration;
