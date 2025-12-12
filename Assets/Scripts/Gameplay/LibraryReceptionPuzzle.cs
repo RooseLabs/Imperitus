@@ -30,8 +30,11 @@ namespace RooseLabs.Gameplay
         [SerializeField, Tooltip("The transform that will rotate when the puzzle is solved and the door opens")]
         private Transform doorTransform;
 
-        [SerializeField, Tooltip("Rotation speed of the door")]
-        private float doorRotationSpeed = 90f;
+        [SerializeField, Tooltip("Duration in seconds for the door to fully open")]
+        private float doorOpeningDuration = 1f;
+
+        [SerializeField, Tooltip("The angle (in degrees) the door rotates around Y axis when opening")]
+        private float doorOpeningAngle = -90f;
         #endregion
 
         private static readonly string[] PuzzleSentences =
@@ -126,7 +129,7 @@ namespace RooseLabs.Gameplay
             if (doorTransform)
             {
                 m_doorClosedRotation = doorTransform.localRotation;
-                m_doorOpenRotation = m_doorClosedRotation * Quaternion.Euler(0, 90, 0);
+                m_doorOpenRotation = m_doorClosedRotation * Quaternion.Euler(0, doorOpeningAngle, 0);
             }
 
             // Subscribe to network variable changes
@@ -260,6 +263,7 @@ namespace RooseLabs.Gameplay
         {
             // Get active clients
             var activeClients = ServerManager.Clients.Values.Where(c => c.IsActive).ToList();
+            if (activeClients.Count == 0) return;
 
             // Redistribute using round-robin
             for (int i = 0; i < m_spawnedWordObjects.Count; i++)
@@ -368,14 +372,13 @@ namespace RooseLabs.Gameplay
         private IEnumerator AnimateDoorOpen()
         {
             float elapsedTime = 0f;
-            float duration = 90f / doorRotationSpeed; // Time to rotate 90 degrees
 
-            while (elapsedTime < duration)
+            while (elapsedTime < doorOpeningDuration)
             {
                 doorTransform.localRotation = Quaternion.Slerp(
                     m_doorClosedRotation,
                     m_doorOpenRotation,
-                    elapsedTime / duration
+                    elapsedTime / doorOpeningDuration
                 );
 
                 elapsedTime += Time.deltaTime;
@@ -400,6 +403,44 @@ namespace RooseLabs.Gameplay
             // Draw hearing radius
             Gizmos.color = Color.yellow;
             Gizmos.DrawWireSphere(transform.position, hearingRadius);
+
+            // Draw door opening angle visualization
+            if (doorTransform)
+            {
+                Gizmos.color = Color.red;
+                Vector3 doorPosition = doorTransform.position;
+
+                // Use the door's current local rotation as the closed state
+                Quaternion closedLocalRotation = doorTransform.localRotation;
+                Quaternion openLocalRotation = closedLocalRotation * Quaternion.Euler(0, doorOpeningAngle, 0);
+
+                // Convert to world space for visualization
+                Quaternion parentRotation = doorTransform.parent ? doorTransform.parent.rotation : Quaternion.identity;
+                Quaternion closedWorldRotation = parentRotation * closedLocalRotation;
+                Quaternion openWorldRotation = parentRotation * openLocalRotation;
+
+                // Draw closed door direction
+                Vector3 closedDirection = closedWorldRotation * Vector3.left * 1.5f;
+                Gizmos.DrawRay(doorPosition, closedDirection);
+
+                // Draw open door direction
+                Vector3 openDirection = openWorldRotation * Vector3.left * 1.5f;
+                Gizmos.DrawRay(doorPosition, openDirection);
+
+                // Draw arc between closed and open positions to show rotation angle
+                int arcSegments = 20;
+                float angleStep = doorOpeningAngle / arcSegments;
+                for (int i = 0; i < arcSegments; i++)
+                {
+                    Quaternion stepLocalRotation1 = closedLocalRotation * Quaternion.Euler(0, angleStep * i, 0);
+                    Quaternion stepLocalRotation2 = closedLocalRotation * Quaternion.Euler(0, angleStep * (i + 1), 0);
+                    Quaternion stepWorldRotation1 = parentRotation * stepLocalRotation1;
+                    Quaternion stepWorldRotation2 = parentRotation * stepLocalRotation2;
+                    Vector3 from = stepWorldRotation1 * Vector3.left * 1.5f;
+                    Vector3 to = stepWorldRotation2 * Vector3.left * 1.5f;
+                    Gizmos.DrawLine(doorPosition + from, doorPosition + to);
+                }
+            }
         }
         #endregion
     }

@@ -9,7 +9,7 @@ namespace RooseLabs.Gameplay
         [field: SerializeField] public GameObject[] AllowedObjects { get; private set; } = Array.Empty<GameObject>();
 
         #if UNITY_EDITOR
-        private Bounds m_maxLocalBounds;
+        private Bounds m_maxLocalBounds = new(Vector3.zero, Vector3.zero);
         private readonly Collider[] m_overlaps = new Collider[2];
 
         protected virtual void OnValidate()
@@ -19,52 +19,21 @@ namespace RooseLabs.Gameplay
 
         private void ComputeMaxBounds()
         {
-            bool hasAny = false;
             Vector3 overallMin = Vector3.one * float.MaxValue;
             Vector3 overallMax = Vector3.one * float.MinValue;
 
             foreach (var prefab in AllowedObjects)
             {
-                if (prefab == null) continue;
+                if (!prefab) continue;
 
                 var prefabBounds = GetPrefabBounds(prefab);
                 if (prefabBounds.size == Vector3.zero) continue;
 
                 overallMin = Vector3.Min(overallMin, prefabBounds.min);
                 overallMax = Vector3.Max(overallMax, prefabBounds.max);
-                hasAny = true;
             }
 
-            if (hasAny)
-            {
-                m_maxLocalBounds.SetMinMax(overallMin, overallMax);
-
-                UnityEditor.EditorApplication.delayCall += () =>
-                {
-                    if (this == null) return;
-                    BoxCollider col = GetComponent<BoxCollider>();
-                    if (col == null)
-                    {
-                        col = gameObject.AddComponent<BoxCollider>();
-                    }
-                    col.center = m_maxLocalBounds.center;
-                    col.size = m_maxLocalBounds.size;
-                };
-            }
-            else
-            {
-                m_maxLocalBounds = new Bounds(Vector3.zero, Vector3.zero);
-
-                BoxCollider col = GetComponent<BoxCollider>();
-                if (col != null)
-                {
-                    UnityEditor.EditorApplication.delayCall += () =>
-                    {
-                        if (this == null) return;
-                        DestroyImmediate(col, true);
-                    };
-                }
-            }
+            m_maxLocalBounds.SetMinMax(overallMin, overallMax);
         }
 
         private Bounds GetPrefabBounds(GameObject prefab)
@@ -101,6 +70,9 @@ namespace RooseLabs.Gameplay
             // First overlap is always self, so we check for more than 1
             Gizmos.color = nOverlaps > 1 ? new Color(1, 0, 0, 0.3f) : new Color(0, 1, 0, 0.3f);
             Gizmos.DrawCube(center, m_maxLocalBounds.size);
+            // Draw wireframe
+            Gizmos.color = nOverlaps > 1 ? Color.red : Color.green;
+            Gizmos.DrawWireCube(center, m_maxLocalBounds.size);
 
             Gizmos.matrix = originalMatrix;
         }

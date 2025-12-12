@@ -283,7 +283,10 @@ namespace RooseLabs.Enemies
             }
 
             generatedPoints = optimized;
-            this.LogInfo("Waypoint order optimized for smoother patrol paths");
+            if (Application.isPlaying)
+                this.LogInfo("Waypoint order optimized for smoother patrol paths");
+            else
+                Debug.Log("[PatrolPointGenerator] Waypoint order optimized for smoother patrol paths");
         }
 
         /// <summary>
@@ -760,7 +763,6 @@ namespace RooseLabs.Enemies
         #endregion
 
         #region Editor-Time Generation
-
         /// <summary>
         /// Generate patrol points in Edit Mode for preview/testing
         /// Called by custom editor
@@ -776,8 +778,6 @@ namespace RooseLabs.Enemies
                 this.LogError("No map container found with tag: " + mapContainerTag);
                 return false;
             }
-
-            this.LogInfo($"Map bounds: {mapBounds.size}, Center: {mapBounds.center}");
 
             int pointsGenerated = 0;
             int pointsRejected = 0;
@@ -800,7 +800,7 @@ namespace RooseLabs.Enemies
                 }
             }
 
-            this.LogInfo($"Generation complete! Valid points: {pointsGenerated}, Rejected: {pointsRejected}");
+            Debug.Log($"[PatrolPointGenerator] Generation complete! Valid points: {pointsGenerated}, Rejected: {pointsRejected}");
 
             // Optimize waypoint order
             if (generatedPoints.Count > 1)
