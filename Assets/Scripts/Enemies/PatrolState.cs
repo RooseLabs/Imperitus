@@ -63,7 +63,8 @@ namespace RooseLabs.Enemies
 
             float dist = Vector3.Distance(ai.transform.position, wp.position);
 
-            if (dist <= ai.navAgent.stoppingDistance + 1.2f)
+            //if (dist <= ai.navAgent.stoppingDistance + 1.2f)
+            if (dist <= ai.navAgent.stoppingDistance)
             {
                 currentIndex++;
                 if (currentIndex >= route.Count)
