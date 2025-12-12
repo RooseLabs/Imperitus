@@ -2,9 +2,8 @@
 
 ## Project Overview
 
-Made by: 
-José Miguel Pereira Silva Cunha
-A22550
+**Made by**: 
+José Miguel Pereira Silva Cunha (A22550)
 
 The project explores the following AI techniques in game development:
 
