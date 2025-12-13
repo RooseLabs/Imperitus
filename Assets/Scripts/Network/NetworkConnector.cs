@@ -119,7 +119,7 @@ namespace RooseLabs.Network
             }
             catch (Exception e)
             {
-                Debug.LogError($"[NetworkConnector] Failed to start host with relay: {e.Message}");
+                Debug.LogWarning($"[NetworkConnector] Failed to start host with relay: {e.Message}");
                 return null;
             }
         }
@@ -150,7 +150,7 @@ namespace RooseLabs.Network
             }
             catch (Exception e)
             {
-                Debug.LogError($"[NetworkConnector] Failed to start client with relay: {e.Message}");
+                Debug.LogWarning($"[NetworkConnector] Failed to start client with relay: {e.Message}");
                 return false;
             }
         }

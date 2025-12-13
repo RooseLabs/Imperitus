@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using FishNet.Connection;
 using FishNet.Object;
 using RooseLabs.Core;
 using RooseLabs.Gameplay;
@@ -129,8 +128,7 @@ namespace RooseLabs.Player
             Data.lookDirectionFlat = normalized;
         }
 
-        [TargetRpc]
-        public void SetPositionAndRotation(NetworkConnection _, Vector3 position, Quaternion rotation)
+        public void SetPositionAndRotation(Vector3 position, Quaternion rotation)
         {
             m_rigidbody.position = position;
             Data.lookValues.x = rotation.eulerAngles.y;
@@ -255,7 +253,7 @@ namespace RooseLabs.Player
         }
 
         #region Utils
-        public Vector3 Center => GetBodypart(HumanBodyBones.Spine).Position;
+        public Vector3 Center => ModelTransform.position + ModelTransform.up * 1.7f * 0.5f;
 
         public Bodypart GetBodypart(HumanBodyBones type) => m_bodyparts[type];
         public ICollection<Bodypart> GetAllBodyparts() => m_bodyparts.Values;

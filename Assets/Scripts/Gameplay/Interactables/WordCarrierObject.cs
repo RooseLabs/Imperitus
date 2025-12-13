@@ -113,11 +113,11 @@ namespace RooseLabs.Gameplay.Interactables
             const float maxGlowPower = 0.5f;
             float elapsedTime = 0f;
             bool goingUp = true;
-            Camera playerCamera = PlayerCharacter.LocalCharacter.Camera;
 
             while (true)
             {
-                if (!CameraUtils.VisibleFromCamera(playerCamera, m_textRenderer))
+                if (!PlayerCharacter.LocalCharacter ||
+                    !CameraUtils.VisibleFromCamera(PlayerCharacter.LocalCharacter.Camera, m_textRenderer))
                 {
                     yield return null;
                     continue;

@@ -10,7 +10,6 @@ namespace RooseLabs.Gameplay
 
         #if UNITY_EDITOR
         private Bounds m_maxLocalBounds = new(Vector3.zero, Vector3.zero);
-        private readonly Collider[] m_overlaps = new Collider[2];
 
         protected virtual void OnValidate()
         {
@@ -65,13 +64,12 @@ namespace RooseLabs.Gameplay
             Vector3 worldCenter = transform.TransformPoint(center);
             int layerMask = LayerMask.GetMask("Default", "Ground", "Draggable");
 
-            int nOverlaps = Physics.OverlapBoxNonAlloc(worldCenter, halfExtents, m_overlaps, transform.rotation, layerMask, QueryTriggerInteraction.Ignore);
+            bool overlaps = Physics.CheckBox(worldCenter, halfExtents, transform.rotation, layerMask, QueryTriggerInteraction.Ignore);
 
-            // First overlap is always self, so we check for more than 1
-            Gizmos.color = nOverlaps > 1 ? new Color(1, 0, 0, 0.3f) : new Color(0, 1, 0, 0.3f);
+            Gizmos.color = overlaps ? new Color(1, 0, 0, 0.3f) : new Color(0, 1, 0, 0.3f);
             Gizmos.DrawCube(center, m_maxLocalBounds.size);
             // Draw wireframe
-            Gizmos.color = nOverlaps > 1 ? Color.red : Color.green;
+            Gizmos.color = overlaps ? Color.red : Color.green;
             Gizmos.DrawWireCube(center, m_maxLocalBounds.size);
 
             Gizmos.matrix = originalMatrix;

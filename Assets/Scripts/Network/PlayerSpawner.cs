@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using FishNet.Connection;
 using FishNet.Object;
 using UnityEngine;
@@ -10,7 +11,22 @@ namespace RooseLabs.Network
         [SerializeField] private NetworkObject playerPrefab;
         [SerializeField] private Transform[] spawns = Array.Empty<Transform>();
 
-        private int m_nextSpawn;
+        private void Awake()
+        {
+            // If playerCharacter exists, then it was already registered, which means we must be transitioning scenes
+            // In this case we reposition the local player to the correct spawn point
+            var clientManager = FishNet.InstanceFinder.ClientManager;
+            if (!clientManager || !clientManager.Started) return;
+
+            var localConnection = clientManager.Connection;
+            if (localConnection == null) return;
+
+            var playerCharacter = PlayerHandler.GetCharacter(localConnection);
+            if (!playerCharacter) return;
+
+            GetSpawnForClient(GetConnectionSpawnIndex(localConnection), out Vector3 position, out Quaternion rotation);
+            playerCharacter.SetPositionAndRotation(position, rotation);
+        }
 
         public override void OnStartServer()
         {
@@ -38,21 +54,10 @@ namespace RooseLabs.Network
 
         private void SpawnPlayer(NetworkConnection connection)
         {
-            Vector3 position;
-            Quaternion rotation;
-
             // Check if player has already been spawned for this connection
-            // If that's the case we're probably transitioning scenes, try to set new position for existing character
+            // If so, we're transitioning scenes - the player will reposition themselves locally in Awake
             if (PlayerHandler.GetPlayer(connection) != null)
-            {
-                var playerCharacter = PlayerHandler.GetCharacter(connection);
-                if (playerCharacter != null)
-                {
-                    SetSpawn(playerCharacter.transform, out position, out rotation);
-                    playerCharacter.SetPositionAndRotation(connection, position, rotation);
-                }
                 return;
-            }
 
             if (playerPrefab == null)
             {
@@ -60,39 +65,52 @@ namespace RooseLabs.Network
                 return;
             }
 
-            SetSpawn(playerPrefab.transform, out position, out rotation);
+            GetSpawnForClient(connection.ClientId, out Vector3 position, out Quaternion rotation);
             NetworkObject playerObject = Instantiate(playerPrefab, position, rotation);
             Spawn(playerObject, connection);
         }
 
-        private void SetSpawn(Transform prefab, out Vector3 pos, out Quaternion rot)
+        private void GetSpawnForClient(int clientId, out Vector3 position, out Quaternion rotation)
         {
-            // No spawns specified.
+            // No spawns specified, use prefab position
             if (spawns.Length == 0)
             {
-                SetSpawnUsingPrefab(prefab, out pos, out rot);
+                SetSpawnUsingPrefab(playerPrefab.transform, out position, out rotation);
                 return;
             }
 
-            Transform result = spawns[m_nextSpawn];
-            if (result == null)
+            // Use client ID to deterministically select a spawn point
+            int spawnIndex = clientId % spawns.Length;
+            Transform spawnPoint = spawns[spawnIndex];
+
+            if (!spawnPoint)
             {
-                SetSpawnUsingPrefab(prefab, out pos, out rot);
+                SetSpawnUsingPrefab(playerPrefab.transform, out position, out rotation);
             }
             else
             {
-                pos = result.position;
-                rot = result.rotation;
+                position = spawnPoint.position;
+                rotation = spawnPoint.rotation;
             }
-
-            // Advance to next spawn point or loop back to the first one.
-            m_nextSpawn = (m_nextSpawn + 1) % spawns.Length;
         }
 
         private void SetSpawnUsingPrefab(Transform prefab, out Vector3 pos, out Quaternion rot)
         {
             pos = prefab.position;
             rot = prefab.rotation;
+        }
+
+        private int GetConnectionSpawnIndex(NetworkConnection connection)
+        {
+            int index = 0;
+            foreach (var player in PlayerHandler.AllConnectedPlayers.OrderBy(p => p.Owner.ClientId))
+            {
+                if (player.Owner == connection)
+                    return index;
+                index++;
+            }
+            // Fallback to the client ID
+            return connection.ClientId;
         }
 
         #if UNITY_EDITOR

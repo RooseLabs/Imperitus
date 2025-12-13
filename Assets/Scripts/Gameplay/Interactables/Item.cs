@@ -134,7 +134,7 @@ namespace RooseLabs.Gameplay.Interactables
                 m_pickupCoroutine = null;
             }
             transform.SetParent(null);
-            SceneManagement.SceneManager.Instance.MoveGameObjectToOnlineScene(gameObject);
+            SceneManagement.SceneManager.MoveGameObjectToOnlineScene(gameObject);
             SetState(ItemState.Ground);
             OnDrop();
             // m_hasDropped = false;

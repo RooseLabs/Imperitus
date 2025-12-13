@@ -50,7 +50,7 @@ namespace RooseLabs.Gameplay
             if (!IsServerInitialized) return;
             int randomIndex = Random.Range(0, heistScenes.Length);
             string selectedSceneName = GetSceneName(heistScenes[randomIndex]);
-            SceneManagement.SceneManager.Instance.LoadScene(selectedSceneName);
+            SceneManagement.SceneManager.LoadOnlineScene(selectedSceneName);
             m_isEndingHeist = false;
 
             // Lock spell loadouts for all players when heist starts
@@ -111,7 +111,7 @@ namespace RooseLabs.Gameplay
             {
                 player.ResetState();
             }
-            SceneManagement.SceneManager.Instance.LoadScene(GetSceneName(lobbyScene));
+            SceneManagement.SceneManager.LoadOnlineScene(GetSceneName(lobbyScene));
 
             // Unlock spell loadouts for all players when heist starts
             if (NotebookManager.Instance != null)

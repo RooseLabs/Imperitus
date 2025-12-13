@@ -1,3 +1,4 @@
+using System.Collections;
 using System.IO;
 using System.Runtime.CompilerServices;
 using FishNet.Managing;
@@ -6,6 +7,7 @@ using FishNet.Object;
 using FishNet.Transporting;
 using GameKit.Dependencies.Utilities;
 using GameKit.Dependencies.Utilities.Types;
+using RooseLabs.UI;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnitySceneManager = UnityEngine.SceneManagement.SceneManager;
@@ -83,6 +85,8 @@ namespace RooseLabs.SceneManagement
             }
         }
 
+        private Coroutine m_postLoadEndCoroutine;
+
         private void Awake()
         {
             Instance = this;
@@ -117,6 +121,7 @@ namespace RooseLabs.SceneManagement
 
             m_networkManager.ClientManager.OnClientConnectionState += ClientManager_OnClientConnectionState;
             m_networkManager.ServerManager.OnServerConnectionState += ServerManager_OnServerConnectionState;
+            m_networkManager.SceneManager.OnLoadStart += SceneManager_OnLoadStart;
             m_networkManager.SceneManager.OnLoadEnd += SceneManager_OnLoadEnd;
             if (startInOffline)
                 LoadOfflineScene();
@@ -128,15 +133,23 @@ namespace RooseLabs.SceneManagement
             {
                 m_networkManager.ClientManager.OnClientConnectionState -= ClientManager_OnClientConnectionState;
                 m_networkManager.ServerManager.OnServerConnectionState -= ServerManager_OnServerConnectionState;
+                m_networkManager.SceneManager.OnLoadStart -= SceneManager_OnLoadStart;
                 m_networkManager.SceneManager.OnLoadEnd -= SceneManager_OnLoadEnd;
             }
         }
 
-        private void SceneManager_OnLoadEnd(SceneLoadEndEventArgs obj)
+        private void SceneManager_OnLoadStart(SceneLoadStartEventArgs args)
         {
-            bool startingOnlineSceneLoaded = false;
+            UILoadingScreen.Show();
+        }
+
+        private void SceneManager_OnLoadEnd(SceneLoadEndEventArgs args)
+        {
+            if (args.LoadedScenes.Length == 0)
+                return;
+
             bool gameplayManagersSceneLoaded = false;
-            foreach (Scene s in obj.LoadedScenes)
+            foreach (Scene s in args.LoadedScenes)
             {
                 Logger.Info($"Scene loaded: {s.name}");
                 if (s.name == GetSceneName(gameplayManagersScene))
@@ -144,21 +157,23 @@ namespace RooseLabs.SceneManagement
                     gameplayManagersSceneLoaded = true;
                     continue;
                 }
-                if (s.name == GetSceneName(startingOnlineScene))
-                    startingOnlineSceneLoaded = true;
                 CurrentlyLoadedOnlineSceneName = s.name;
             }
 
-            if (startingOnlineSceneLoaded)
+            if (gameplayManagersSceneLoaded)
+            {
+                if (string.IsNullOrEmpty(CurrentlyLoadedOnlineSceneName))
+                {
+                    Logger.Info("No online scene loaded yet, loading starting online scene.");
+                    LoadStartingOnlineScene();
+                }
+            }
+            if (!string.IsNullOrEmpty(CurrentlyLoadedOnlineSceneName))
             {
                 UnloadOfflineScene();
             }
-            else if (gameplayManagersSceneLoaded)
-            {
-                LoadStartingOnlineScene();
-            }
 
-            if (!string.IsNullOrEmpty(m_pendingUnloadAfterLoadSceneName))
+            if (m_networkManager.IsServerStarted && !string.IsNullOrEmpty(m_pendingUnloadAfterLoadSceneName))
             {
                 Logger.Info($"Unloading pending scene '{m_pendingUnloadAfterLoadSceneName}'.");
                 Scene pendingScene = UnitySceneManager.GetSceneByName(m_pendingUnloadAfterLoadSceneName);
@@ -174,12 +189,47 @@ namespace RooseLabs.SceneManagement
                 }
                 m_pendingUnloadAfterLoadSceneName = string.Empty;
             }
+
+            // Wait for NetworkObjects to initialize before hiding loading screen
+            if (m_postLoadEndCoroutine != null)
+                StopCoroutine(m_postLoadEndCoroutine);
+            m_postLoadEndCoroutine = StartCoroutine(PostLoadEnd_Coroutine(args.LoadedScenes));
         }
 
-        private void ServerManager_OnServerConnectionState(ServerConnectionStateArgs obj)
+        private IEnumerator PostLoadEnd_Coroutine(Scene[] loadedScenes)
+        {
+            yield return new WaitUntil(() => AreAllNetworkObjectsClientInitializedInScenes(loadedScenes));
+            UILoadingScreen.Hide();
+            m_postLoadEndCoroutine = null;
+        }
+
+        private bool AreAllNetworkObjectsClientInitializedInScenes(Scene[] loadedScenes)
+        {
+            foreach (var scene in loadedScenes)
+            {
+                if (!scene.isLoaded)
+                    continue;
+
+                var rootObjects = scene.GetRootGameObjects();
+                foreach (var rootObject in rootObjects)
+                {
+                    var nobs = rootObject.GetComponentsInChildren<NetworkObject>(true);
+                    foreach (var nob in nobs)
+                    {
+                        if (!nob || !nob.GetIsNetworked())
+                            continue;
+                        if (!nob.IsClientInitialized)
+                            return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        private void ServerManager_OnServerConnectionState(ServerConnectionStateArgs args)
         {
             /* When server starts load scenes. */
-            if (obj.ConnectionState == LocalConnectionState.Started)
+            if (args.ConnectionState == LocalConnectionState.Started)
             {
                 /* If not exactly one server is started then
                  * that means either none are started, which isn't true because
@@ -193,15 +243,15 @@ namespace RooseLabs.SceneManagement
                 LoadGameplayManagersScene();
             }
             // When server stops load offline scene.
-            else if (obj.ConnectionState == LocalConnectionState.Stopped && !m_networkManager.ServerManager.IsAnyServerStarted())
+            else if (args.ConnectionState == LocalConnectionState.Stopped && !m_networkManager.ServerManager.IsAnyServerStarted())
             {
                 LoadOfflineScene();
             }
         }
 
-        private void ClientManager_OnClientConnectionState(ClientConnectionStateArgs obj)
+        private void ClientManager_OnClientConnectionState(ClientConnectionStateArgs args)
         {
-            if (obj.ConnectionState == LocalConnectionState.Stopped)
+            if (args.ConnectionState == LocalConnectionState.Stopped)
             {
                 // Only load offline scene if not also server.
                 if (!m_networkManager.IsServerStarted)
@@ -231,13 +281,7 @@ namespace RooseLabs.SceneManagement
             m_networkManager.SceneManager.LoadGlobalScenes(sld);
         }
 
-        /// <summary>
-        /// Loads a new online scene, replacing the previous one.
-        /// This must be called on the server.
-        /// </summary>
-        /// <param name="sceneName">The name of the scene to load.</param>
-        /// <param name="movedNetworkObjects">NetworkObjects to move to the new scene.</param>
-        public void LoadScene(string sceneName, NetworkObject[] movedNetworkObjects = null)
+        private void LoadScene(string sceneName, NetworkObject[] movedNetworkObjects = null)
         {
             if (!m_networkManager.IsServerStarted)
             {
@@ -283,12 +327,23 @@ namespace RooseLabs.SceneManagement
         }
 
         /// <summary>
+        /// Loads a new online scene, replacing the previous one.
+        /// This must be called on the server.
+        /// </summary>
+        /// <param name="sceneName">The name of the scene to load.</param>
+        /// <param name="movedNetworkObjects">NetworkObjects to move to the new scene.</param>
+        public static void LoadOnlineScene(string sceneName, NetworkObject[] movedNetworkObjects = null)
+        {
+            Instance.LoadScene(sceneName, movedNetworkObjects);
+        }
+
+        /// <summary>
         /// Moves a GameObject to the currently loaded online scene.
         /// </summary>
         /// <param name="go">The GameObject to move.</param>
-        public void MoveGameObjectToOnlineScene(GameObject go)
+        public static void MoveGameObjectToOnlineScene(GameObject go)
         {
-            Scene onlineScene = CurrentOnlineScene;
+            Scene onlineScene = Instance.CurrentOnlineScene;
             if (!onlineScene.IsValid())
             {
                 Logger.Warning("Cannot move GameObject to online scene because no online scene is loaded.");
