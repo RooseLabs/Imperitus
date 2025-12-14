@@ -41,6 +41,7 @@ namespace RooseLabs.Enemies
             Transform detectedPlayer = ai.DetectedPlayer;
             if (detectedPlayer)
             {
+                Debug.Log($"[Alert] Rotating spotlight to player at {detectedPlayer.position}");
                 ai.RotateSpotlightToTarget(detectedPlayer, 5f);
             }
 

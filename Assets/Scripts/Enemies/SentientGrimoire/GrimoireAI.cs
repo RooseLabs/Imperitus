@@ -26,6 +26,7 @@ namespace RooseLabs.Enemies
         public Transform modelTransform;
         private Quaternion defaultModelRotation;
         public Rigidbody rb;
+        public SpotlightConeVisualizer coneVisualizer;
 
         [Header("Patrol")]
         public int startWaypointIndex = 0;
@@ -60,6 +61,11 @@ namespace RooseLabs.Enemies
         public float modelRotationSpeed = 5f;
         public bool showDebugRay = true;
         public float debugRayLength = 3f;
+
+        [Header("Spotlight Bob Animation")]
+        public float bobSpeed = 2f;
+        public float bobAmount = 0.15f;
+        private Vector3 spotlightLocalOffset;
 
         #region Animation Parameters
         private static readonly int AnimParamIsPatrolling = Animator.StringToHash("isPatrolling");
@@ -103,12 +109,20 @@ namespace RooseLabs.Enemies
             {
                 defaultSpotlightRotation = spotlightTransform.rotation;
                 syncedSpotlightRotation.Value = defaultSpotlightRotation;
+                spotlightLocalOffset = spotlightTransform.localPosition;
             }
 
             if (modelTransform != null)
             {
                 defaultModelRotation = modelTransform.localRotation;
                 syncedModelRotation.Value = defaultModelRotation;
+            }
+
+            // Initialize cone visualizer (ADD THIS BLOCK)
+            if (coneVisualizer != null)
+            {
+                coneVisualizer.SetSpotlightOrigin(spotlightTransform);
+                coneVisualizer.SetConeAngle(spotlightAngle);
             }
 
             syncedSpotlightColor.Value = normalSpotlightColor;
@@ -201,6 +215,7 @@ namespace RooseLabs.Enemies
             UpdateSpotlightVisualsServer();
 
             UpdateModelRotation();
+            UpdateSpotlightBob();
 
             // Update animator parameters (NetworkAnimator handles the syncing)
             UpdateAnimatorParameters();
@@ -220,6 +235,31 @@ namespace RooseLabs.Enemies
 
             animator.SetBool(AnimParamIsPatrolling, isInPatrolState);
             animator.SetBool(AnimParamIsAlert, isInAlertOrTracking);
+        }
+
+        /// <summary>
+        /// Animate spotlight up/down bobbing during patrol
+        /// </summary>
+        private void UpdateSpotlightBob()
+        {
+            if (!spotlightTransform) return;
+
+            if (currentState is GrimoirePatrolState)
+            {
+                // Calculate bob offset using sine wave
+                float bobOffset = Mathf.Sin(Time.time * bobSpeed) * bobAmount;
+                Vector3 newLocalPos = spotlightLocalOffset + Vector3.up * bobOffset;
+                spotlightTransform.localPosition = newLocalPos;
+            }
+            else
+            {
+                // Return to original position when not patrolling
+                spotlightTransform.localPosition = Vector3.Lerp(
+                    spotlightTransform.localPosition,
+                    spotlightLocalOffset,
+                    Time.deltaTime * 5f
+                );
+            }
         }
         #endregion
 
@@ -309,9 +349,10 @@ namespace RooseLabs.Enemies
 
             Vector3 targetPoint = (bool)detectedPlayerCharacter
                 ? detectedPlayerCharacter.Center
-                : target.position + Vector3.up * 1f;
+                : target.position + Vector3.up * 1.5f;
 
             Vector3 dirToTarget = (targetPoint - spotlightTransform.position).normalized;
+
             Quaternion targetRot = Quaternion.LookRotation(dirToTarget);
             spotlightTransform.rotation = Quaternion.Slerp(
                 spotlightTransform.rotation,
@@ -426,6 +467,11 @@ namespace RooseLabs.Enemies
 
             // Sync color to network
             syncedSpotlightColor.Value = spotlight.color;
+
+            if (coneVisualizer != null)
+            {
+                coneVisualizer.SetConeColor(targetColor);
+            }
         }
 
         /// <summary>
