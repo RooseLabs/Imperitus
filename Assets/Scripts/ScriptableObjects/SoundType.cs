@@ -19,6 +19,9 @@ namespace RooseLabs.ScriptableObjects
         [Tooltip("Priority for AI decision (higher = more important).")]
         public int priority = 0;
 
+        [Tooltip("Should this sound be ignored by AI or gameplay systems?")]
+        public bool ignoreDetectionLogic = false;
+
         [Header("Audio Playback")]
         [Tooltip("Audio clips to play (one chosen randomly if multiple)")]
         public AudioClip[] audioClips;

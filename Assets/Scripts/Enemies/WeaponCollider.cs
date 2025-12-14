@@ -32,7 +32,7 @@ namespace RooseLabs.Enemies
             // Get collider from the weapon tip object
             if (weaponTipObject != null)
             {
-                m_weaponCollider = weaponTipObject.GetComponent<Collider>();
+                m_weaponCollider = weaponTipObject.GetComponent<CapsuleCollider>();
 
                 if (m_weaponCollider == null)
                 {

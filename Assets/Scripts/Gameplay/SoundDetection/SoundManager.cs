@@ -277,67 +277,73 @@ namespace RooseLabs
                 PlaySoundLocal(soundType, position);
             }
 
-            // GAMEPLAY DETECTION: Notify ISoundListeners
-            float effectiveRadius = Mathf.Max(0.01f, soundType.radius);
-            Collider[] hits = Physics.OverlapSphere(position, effectiveRadius, listenerOverlapMask, QueryTriggerInteraction.Collide);
-
-            bool isItemDrop = soundType.key == "ItemDropped";
-
-            foreach (Collider c in hits)
+            if (!soundType.ignoreDetectionLogic)
             {
-                if (c == null) continue;
+                // GAMEPLAY DETECTION: Notify ISoundListeners
+                float effectiveRadius = Mathf.Max(0.01f, soundType.radius);
+                Collider[] hits = Physics.OverlapSphere(position, effectiveRadius, listenerOverlapMask, QueryTriggerInteraction.Collide);
 
-                ISoundListener listener = c.GetComponentInParent<ISoundListener>();
-                if (listener == null) continue;
+                bool isItemDrop = soundType.key == "ItemDropped";
 
-                Vector3[] sampleOffsets = { Vector3.up * 0.5f, Vector3.zero, Vector3.down * 0.5f };
-                float maxIntensity = 0f;
-
-                foreach (var offset in sampleOffsets)
+                foreach (Collider c in hits)
                 {
-                    Vector3 samplePoint = c.ClosestPoint(position) + offset;
-                    float distance = Vector3.Distance(position, samplePoint);
+                    if (c == null) continue;
 
-                    // Exponential falloff
-                    float intensity = Mathf.Exp(-distance / soundType.radius);
+                    ISoundListener listener = c.GetComponentInParent<ISoundListener>();
+                    if (listener == null) continue;
 
-                    if (!isItemDrop && occlusionMask != 0)
+                    Vector3[] sampleOffsets = { Vector3.up * 0.5f, Vector3.zero, Vector3.down * 0.5f };
+                    float maxIntensity = 0f;
+
+                    foreach (var offset in sampleOffsets)
                     {
-                        Vector3 dir = (samplePoint - position).normalized;
-                        float rayDist = distance - 0.05f;
+                        Vector3 samplePoint = c.ClosestPoint(position) + offset;
+                        float distance = Vector3.Distance(position, samplePoint);
 
-                        if (rayDist > 0f)
+                        // Exponential falloff
+                        float intensity = Mathf.Exp(-distance / soundType.radius);
+
+                        if (!isItemDrop && occlusionMask != 0)
                         {
-                            RaycastHit[] hitsInfo = Physics.RaycastAll(position, dir, rayDist, occlusionMask, QueryTriggerInteraction.Collide);
-                            float blockedDistance = 0f;
+                            Vector3 dir = (samplePoint - position).normalized;
+                            float rayDist = distance - 0.05f;
 
-                            foreach (var hit in hitsInfo)
-                                blockedDistance += hit.distance;
+                            if (rayDist > 0f)
+                            {
+                                RaycastHit[] hitsInfo = Physics.RaycastAll(position, dir, rayDist, occlusionMask, QueryTriggerInteraction.Collide);
+                                float blockedDistance = 0f;
 
-                            // Reduce intensity based on total distance through obstacles
-                            float occlusionFactor = Mathf.Exp(-blockedDistance / (soundType.radius * 0.5f));
-                            intensity *= occlusionFactor;
+                                foreach (var hit in hitsInfo)
+                                    blockedDistance += hit.distance;
 
-                            // Debug lines
-                            if (hitsInfo.Length > 0)
-                                Debug.DrawLine(position, hitsInfo[hitsInfo.Length - 1].point, Color.red, 1.5f);
-                            else
-                                Debug.DrawLine(position, samplePoint, Color.green, 1.5f);
+                                // Reduce intensity based on total distance through obstacles
+                                float occlusionFactor = Mathf.Exp(-blockedDistance / (soundType.radius * 0.5f));
+                                intensity *= occlusionFactor;
+
+                                // Debug lines
+                                if (hitsInfo.Length > 0)
+                                    Debug.DrawLine(position, hitsInfo[hitsInfo.Length - 1].point, Color.red, 1.5f);
+                                else
+                                    Debug.DrawLine(position, samplePoint, Color.green, 1.5f);
+                            }
                         }
+
+                        maxIntensity = Mathf.Max(maxIntensity, intensity);
                     }
 
-                    maxIntensity = Mathf.Max(maxIntensity, intensity);
+                    try
+                    {
+                        listener.OnSoundHeard(position, soundType, maxIntensity);
+                        Debug.Log($"Notifying '{c.name}' with intensity {maxIntensity:F2} (isItemDrop: {isItemDrop})");
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.LogError($"Exception when notifying listener '{c.name}': {ex}");
+                    }
                 }
-
-                try
-                {
-                    listener.OnSoundHeard(position, soundType, maxIntensity);
-                    Debug.Log($"Notifying '{c.name}' with intensity {maxIntensity:F2} (isItemDrop: {isItemDrop})");
-                }
-                catch (Exception ex)
-                {
-                    Debug.LogError($"Exception when notifying listener '{c.name}': {ex}");
-                }
+            } else
+            {
+                Debug.Log("Sound emission skipped detection logic for sound type: " + soundType.key);
             }
         }
 
@@ -370,7 +376,7 @@ namespace RooseLabs
         /// <summary>
         /// Play sound locally with occlusion and 3D spatialization
         /// </summary>
-        private void PlaySoundLocal(SoundType soundType, Vector3 position)
+        public void PlaySoundLocal(SoundType soundType, Vector3 position)
         {
             if (soundType == null)
             {

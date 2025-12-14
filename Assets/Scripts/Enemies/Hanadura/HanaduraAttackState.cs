@@ -9,6 +9,7 @@ namespace RooseLabs.Enemies
         private bool hasAttacked = false;
         private float rotationSpeed = 8f; 
         private float minRotationThreshold = 5f;
+        private bool hasPlayedAttackSound = false;
 
         public HanaduraAttackState(HanaduraAI ai)
         {
@@ -43,6 +44,11 @@ namespace RooseLabs.Enemies
         public void Update()
         {
             if (ai.CurrentTarget == null) return;
+
+            if (ai.attackTimer <= 0f && hasPlayedAttackSound)
+            {
+                hasPlayedAttackSound = false;
+            }
 
             if (!ai.navAgent.isStopped)
             {
@@ -94,7 +100,14 @@ namespace RooseLabs.Enemies
                 if (!hasAttacked)
                 {
                     ai.SetAnimatorTrigger("Attack");
-                    ai.LockIntoAttack();
+
+                    // Only play sound if we haven't played it this attack cycle
+                    if (!hasPlayedAttackSound)
+                    {
+                        ai.soundEmitter.RequestEmitFromClient("Hanadura_Attack");
+                        hasPlayedAttackSound = true;
+                    }
+
                     hasAttacked = true;
                 }
             }

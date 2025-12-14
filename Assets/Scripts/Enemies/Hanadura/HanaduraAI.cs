@@ -23,13 +23,15 @@ namespace RooseLabs.Enemies
         public Transform RaycastOrigin;
         public Transform modelTransform;
         public Rigidbody rb;
+        public LayerMask HanaduraDeathBonesLayer;
+        public SoundEmitter soundEmitter;
 
         [Header("Combat")]
         public float attackRange = 4f;
-        public float attackCooldown = 1.2f;
+        public float attackCooldown = 2.5f;
         // This is just a reference to the duration of the hanadura attack so
         // I can lock state changes during the attack animation...
-        public float attackAnimationDuration = 2.3f;
+        public float attackAnimationDuration = 2.5f;
 
         [Header("Patrol")]
         public int startWaypointIndex = 0;
@@ -39,6 +41,9 @@ namespace RooseLabs.Enemies
         public float detectionExpiryTime = 10f;
         public float minSoundIntensity = 0.1f;
         public float visualLostSightGracePeriod = 6f;
+
+        [Header("Death")]
+        public float despawnDelayAfterDeath = 5f;
 
         private float visualLostSightTimer = 0f;
 
@@ -75,7 +80,7 @@ namespace RooseLabs.Enemies
         private DetectionInfo currentDetection = null;
 
         // for attack cooldown
-        private float attackTimer = 0f;
+        public float attackTimer { get; private set; } = 0f;
 
         private bool hasTriggeredDetectedAnimation = false;
         private bool isPlayingDetectedAnimation = false;
@@ -199,6 +204,7 @@ namespace RooseLabs.Enemies
             TryGetComponent(out rb);
             TryGetComponent(out navAgent);
             TryGetComponent(out detection);
+            TryGetComponent(out soundEmitter);
         }
 
         public override void OnStartServer()
@@ -255,7 +261,7 @@ namespace RooseLabs.Enemies
                 currentState?.Update();
             }
 
-            attackTimer -= Time.deltaTime;
+            this.attackTimer -= Time.deltaTime;
 
             if (isAttackLocked)
             {
@@ -544,6 +550,8 @@ namespace RooseLabs.Enemies
             // Start attack cooldown
             attackTimer = attackCooldown;
 
+            //soundEmitter.RequestEmitFromClient("Hanadura_Attack");
+
             // Enable weapon collider for this attack
             if (weaponCollider != null)
             {
@@ -636,27 +644,77 @@ namespace RooseLabs.Enemies
                 randomZone?.ReleaseRoute(gameObject);
                 isPatrollingRandomRoom = false;
             }
-
-            rb.isKinematic = true;
             weaponCollider.DisableWeapon();
-
-            Collider col = gameObject.GetComponent<Collider>();
-            if (col != null)
-                col.enabled = false;
-
-            animator.Play("Death");
-            hasPlayedDeathAnimation = true;
 
             if (navAgent != null)
                 navAgent.enabled = false;
 
+            // Stop the animator 
+            animator.enabled = false;
+
+            // Find all particle systems and stop them
+            ParticleSystem[] particleSystems = GetComponentsInChildren<ParticleSystem>();
+            foreach (ParticleSystem ps in particleSystems)
+            {
+                ps.Stop();
+            }
+
+            // Find all gameobjects in the HanaduraDeathBones layer and set them to use gravity and fall after death
+            Transform[] allChildren = GetComponentsInChildren<Transform>();
+            foreach (Transform child in allChildren)
+            {
+                if (child == transform) continue; // Skip the root object itself
+
+                if (((1 << child.gameObject.layer) & HanaduraDeathBonesLayer) != 0)
+                {
+                    Rigidbody childRb = child.GetComponent<Rigidbody>();
+                    if (childRb != null)
+                    {
+                        childRb.useGravity = true;
+                        childRb.isKinematic = false;
+                    }
+
+                    // Check for a special case, if the gameobject is the SpearTipBone, we only activate the box collider
+                    // (the capsule collider in the bone is for the weapon hitbox during combat)
+                    if (child.gameObject.name == "SpearTipBone")
+                    {
+                        Collider spearCol = child.GetComponent<BoxCollider>();
+                        if (spearCol != null)
+                        {
+                            spearCol.enabled = true;
+                        }
+                        continue;
+                    }
+
+                    Collider childCol = child.GetComponent<Collider>();
+                    if (childCol != null)
+                    {
+                        childCol.enabled = true;
+                    }
+                }
+            }
+
+            // Disable the collider on the root transform
+            Collider rootCol = GetComponent<Collider>();
+            if (rootCol != null)
+            {
+                rootCol.enabled = false;
+            }
+
+            hasPlayedDeathAnimation = true;
+
             Logger.Info($"{gameObject.name} death sequence executed on observer");
+
+            // Start despawn timer on server only
+            if (IsServerInitialized)
+            {
+                StartCoroutine(DespawnAfterDeath());
+            }
         }
 
         private IEnumerator DespawnAfterDeath()
         {
-            // Wait for death animation to finish
-            yield return new WaitForSeconds(10f); 
+            yield return new WaitForSeconds(despawnDelayAfterDeath);
 
             if (IsServerInitialized)
             {
