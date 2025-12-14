@@ -56,6 +56,7 @@ namespace RooseLabs.Gameplay.Spells
         private float m_castProgress = 0f;
 
         public PlayerCharacter CasterCharacter { get; private set; }
+        public bool IsAiming { get; private set; }
         public bool IsCasting { get; private set; }
 
         public override void OnStartClient()
@@ -63,11 +64,30 @@ namespace RooseLabs.Gameplay.Spells
             CasterCharacter = PlayerHandler.GetCharacter(Owner);
             Debug.Assert(CasterCharacter != null, "[SpellBase] No owner character found for spell.");
             SetupParentConstraint(CasterCharacter.Wand.AttachmentPoint, CasterCharacter.Wand.SpellCastPointLocalPosition);
+            gameObject.name = $"Spell_{GetType().Name} ({CasterCharacter.Player.PlayerName})";
         }
 
         #region Public API
         public bool CanAimToSustain => castType == SpellCastType.AimToSustain;
         public bool IsBeingSustained { get; private set; } = false;
+
+        public void Aim()
+        {
+            if (!IsAiming)
+            {
+                IsAiming = true;
+                OnStartAim();
+            }
+
+            OnAim();
+        }
+
+        public void StopAim()
+        {
+            if (!IsAiming) return;
+            IsAiming = false;
+            OnStopAim();
+        }
 
         public void StartCast()
         {
@@ -226,11 +246,38 @@ namespace RooseLabs.Gameplay.Spells
         }
 
         /// <summary>
+        /// Called when the spell starts being aimed (first frame of aiming).
+        /// </summary>
+        protected virtual void OnStartAim()
+        {
+            // Logger.Info($"Spell {SpellInfo.Name} Started Aiming");
+        }
+
+        /// <summary>
+        /// Called every frame while the spell is being aimed.
+        /// Use this for custom aim effects like targeting indicators, trajectories, etc.
+        /// This will be called even while the spell is being cast.
+        /// If you want to do Aim-only logic, check IsCasting flag.
+        /// </summary>
+        protected virtual void OnAim()
+        {
+            // Logger.Info($"Spell {SpellInfo.Name} Aiming");
+        }
+
+        /// <summary>
+        /// Called when the spell stops being aimed.
+        /// </summary>
+        protected virtual void OnStopAim()
+        {
+            // Logger.Info($"Spell {SpellInfo.Name} Stopped Aiming");
+        }
+
+        /// <summary>
         /// Called on button press to start casting the spell.
         /// </summary>
         protected virtual void OnStartCast()
         {
-            Logger.Info($"Spell {SpellInfo.Name} Started Casting");
+            // Logger.Info($"Spell {SpellInfo.Name} Started Casting");
         }
 
         /// <summary>
@@ -238,7 +285,7 @@ namespace RooseLabs.Gameplay.Spells
         /// </summary>
         protected virtual void OnCancelCast()
         {
-            Logger.Info($"Spell {SpellInfo.Name} Cancelled Casting");
+            // Logger.Info($"Spell {SpellInfo.Name} Cancelled Casting");
         }
 
         /// <summary>
@@ -246,7 +293,7 @@ namespace RooseLabs.Gameplay.Spells
         /// </summary>
         protected virtual void OnContinueCast()
         {
-            Logger.Info($"Spell {SpellInfo.Name} Continuing Casting");
+            // Logger.Info($"Spell {SpellInfo.Name} Continuing Casting");
         }
 
         /// <summary>
@@ -255,7 +302,7 @@ namespace RooseLabs.Gameplay.Spells
         /// <returns>True if the spell was successfully cast, false otherwise.</returns>
         protected virtual bool OnCastFinished()
         {
-            Logger.Info($"Spell {SpellInfo.Name} Cast Finished");
+            // Logger.Info($"Spell {SpellInfo.Name} Cast Finished");
             return true;
         }
 
@@ -264,7 +311,7 @@ namespace RooseLabs.Gameplay.Spells
         /// </summary>
         protected virtual void OnContinueCastSustained()
         {
-            Logger.Info($"Spell {SpellInfo.Name} Cast Held Continued");
+            // Logger.Info($"Spell {SpellInfo.Name} Cast Held Continued");
         }
 
         /// <summary>
@@ -272,7 +319,7 @@ namespace RooseLabs.Gameplay.Spells
         /// </summary>
         protected virtual void OnCancelCastSustained()
         {
-            Logger.Info($"Spell {SpellInfo.Name} Cancel Held");
+            // Logger.Info($"Spell {SpellInfo.Name} Cancel Held");
         }
 
         /// <summary>
@@ -281,7 +328,7 @@ namespace RooseLabs.Gameplay.Spells
         /// </summary>
         protected virtual void OnScrollBackwardPressed()
         {
-            Logger.Info($"Spell {SpellInfo.Name} Scroll Backward Pressed");
+            // Logger.Info($"Spell {SpellInfo.Name} Scroll Backward Pressed");
         }
 
         /// <summary>
@@ -290,7 +337,7 @@ namespace RooseLabs.Gameplay.Spells
         /// </summary>
         protected virtual void OnScrollForwardPressed()
         {
-            Logger.Info($"Spell {SpellInfo.Name} Scroll Forward Pressed");
+            // Logger.Info($"Spell {SpellInfo.Name} Scroll Forward Pressed");
         }
 
         /// <summary>
@@ -299,7 +346,7 @@ namespace RooseLabs.Gameplay.Spells
         /// </summary>
         protected virtual void OnScrollBackwardHeld()
         {
-            Logger.Info($"Spell {SpellInfo.Name} Scroll Backward Held");
+            // Logger.Info($"Spell {SpellInfo.Name} Scroll Backward Held");
         }
 
         /// <summary>
@@ -308,7 +355,7 @@ namespace RooseLabs.Gameplay.Spells
         /// </summary>
         protected virtual void OnScrollForwardHeld()
         {
-            Logger.Info($"Spell {SpellInfo.Name} Scroll Forward Held");
+            // Logger.Info($"Spell {SpellInfo.Name} Scroll Forward Held");
         }
 
         /// <summary>
@@ -317,11 +364,12 @@ namespace RooseLabs.Gameplay.Spells
         /// </summary>
         protected virtual void OnScroll(float value)
         {
-            Logger.Info($"Spell {SpellInfo.Name} Scrolled: {value}");
+            // Logger.Info($"Spell {SpellInfo.Name} Scrolled: {value}");
         }
 
         protected virtual void ResetData()
         {
+            IsAiming = false;
             IsCasting = false;
             m_castProgress = 0f;
             IsBeingSustained = false;

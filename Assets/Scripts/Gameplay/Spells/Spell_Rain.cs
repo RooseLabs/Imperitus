@@ -7,7 +7,7 @@ namespace RooseLabs.Gameplay.Spells
     /// <summary>
     /// Rain spell - Player aims to place a cloud that grows, rains, then despawns.
     /// </summary>
-    public class Spell_Rain : SpellBase
+    public class Rain : SpellBase
     {
         #region Serialized Fields
         [Header("Rain Spell Configuration")]
@@ -45,16 +45,19 @@ namespace RooseLabs.Gameplay.Spells
         #endregion
 
         #region Spell Lifecycle
-        protected override void OnStartCast()
+        protected override void OnAim()
         {
-            base.OnStartCast();
-            // Casting started, keep showing indicators
+            // Update placement indicators every frame while aiming
+            if (CasterCharacter == PlayerCharacter.LocalCharacter)
+            {
+                UpdatePlacementIndicators();
+            }
         }
 
-        protected override void OnContinueCast()
+        protected override void OnStopAim()
         {
-            base.OnContinueCast();
-            // Continue showing indicators during cast
+            // Hide indicators when aiming stops
+            HideIndicators();
         }
 
         protected override bool OnCastFinished()
@@ -84,21 +87,6 @@ namespace RooseLabs.Gameplay.Spells
         #endregion
 
         #region Lifecycle
-        private void Update()
-        {
-            if (!CasterCharacter) return;
-            if (CasterCharacter != PlayerCharacter.LocalCharacter) return;
-
-            // Only update placement while player is aiming (not necessarily casting yet)
-            if (CasterCharacter.Data.isAiming)
-            {
-                UpdatePlacementIndicators();
-            }
-            else
-            {
-                HideIndicators();
-            }
-        }
 
         public override void OnStartClient()
         {

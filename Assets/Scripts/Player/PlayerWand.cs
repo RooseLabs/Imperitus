@@ -14,6 +14,7 @@ namespace RooseLabs.Player
         private class SpellSlot
         {
             public SpellBase SpellPrefab { get; private set; }
+            public SpellBase SpellInstance { get; set; }
             public bool IsTemporary { get; }
             public ICollection<RuneSO> Runes => m_customRunes ?? SpellPrefab?.SpellInfo.Runes;
 
@@ -24,6 +25,21 @@ namespace RooseLabs.Player
                 SpellPrefab = spellPrefab;
                 IsTemporary = isTemporary;
                 m_customRunes = customRunes;
+            }
+
+            public void Instantiate()
+            {
+                if ((bool)SpellPrefab && !SpellInstance)
+                {
+                    SpellInstance = SpellBase.Instantiate(SpellPrefab);
+                }
+            }
+
+            public void DestroyInstance()
+            {
+                if (!SpellInstance) return;
+                SpellInstance.Destroy();
+                SpellInstance = null;
             }
         }
 
@@ -49,16 +65,13 @@ namespace RooseLabs.Player
         #endregion
 
         #region Private Fields
-        private SpellBase m_currentSpellInstance;
-        private bool m_currentSpellInstanceDirty;
-
         /// <summary>
         /// List of spell slots that the player can currently use.
         /// Permanent spells come first, temporary spell is always last (if present).
         /// </summary>
         private readonly List<SpellSlot> m_spellSlots = new();
 
-        private const float SpellSwitchCooldownDuration = 0.3f;
+        private const float SpellSwitchCooldownDuration = 0.25f;
         private float m_spellSwitchCooldownTimer = 0f;
 
         private int m_currentSpellIndex = 0;
@@ -72,20 +85,22 @@ namespace RooseLabs.Player
                 m_currentSpellIndex = (value % m_spellSlots.Count + m_spellSlots.Count) % m_spellSlots.Count;
                 if (previousValue != m_currentSpellIndex)
                 {
-                    m_currentSpellInstanceDirty = true;
+                    SpellSlot previousSlot = m_spellSlots[previousValue];
+                    previousSlot?.SpellInstance?.StopAim();
                     m_spellSwitchCooldownTimer = SpellSwitchCooldownDuration; // Reset cooldown
-                    var slot = m_spellSlots[m_currentSpellIndex];
-                    this.LogInfo($"Switched to spell index {m_currentSpellIndex} (Spell: {slot.SpellPrefab.SpellInfo.EnglishName})");
+                    SpellSlot slot = m_spellSlots[m_currentSpellIndex];
+                    SetOrbitingRunes(slot.Runes); // Update orbiting runes for the new spell
                 }
             }
         }
+
+        private SpellSlot CurrentSpellSlot => m_spellSlots.Count > 0 ? m_spellSlots[m_currentSpellIndex] : null;
+        private SpellBase CurrentSpellInstance => CurrentSpellSlot?.SpellInstance;
         #endregion
 
         public override void OnStartNetwork()
         {
             if (!Owner.IsLocalClient) return;
-
-            InitializeSpellLoadout();
             character.Notebook.OnToggledRuneObjectsChanged += OnRuneSelectionChanged;
             character.Notebook.OnToggledSpellsChanged += OnSpellSelectionChanged;
         }
@@ -95,6 +110,13 @@ namespace RooseLabs.Player
             if (!IsOwner) return;
             character.Notebook.OnToggledRuneObjectsChanged -= OnRuneSelectionChanged;
             character.Notebook.OnToggledSpellsChanged -= OnSpellSelectionChanged;
+        }
+
+        public override void OnStartClient()
+        {
+            if (!IsOwner) return;
+            InitializeSpellLoadout();
+            SetOrbitingRunes(CurrentSpellSlot?.Runes);
         }
 
         private void Update()
@@ -110,58 +132,28 @@ namespace RooseLabs.Player
             UpdateAimingState();
             if (character.Data.isAiming)
             {
+                if (!CurrentSpellInstance && CurrentSpellSlot != null)
+                {
+                    CurrentSpellSlot.Instantiate();
+                }
+
+                CurrentSpellInstance?.Aim();
                 HandleSpellCasting();
+
                 if (!character.Data.isCasting)
                 {
                     HandleSpellSwitching();
                 }
-                if (m_currentSpellInstanceDirty || !m_currentSpellInstance)
-                {
-                    UpdateCurrentSpellInstance();
-                }
-            }
-            else if (character.Data.isCasting)
-            {
-                m_currentSpellInstance?.CancelCast();
-                character.Data.isCasting = false;
-            }
-        }
-
-        private void UpdateCurrentSpellInstance()
-        {
-            // Destroy previous spell instance (if it exists)
-            if (m_currentSpellInstance)
-            {
-                m_currentSpellInstance.Destroy();
-                m_currentSpellInstance = null;
-            }
-
-            if (m_spellSlots.Count == 0)
-            {
-                ClearOrbitingRunes();
-                m_currentSpellInstanceDirty = false;
-                return;
-            }
-
-            // Get current spell slot
-            SpellSlot currentSlot = m_spellSlots[m_currentSpellIndex];
-
-            // Instantiate new spell
-            if (currentSlot.SpellPrefab)
-            {
-                m_currentSpellInstance = SpellBase.Instantiate(currentSlot.SpellPrefab);
-                this.LogInfo($"Instantiated spell '{currentSlot.SpellPrefab.SpellInfo.EnglishName}' (Temporary: {currentSlot.IsTemporary})");
-
-                // Set orbiting runes
-                SetOrbitingRunes(currentSlot.Runes);
             }
             else
             {
-                this.LogError($"Spell at index {m_currentSpellIndex} is null!");
-                ClearOrbitingRunes();
+                if (character.Data.isCasting)
+                {
+                    CurrentSpellInstance?.CancelCast();
+                    character.Data.isCasting = false;
+                }
+                CurrentSpellInstance?.StopAim();
             }
-
-            m_currentSpellInstanceDirty = false;
         }
 
         private void LateUpdate()
@@ -201,6 +193,7 @@ namespace RooseLabs.Player
 
         private void OnSpellSelectionChanged(ICollection<int> selectedSpellIndices)
         {
+            // Rebuild the loadout
             InitializeSpellLoadout();
 
             foreach (int spellIndex in selectedSpellIndices)
@@ -213,13 +206,7 @@ namespace RooseLabs.Player
             // Ensure current spell index is valid
             if (m_currentSpellIndex >= m_spellSlots.Count)
             {
-                CurrentSpellIndex = 0;
-            }
-            else if (m_currentSpellInstance.SpellInfo != m_spellSlots[m_currentSpellIndex].SpellPrefab.SpellInfo)
-            {
-                // If the current spell is now different, mark spell instance as dirty and reset spell switch cooldown
-                m_currentSpellInstanceDirty = true;
-                m_spellSwitchCooldownTimer = SpellSwitchCooldownDuration;
+                m_currentSpellIndex = 0;
             }
         }
         #endregion
@@ -269,18 +256,34 @@ namespace RooseLabs.Player
             SpellSlot newTemporarySpellSlot = new SpellSlot(spell, isTemporary: true, customRunes: runes);
             if (m_spellSlots[^1].IsTemporary)
             {
-                // There is already a temporary spell, replace it with the new one
+                // There is already a temporary spell, destroy its instance and replace it with the new one
+                m_spellSlots[^1].DestroyInstance();
                 m_spellSlots[^1] = newTemporarySpellSlot;
+
+                // Instantiate the new temporary spell
+                newTemporarySpellSlot.Instantiate();
+                if (newTemporarySpellSlot.SpellInstance)
+                {
+                    this.LogInfo($"Instantiated temporary spell '{newTemporarySpellSlot.SpellPrefab.SpellInfo.EnglishName}'");
+                }
+
                 if (m_currentSpellIndex == m_spellSlots.Count - 1)
                 {
-                    // If the temporary spell was selected, mark instance as dirty to update it
-                    m_currentSpellInstanceDirty = true;
+                    // If the temporary spell was selected, update the orbiting runes to the new ones
+                    SetOrbitingRunes(newTemporarySpellSlot.Runes);
                 }
             }
             else
             {
                 // No temporary spell present, add it
                 m_spellSlots.Add(newTemporarySpellSlot);
+
+                // Instantiate the new temporary spell
+                newTemporarySpellSlot.Instantiate();
+                if (newTemporarySpellSlot.SpellInstance)
+                {
+                    this.LogInfo($"Instantiated temporary spell '{newTemporarySpellSlot.SpellPrefab.SpellInfo.EnglishName}'");
+                }
             }
         }
 
@@ -293,12 +296,14 @@ namespace RooseLabs.Player
         {
             // Check if the spell is already present in the spell slots
             int existingIndex = m_spellSlots.FindIndex(slot => slot.SpellPrefab == spell);
+            SpellBase existingInstance = null;
 
             if (existingIndex >= 0)
             {
                 if (m_spellSlots[existingIndex].IsTemporary)
                 {
-                    // Remove temporary spell
+                    // The spell exists as temporary, destroy it and replace with permanent version
+                    existingInstance = m_spellSlots[existingIndex].SpellInstance;
                     m_spellSlots.RemoveAt(existingIndex);
                 }
                 else
@@ -310,12 +315,12 @@ namespace RooseLabs.Player
 
             // Add new permanent spell
             SpellSlot permanentSlot = new SpellSlot(spell, isTemporary: false);
+            permanentSlot.SpellInstance = existingInstance;
             m_spellSlots.Add(permanentSlot);
 
             if (existingIndex >= 0 && m_currentSpellIndex == existingIndex)
             {
                 // If the added spell was previously selected as temporary, switch back to it
-                // We don't need to set m_currentSpellInstanceDirty here because the spell prefab is the same
                 m_currentSpellIndex = m_spellSlots.Count - 1;
             }
         }
@@ -338,6 +343,7 @@ namespace RooseLabs.Player
             }
 
             bool wasSelected = m_currentSpellIndex == existingIndex;
+            m_spellSlots[existingIndex].DestroyInstance();
             m_spellSlots.RemoveAt(existingIndex);
 
             if (wasSelected && m_spellSlots.Count > 0)
@@ -353,6 +359,9 @@ namespace RooseLabs.Player
             if (m_spellSlots.Count > 1 && m_spellSlots[^1].IsTemporary)
             {
                 bool wasSelected = m_currentSpellIndex == m_spellSlots.Count - 1;
+
+                // Destroy the temporary spell instance
+                m_spellSlots[^1].DestroyInstance();
                 m_spellSlots.RemoveAt(m_spellSlots.Count - 1);
 
                 if (wasSelected && m_spellSlots.Count > 0)
@@ -380,34 +389,34 @@ namespace RooseLabs.Player
 
         private void HandleSpellCasting()
         {
-            if (!m_currentSpellInstance) return;
+            if (!CurrentSpellInstance) return;
 
             // Handle sustained spells
-            if (m_currentSpellInstance.CanAimToSustain && m_currentSpellInstance.IsBeingSustained)
+            if (CurrentSpellInstance.CanAimToSustain && CurrentSpellInstance.IsBeingSustained)
             {
-                m_currentSpellInstance.ContinueCast();
+                CurrentSpellInstance.ContinueCast();
             }
             // Handle spell input
             else if (character.Input.castWasPressed)
             {
-                m_currentSpellInstance.StartCast();
+                CurrentSpellInstance.StartCast();
             }
             else if (character.Input.castIsPressed)
             {
-                m_currentSpellInstance.ContinueCast();
+                CurrentSpellInstance.ContinueCast();
             }
             else if (character.Input.castWasReleased)
             {
-                m_currentSpellInstance.CancelCast();
+                CurrentSpellInstance.CancelCast();
             }
 
             // Handle scroll input during sustained spells
-            if (m_currentSpellInstance.IsBeingSustained)
+            if (CurrentSpellInstance.IsBeingSustained)
             {
                 HandleSustainedSpellScrollInput();
             }
 
-            character.Data.isCasting = m_currentSpellInstance.IsCasting;
+            character.Data.isCasting = CurrentSpellInstance.IsCasting;
         }
 
         private void HandleSustainedSpellScrollInput()
@@ -419,15 +428,15 @@ namespace RooseLabs.Player
             }
 
             if (character.Input.scrollForwardWasPressed)
-                m_currentSpellInstance.ScrollForwardPressed();
+                CurrentSpellInstance.ScrollForwardPressed();
             else if (character.Input.scrollForwardIsPressed)
-                m_currentSpellInstance.ScrollForwardHeld();
+                CurrentSpellInstance.ScrollForwardHeld();
             else if (character.Input.scrollBackwardWasPressed)
-                m_currentSpellInstance.ScrollBackwardPressed();
+                CurrentSpellInstance.ScrollBackwardPressed();
             else if (character.Input.scrollBackwardIsPressed)
-                m_currentSpellInstance.ScrollBackwardHeld();
+                CurrentSpellInstance.ScrollBackwardHeld();
             else if (character.Input.scrollInput != 0f)
-                m_currentSpellInstance.Scroll(character.Input.scrollInput);
+                CurrentSpellInstance.Scroll(character.Input.scrollInput);
         }
 
         private void HandleSpellSwitching()
