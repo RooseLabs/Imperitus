@@ -10,7 +10,7 @@ using Logger = RooseLabs.Core.Logger;
 namespace RooseLabs.Enemies
 {
     [RequireComponent(typeof(NavMeshAgent))]
-    public class HanaduraAI : BaseEnemy
+    public class HanaduraAI : BaseEnemy, ISoundListener
     {
         private static Logger Logger => Logger.GetLogger("Hanadura");
 
