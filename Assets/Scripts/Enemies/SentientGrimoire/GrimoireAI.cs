@@ -71,6 +71,7 @@ namespace RooseLabs.Enemies
         private float m_reinforcementUpdateTimer;
         private readonly List<HanaduraAI> m_alertedHanaduras = new();
         private Transform m_detectedPlayer;
+        private PlayerCharacter m_cachedSpotlightTargetCharacter;
         private float m_reinforcementTimer;
         private float m_detectionTimer;
         private bool m_hasHandledDeath;
@@ -100,6 +101,23 @@ namespace RooseLabs.Enemies
             {
                 m_defaultSpotlightRotation = spotlightTransform.rotation;
             }
+        }
+
+        public override void OnStartNetwork()
+        {
+            // Subscribe to spotlight target changes
+            m_syncedSpotlightTarget.OnChange += OnSpotlightTargetChanged;
+            // Cache initial PlayerCharacter if target exists
+            if (m_syncedSpotlightTarget.Value)
+            {
+                m_syncedSpotlightTarget.Value.TryGetComponentInParent(out m_cachedSpotlightTargetCharacter);
+            }
+        }
+
+        public override void OnStopNetwork()
+        {
+            // Unsubscribe from spotlight target changes
+            m_syncedSpotlightTarget.OnChange -= OnSpotlightTargetChanged;
         }
 
         public override void OnStartServer()
@@ -273,6 +291,23 @@ namespace RooseLabs.Enemies
         }
 
         /// <summary>
+        /// SyncVar callback when spotlight target changes - caches PlayerCharacter component
+        /// </summary>
+        private void OnSpotlightTargetChanged(Transform prev, Transform next, bool asServer)
+        {
+            if (next)
+            {
+                // Cache PlayerCharacter component if target is not null
+                next.TryGetComponentInParent(out m_cachedSpotlightTargetCharacter);
+            }
+            else
+            {
+                // Clear cache if target is null
+                m_cachedSpotlightTargetCharacter = null;
+            }
+        }
+
+        /// <summary>
         /// Update all visual elements including spotlight color, spotlight rotation, and model rotation.
         /// Called in LateUpdate on both server and clients to ensure synchronized visuals.
         /// </summary>
@@ -315,10 +350,10 @@ namespace RooseLabs.Enemies
                 // Track the target transform
                 Vector3 targetPoint = currentTarget.position;
 
-                // Try to get player character for better center targeting
-                if (currentTarget.TryGetComponentInParent(out PlayerCharacter playerChar))
+                // Use cached PlayerCharacter for better center targeting
+                if (m_cachedSpotlightTargetCharacter)
                 {
-                    targetPoint = playerChar.Center;
+                    targetPoint = m_cachedSpotlightTargetCharacter.Center;
                 }
 
                 Vector3 direction = (targetPoint - spotlightTransform.position).normalized;
@@ -354,10 +389,10 @@ namespace RooseLabs.Enemies
                 // Rotate model to face the target
                 Vector3 targetPoint = currentTarget.position;
 
-                // Try to get player character for better center targeting
-                if (currentTarget.TryGetComponentInParent(out PlayerCharacter playerChar))
+                // Use cached PlayerCharacter for better center targeting
+                if (m_cachedSpotlightTargetCharacter)
                 {
-                    targetPoint = playerChar.Center;
+                    targetPoint = m_cachedSpotlightTargetCharacter.Center;
                 }
 
                 Vector3 directionToTarget = targetPoint - transform.position;
