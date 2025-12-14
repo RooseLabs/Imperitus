@@ -67,10 +67,18 @@ namespace RooseLabs.Player
             SetNetworkTransformSync(m_heldItemPositionNetworkTransform, true);
         }
 
-        private void DropCurrentItem()
+        public void DropCurrentItem()
         {
             if (!CurrentHeldItem) return;
             CurrentHeldItem.RequestDrop();
+            CurrentHeldItem = null;
+            SetNetworkTransformSync(m_heldItemPositionNetworkTransform, false);
+        }
+
+        public void DestroyCurrentItem()
+        {
+            if (!CurrentHeldItem) return;
+            Destroy(CurrentHeldItem.gameObject);
             CurrentHeldItem = null;
             SetNetworkTransformSync(m_heldItemPositionNetworkTransform, false);
         }

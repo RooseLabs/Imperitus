@@ -188,6 +188,7 @@ namespace RooseLabs.Player
                     HandlePlayerDeath(damage);
                 }
                 Data.isDead = true;
+                Items.DropCurrentItem();
                 this.LogInfo($"Player '{Player.PlayerName}' died!");
             }
         }
@@ -248,6 +249,7 @@ namespace RooseLabs.Player
                 CameraController.Instance.ResetPosition();
                 Wand.RemoveTemporarySpell();
             }
+            Items.DestroyCurrentItem();
             // Reset the runes in the notebook
             Notebook.ResetNotebook();
         }
