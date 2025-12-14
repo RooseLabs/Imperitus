@@ -1,12 +1,9 @@
 using UnityEngine;
-using FishNet.Object;
-using FishNet.Object.Synchronizing;
 
-namespace RooseLabs
+namespace RooseLabs.Enemies
 {
-    [RequireComponent(typeof(MeshFilter))]
-    [RequireComponent(typeof(MeshRenderer))]
-    public class SpotlightConeVisualizer : NetworkBehaviour
+    [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
+    public class SpotlightConeVisualizer : MonoBehaviour
     {
         [Header("References")]
         [SerializeField] private Transform spotlightOrigin;
@@ -29,22 +26,16 @@ namespace RooseLabs
 
         [Header("Visual Settings")]
         [SerializeField] private float heightUpdateSpeed = 10f;
-        [SerializeField] private float colorTransitionSpeed = 10f;
-
-        // Network synced
-        private readonly SyncVar<Color> syncedConeColor = new SyncVar<Color>(
-            new SyncTypeSettings(WritePermission.ServerOnly, ReadPermission.Observers)
-        );
 
         // Runtime data
-        private Mesh coneMesh;
-        private float currentConeHeight;
-        private float targetConeHeight;
-        private Material coneMaterial;
+        private Mesh m_coneMesh;
+        private float m_currentConeHeight;
+        private float m_targetConeHeight;
+        private Material m_coneMaterial;
         private static readonly int ColorPropertyID = Shader.PropertyToID("_ConeColor");
 
         // Cache to avoid recreating mesh every frame if height hasn't changed much
-        private float lastMeshHeight = -1f;
+        private float m_lastMeshHeight = -1f;
         private const float MeshUpdateThreshold = 0.1f;
 
         private void Awake()
@@ -56,69 +47,31 @@ namespace RooseLabs
                 meshRenderer = GetComponent<MeshRenderer>();
 
             // Create the cone mesh
-            coneMesh = new Mesh();
-            coneMesh.name = "SpotlightCone";
-            meshFilter.mesh = coneMesh;
+            m_coneMesh = new Mesh
+            {
+                name = "SpotlightCone"
+            };
+            meshFilter.mesh = m_coneMesh;
 
             // Get material instance
-            coneMaterial = meshRenderer.material;
-        }
-
-        public override void OnStartServer()
-        {
-            base.OnStartServer();
-            syncedConeColor.OnChange += OnConeColorChanged;
-        }
-
-        public override void OnStartClient()
-        {
-            base.OnStartClient();
-
-            if (!IsServerInitialized)
-            {
-                syncedConeColor.OnChange += OnConeColorChanged;
-
-                // Apply initial synced color
-                if (coneMaterial != null)
-                    coneMaterial.SetColor(ColorPropertyID, syncedConeColor.Value);
-            }
-        }
-
-        public override void OnStopClient()
-        {
-            base.OnStopClient();
-            syncedConeColor.OnChange -= OnConeColorChanged;
-        }
-
-        public override void OnStopServer()
-        {
-            base.OnStopServer();
-            syncedConeColor.OnChange -= OnConeColorChanged;
+            m_coneMaterial = meshRenderer.material;
         }
 
         private void LateUpdate()
         {
-            if (spotlightOrigin == null) return;
+            if (!spotlightOrigin) return;
 
             // Update cone height based on ground distance
             UpdateConeHeight();
 
             // Smoothly interpolate to target height
-            currentConeHeight = Mathf.Lerp(currentConeHeight, targetConeHeight, Time.deltaTime * heightUpdateSpeed);
+            m_currentConeHeight = Mathf.Lerp(m_currentConeHeight, m_targetConeHeight, Time.deltaTime * heightUpdateSpeed);
 
             // Only regenerate mesh if height changed significantly
-            if (Mathf.Abs(currentConeHeight - lastMeshHeight) > MeshUpdateThreshold)
+            if (Mathf.Abs(m_currentConeHeight - m_lastMeshHeight) > MeshUpdateThreshold)
             {
-                GenerateConeMesh(currentConeHeight);
-                lastMeshHeight = currentConeHeight;
-            }
-
-            // Update material color (client-side interpolation)
-            if (coneMaterial != null && !IsServerInitialized)
-            {
-                Color currentColor = coneMaterial.GetColor(ColorPropertyID);
-                Color targetColor = syncedConeColor.Value;
-                coneMaterial.SetColor(ColorPropertyID, Color.Lerp(currentColor, targetColor, Time.deltaTime * colorTransitionSpeed));
+                GenerateConeMesh(m_currentConeHeight);
+                m_lastMeshHeight = m_currentConeHeight;
             }
         }
 
@@ -128,7 +81,7 @@ namespace RooseLabs
         /// </summary>
         private void UpdateConeHeight()
         {
-            if (spotlightOrigin == null) return;
+            if (!spotlightOrigin) return;
 
             // Cast from spotlight position in its forward direction
             // Use ONLY groundLayer to avoid interfering with player detection
@@ -138,12 +91,12 @@ namespace RooseLabs
 
             if (Physics.Raycast(origin, direction, out hit, maxConeHeight, groundLayer, QueryTriggerInteraction.Ignore))
             {
-                targetConeHeight = hit.distance;
+                m_targetConeHeight = hit.distance;
             }
             else
             {
                 // No ground found, use max height
-                targetConeHeight = maxConeHeight;
+                m_targetConeHeight = maxConeHeight;
             }
         }
 
@@ -153,9 +106,9 @@ namespace RooseLabs
         /// </summary>
         private void GenerateConeMesh(float height)
         {
-            if (coneMesh == null || height <= 0.01f) return;
+            if (!m_coneMesh || height <= 0.01f) return;
 
-            coneMesh.Clear();
+            m_coneMesh.Clear();
 
             // Calculate radius at the base using spotlight angle
             float baseRadius = height * Mathf.Tan(coneAngle * 0.5f * Mathf.Deg2Rad);
@@ -309,39 +262,19 @@ namespace RooseLabs
                 }
             }
 
-            coneMesh.vertices = vertices;
-            coneMesh.uv = uv;
-            coneMesh.triangles = triangles;
-            coneMesh.RecalculateNormals();
-            coneMesh.RecalculateBounds();
+            m_coneMesh.vertices = vertices;
+            m_coneMesh.uv = uv;
+            m_coneMesh.triangles = triangles;
+            m_coneMesh.RecalculateNormals();
+            m_coneMesh.RecalculateBounds();
         }
 
         /// <summary>
-        /// Set cone color (SERVER ONLY - will sync to clients)
+        /// Set cone color target (works on both server and clients)
         /// </summary>
         public void SetConeColor(Color color)
         {
-            if (!IsServerInitialized)
-            {
-                return;
-            }
-
-            syncedConeColor.Value = color;
-
-            // Apply immediately on server
-            if (coneMaterial != null)
-                coneMaterial.SetColor(ColorPropertyID, color);
-        }
-
-        /// <summary>
-        /// SyncVar callback when color changes
-        /// </summary>
-        private void OnConeColorChanged(Color prev, Color next, bool asServer)
-        {
-            if (!asServer && coneMaterial != null)
-            {
-                coneMaterial.SetColor(ColorPropertyID, next);
-            }
+            m_coneMaterial?.SetColor(ColorPropertyID, color);
         }
 
         /// <summary>
@@ -352,12 +285,12 @@ namespace RooseLabs
             spotlightOrigin = origin;
 
             // Initialize height immediately
-            if (spotlightOrigin != null)
+            if (spotlightOrigin)
             {
                 UpdateConeHeight();
-                currentConeHeight = targetConeHeight;
-                GenerateConeMesh(currentConeHeight);
-                lastMeshHeight = currentConeHeight;
+                m_currentConeHeight = m_targetConeHeight;
+                GenerateConeMesh(m_currentConeHeight);
+                m_lastMeshHeight = m_currentConeHeight;
             }
         }
 
@@ -367,16 +300,16 @@ namespace RooseLabs
         public void SetConeAngle(float angle)
         {
             coneAngle = angle;
-            lastMeshHeight = -1f; // Force mesh regeneration
+            m_lastMeshHeight = -1f; // Force mesh regeneration
         }
 
         private void OnDestroy()
         {
-            if (coneMesh != null)
-                Destroy(coneMesh);
+            if (m_coneMesh != null)
+                Destroy(m_coneMesh);
 
-            if (coneMaterial != null)
-                Destroy(coneMaterial);
+            if (m_coneMaterial != null)
+                Destroy(m_coneMaterial);
         }
     }
 }

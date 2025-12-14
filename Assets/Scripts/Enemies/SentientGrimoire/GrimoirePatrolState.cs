@@ -7,32 +7,32 @@ namespace RooseLabs.Enemies
     /// </summary>
     public class GrimoirePatrolState : IEnemyState
     {
-        private GrimoireAI ai;
-        private PatrolRoute route;
-        private int currentWaypointIndex;
-        private bool loop;
-        private float waypointReachThreshold;
+        private readonly GrimoireAI m_ai;
+        private readonly PatrolRoute m_route;
+        private int m_currentWaypointIndex;
+        private readonly bool m_loop;
+        private readonly float m_waypointReachThreshold;
 
         public GrimoirePatrolState(GrimoireAI ai, PatrolRoute route, bool loop, int startIndex = 0, float reachThreshold = 1.5f)
         {
-            this.ai = ai;
-            this.route = route;
-            this.loop = loop;
-            this.currentWaypointIndex = startIndex;
-            this.waypointReachThreshold = reachThreshold;
+            m_ai = ai;
+            m_route = route;
+            m_loop = loop;
+            m_currentWaypointIndex = startIndex;
+            m_waypointReachThreshold = reachThreshold;
         }
 
         public void OnEnter()
         {
-            if (route == null || route.Count == 0)
+            if (m_route == null || m_route.Count == 0)
             {
-                ai.navAgent.isStopped = true;
+                m_ai.navAgent.isStopped = true;
                 return;
             }
 
             // Find nearest waypoint
             FindNearestWaypoint();
-            MoveToWaypoint(currentWaypointIndex);
+            MoveToWaypoint(m_currentWaypointIndex);
 
             // Debug.Log("[GrimoirePatrolState] Entered - starting patrol");
         }
@@ -44,63 +44,60 @@ namespace RooseLabs.Enemies
 
         public void Update()
         {
-            if (ai.DetectedPlayer)
+            if (m_ai.DetectedPlayer)
             {
-                ai.ChangeState(ai.AlertState);
+                m_ai.ChangeState(m_ai.AlertState);
                 return;
             }
 
-            if (route == null || route.Count == 0) return;
+            if (m_route == null || m_route.Count == 0) return;
 
             // Check if reached current waypoint
-            if (!ai.navAgent.pathPending && ai.navAgent.remainingDistance <= waypointReachThreshold)
+            if (!m_ai.navAgent.pathPending && m_ai.navAgent.remainingDistance <= m_waypointReachThreshold)
             {
                 // Move to next waypoint
-                currentWaypointIndex++;
-                if (currentWaypointIndex >= route.Count)
+                m_currentWaypointIndex++;
+                if (m_currentWaypointIndex >= m_route.Count)
                 {
-                    if (loop)
+                    if (m_loop)
                     {
-                        currentWaypointIndex = 0;
+                        m_currentWaypointIndex = 0;
                     }
                     else
                     {
-                        ai.navAgent.isStopped = true;
+                        m_ai.navAgent.isStopped = true;
                         return;
                     }
                 }
 
-                MoveToWaypoint(currentWaypointIndex);
+                MoveToWaypoint(m_currentWaypointIndex);
             }
-
-            // Rotate spotlight back to default smoothly
-            ai.RotateSpotlightToDefault(2f);
         }
 
         private void MoveToWaypoint(int index)
         {
-            Transform waypoint = route.GetWaypoint(index);
+            Transform waypoint = m_route.GetWaypoint(index);
             if (waypoint != null)
             {
-                ai.navAgent.isStopped = false;
-                ai.navAgent.SetDestination(waypoint.position);
+                m_ai.navAgent.isStopped = false;
+                m_ai.navAgent.SetDestination(waypoint.position);
                 //Debug.Log($"[GrimoirePatrolState] Moving to waypoint {index}");
             }
         }
 
         private void FindNearestWaypoint()
         {
-            if (route == null || route.Count == 0) return;
+            if (m_route == null || m_route.Count == 0) return;
 
             float minDist = float.MaxValue;
             int nearestIndex = 0;
 
-            for (int i = 0; i < route.Count; i++)
+            for (int i = 0; i < m_route.Count; i++)
             {
-                Transform wp = route.GetWaypoint(i);
+                Transform wp = m_route.GetWaypoint(i);
                 if (wp == null) continue;
 
-                float dist = Vector3.Distance(ai.transform.position, wp.position);
+                float dist = Vector3.Distance(m_ai.transform.position, wp.position);
                 if (dist < minDist)
                 {
                     minDist = dist;
@@ -108,9 +105,9 @@ namespace RooseLabs.Enemies
                 }
             }
 
-            currentWaypointIndex = nearestIndex;
+            m_currentWaypointIndex = nearestIndex;
         }
 
-        public int CurrentWaypointIndex => currentWaypointIndex;
+        public int CurrentWaypointIndex => m_currentWaypointIndex;
     }
 }

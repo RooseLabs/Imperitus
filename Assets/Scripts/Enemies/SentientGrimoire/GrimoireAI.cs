@@ -18,58 +18,70 @@ namespace RooseLabs.Enemies
     {
         [Header("References")]
         public NavMeshAgent navAgent;
-        public PatrolRoute patrolRoute;
         public Animator animator;
+        public Rigidbody rb;
+        public Transform modelTransform;
         public Light spotlight;
         public Transform spotlightTransform;
-        private Quaternion defaultSpotlightRotation;
-        public Transform modelTransform;
-        private Quaternion defaultModelRotation;
-        public Rigidbody rb;
         public SpotlightConeVisualizer coneVisualizer;
+        public PatrolRoute patrolRoute;
 
-        [Header("Patrol")]
-        public int startWaypointIndex = 0;
-        public bool loopPatrol = true;
+        [Header("Movement & Patrol")]
         public float patrolSpeed = 2f;
+        public float trackingSpeed = 1.5f;
+        public int startWaypointIndex;
+        public bool loopPatrol = true;
         public float waypointReachThreshold = 1.5f;
 
-        [Header("Detection - Spotlight")]
+        [Header("Spotlight Detection")]
         public float spotlightRange = 15f;
         public float spotlightAngle = 60f;
+        public float detectionCheckInterval = 0.2f;
         public LayerMask playerMask;
         public LayerMask obstructionMask;
-        public float detectionCheckInterval = 0.2f;
 
-        [Header("Alert Behavior")]
+        [Header("Visual Settings")]
+        public Color normalSpotlightColor = Color.white;
+        public Color alertSpotlightColor = Color.red;
+        public float colorTransitionSpeed = 2f;
+        [Tooltip("Rotation speed in degrees per second")]
+        public float spotlightRotationSpeed = 180f;
+        [Tooltip("Rotation speed in degrees per second")]
+        public float modelRotationSpeed = 180f;
+
+        [Header("Alert & Reinforcements")]
         public float alertDuration = 5f;
         public float callReinforcementsCooldown = 10f;
         public float reinforcementSearchRadius = 50f;
         public int maxReinforcementsToCall = 3;
-        public float trackingSpeed = 1.5f;
         [Tooltip("How often to send position updates to alerted Hanaduras (seconds)")]
         public float reinforcementUpdateInterval = 1f;
-        private float reinforcementUpdateTimer = 0f;
-        private List<HanaduraAI> alertedHanaduras = new();
 
-        [Header("Alert Visual")]
-        public Color normalSpotlightColor = Color.white;
-        public Color alertSpotlightColor = Color.red;
-        public float colorTransitionSpeed = 2f;
-
-        [Header("Model Rotation")]
-        public float modelRotationSpeed = 5f;
+        [Header("Debug")]
         public bool showDebugRay = true;
         public float debugRayLength = 3f;
-
-        [Header("Spotlight Bob Animation")]
-        public float bobSpeed = 2f;
-        public float bobAmount = 0.15f;
-        private Vector3 spotlightLocalOffset;
 
         #region Animation Parameters
         private static readonly int AnimParamIsPatrolling = Animator.StringToHash("isPatrolling");
         private static readonly int AnimParamIsAlert = Animator.StringToHash("isAlert");
+        #endregion
+
+        #region Private Fields
+        private Quaternion m_defaultSpotlightRotation;
+        private float m_reinforcementUpdateTimer;
+        private readonly List<HanaduraAI> m_alertedHanaduras = new();
+        private Transform m_detectedPlayer;
+        private float m_reinforcementTimer;
+        private float m_detectionTimer;
+        private bool m_hasHandledDeath;
+        #endregion
+
+        #region Network Synchronized Variables
+        private readonly SyncVar<Transform> m_syncedSpotlightTarget = new();
+        #endregion
+
+        #region Public Properties
+        public Transform DetectedPlayer => m_detectedPlayer;
         #endregion
 
         // FSM States
@@ -77,60 +89,22 @@ namespace RooseLabs.Enemies
         public GrimoireAlertState AlertState { get; private set; }
         public GrimoireTrackingState TrackingState { get; private set; }
 
-        // Detection
-        private Transform detectedPlayer;
-        private PlayerCharacter detectedPlayerCharacter;
-        private float reinforcementTimer = 0f;
-        private float detectionTimer = 0f;
-
-        // Network synchronized variables
-        private readonly SyncVar<Color> syncedSpotlightColor = new();
-        private readonly SyncVar<Quaternion> syncedSpotlightRotation = new();
-        private readonly SyncVar<Quaternion> syncedModelRotation = new();
-
-        // Public properties for states to access
-        public Transform DetectedPlayer => detectedPlayer;
-
-        private bool m_hasHandledDeath = false;
-
         protected override void Initialize()
         {
             TryGetComponent(out navAgent);
             modelTransform.TryGetComponent(out animator);
             TryGetComponent(out rb);
+
+            // Store initial spotlight rotation
+            if (spotlightTransform)
+            {
+                m_defaultSpotlightRotation = spotlightTransform.rotation;
+            }
         }
 
         public override void OnStartServer()
         {
             navAgent.speed = patrolSpeed;
-
-            // Store initial spotlight rotation
-            if (spotlightTransform != null)
-            {
-                defaultSpotlightRotation = spotlightTransform.rotation;
-                syncedSpotlightRotation.Value = defaultSpotlightRotation;
-                spotlightLocalOffset = spotlightTransform.localPosition;
-            }
-
-            if (modelTransform != null)
-            {
-                defaultModelRotation = modelTransform.localRotation;
-                syncedModelRotation.Value = defaultModelRotation;
-            }
-
-            // Initialize cone visualizer (ADD THIS BLOCK)
-            if (coneVisualizer != null)
-            {
-                coneVisualizer.SetSpotlightOrigin(spotlightTransform);
-                coneVisualizer.SetConeAngle(spotlightAngle);
-            }
-
-            syncedSpotlightColor.Value = normalSpotlightColor;
-
-            // Subscribe to SyncVar changes
-            syncedSpotlightColor.OnChange += OnSpotlightColorChanged;
-            syncedSpotlightRotation.OnChange += OnSpotlightRotationChanged;
-            syncedModelRotation.OnChange += OnModelRotationChanged;
 
             // Create states
             PatrolState = new GrimoirePatrolState(this, patrolRoute, loopPatrol, startWaypointIndex, waypointReachThreshold);
@@ -143,82 +117,55 @@ namespace RooseLabs.Enemies
 
         public override void OnStartClient()
         {
-            // Subscribe to SyncVar changes on clients
-            if (IsServerInitialized) return;
-            syncedSpotlightColor.OnChange += OnSpotlightColorChanged;
-            syncedSpotlightRotation.OnChange += OnSpotlightRotationChanged;
-            syncedModelRotation.OnChange += OnModelRotationChanged;
-
-            // Apply initial synced values
-            if (spotlight != null)
-                spotlight.color = syncedSpotlightColor.Value;
-
-            if (spotlightTransform != null)
-                spotlightTransform.rotation = syncedSpotlightRotation.Value;
-
-            if (modelTransform != null)
-                modelTransform.localRotation = syncedModelRotation.Value;
-        }
-
-        public override void OnStopClient()
-        {
-            syncedSpotlightColor.OnChange -= OnSpotlightColorChanged;
-            syncedSpotlightRotation.OnChange -= OnSpotlightRotationChanged;
-            syncedModelRotation.OnChange -= OnModelRotationChanged;
-        }
-
-        public override void OnStopServer()
-        {
-            syncedSpotlightColor.OnChange -= OnSpotlightColorChanged;
-            syncedSpotlightRotation.OnChange -= OnSpotlightRotationChanged;
-            syncedModelRotation.OnChange -= OnModelRotationChanged;
+            // Initialize cone visualizer
+            if (coneVisualizer)
+            {
+                coneVisualizer.SetSpotlightOrigin(spotlightTransform);
+                coneVisualizer.SetConeAngle(spotlightAngle);
+            }
         }
 
         private void Update()
         {
+            if (!IsServerInitialized) return;
             if (IsDead) return;
-
-            if (!IsServerInitialized)
-            {
-                UpdateSpotlightVisualsClient();
-                return;
-            }
 
             if (showDebugRay)
             {
                 Debug.DrawRay(transform.position, transform.forward * debugRayLength, Color.purple);
             }
 
-            // Server logic only
-            detectionTimer -= Time.deltaTime;
-            reinforcementTimer -= Time.deltaTime;
-            reinforcementUpdateTimer -= Time.deltaTime;
+            m_detectionTimer -= Time.deltaTime;
+            m_reinforcementTimer -= Time.deltaTime;
+            m_reinforcementUpdateTimer -= Time.deltaTime;
 
             // Update current state
             currentState?.Update();
 
             // Periodic detection check
-            if (detectionTimer <= 0f)
+            if (m_detectionTimer <= 0f)
             {
-                detectionTimer = detectionCheckInterval;
+                m_detectionTimer = detectionCheckInterval;
                 CheckSpotlightDetection();
             }
 
             // Send position updates to alerted Hanaduras
-            if (reinforcementUpdateTimer <= 0f)
+            if (m_reinforcementUpdateTimer <= 0f)
             {
-                reinforcementUpdateTimer = reinforcementUpdateInterval;
+                m_reinforcementUpdateTimer = reinforcementUpdateInterval;
                 UpdateAlertedHanaduras();
             }
 
-            // Update spotlight visuals and sync to network
-            UpdateSpotlightVisualsServer();
-
-            UpdateModelRotation();
-            UpdateSpotlightBob();
-
             // Update animator parameters (NetworkAnimator handles the syncing)
             UpdateAnimatorParameters();
+        }
+
+        private void LateUpdate()
+        {
+            if (IsDead) return;
+
+            // Update all visual elements (spotlight, model rotation) on both server and clients
+            UpdateVisuals();
         }
 
         #region Animation Control
@@ -236,31 +183,6 @@ namespace RooseLabs.Enemies
             animator.SetBool(AnimParamIsPatrolling, isInPatrolState);
             animator.SetBool(AnimParamIsAlert, isInAlertOrTracking);
         }
-
-        /// <summary>
-        /// Animate spotlight up/down bobbing during patrol
-        /// </summary>
-        private void UpdateSpotlightBob()
-        {
-            if (!spotlightTransform) return;
-
-            if (currentState is GrimoirePatrolState)
-            {
-                // Calculate bob offset using sine wave
-                float bobOffset = Mathf.Sin(Time.time * bobSpeed) * bobAmount;
-                Vector3 newLocalPos = spotlightLocalOffset + Vector3.up * bobOffset;
-                spotlightTransform.localPosition = newLocalPos;
-            }
-            else
-            {
-                // Return to original position when not patrolling
-                spotlightTransform.localPosition = Vector3.Lerp(
-                    spotlightTransform.localPosition,
-                    spotlightLocalOffset,
-                    Time.deltaTime * 5f
-                );
-            }
-        }
         #endregion
 
         #region Detection
@@ -276,7 +198,6 @@ namespace RooseLabs.Enemies
 
             Transform closestPlayer = null;
             float closestDist = float.MaxValue;
-            Collider closestPlayerCollider = null;
 
             foreach (Collider col in potentialTargets)
             {
@@ -305,7 +226,6 @@ namespace RooseLabs.Enemies
                         {
                             closestDist = dist;
                             closestPlayer = target;
-                            closestPlayerCollider = col;
                         }
                     }
                 }
@@ -316,69 +236,153 @@ namespace RooseLabs.Enemies
             {
                 OnPlayerDetected(closestPlayer);
             }
-            else if ((bool)detectedPlayer && currentState is not GrimoirePatrolState)
+            else if ((bool)m_detectedPlayer && currentState is not GrimoirePatrolState)
             {
                 // Lost sight of player
-                detectedPlayer = null;
+                m_detectedPlayer = null;
+                SetSpotlightTarget(null);
             }
         }
 
         private void OnPlayerDetected(Transform player)
         {
-            bool isNewDetection = !detectedPlayer;
-            detectedPlayer = player;
-            player.TryGetComponentInParent(out detectedPlayerCharacter);
+            bool isNewDetection = !m_detectedPlayer;
+            m_detectedPlayer = player;
+
+            // Set spotlight to track the detected player
+            SetSpotlightTarget(player);
 
             // Call reinforcements if cooldown is ready
-            if (isNewDetection && reinforcementTimer <= 0f)
+            if (isNewDetection && m_reinforcementTimer <= 0f)
             {
                 CallReinforcements();
-                reinforcementTimer = callReinforcementsCooldown;
+                m_reinforcementTimer = callReinforcementsCooldown;
             }
         }
         #endregion
 
         #region Spotlight Control (Helper methods for states)
         /// <summary>
-        /// Rotate spotlight to track a target (SERVER ONLY)
+        /// Set the spotlight to track a specific transform (usually the detected player)
         /// </summary>
-        public void RotateSpotlightToTarget(Transform target, float speed)
+        /// <param name="target">Transform to track, or null to return to default rotation</param>
+        public void SetSpotlightTarget(Transform target)
         {
             if (!IsServerInitialized) return;
-            if (!target || !spotlightTransform) return;
-
-            Vector3 targetPoint = (bool)detectedPlayerCharacter
-                ? detectedPlayerCharacter.Center
-                : target.position + Vector3.up * 1.5f;
-
-            Vector3 dirToTarget = (targetPoint - spotlightTransform.position).normalized;
-
-            Quaternion targetRot = Quaternion.LookRotation(dirToTarget);
-            spotlightTransform.rotation = Quaternion.Slerp(
-                spotlightTransform.rotation,
-                targetRot,
-                Time.deltaTime * speed
-            );
-
-            syncedSpotlightRotation.Value = spotlightTransform.rotation;
+            m_syncedSpotlightTarget.Value = target;
         }
 
         /// <summary>
-        /// Rotate spotlight back to default forward position (SERVER ONLY)
+        /// Update all visual elements including spotlight color, spotlight rotation, and model rotation.
+        /// Called in LateUpdate on both server and clients to ensure synchronized visuals.
         /// </summary>
-        public void RotateSpotlightToDefault(float speed)
+        private void UpdateVisuals()
         {
-            if (!IsServerInitialized) return;
-            if (spotlightTransform == null) return;
+            // Update spotlight rotation
+            UpdateSpotlightRotation();
 
-            spotlightTransform.rotation = Quaternion.Slerp(
+            // Update spotlight color based on target
+            if (spotlight)
+            {
+                Color targetColor = (bool)m_syncedSpotlightTarget.Value
+                    ? alertSpotlightColor
+                    : normalSpotlightColor;
+
+                Color finalColor = Color.Lerp(spotlight.color, targetColor, Time.deltaTime * colorTransitionSpeed);
+                spotlight.color = finalColor;
+                coneVisualizer?.SetConeColor(finalColor);
+            }
+
+            // Update model rotation
+            UpdateModelRotation();
+        }
+
+        /// <summary>
+        /// Continuously update spotlight rotation toward target or default direction.
+        /// Called by UpdateVisuals in LateUpdate on both server and clients.
+        /// </summary>
+        private void UpdateSpotlightRotation()
+        {
+            if (!spotlightTransform) return;
+
+            Quaternion targetRotation;
+
+            // Determine target rotation based on synced target
+            Transform currentTarget = m_syncedSpotlightTarget.Value;
+
+            if (currentTarget)
+            {
+                // Track the target transform
+                Vector3 targetPoint = currentTarget.position;
+
+                // Try to get player character for better center targeting
+                if (currentTarget.TryGetComponentInParent(out PlayerCharacter playerChar))
+                {
+                    targetPoint = playerChar.Center;
+                }
+
+                Vector3 direction = (targetPoint - spotlightTransform.position).normalized;
+                targetRotation = Quaternion.LookRotation(direction);
+            }
+            else
+            {
+                // Return to default rotation
+                targetRotation = m_defaultSpotlightRotation;
+            }
+
+            // Smoothly rotate toward target using RotateTowards
+            spotlightTransform.rotation = Quaternion.RotateTowards(
                 spotlightTransform.rotation,
-                defaultSpotlightRotation,
-                Time.deltaTime * speed
+                targetRotation,
+                spotlightRotationSpeed * Time.deltaTime
             );
+        }
 
-            // Update synced rotation
-            syncedSpotlightRotation.Value = spotlightTransform.rotation;
+        /// <summary>
+        /// Update model rotation based on spotlight target.
+        /// Called by UpdateVisuals in LateUpdate on both server and clients.
+        /// </summary>
+        private void UpdateModelRotation()
+        {
+            if (!modelTransform) return;
+
+            Quaternion targetRotation;
+            Transform currentTarget = m_syncedSpotlightTarget.Value;
+
+            if (currentTarget)
+            {
+                // Rotate model to face the target
+                Vector3 targetPoint = currentTarget.position;
+
+                // Try to get player character for better center targeting
+                if (currentTarget.TryGetComponentInParent(out PlayerCharacter playerChar))
+                {
+                    targetPoint = playerChar.Center;
+                }
+
+                Vector3 directionToTarget = targetPoint - transform.position;
+                directionToTarget.y = 0;
+
+                if (directionToTarget != Vector3.zero)
+                {
+                    targetRotation = Quaternion.LookRotation(directionToTarget);
+                    targetRotation = Quaternion.Inverse(transform.rotation) * targetRotation;
+                }
+                else
+                {
+                    targetRotation = Quaternion.identity;
+                }
+            }
+            else
+            {
+                targetRotation = Quaternion.identity;
+            }
+
+            modelTransform.localRotation = Quaternion.RotateTowards(
+                modelTransform.localRotation,
+                targetRotation,
+                modelRotationSpeed * Time.deltaTime
+            );
         }
         #endregion
 
@@ -407,18 +411,18 @@ namespace RooseLabs.Enemies
                 return distA.CompareTo(distB);
             });
 
-            alertedHanaduras.Clear();
+            m_alertedHanaduras.Clear();
 
             int called = 0;
             foreach (HanaduraAI hanadura in availableHanaduras)
             {
                 if (called >= maxReinforcementsToCall) break;
-                hanadura.AlertToPosition(detectedPlayer.position);
-                alertedHanaduras.Add(hanadura);
+                hanadura.AlertToPosition(m_detectedPlayer.position);
+                m_alertedHanaduras.Add(hanadura);
                 called++;
             }
 
-            EnemySpawnManager.Instance?.OnGrimoireAlert(detectedPlayer.position);
+            EnemySpawnManager.Instance?.OnGrimoireAlert(m_detectedPlayer.position);
 
             // Notify all clients of reinforcement call
             RPC_PlayReinforcementCallEffect();
@@ -429,104 +433,29 @@ namespace RooseLabs.Enemies
         /// </summary>
         private void UpdateAlertedHanaduras()
         {
-            if (!detectedPlayer || currentState is GrimoirePatrolState)
+            if (!m_detectedPlayer || currentState is GrimoirePatrolState)
             {
                 // Clear the list if we're not tracking anymore
-                if (alertedHanaduras.Count > 0)
+                if (m_alertedHanaduras.Count > 0)
                 {
-                    alertedHanaduras.Clear();
+                    m_alertedHanaduras.Clear();
                 }
                 return;
             }
 
             // Remove any dead or null Hanaduras from the list
-            alertedHanaduras.RemoveAll(h => !h || h.IsDead);
+            m_alertedHanaduras.RemoveAll(h => !h || h.IsDead);
 
             // Send updated position to all alerted Hanaduras
-            foreach (HanaduraAI hanadura in alertedHanaduras)
+            foreach (HanaduraAI hanadura in m_alertedHanaduras)
             {
-                hanadura.AlertToPosition(detectedPlayer.position, detectedPlayer);
+                hanadura.AlertToPosition(m_detectedPlayer.position, m_detectedPlayer);
                 this.LogInfo($"Updated Hanadura {hanadura.gameObject.name} with new player position.");
             }
         }
         #endregion
 
         #region Visual Effects & Network Sync
-        /// <summary>
-        /// Server: Update spotlight visuals and sync to network
-        /// </summary>
-        private void UpdateSpotlightVisualsServer()
-        {
-            if (!spotlight) return;
-
-            Color targetColor = (currentState is GrimoirePatrolState)
-                ? normalSpotlightColor
-                : alertSpotlightColor;
-
-            spotlight.color = Color.Lerp(spotlight.color, targetColor, Time.deltaTime * colorTransitionSpeed);
-
-            // Sync color to network
-            syncedSpotlightColor.Value = spotlight.color;
-
-            if (coneVisualizer != null)
-            {
-                coneVisualizer.SetConeColor(targetColor);
-            }
-        }
-
-        /// <summary>
-        /// Client: Smoothly interpolate spotlight to synced values
-        /// </summary>
-        private void UpdateSpotlightVisualsClient()
-        {
-            if (spotlight)
-            {
-                spotlight.color = Color.Lerp(spotlight.color, syncedSpotlightColor.Value, Time.deltaTime * colorTransitionSpeed);
-            }
-
-            if (spotlightTransform)
-            {
-                spotlightTransform.rotation = Quaternion.Slerp(
-                    spotlightTransform.rotation,
-                    syncedSpotlightRotation.Value,
-                    Time.deltaTime * 10f
-                );
-            }
-
-            if (modelTransform)
-            {
-                modelTransform.localRotation = Quaternion.Slerp(
-                    modelTransform.localRotation,
-                    syncedModelRotation.Value,
-                    Time.deltaTime * modelRotationSpeed
-                );
-            }
-        }
-
-        /// <summary>
-        /// SyncVar callback when spotlight color changes
-        /// </summary>
-        private void OnSpotlightColorChanged(Color prev, Color next, bool asServer)
-        {
-            if (!asServer && spotlight != null)
-            {
-                // Client received color update - apply immediately
-                spotlight.color = next;
-            }
-        }
-
-        /// <summary>
-        /// SyncVar callback when spotlight rotation changes
-        /// </summary>
-        private void OnSpotlightRotationChanged(Quaternion prev, Quaternion next, bool asServer)
-        {
-            if (!asServer && spotlightTransform != null)
-            {
-                // Client received rotation update - will interpolate in Update
-                spotlightTransform.rotation = next;
-            }
-        }
-
         [ObserversRpc]
         public void RPC_ShowAlert()
         {
@@ -541,49 +470,6 @@ namespace RooseLabs.Enemies
             // Play special effect when reinforcements are called
             // e.g., magic circle, sound effect, screen shake, etc.
             // this.LogInfo("Reinforcement call effect RPC received");
-        }
-
-        private void UpdateModelRotation()
-        {
-            if (!modelTransform) return;
-
-            Quaternion targetRotation;
-
-            if (currentState is GrimoireAlertState or GrimoireTrackingState && (bool)detectedPlayer)
-            {
-                Vector3 directionToPlayer = detectedPlayerCharacter.Center - transform.position;
-                directionToPlayer.y = 0;
-
-                if (directionToPlayer != Vector3.zero)
-                {
-                    targetRotation = Quaternion.LookRotation(directionToPlayer);
-                    targetRotation = Quaternion.Inverse(transform.rotation) * targetRotation;
-                }
-                else
-                {
-                    targetRotation = defaultModelRotation;
-                }
-            }
-            else
-            {
-                targetRotation = defaultModelRotation;
-            }
-
-            modelTransform.localRotation = Quaternion.Slerp(
-                modelTransform.localRotation,
-                targetRotation,
-                Time.deltaTime * modelRotationSpeed
-            );
-
-            syncedModelRotation.Value = modelTransform.localRotation;
-        }
-
-        private void OnModelRotationChanged(Quaternion prev, Quaternion next, bool asServer)
-        {
-            if (!asServer && modelTransform != null)
-            {
-                modelTransform.localRotation = next;
-            }
         }
         #endregion
 

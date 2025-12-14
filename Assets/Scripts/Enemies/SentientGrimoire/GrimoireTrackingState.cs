@@ -7,40 +7,39 @@ namespace RooseLabs.Enemies
     /// </summary>
     public class GrimoireTrackingState : IEnemyState
     {
-        private GrimoireAI ai;
+        private readonly GrimoireAI m_ai;
 
         public GrimoireTrackingState(GrimoireAI ai)
         {
-            this.ai = ai;
+            m_ai = ai;
         }
 
         public void OnEnter()
         {
-            ai.navAgent.isStopped = false;
-            ai.navAgent.speed = ai.trackingSpeed;
+            m_ai.navAgent.isStopped = false;
+            m_ai.navAgent.speed = m_ai.trackingSpeed;
 
             //Debug.Log("[GrimoireTrackingState] Entered - actively tracking player");
         }
 
         public void OnExit()
         {
-            ai.navAgent.speed = ai.patrolSpeed;
+            m_ai.navAgent.speed = m_ai.patrolSpeed;
         }
 
         public void Update()
         {
-            Transform detectedPlayer = ai.DetectedPlayer;
+            Transform detectedPlayer = m_ai.DetectedPlayer;
 
             // Continue tracking player while in sight
             if (detectedPlayer)
             {
-                ai.RotateSpotlightToTarget(detectedPlayer, 5f);
-                ai.navAgent.SetDestination(detectedPlayer.position);
+                m_ai.navAgent.SetDestination(detectedPlayer.position);
             }
             else
             {
                 // Lost player, return to patrol
-                ai.ChangeState(ai.PatrolState);
+                m_ai.ChangeState(m_ai.PatrolState);
             }
         }
     }

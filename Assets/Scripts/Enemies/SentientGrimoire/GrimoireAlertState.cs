@@ -7,23 +7,23 @@ namespace RooseLabs.Enemies
     /// </summary>
     public class GrimoireAlertState : IEnemyState
     {
-        private GrimoireAI ai;
-        private float alertDuration;
-        private float alertTimer;
+        private readonly GrimoireAI m_ai;
+        private readonly float m_alertDuration;
+        private float m_alertTimer;
 
         public GrimoireAlertState(GrimoireAI ai, float alertDuration)
         {
-            this.ai = ai;
-            this.alertDuration = alertDuration;
+            m_ai = ai;
+            m_alertDuration = alertDuration;
         }
 
         public void OnEnter()
         {
-            ai.navAgent.isStopped = true;
-            alertTimer = alertDuration;
+            m_ai.navAgent.isStopped = true;
+            m_alertTimer = m_alertDuration;
 
             // RPC to show visual alert to all clients
-            ai.RPC_ShowAlert();
+            m_ai.RPC_ShowAlert();
 
             // Debug.Log("[GrimoireAlertState] Player detected! Entering Alert state");
         }
@@ -35,28 +35,22 @@ namespace RooseLabs.Enemies
 
         public void Update()
         {
-            alertTimer -= Time.deltaTime;
+            m_alertTimer -= Time.deltaTime;
 
-            // Rotate spotlight to track player
-            Transform detectedPlayer = ai.DetectedPlayer;
-            if (detectedPlayer)
-            {
-                Debug.Log($"[Alert] Rotating spotlight to player at {detectedPlayer.position}");
-                ai.RotateSpotlightToTarget(detectedPlayer, 5f);
-            }
+            Transform detectedPlayer = m_ai.DetectedPlayer;
 
             // After alert duration, transition
-            if (alertTimer <= 0f)
+            if (m_alertTimer <= 0f)
             {
                 if (detectedPlayer)
                 {
                     // Still have target, go to tracking
-                    ai.ChangeState(ai.TrackingState);
+                    m_ai.ChangeState(m_ai.TrackingState);
                 }
                 else
                 {
                     // Lost target, return to patrol
-                    ai.ChangeState(ai.PatrolState);
+                    m_ai.ChangeState(m_ai.PatrolState);
                 }
             }
         }

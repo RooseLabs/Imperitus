@@ -86,7 +86,7 @@ Light:
   m_Lightmapping: 4
   m_LightShadowCasterMode: 0
   m_AreaSize: {x: 1, y: 1}
-  m_BounceIntensity: 1
+  m_BounceIntensity: 0
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
   m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
@@ -310,40 +310,39 @@ MonoBehaviour:
   maxHealth: 1
   attackDamage: 0
   navAgent: {fileID: 2039317095261099087}
-  patrolRoute: {fileID: 0}
   animator: {fileID: 0}
+  rb: {fileID: 0}
+  modelTransform: {fileID: 584479379418611331}
   spotlight: {fileID: 3310447793082394167}
   spotlightTransform: {fileID: 7769504255186393303}
-  modelTransform: {fileID: 584479379418611331}
-  rb: {fileID: 0}
   coneVisualizer: {fileID: 1055448732173619223}
+  patrolRoute: {fileID: 0}
+  patrolSpeed: 2
+  trackingSpeed: 1.5
   startWaypointIndex: 0
   loopPatrol: 1
-  patrolSpeed: 2
   waypointReachThreshold: 1.5
   spotlightRange: 15
   spotlightAngle: 60
+  detectionCheckInterval: 0.2
   playerMask:
     serializedVersion: 2
     m_Bits: 256
   obstructionMask:
     serializedVersion: 2
     m_Bits: 2177
-  detectionCheckInterval: 0.2
+  normalSpotlightColor: {r: 1, g: 1, b: 1, a: 1}
+  alertSpotlightColor: {r: 1, g: 0, b: 0, a: 1}
+  colorTransitionSpeed: 2
+  spotlightRotationSpeed: 180
+  modelRotationSpeed: 180
   alertDuration: 5
   callReinforcementsCooldown: 10
   reinforcementSearchRadius: 50
   maxReinforcementsToCall: 3
-  trackingSpeed: 1.5
   reinforcementUpdateInterval: 1
-  normalSpotlightColor: {r: 1, g: 1, b: 1, a: 1}
-  alertSpotlightColor: {r: 1, g: 0, b: 0, a: 1}
-  colorTransitionSpeed: 2
-  modelRotationSpeed: 5
   showDebugRay: 1
   debugRayLength: 3
-  bobSpeed: 0
-  bobAmount: 0
 --- !u!114 &8735231212856205354
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -593,14 +592,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 77eb1a444aff8e1488202419c4bd347c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Enemies.SpotlightConeVisualizer
-  _componentIndexCache: 255
-  _addedNetworkObject: {fileID: 4866373312013150636}
-  _networkObjectCache: {fileID: 0}
   spotlightOrigin: {fileID: 7769504255186393303}
   meshFilter: {fileID: 0}
   meshRenderer: {fileID: 0}
   maxConeHeight: 20
-  coneAngle: 80
+  coneAngle: 65
   radialSegments: 32
   heightSegments: 16
   groundLayer:
@@ -610,7 +606,6 @@ MonoBehaviour:
   capTopOpening: 0
   capBottomOpening: 0
   heightUpdateSpeed: 10
-  colorTransitionSpeed: 10
 --- !u!1001 &1123302428237896040
 PrefabInstance:
   m_ObjectHideFlags: 0
