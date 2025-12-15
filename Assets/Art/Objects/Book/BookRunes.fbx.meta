@@ -3,7 +3,12 @@ guid: 87077e485d5dd384e9d1ec325d05cfbb
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: RuneBookMat
+    second: {fileID: 2100000, guid: bbae7a1b6a9c8b744b023e3d6aadde6e, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
