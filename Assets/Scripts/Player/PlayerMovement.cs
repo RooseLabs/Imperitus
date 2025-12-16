@@ -1,4 +1,5 @@
 ﻿using RooseLabs.Core;
+using RooseLabs.Gameplay;
 using UnityEngine;
 
 namespace RooseLabs.Player
@@ -13,17 +14,21 @@ namespace RooseLabs.Player
         private float m_nextFootstepTime;
 
         [Header("Movement Settings")]
-        [SerializeField] private float walkSpeed   = 1.50f; // Average speed from animation: 1.20f;
+        [SerializeField] private float walkSpeed = 1.50f; // Average speed from animation: 1.20f;
         [SerializeField] private float sprintSpeed = 5.00f; // Average speed from animation: 5.83f;
         [SerializeField] private float crouchSpeed = 0.75f; // Average speed from animation: 0.67f;
-        [SerializeField] private float crawlSpeed  = 0.50f; // Average speed from animation: 0.25f;
-        [SerializeField] private float jumpHeight  = 0.50f;
+        [SerializeField] private float crawlSpeed = 0.50f; // Average speed from animation: 0.25f;
+        [SerializeField] private float jumpHeight = 0.50f;
         [SerializeField] private float sprintStaminaUsage = 20f;
 
         [Header("Object Colliders")]
         [SerializeField] private Collider standingCollider;
         [SerializeField] private Collider crouchingCollider;
         [SerializeField] private Collider crawlingCollider;
+
+        [Header("Fall Damage")]
+        [SerializeField] private float fallDamageMinDistance = 5f; // Minimum fall distance before taking damage
+        [SerializeField] private float fallDamagePerUnit = 10f; // Damage per unit of distance fallen
 
         public float CurrentStateSpeed
         {
@@ -49,6 +54,9 @@ namespace RooseLabs.Player
         private int m_footstepIndex = -1;
         private int m_runningIndex = -1;
         private int m_crouchingIndex = -1;
+
+        private float m_fallStartHeight = 0f;
+        private bool m_isFalling = false;
 
         private void Awake()
         {
@@ -271,8 +279,8 @@ namespace RooseLabs.Player
         private void UpdateColliders()
         {
             const float standingHeight = 1.70f;
-            const float crouchHeight   = 1.10f;
-            const float crawlHeight    = 0.85f;
+            const float crouchHeight = 1.10f;
+            const float crawlHeight = 0.85f;
 
             if (m_character.Data.IsCrawling)
             {
@@ -332,9 +340,45 @@ namespace RooseLabs.Player
 
         private void IsOnGroundStateChanged(bool isGrounded)
         {
-            if (isGrounded) return;
-            // Player just left the ground, take a snapshot of the current horizontal movement speed
-            m_midAirSpeed = CurrentStateSpeed;
+            if (!isGrounded)
+            {
+                // Player just left the ground, take a snapshot of the current horizontal movement speed
+                m_midAirSpeed = CurrentStateSpeed;
+
+                // Start tracking fall height
+                m_fallStartHeight = transform.position.y;
+                m_isFalling = true;
+            }
+            else
+            {
+                // Player just landed, check for fall damage
+                if (m_isFalling)
+                {
+                    ApplyFallDamage();
+                    m_isFalling = false;
+                }
+            }
+        }
+
+        private void ApplyFallDamage()
+        {
+            float fallDistance = m_fallStartHeight - transform.position.y;
+
+            // Only apply damage if fall distance exceeds minimum threshold
+            if (fallDistance < fallDamageMinDistance)
+            {
+                return;
+            }
+
+            // Calculate damage based on fall distance
+            float damageAmount = (fallDistance - fallDamageMinDistance) * fallDamagePerUnit;
+
+            // Debug logging for testing
+            Debug.Log($"Player fell {fallDistance:F2} units, taking {damageAmount:F2} damage");
+
+            // Apply damage to the player
+            DamageInfo damage = new DamageInfo(damageAmount);
+            m_character.ApplyDamage(damage);
         }
 
         public void SetNearTable(bool value)

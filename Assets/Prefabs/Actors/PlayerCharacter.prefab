@@ -1272,7 +1272,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3388423787831225861}
   - component: {fileID: 1020410532817067052}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: VoiceChat
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2245,6 +2245,8 @@ MonoBehaviour:
   standingCollider: {fileID: 910997788957776308}
   crouchingCollider: {fileID: 1079084056669295952}
   crawlingCollider: {fileID: 5542213905719861265}
+  fallDamageMinDistance: 5
+  fallDamagePerUnit: 10
 --- !u!114 &6401856662307630944
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -334,7 +334,7 @@ namespace RooseLabs
                     try
                     {
                         listener.OnSoundHeard(position, soundType, maxIntensity);
-                        Debug.Log($"Notifying '{c.name}' with intensity {maxIntensity:F2} (isItemDrop: {isItemDrop})");
+                        //Debug.Log($"Notifying '{c.name}' with intensity {maxIntensity:F2} (isItemDrop: {isItemDrop})");
                     }
                     catch (Exception ex)
                     {
@@ -343,7 +343,7 @@ namespace RooseLabs
                 }
             } else
             {
-                Debug.Log("Sound emission skipped detection logic for sound type: " + soundType.key);
+                //Debug.Log("Sound emission skipped detection logic for sound type: " + soundType.key);
             }
         }
 
