@@ -49,8 +49,14 @@ namespace RooseLabs.Player
 
         [Tooltip("Point from which spells are cast. This should be at the tip of the wand.")]
         [SerializeField] private Transform spellCastPoint;
+
+        [Header("Orbiting Runes")]
         [Tooltip("Container for the orbiting runes.")]
         [SerializeField] private Transform orbitingRunesContainer;
+        [Tooltip("Local scale of the orbiting runes.")]
+        [SerializeField] private Vector3 orbitingRunesLocalScale = Vector3.one * 0.35f;
+        [Tooltip("Radius at which the runes orbit around the wand.")]
+        [SerializeField] private float orbitingRunesRadius = 3.5f;
         #endregion
 
         #region Public Properties
@@ -480,7 +486,6 @@ namespace RooseLabs.Player
 
         #region Orbiting Runes
         private readonly List<OrbitingRune> m_orbitingRunes = new();
-        private const float OrbitingRunesRadius = 3f;
 
         private void SetOrbitingRunes(ICollection<RuneSO> runes)
         {
@@ -497,7 +502,7 @@ namespace RooseLabs.Player
                 runeObj.transform.SetParent(orbitingRunesContainer);
                 runeObj.transform.localPosition = Vector3.zero;
                 runeObj.transform.localRotation = Quaternion.identity;
-                runeObj.transform.localScale = Vector3.one * 2;
+                runeObj.transform.localScale = orbitingRunesLocalScale;
                 var orbitingRuneComp = runeObj.AddComponent<OrbitingRune>();
                 orbitingRuneComp.SetRune(rune);
                 orbitingRuneComp.SetVisible(character.Data.isAiming);
@@ -525,8 +530,8 @@ namespace RooseLabs.Player
 
             foreach (var obj in m_orbitingRunes)
             {
-                float x = OrbitingRunesRadius * Mathf.Cos(angle * Mathf.Deg2Rad);
-                float y = OrbitingRunesRadius * Mathf.Sin(angle * Mathf.Deg2Rad);
+                float x = orbitingRunesRadius * Mathf.Cos(angle * Mathf.Deg2Rad);
+                float y = orbitingRunesRadius * Mathf.Sin(angle * Mathf.Deg2Rad);
 
                 obj.SetPosition(new Vector3(x, y, obj.transform.localPosition.z));
                 angle += angleStep;

@@ -2264,6 +2264,8 @@ MonoBehaviour:
   spellDatabase: {fileID: 11400000, guid: 9989f6ae5baf9cf40a61f0ef300f97fe, type: 2}
   spellCastPoint: {fileID: 7084882734756081741}
   orbitingRunesContainer: {fileID: 6184962171626993392}
+  orbitingRunesLocalScale: {x: 0.35, y: 0.35, z: 0.35}
+  orbitingRunesRadius: 3.5
 --- !u!114 &9131127460476143004
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2389,9 +2391,9 @@ MonoBehaviour:
   _enableStateForwarding: 0
   _networkTransform: {fileID: 2911172595631321588}
   _ownerInterpolation: 1
-  _ownerSmoothedProperties: 255
+  _ownerSmoothedProperties: 4294967295
   _adaptiveInterpolation: 3
-  _spectatorSmoothedProperties: 255
+  _spectatorSmoothedProperties: 4294967295
   _spectatorInterpolation: 2
   _enableTeleport: 0
   _teleportThreshold: 1
