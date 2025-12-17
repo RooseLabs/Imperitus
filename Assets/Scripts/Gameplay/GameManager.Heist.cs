@@ -58,6 +58,9 @@ namespace RooseLabs.Gameplay
             {
                 NotebookManager.Instance.LockSpellLoadout();
             }
+
+            // Pause tutorial when leaving the lobby
+            PauseTutorial();
         }
 
         private void UpdateHeist()

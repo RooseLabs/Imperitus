@@ -47,11 +47,13 @@ namespace RooseLabs.Gameplay
         private void OnEnable()
         {
             SpellBase.OnSpellCast += OnSpellCast;
+            SpellBase.OnSpellCast += OnTutorialSpellCast;
         }
 
         private void OnDisable()
         {
             SpellBase.OnSpellCast -= OnSpellCast;
+            SpellBase.OnSpellCast -= OnTutorialSpellCast;
         }
 
         private void OnDestroy()
@@ -70,6 +72,7 @@ namespace RooseLabs.Gameplay
         private void Update()
         {
             UpdateHeist();
+            UpdateTutorial();
         }
 
         private void HandleSceneLoaded(SceneLoadEndEventArgs args)
@@ -127,6 +130,12 @@ namespace RooseLabs.Gameplay
             {
                 NotebookManager.Instance.UnlockSpellLoadout();
             }
+
+            // Initialize tutorial when lobby is loaded
+            InitializeTutorial();
+
+            // Resume tutorial if it was paused
+            ResumeTutorial();
         }
 
         private void GenerateNewAssignment()
