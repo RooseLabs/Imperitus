@@ -18,7 +18,7 @@ GameObject:
   - component: {fileID: -702573388621352612}
   - component: {fileID: 155590802769196689}
   m_Layer: 0
-  m_Name: LargeTable
+  m_Name: LargeTable2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -37,7 +37,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 6303750796127204655}
+  - {fileID: 230933046590022600}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &3217079890016878552
@@ -212,7 +212,7 @@ MonoBehaviour:
   m_IgnoreFromBuild: 0
   m_ApplyToChildren: 1
   m_AffectedAgents: ffffffff
---- !u!1001 &5127744035989189348
+--- !u!1001 &1397931843081839619
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -260,17 +260,29 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5916142306256739266, guid: eab87e01027d6fb438dff9c6725b653b, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2d111e5dc56fb474080369ec0bcfe9c2, type: 2}
     - target: {fileID: 7127942263229519704, guid: eab87e01027d6fb438dff9c6725b653b, type: 3}
       propertyPath: m_Name
-      value: TableTowel_Prefab
+      value: TableTowel
+      objectReference: {fileID: 0}
+    - target: {fileID: 7127942263229519704, guid: eab87e01027d6fb438dff9c6725b653b, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7127942263229519704, guid: eab87e01027d6fb438dff9c6725b653b, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: eab87e01027d6fb438dff9c6725b653b, type: 3}
---- !u!4 &6303750796127204655 stripped
+--- !u!4 &230933046590022600 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1176006830073841611, guid: eab87e01027d6fb438dff9c6725b653b, type: 3}
-  m_PrefabInstance: {fileID: 5127744035989189348}
+  m_PrefabInstance: {fileID: 1397931843081839619}
   m_PrefabAsset: {fileID: 0}
