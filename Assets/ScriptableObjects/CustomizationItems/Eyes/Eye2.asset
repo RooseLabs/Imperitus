@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1f774909fddefc046a5a4747e866e0ac, type: 3}
+  m_Name: Eye2
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.ScriptableObjects.CustomizationItem
+  category: 1
+  applicationMode: 0
+  slots:
+  - mesh: {fileID: 0}
+    material: {fileID: 2100000, guid: a23a712d03ae73245ab0b09f0333d333, type: 2}
+    targetRendererId: 1
+  itemName: Eye2
+  description: 
+  icon: {fileID: 21300000, guid: cc1832e5208cba0489b3645a05dc908a, type: 3}
+  femaleOutfitFix: 0
