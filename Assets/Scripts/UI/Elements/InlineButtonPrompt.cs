@@ -10,7 +10,6 @@ namespace RooseLabs.UI.Elements
     [RequireComponent(typeof(TextMeshProUGUI))]
     public class InlineButtonPrompt : MonoBehaviour
     {
-        [Tooltip("")]
         [SerializeField] private InputActionReference[] inputActions;
 
         private TMP_Text m_text;
@@ -43,7 +42,7 @@ namespace RooseLabs.UI.Elements
 
             for (int i = 0; i < inputActions.Length; i++)
             {
-                string spriteTag = InputSpriteData.Instance.GetSpriteTag(inputActions[i], scheme);
+                string spriteTag = InputSpriteData.GetSpriteTag(inputActions[i], scheme);
 
                 if (!string.IsNullOrEmpty(spriteTag))
                 {
@@ -60,7 +59,7 @@ namespace RooseLabs.UI.Elements
 
         private void UpdateSprites(InputDevice device)
         {
-            m_text.spriteAsset = InputSpriteData.Instance.GetSpriteAssetForInputDevice(device);
+            m_text.spriteAsset = InputSpriteData.GetSpriteAssetForInputDevice(device);
         }
     }
 }

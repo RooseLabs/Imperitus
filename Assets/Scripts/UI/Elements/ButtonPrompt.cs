@@ -35,7 +35,7 @@ namespace RooseLabs.UI.Elements
 
         private void UpdateText(InputScheme scheme)
         {
-            string spriteTag = InputSpriteData.Instance.GetSpriteTag(inputAction.action, scheme);
+            string spriteTag = InputSpriteData.GetSpriteTag(inputAction.action, scheme);
 
             if (!string.IsNullOrEmpty(spriteTag))
             {
@@ -50,19 +50,20 @@ namespace RooseLabs.UI.Elements
 
         private void UpdateSprite(InputDevice device)
         {
-            m_text.spriteAsset = InputSpriteData.Instance.GetSpriteAssetForInputDevice(device);
+            m_text.spriteAsset = InputSpriteData.GetSpriteAssetForInputDevice(device);
         }
 
+        #if UNITY_EDITOR
         private void OnValidate()
         {
-            if (!inputAction) return;
+            if (!inputAction || !InputSpriteData.Instance) return;
             if (TryGetComponent(out TMP_Text textComponent))
             {
-                string spriteTag = InputSpriteData.Instance.GetSpriteTag(inputAction.action, InputScheme.KeyboardMouse);
+                string spriteTag = InputSpriteData.GetSpriteTag(inputAction.action, InputScheme.KeyboardMouse);
                 if (!string.IsNullOrEmpty(spriteTag))
                 {
                     textComponent.text = $"<sprite name=\"{spriteTag}\">";
-                    textComponent.spriteAsset = InputSpriteData.Instance.kbmSprites;
+                    textComponent.spriteAsset = InputSpriteData.KeyboardMouseSprites;
                 }
                 else
                 {
@@ -70,5 +71,6 @@ namespace RooseLabs.UI.Elements
                 }
             }
         }
+        #endif
     }
 }
