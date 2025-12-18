@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 7801576332500616349}
   - component: {fileID: 549837751143501826}
   - component: {fileID: 5453324825069703245}
+  - component: {fileID: 6782106771646982937}
   m_Layer: 0
   m_Name: Wardrove
   m_TagString: Untagged
@@ -90,3 +91,24 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!65 &6782106771646982937
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2009662617590181820}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.82166576, y: 1.9047685, z: 2.8028233}
+  m_Center: {x: -0.25437975, y: -0.0000052452087, z: 1.4014117}
