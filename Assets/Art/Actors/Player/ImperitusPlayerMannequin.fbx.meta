@@ -22,6 +22,11 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
+      name: Hair2
+    second: {fileID: 2100000, guid: 7c27c6bd958f1a2429927e99685f5574, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
       name: Hair3
     second: {fileID: 2100000, guid: 7b6849382194332438a76f61e8b85c9f, type: 2}
   - first:
@@ -29,6 +34,11 @@ ModelImporter:
       assembly: UnityEngine.CoreModule
       name: Lens
     second: {fileID: 2100000, guid: b8f61511814d83b4c8761cba4c14db41, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Material
+    second: {fileID: 2100000, guid: 7c27c6bd958f1a2429927e99685f5574, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
