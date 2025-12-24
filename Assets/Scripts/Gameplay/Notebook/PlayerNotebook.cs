@@ -856,7 +856,7 @@ namespace RooseLabs.Gameplay.Notebook
             m_runeCollection.collectedRuneIndices.Clear();
             m_borrowedRunes.Clear();
             m_toggledRunes.Clear();
-            m_toggledSpells.Clear();
+            // m_toggledSpells.Clear();
             this.LogInfo("Player notebook reset");
         }
 

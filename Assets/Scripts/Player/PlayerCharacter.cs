@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using FishNet.Object;
 using RooseLabs.Core;
@@ -49,6 +50,9 @@ namespace RooseLabs.Player
         private readonly Dictionary<HumanBodyBones, Bodypart> m_bodyparts = new();
         private readonly Dictionary<Collider, int> m_characterColliders = new();
 
+        private Vector3 m_lastSpawnPosition;
+        private float m_lastSpawnLookX;
+
         private void Awake()
         {
             Input = GetComponent<PlayerInput>();
@@ -94,6 +98,8 @@ namespace RooseLabs.Player
             Data.lookValues.x = transform.eulerAngles.y;
             m_rigidbody.rotation = Quaternion.identity;
             UpdateLookDirection();
+            m_lastSpawnPosition = transform.position;
+            m_lastSpawnLookX = Data.lookValues.x;
 
             // Hide renderers for local player
             ToggleMeshesVisibility(false);
@@ -133,6 +139,8 @@ namespace RooseLabs.Player
             m_rigidbody.position = position;
             Data.lookValues.x = rotation.eulerAngles.y;
             UpdateLookDirection();
+            m_lastSpawnPosition = position;
+            m_lastSpawnLookX = Data.lookValues.x;
         }
 
         public bool UseStamina(float amount)
@@ -196,10 +204,13 @@ namespace RooseLabs.Player
         [Server]
         private void HandlePlayerDeath(DamageInfo? damage = null)
         {
-            // Spawn dropped notebook
-            GameObject droppedNotebook = Instantiate(droppedNotebookPrefab, transform.position + Vector3.up * 1.0f, Quaternion.identity);
-            Spawn(droppedNotebook, null, GameManager.Instance.CurrentScene);
-            droppedNotebook.GetComponent<DroppedNotebook>().Initialize(this);
+            if (GameManager.Instance.IsHeistOngoing)
+            {
+                // Spawn dropped notebook
+                GameObject droppedNotebook = Instantiate(droppedNotebookPrefab, transform.position + Vector3.up * 1.0f, Quaternion.identity);
+                Spawn(droppedNotebook, null, GameManager.Instance.CurrentScene);
+                droppedNotebook.GetComponent<DroppedNotebook>().Initialize(this);
+            }
 
             // Trigger ragdoll
             Ragdoll.TriggerRagdoll(
@@ -207,6 +218,24 @@ namespace RooseLabs.Player
                 damage?.hitPoint ?? Center,
                 false
             );
+
+            if (!GameManager.Instance.IsHeistOngoing)
+            {
+                // Start dormitory revive coroutine
+                StartCoroutine(DormitoryReviveCoroutine());
+            }
+        }
+
+        private IEnumerator DormitoryReviveCoroutine(float delay = 5.0f)
+        {
+            yield return new WaitForSeconds(delay);
+            // Only revive if heist is not ongoing, we check again in case a heist started during the wait
+            if (GameManager.Instance.IsHeistOngoing) yield break;
+            transform.position = m_lastSpawnPosition;
+            Data.lookValues.x = m_lastSpawnLookX;
+            Data.lookValues.y = 0.0f;
+            UpdateLookDirection();
+            ResetState();
         }
 
         public void ResetState()

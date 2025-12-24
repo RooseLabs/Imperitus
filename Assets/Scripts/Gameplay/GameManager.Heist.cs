@@ -19,6 +19,8 @@ namespace RooseLabs.Gameplay
         private bool m_isEndingHeist = false;
         private bool m_isHeistOngoing = false;
 
+        public bool IsHeistOngoing => m_isHeistOngoing;
+
         private void HandleHeistSceneLoaded()
         {
             m_heistTimer.ToggleTimerVisibility(true);
@@ -48,19 +50,23 @@ namespace RooseLabs.Gameplay
         public void StartHeist()
         {
             if (!IsServerInitialized) return;
+
             int randomIndex = Random.Range(0, heistScenes.Length);
             string selectedSceneName = GetSceneName(heistScenes[randomIndex]);
             SceneManagement.SceneManager.LoadOnlineScene(selectedSceneName);
             m_isEndingHeist = false;
 
             // Lock spell loadouts for all players when heist starts
-            if (NotebookManager.Instance != null)
-            {
-                NotebookManager.Instance.LockSpellLoadout();
-            }
+            NotebookManager.Instance?.LockSpellLoadout();
 
             // Pause tutorial when leaving the lobby
             PauseTutorial();
+
+            // Reset player states to ensure they're at full health and stamina, not dead, etc.
+            foreach (var player in PlayerHandler.AllConnectedCharacters)
+            {
+                player.ResetState();
+            }
         }
 
         private void UpdateHeist()
