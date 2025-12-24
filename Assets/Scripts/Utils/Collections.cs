@@ -41,6 +41,14 @@ namespace RooseLabs.Utils
         }
 
         /// <summary>
+        /// Determines whether any element in the source collection matches any element in the target collection.
+        /// </summary>
+        public static bool Intersects<T>(this IEnumerable<T> source, IEnumerable<T> target)
+        {
+            return source.Intersects(target, (a, b) => EqualityComparer<T>.Default.Equals(a, b));
+        }
+
+        /// <summary>
         /// Adds a collection of items to the HashSet.
         /// </summary>
         public static void AddRange<T>(this HashSet<T> hashSet, IEnumerable<T> items)

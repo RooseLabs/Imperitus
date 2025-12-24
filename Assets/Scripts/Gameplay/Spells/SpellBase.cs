@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using FishNet;
 using FishNet.Component.Ownership;
 using FishNet.Object;
@@ -51,6 +52,9 @@ namespace RooseLabs.Gameplay.Spells
 
         [SerializeField, Tooltip("For sustained spells: extra stamina cost per second while the spell is sustained.")]
         private float staminaCostPerSecond = 0f;
+
+        [SerializeField, Tooltip("Cooldown time in seconds after casting the spell, during which the spell cannot be cast again.")]
+        private float cooldownTime = 0f;
         #endregion
 
         private float m_castProgress = 0f;
@@ -58,6 +62,19 @@ namespace RooseLabs.Gameplay.Spells
         public PlayerCharacter CasterCharacter { get; private set; }
         public bool IsAiming { get; private set; }
         public bool IsCasting { get; private set; }
+
+        private float CooldownEndTime {
+            get => Cooldowns.GetValueOrDefault(GetType(), 0f);
+            set => Cooldowns[GetType()] = value;
+        }
+        public bool IsOnCooldown => Time.time < CooldownEndTime;
+
+        /// <summary>
+        /// Static dictionary to track cooldown end times for each spell type.
+        /// This ensures that cooldowns are shared across all instances of the same spell type.
+        /// For instance, if a player has both "Lux" and "Lux Variant" spells, casting one will put both on cooldown.
+        /// </summary>
+        private static readonly Dictionary<Type, float> Cooldowns = new();
 
         public override void OnStartClient()
         {
@@ -91,7 +108,7 @@ namespace RooseLabs.Gameplay.Spells
 
         public void StartCast()
         {
-            if (IsCasting) return;
+            if (IsCasting || IsOnCooldown) return;
             if (PlayerCharacter.LocalCharacter.Data.Stamina <= 0f) return;
             if (staminaConsumptionType == StaminaConsumptionType.OnCastStart)
             {
@@ -115,6 +132,8 @@ namespace RooseLabs.Gameplay.Spells
             {
                 IsBeingSustained = false;
                 OnCancelCastSustained();
+                if (cooldownTime > 0f)
+                    CooldownEndTime = Time.time + cooldownTime;
             }
             else
             {
@@ -206,6 +225,11 @@ namespace RooseLabs.Gameplay.Spells
         {
             Despawn(NetworkObject, DespawnType.Pool);
         }
+
+        public static void ClearCooldowns()
+        {
+            Cooldowns.Clear();
+        }
         #endregion
 
         private void SetupParentConstraint(Transform parent, Vector3 offsetPosition)
@@ -242,6 +266,10 @@ namespace RooseLabs.Gameplay.Spells
             if (successfulCast)
             {
                 OnSpellCast.Invoke(SpellInfo);
+                if (castType == SpellCastType.OneShot && cooldownTime > 0f)
+                {
+                    CooldownEndTime = Time.time + cooldownTime;
+                }
             }
         }
 
@@ -372,6 +400,7 @@ namespace RooseLabs.Gameplay.Spells
             IsAiming = false;
             IsCasting = false;
             m_castProgress = 0f;
+            CooldownEndTime = 0f;
             IsBeingSustained = false;
         }
 

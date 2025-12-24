@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: GlowingOrb_Ignis
+  m_Shader: {fileID: 4800000, guid: 8ac37d3b337746eaa8473963a4a754c7, type: 3}
+  m_Parent: {fileID: 2100000, guid: 975862628609ceb44a80390f8cc45df3, type: 2}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords:
+  - _SPECULAR1ENABLED_ON
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses:
+  - MOTIONVECTORS
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs: []
+    m_Ints: []
+    m_Floats:
+    - _GlowStrength: 1.3
+    - _Light1Strength: 1.5
+    - _Light2Strength: 1.5
+    - _Specular1Sharpness: 40
+    - _Specular1Strength: 1.6
+    m_Colors:
+    - _GlowColor: {r: 1, g: 0.65297794, b: 0, a: 1}
+    - _Light1Color: {r: 0.69, g: 0.45188236, b: 0, a: 1}
+    - _Light2Color: {r: 0.6901961, g: 0.45098042, b: 0, a: 1}
+    - _Light3Color: {r: 0.6901961, g: 0.45098042, b: 0, a: 1}
+    - _Specular1Color: {r: 1, g: 0.654902, b: 0, a: 1}
+    - _Specular2Color: {r: 0.6901961, g: 0.45098042, b: 0, a: 1}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1
