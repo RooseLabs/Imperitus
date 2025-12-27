@@ -5479,10 +5479,10 @@ MonoBehaviour:
   detectionCheckInterval: 0.2
   playerMask:
     serializedVersion: 2
-    m_Bits: 256
+    m_Bits: 512
   obstructionMask:
     serializedVersion: 2
-    m_Bits: 2177
+    m_Bits: 4225
   normalSpotlightColor: {r: 1, g: 1, b: 1, a: 1}
   alertSpotlightColor: {r: 1, g: 0, b: 0, a: 1}
   colorTransitionSpeed: 2
