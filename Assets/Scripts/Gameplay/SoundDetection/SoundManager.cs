@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using FishNet.Object;
 using RooseLabs.ScriptableObjects;
+using RooseLabs.Utils;
 using UnityEngine;
 using Logger = RooseLabs.Core.Logger;
 
@@ -287,10 +288,7 @@ namespace RooseLabs
 
                 foreach (Collider c in hits)
                 {
-                    if (c == null) continue;
-
-                    ISoundListener listener = c.GetComponentInParent<ISoundListener>();
-                    if (listener == null) continue;
+                    if (!c || !c.TryGetComponentInParent(out ISoundListener listener)) continue;
 
                     Vector3[] sampleOffsets = { Vector3.up * 0.5f, Vector3.zero, Vector3.down * 0.5f };
                     float maxIntensity = 0f;
@@ -541,10 +539,7 @@ namespace RooseLabs
 
             foreach (Collider c in hits)
             {
-                if (c == null) continue;
-
-                ISoundListener listener = c.GetComponentInParent<ISoundListener>();
-                if (listener == null) continue;
+                if (!c || !c.TryGetComponentInParent(out ISoundListener listener)) continue;
 
                 Vector3 samplePoint = c.ClosestPoint(position);
                 float distance = Vector3.Distance(position, samplePoint);
