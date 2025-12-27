@@ -33,7 +33,11 @@ namespace RooseLabs.Core
 
         private static readonly Dictionary<string, Logger> Instances = new(StringComparer.OrdinalIgnoreCase);
 
+        #if UNITY_EDITOR
         public static Logger GetLogger(string name, bool enableOnCreate = false)
+        #else
+        public static Logger GetLogger(string name, bool enableOnCreate = true)
+        #endif
         {
             if (Instances.TryGetValue(name, out var logger)) return logger;
             logger = new Logger(name, enableOnCreate);
@@ -92,8 +96,11 @@ namespace RooseLabs.Core
         [HideInCallstack]
         private void Log(MessageType messageType, string message)
         {
-            string timestamp = Application.isEditor ? "" : $"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} ";
-            string msg = $"{timestamp}[{messageType}] [{Name}] {message}";
+            #if UNITY_EDITOR
+            string msg = $"[{messageType}] [{Name}] {message}";
+            #else
+            string msg = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} [{messageType}] [{Name}] {message}";
+            #endif
 
             switch (messageType)
             {
