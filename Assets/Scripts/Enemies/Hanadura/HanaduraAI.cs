@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using FishNet.Object;
 using RooseLabs.Gameplay;
 using RooseLabs.ScriptableObjects;
+using RooseLabs.Utils;
 using UnityEngine;
 using UnityEngine.AI;
 using Logger = RooseLabs.Core.Logger;
@@ -23,7 +24,6 @@ namespace RooseLabs.Enemies
         public Transform RaycastOrigin;
         public Transform modelTransform;
         public Rigidbody rb;
-        public LayerMask HanaduraDeathBonesLayer;
         public SoundEmitter soundEmitter;
 
         [Header("Combat")]
@@ -200,7 +200,7 @@ namespace RooseLabs.Enemies
         protected override void Initialize()
         {
             modelTransform.TryGetComponent(out animator);
-            TryGetComponent(out weaponCollider);
+            gameObject.TryGetComponentInChildren(out weaponCollider);
             TryGetComponent(out rb);
             TryGetComponent(out navAgent);
             TryGetComponent(out detection);
@@ -553,7 +553,7 @@ namespace RooseLabs.Enemies
             //soundEmitter.RequestEmitFromClient("Hanadura_Attack");
 
             // Enable weapon collider for this attack
-            if (weaponCollider != null)
+            if ((bool)weaponCollider)
             {
                 weaponCollider.EnableWeapon();
             }
@@ -616,21 +616,7 @@ namespace RooseLabs.Enemies
 
         protected override void OnDeath()
         {
-            if (animator)
-            {
-                HandleDeath_ObserversRPC();
-            }
-            else
-            {
-                Logger.Warning($"No Animator found on {gameObject.name}, cannot play death animation.");
-                Despawn(gameObject);
-            }
-        }
-
-        [ObserversRpc(ExcludeServer = true, RunLocally = true)]
-        private void HandleDeath_ObserversRPC()
-        {
-            if (!animator || hasPlayedDeathAnimation) return;
+            if (hasPlayedDeathAnimation) return;
             StopMovement();
             currentState = null;
             ClearCurrentDetection();
@@ -646,10 +632,9 @@ namespace RooseLabs.Enemies
             }
             weaponCollider.DisableWeapon();
 
-            if (navAgent != null)
-                navAgent.enabled = false;
+            if (navAgent) navAgent.enabled = false;
 
-            // Stop the animator 
+            // Stop the animator
             animator.enabled = false;
 
             // Find all particle systems and stop them
@@ -659,47 +644,28 @@ namespace RooseLabs.Enemies
                 ps.Stop();
             }
 
-            // Find all gameobjects in the HanaduraDeathBones layer and set them to use gravity and fall after death
-            Transform[] allChildren = GetComponentsInChildren<Transform>();
-            foreach (Transform child in allChildren)
+            Collider[] colliders = modelTransform.GetComponentsInChildren<Collider>();
+            // Enable all non-trigger colliders and disable all trigger colliders on the model
+            // and set rigidbodies to non-kinematic
+            foreach (Collider col in colliders)
             {
-                if (child == transform) continue; // Skip the root object itself
-
-                if (((1 << child.gameObject.layer) & HanaduraDeathBonesLayer) != 0)
+                if (!col.isTrigger)
                 {
-                    Rigidbody childRb = child.GetComponent<Rigidbody>();
-                    if (childRb != null)
+                    if (col.TryGetComponentInParent(out Rigidbody colRb))
                     {
-                        childRb.useGravity = true;
-                        childRb.isKinematic = false;
+                        col.enabled = true;
+                        colRb.isKinematic = false;
                     }
-
-                    // Check for a special case, if the gameobject is the SpearTipBone, we only activate the box collider
-                    // (the capsule collider in the bone is for the weapon hitbox during combat)
-                    if (child.gameObject.name == "SpearTipBone")
-                    {
-                        Collider spearCol = child.GetComponent<BoxCollider>();
-                        if (spearCol != null)
-                        {
-                            spearCol.enabled = true;
-                        }
-                        continue;
-                    }
-
-                    Collider childCol = child.GetComponent<Collider>();
-                    if (childCol != null)
-                    {
-                        childCol.enabled = true;
-                    }
+                }
+                else
+                {
+                    col.enabled = false;
                 }
             }
 
             // Disable the collider on the root transform
-            Collider rootCol = GetComponent<Collider>();
-            if (rootCol != null)
-            {
+            if (TryGetComponent(out Collider rootCol))
                 rootCol.enabled = false;
-            }
 
             hasPlayedDeathAnimation = true;
 

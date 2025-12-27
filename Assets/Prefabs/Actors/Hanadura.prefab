@@ -19432,7 +19432,6 @@ GameObject:
   - component: {fileID: 3200562120539995110}
   - component: {fileID: 3025078776930143745}
   - component: {fileID: 5016868397172176932}
-  - component: {fileID: 1005745351957962536}
   - component: {fileID: 2753149022113849445}
   - component: {fileID: 4256106457363921830}
   - component: {fileID: 8806621658639097980}
@@ -19558,9 +19557,6 @@ MonoBehaviour:
   RaycastOrigin: {fileID: 286549264654445459}
   modelTransform: {fileID: 3943088723915446607}
   rb: {fileID: 0}
-  HanaduraDeathBonesLayer:
-    serializedVersion: 2
-    m_Bits: 0
   soundEmitter: {fileID: 0}
   attackRange: 4
   attackCooldown: 2.5
@@ -19605,27 +19601,6 @@ MonoBehaviour:
   edgeDstThreshold: 0.5
   fovMaterial: {fileID: 2100000, guid: 96f5d440b5f093044bf135016bfee8ee, type: 2}
   fovAlpha: 0.3
---- !u!114 &1005745351957962536
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3774049500881470253}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f8f8b5c4170b9b941abe2febb99a913f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Enemies.WeaponCollider
-  _componentIndexCache: 1
-  _addedNetworkObject: {fileID: 8806621658639097980}
-  _networkObjectCache: {fileID: 8806621658639097980}
-  ownerAI: {fileID: 3025078776930143745}
-  weaponTipObject: {fileID: 9211336466830289412}
-  damageCooldown: 0.5
-  playerLayer:
-    serializedVersion: 2
-    m_Bits: 512
 --- !u!114 &2753149022113849445
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19685,7 +19660,7 @@ MonoBehaviour:
   <PredictedOwner>k__BackingField: {fileID: 0}
   NetworkBehaviours:
   - {fileID: 3025078776930143745}
-  - {fileID: 1005745351957962536}
+  - {fileID: 0}
   - {fileID: 2753149022113849445}
   - {fileID: 4256106457363921830}
   - {fileID: 912312794422129550}
@@ -50573,6 +50548,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 2980920006106233365, guid: 40a8f7565f3902043897dd549a7663b9, type: 3}
       insertIndex: -1
       addedObject: {fileID: 6261534263322919147}
+    - targetCorrespondingSourceObject: {fileID: 2980920006106233365, guid: 40a8f7565f3902043897dd549a7663b9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 304359883813083627}
     - targetCorrespondingSourceObject: {fileID: 5685564210062038176, guid: 40a8f7565f3902043897dd549a7663b9, type: 3}
       insertIndex: -1
       addedObject: {fileID: 6333691782400092406}
@@ -50708,6 +50686,27 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 2
+--- !u!114 &304359883813083627
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1759862657868383409}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8f8b5c4170b9b941abe2febb99a913f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Enemies.WeaponCollider
+  _componentIndexCache: 1
+  _addedNetworkObject: {fileID: 8806621658639097980}
+  _networkObjectCache: {fileID: 8806621658639097980}
+  ownerAI: {fileID: 3025078776930143745}
+  weaponTipObject: {fileID: 9211336466830289412}
+  damageCooldown: 0.5
+  playerLayer:
+    serializedVersion: 2
+    m_Bits: 512
 --- !u!137 &2053438187525070592 stripped
 SkinnedMeshRenderer:
   m_CorrespondingSourceObject: {fileID: 3264357758577549732, guid: 40a8f7565f3902043897dd549a7663b9, type: 3}
