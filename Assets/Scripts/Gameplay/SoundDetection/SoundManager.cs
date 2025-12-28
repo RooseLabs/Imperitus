@@ -48,6 +48,9 @@ namespace RooseLabs
         // Debug visualization
         private readonly List<ActiveSound> _activeSounds = new List<ActiveSound>();
 
+        // Track active sounds by key so we can stop them
+        private Dictionary<string, List<PooledAudioSource>> _soundsByKey = new Dictionary<string, List<PooledAudioSource>>();
+
         private void Awake()
         {
             if (Instance != null && Instance != this)
@@ -339,7 +342,8 @@ namespace RooseLabs
                         Debug.LogError($"Exception when notifying listener '{c.name}': {ex}");
                     }
                 }
-            } else
+            }
+            else
             {
                 //Debug.Log("Sound emission skipped detection logic for sound type: " + soundType.key);
             }
@@ -455,6 +459,45 @@ namespace RooseLabs
             pooled.playStartTime = Time.time;
 
             //Debug.Log($"Playing 3D sound '{soundType.key}' at {position}");
+
+            // Track this sound by key so it can be stopped later
+            if (!_soundsByKey.ContainsKey(soundType.key))
+            {
+                _soundsByKey[soundType.key] = new List<PooledAudioSource>();
+            }
+            _soundsByKey[soundType.key].Add(pooled);
+        }
+
+        /// <summary>
+        /// Stop all playing sounds with a specific key (e.g., "Kiwi_Scream")
+        /// </summary>
+        public void StopSoundByKey(string soundKey)
+        {
+            if (string.IsNullOrEmpty(soundKey))
+                return;
+
+            if (!_soundsByKey.ContainsKey(soundKey))
+                return;
+
+            List<PooledAudioSource> soundsToStop = _soundsByKey[soundKey];
+
+            for (int i = soundsToStop.Count - 1; i >= 0; i--)
+            {
+                PooledAudioSource pooled = soundsToStop[i];
+
+                if (pooled != null && pooled.audioSource != null)
+                {
+                    pooled.audioSource.Stop();
+                    pooled.isPlaying = false;
+                    ReturnAudioSource(pooled);
+                }
+
+                soundsToStop.RemoveAt(i);
+            }
+
+            _soundsByKey.Remove(soundKey);
+
+            Debug.Log($"Stopped all instances of sound '{soundKey}'");
         }
 
         /// <summary>

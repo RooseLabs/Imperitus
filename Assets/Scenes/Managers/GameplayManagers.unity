@@ -390,9 +390,11 @@ MonoBehaviour:
   _networkObjectCache: {fileID: 0}
   hanaduraPrefab: {fileID: 3774049500881470253, guid: 57090dfd109dc2642a434deb8b456572, type: 3}
   grimoirePrefab: {fileID: 8490385624122815485, guid: 7d22e7a8fa558f446af02d88fb59af93, type: 3}
+  kiwiPrefab: {fileID: 8314759894404373815, guid: 06beb91013d5bc646931747e0431885c, type: 3}
   initialHanaduraCount: 7
   initialGrimoireCount: 3
   initialSpawnerCount: 0
+  kiwiSpawnChance: 100
   grimoireAlertSpawnChance: 50
   instantRespawnChance: 30
   baseRespawnTime: 60
@@ -402,6 +404,7 @@ MonoBehaviour:
   roomTag: Room
   roomProximityThreshold: 50
   maxHanaduraPerRoom: 2
+  showDebugLogs: 1
   showDebugGizmos: 1
 --- !u!4 &832602295
 Transform:

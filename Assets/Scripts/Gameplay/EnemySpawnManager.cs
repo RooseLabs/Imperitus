@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using FishNet.Object;
 using RooseLabs.Gameplay;
+using RooseLabs.Player;
 using RooseLabs.Utils;
 using UnityEngine;
 
@@ -22,6 +23,9 @@ namespace RooseLabs.Enemies
         [Tooltip("Prefab for Grimoire enemy")]
         [SerializeField] private GameObject grimoirePrefab;
 
+        [Tooltip("Prefab for Kiwi enemy")]
+        [SerializeField] private GameObject kiwiPrefab;
+
         [Header("Initial Spawn Settings")]
         [Tooltip("Number of Hanadura enemies to spawn when heist starts")]
         [SerializeField] private int initialHanaduraCount = 3;
@@ -31,6 +35,10 @@ namespace RooseLabs.Enemies
 
         [Tooltip("Number of spawners to use for initial spawn (0 = use all available)")]
         [SerializeField] private int initialSpawnerCount = 0;
+
+        [Header("Kiwi Spawn Settings")]
+        [Tooltip("Chance (0-100%) to spawn a Kiwi enemy when heist starts")]
+        [SerializeField][Range(0f, 100f)] private float kiwiSpawnChance = 50f;
 
         [Header("Grimoire Alert Spawn Settings")]
         [Tooltip("Chance (0-100%) to spawn an enemy when Grimoire alerts")]
@@ -65,6 +73,7 @@ namespace RooseLabs.Enemies
         [SerializeField] private int maxHanaduraPerRoom = 2;
 
         [Header("Debug")]
+        [SerializeField] private bool showDebugLogs = true;
         [SerializeField] private bool showDebugGizmos = true;
 
         // Runtime data
@@ -459,6 +468,16 @@ namespace RooseLabs.Enemies
 
             this.LogInfo($"Initial spawn complete: {hanaduraSpawned}/{initialHanaduraCount} Hanaduras across rooms, {grimoireSpawned}/{initialGrimoireCount} Grimoires");
 
+            // Spawn Kiwi
+            if (Random.Range(0f, 100f) <= kiwiSpawnChance)
+            {
+                SpawnKiwi();
+            }
+            else
+            {
+                this.LogInfo($"Kiwi did not spawn this heist (spawn chance: {kiwiSpawnChance}%)");
+            }
+
             // Debug room distribution
             // DebugRoomDistribution();
         }
@@ -602,9 +621,176 @@ namespace RooseLabs.Enemies
                 SpawnEnemyAtSpawner(spawner, isGrimoire);
             }
         }
+
+        /// <summary>
+        /// Spawn Kiwi enemy at the furthest available waypoint from all players
+        /// </summary>
+        private void SpawnKiwi()
+        {
+            if (kiwiPrefab == null)
+            {
+                this.LogWarning("[Kiwi] Kiwi prefab not assigned!");
+                return;
+            }
+
+            // Get patrol zones from GameManager (the authoritative source)
+            Dictionary<string, RoomPatrolZone> patrolZones = GameManager.Instance.GetAllPatrolZones();
+            if (patrolZones == null || patrolZones.Count == 0)
+            {
+                this.LogWarning("[Kiwi] No patrol zones available in GameManager, cannot spawn Kiwi");
+                return;
+            }
+
+            // Find furthest waypoint from all players
+            Vector3 furthestWaypoint = Vector3.zero;
+            float maxDistance = 0f;
+            string selectedRoomId = null;
+
+            foreach (var zone in patrolZones.Values)
+            {
+                foreach (var waypoint in zone.waypoints)
+                {
+                    float minPlayerDistance = GetMinDistanceToAnyPlayer(waypoint);
+
+                    if (minPlayerDistance > maxDistance)
+                    {
+                        maxDistance = minPlayerDistance;
+                        furthestWaypoint = waypoint;
+                        selectedRoomId = zone.roomIdentifier;
+                    }
+                }
+            }
+
+            if (selectedRoomId == null)
+            {
+                this.LogWarning("[Kiwi] Could not find a valid waypoint for Kiwi spawn");
+                return;
+            }
+
+            // Instantiate Kiwi at furthest waypoint
+            GameObject kiwiObj = Instantiate(kiwiPrefab, furthestWaypoint, Quaternion.identity);
+            kiwiObj.name = "Kiwi";
+
+            // Set the Kiwi's spawn room BEFORE network spawn so OnStartServer() can access it
+            if (kiwiObj.TryGetComponent(out KiwiAI kiwi))
+            {
+                kiwi.SetSpawnRoom(selectedRoomId);
+            }
+
+            // Network spawn
+            Spawn(kiwiObj);
+
+            // Find closest spawner for tracking (use first spawner in the room)
+            EnemySpawner closestSpawner = allSpawners
+                .FirstOrDefault(s => s.RoomIdentifier == selectedRoomId);
+
+            if (closestSpawner == null && allSpawners.Count > 0)
+            {
+                closestSpawner = allSpawners[0];
+            }
+
+            // Track this enemy
+            if (closestSpawner != null)
+            {
+                activeEnemies[kiwiObj] = closestSpawner;
+                closestSpawner.OnEnemySpawned(kiwiObj);
+            }
+
+            // Track in room
+            if (!roomActiveEnemies.ContainsKey(selectedRoomId))
+            {
+                roomActiveEnemies[selectedRoomId] = new List<GameObject>();
+            }
+            roomActiveEnemies[selectedRoomId].Add(kiwiObj);
+
+            this.LogInfo($"[Kiwi] Kiwi spawned at furthest waypoint in room '{selectedRoomId}' (distance from players: {maxDistance:F1}m)");
+
+            // Subscribe to death event
+            if (kiwiObj.TryGetComponent(out BaseEnemy kiwiData))
+            {
+                StartCoroutine(WaitForKiwiDeathSubscription(kiwiObj, kiwiData));
+            }
+        }
+
+        /// <summary>
+        /// Get minimum distance from a position to any player in the scene
+        /// </summary>
+        private float GetMinDistanceToAnyPlayer(Vector3 position)
+        {
+            // Find all players in scene
+            PlayerCharacter[] players = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None);
+
+            if (players.Length == 0)
+                return float.MaxValue;
+
+            float minDistance = float.MaxValue;
+            foreach (PlayerCharacter player in players)
+            {
+                float distance = Vector3.Distance(position, player.transform.position);
+                if (distance < minDistance)
+                {
+                    minDistance = distance;
+                }
+            }
+
+            return minDistance;
+        }
+
+        /// <summary>
+        /// Monitor for Kiwi death (though Kiwi is immortal, this is for cleanup)
+        /// </summary>
+        private IEnumerator WaitForKiwiDeathSubscription(GameObject kiwiObj, BaseEnemy kiwiData)
+        {
+            // Wait for enemy to be fully initialized
+            yield return new WaitForSeconds(0.5f);
+
+            // Check if enemy still exists
+            if (kiwiObj == null)
+                yield break;
+
+            // Monitor for death (Kiwi should never die, but we monitor just in case)
+            while (kiwiObj != null && !kiwiData.IsDead)
+            {
+                yield return new WaitForSeconds(0.5f);
+            }
+
+            // Kiwi died (shouldn't happen, but handle it)
+            if (kiwiObj != null)
+            {
+                OnKiwiDeath(kiwiObj);
+            }
+        }
+
+        /// <summary>
+        /// Handle Kiwi death
+        /// </summary>
+        private void OnKiwiDeath(GameObject kiwiObj)
+        {
+            if (!IsServerInitialized)
+                return;
+
+            // Remove from active enemies tracking
+            if (!activeEnemies.TryGetValue(kiwiObj, out EnemySpawner spawner))
+            {
+                this.LogInfo("[Kiwi] Kiwi died but was not tracked by spawn manager");
+                return;
+            }
+
+            activeEnemies.Remove(kiwiObj);
+
+            // Clean up room tracking
+            string roomId = spawner.RoomIdentifier;
+            if (roomActiveEnemies.ContainsKey(roomId))
+            {
+                roomActiveEnemies[roomId].Remove(kiwiObj);
+            }
+
+            this.LogInfo($"[Kiwi] Kiwi died in room '{roomId}'");
+        }
         #endregion
 
         #region Utility Methods
+
         /// <summary>
         /// Get next unique ID for an enemy type in a specific room
         /// </summary>
@@ -654,7 +840,10 @@ namespace RooseLabs.Enemies
         /// </summary>
         private void DebugRoomDistribution()
         {
-            this.LogInfo("=== Enemy Distribution by Room ===");
+            if (!showDebugLogs)
+                return;
+
+            LogDebug("=== Enemy Distribution by Room ===");
 
             // Get all unique rooms
             HashSet<string> allRooms = new HashSet<string>();
@@ -668,10 +857,10 @@ namespace RooseLabs.Enemies
                 int hanaduraCount = GetHanaduraCountInRoom(roomId);
                 bool hasGrimoire = roomActiveGrimoires.ContainsKey(roomId) && roomActiveGrimoires[roomId] != null;
 
-                this.LogInfo($"Room '{roomId}': {hanaduraCount} Hanaduras, {(hasGrimoire ? "1" : "0")} Grimoire");
+                LogDebug($"Room '{roomId}': {hanaduraCount} Hanaduras, {(hasGrimoire ? "1" : "0")} Grimoire");
             }
 
-            this.LogInfo("================================");
+            LogDebug("================================");
         }
 
         /// <summary>
@@ -689,7 +878,7 @@ namespace RooseLabs.Enemies
 
             if (activeCount >= maxHanaduraPerRoom)
             {
-                this.LogInfo($"Room '{roomId}' already has {activeCount}/{maxHanaduraPerRoom} Hanaduras");
+                LogDebug($"Room '{roomId}' already has {activeCount}/{maxHanaduraPerRoom} Hanaduras");
                 return false;
             }
 
@@ -720,7 +909,7 @@ namespace RooseLabs.Enemies
                 // Check if it's still alive (null check for destroyed objects)
                 if (existingGrimoire != null)
                 {
-                    this.LogInfo($"Room '{roomId}' already has an active Grimoire");
+                    LogDebug($"Room '{roomId}' already has an active Grimoire");
                     return false;
                 }
                 else
@@ -741,7 +930,7 @@ namespace RooseLabs.Enemies
 
             if (string.IsNullOrEmpty(roomId) || roomId == "Unknown")
             {
-                this.LogWarning($"Spawner has no room identifier, using closest zone");
+                LogDebug($"Spawner has no room identifier, using closest zone", true);
                 roomId = FindClosestRoomToPosition(spawner.SpawnPoint.position);
             }
 
@@ -750,7 +939,7 @@ namespace RooseLabs.Enemies
 
             if (zone == null)
             {
-                this.LogWarning($"No patrol zone found for room '{roomId}'");
+                LogDebug($"No patrol zone found for room '{roomId}'", true);
                 return;
             }
 
@@ -763,11 +952,11 @@ namespace RooseLabs.Enemies
                 hanadura.startWaypointIndex = 0; // Always start at beginning of custom route
                 hanadura.ReinitializePatrolState();
 
-                this.LogInfo($"Assigned {route.Count}-waypoint patrol route to {hanadura.name} in room '{roomId}'");
+                LogDebug($"Assigned {route.Count}-waypoint patrol route to {hanadura.name} in room '{roomId}'");
             }
             else
             {
-                this.LogWarning($"Failed to generate route for room '{roomId}'");
+                LogDebug($"Failed to generate route for room '{roomId}'", true);
             }
         }
 
@@ -780,7 +969,7 @@ namespace RooseLabs.Enemies
 
             if (string.IsNullOrEmpty(roomId) || roomId == "Unknown")
             {
-                this.LogWarning($"Spawner has no room identifier, using closest zone");
+                LogDebug($"Spawner has no room identifier, using closest zone", true);
                 roomId = FindClosestRoomToPosition(spawner.SpawnPoint.position);
             }
 
@@ -789,7 +978,7 @@ namespace RooseLabs.Enemies
 
             if (zone == null)
             {
-                this.LogWarning($"No patrol zone found for room '{roomId}'");
+                LogDebug($"No patrol zone found for room '{roomId}'", true);
                 return;
             }
 
@@ -802,11 +991,11 @@ namespace RooseLabs.Enemies
                 grimoire.startWaypointIndex = 0;
                 // Grimoire doesn't have ReinitializePatrolState, it initializes in OnStartServer
 
-                this.LogInfo($"Assigned {route.Count}-waypoint patrol route to Grimoire {grimoire.name} in room '{roomId}'");
+                LogDebug($"Assigned {route.Count}-waypoint patrol route to Grimoire {grimoire.name} in room '{roomId}'");
             }
             else
             {
-                this.LogWarning($"Failed to generate route for Grimoire in room '{roomId}'");
+                LogDebug($"Failed to generate route for Grimoire in room '{roomId}'", true);
             }
         }
 
@@ -831,7 +1020,7 @@ namespace RooseLabs.Enemies
 
             if (validSpawners.Count == 0)
             {
-                this.LogInfo("No valid spawners outside player's room, using any spawner");
+                LogDebug("No valid spawners outside player's room, using any spawner");
                 validSpawners = allSpawners;
             }
 
@@ -865,7 +1054,7 @@ namespace RooseLabs.Enemies
 
             if (rooms.Length == 0)
             {
-                this.LogWarning("No rooms found with tag: " + roomTag);
+                LogDebug("No rooms found with tag: " + roomTag, true);
                 return "Unknown";
             }
 
@@ -883,7 +1072,7 @@ namespace RooseLabs.Enemies
                     // Check if position is inside room bounds
                     if (roomBounds.Contains(position))
                     {
-                        this.LogInfo($"Position is inside room: {room.name}");
+                        LogDebug($"Position is inside room: {room.name}");
                         return room.name;
                     }
 
@@ -894,7 +1083,7 @@ namespace RooseLabs.Enemies
                 {
                     // Fallback to pivot point if no bounds found
                     roomCenter = room.transform.position;
-                    this.LogWarning($"Room {room.name} has no bounds, using pivot point");
+                    LogDebug($"Room {room.name} has no bounds, using pivot point", true);
                 }
 
                 float distance = Vector3.Distance(roomCenter, position);
@@ -908,7 +1097,7 @@ namespace RooseLabs.Enemies
 
             if (closestRoom != null)
             {
-                this.LogInfo($"Closest room to position is: {closestRoom.name} (distance: {closestDistance:F1}m)");
+                LogDebug($"Closest room to position is: {closestRoom.name} (distance: {closestDistance:F1}m)");
             }
 
             return closestRoom != null ? closestRoom.name : "Unknown";
@@ -961,9 +1150,24 @@ namespace RooseLabs.Enemies
         {
             return GameManager.Instance.GetHeistTimerValue();
         }
+
+        private void LogDebug(string message, bool isWarning = false)
+        {
+            if (!showDebugLogs)
+                return;
+
+            string formatted = $"[EnemySpawnManager] {message}";
+
+            if (isWarning)
+                Debug.LogWarning(formatted);
+            else
+                Debug.Log(formatted);
+        }
+
         #endregion
 
         #region Update Loop
+
         private void Update()
         {
             if (!IsServerInitialized || !heistStarted)
@@ -983,12 +1187,14 @@ namespace RooseLabs.Enemies
                     SpawnEnemyAtSpawner(pending.preferredSpawner, pending.isGrimoire);
                 }
 
-                this.LogInfo($"Processed queued {(pending.isGrimoire ? "Grimoire" : "Hanadura")} respawn");
+                LogDebug($"Processed queued {(pending.isGrimoire ? "Grimoire" : "Hanadura")} respawn");
             }
         }
+
         #endregion
 
         #region Debug Visualization
+
         private void OnDrawGizmos()
         {
             if (!showDebugGizmos || allSpawners.Count == 0)
@@ -1007,6 +1213,7 @@ namespace RooseLabs.Enemies
                 }
             }
         }
+
         #endregion
     }
 }

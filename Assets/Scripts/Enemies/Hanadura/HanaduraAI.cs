@@ -475,6 +475,28 @@ namespace RooseLabs.Enemies
             }
         }
 
+        /// <summary>
+        /// Called by Kiwi enemy to alert this Hanadura to a player location
+        /// </summary>
+        public void AlertByKiwi(Vector3 playerPosition)
+        {
+            if (!IsServerInitialized) return;
+
+            float dist = Vector3.Distance(transform.position, playerPosition);
+            DetectionInfo kiwiBroadcastDetection = new DetectionInfo(
+                DetectionPriority.AlertFromAI,
+                playerPosition,
+                null,
+                dist
+            );
+
+            if (ShouldSwitchToNewDetection(kiwiBroadcastDetection))
+            {
+                currentDetection = kiwiBroadcastDetection;
+                Logger.Info($"Alerted by Kiwi to investigate player at {playerPosition}");
+            }
+        }
+
         public void SetCurrentTarget(Transform target)
         {
             CurrentTarget = target;
