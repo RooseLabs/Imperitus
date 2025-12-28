@@ -198,6 +198,7 @@ namespace RooseLabs.Gameplay
             dest.allowHDR = src.allowHDR;
             dest.allowMSAA = src.allowMSAA;
             dest.allowDynamicResolution = src.allowDynamicResolution;
+            dest.useOcclusionCulling = src.useOcclusionCulling;
         }
 
         private void UpdateReflection(Camera playerCam, Camera reflectionCamera)
@@ -215,7 +216,8 @@ namespace RooseLabs.Gameplay
                 reflectionCamera.worldToCameraMatrix = playerCam.worldToCameraMatrix * reflection;
                 Vector4 clipPlane = CameraSpacePlane(reflectionCamera, pos, normal, 1.0f);
                 reflectionCamera.projectionMatrix = playerCam.CalculateObliqueMatrix(clipPlane);
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 Debug.LogWarning($"Error updating planar reflection: {e.Message}", this);
             }

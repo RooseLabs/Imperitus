@@ -13,9 +13,34 @@ namespace RooseLabs.Gameplay
 
         private const float InteractMaxDistance = 2.5f;
 
-        public IInteractable CurrentHovered { get; private set; }
-
         private IInteractable m_bestInteractable;
+        private IInteractable m_currentInteractable;
+
+        public IInteractable CurrentHovered
+        {
+            get => m_currentInteractable;
+            private set
+            {
+                if (value != null)
+                {
+                    // Update interaction text
+                    GUIManager.Instance.SetInteractionText(value.GetInteractionText());
+                    if (value is Component c)
+                    {
+                        HelperFunctions.HighlightObject(c);
+                    }
+                }
+                else
+                {
+                    GUIManager.Instance.SetInteractionText(string.Empty);
+                    if (m_currentInteractable is Component c)
+                    {
+                        HelperFunctions.UnhighlightObject(c);
+                    }
+                }
+                m_currentInteractable = value;
+            }
+        }
 
         private void Awake()
         {
@@ -41,21 +66,22 @@ namespace RooseLabs.Gameplay
                 m_bestInteractable = null;
             }
             CurrentHovered = m_bestInteractable;
-            GUIManager.Instance.SetInteractionText(CurrentHovered != null ? CurrentHovered.GetInteractionText() : string.Empty);
         }
 
         private void FindBestInteractable()
         {
             m_bestInteractable = null;
             var character = PlayerCharacter.LocalCharacter;
-            if (!character.RaycastIgnoreSelf(
-                character.Camera.transform.position, character.Camera.transform.forward,
-                out var hitInfo, InteractMaxDistance, HelperFunctions.AllPhysicalLayerMask,
-                queryTriggerInteraction: QueryTriggerInteraction.Collide
-            )) return;
-            hitInfo.collider.TryGetComponent(out IInteractable interactable);
-            if (interactable == null || !interactable.IsInteractable(character)) return;
-            m_bestInteractable = interactable;
+            if (character.RaycastIgnoreSelf(
+                    character.Camera.transform.position, character.Camera.transform.forward,
+                    out var hitInfo, InteractMaxDistance, HelperFunctions.AllPhysicalLayerMask,
+                    queryTriggerInteraction: QueryTriggerInteraction.Collide)
+                && hitInfo.collider.TryGetComponent(out IInteractable interactable)
+                && interactable.IsInteractable(character)
+            )
+            {
+                m_bestInteractable = interactable;
+            }
         }
 
         private void DoInteraction(IInteractable interactable)

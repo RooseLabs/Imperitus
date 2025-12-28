@@ -7,6 +7,36 @@ namespace RooseLabs.Utils
         public static readonly int AllPhysicalLayerMask = LayerMask.GetMask("Default", "Ground", "PlayerHitbox", "Draggable", "Enemy");
         public static readonly int MirrorCullLayerMask = LayerMask.GetMask("MirrorCull");
 
+        public static readonly uint OutlineRenderingLayerMask = RenderingLayerMask.GetMask("Outline");
+
+        /// <summary>
+        /// Highlights all renderers on the provided component by enabling the "Outline" rendering layer bit.
+        /// </summary>
+        public static void HighlightObject(Component obj)
+        {
+            if (!obj) return;
+            var rends = obj.GetComponentsInChildren<Renderer>();
+            foreach (var r in rends)
+            {
+                if (!r) continue;
+                r.renderingLayerMask |= OutlineRenderingLayerMask;
+            }
+        }
+
+        /// <summary>
+        /// Removes the "Outline" rendering layer bit from all renderers on the provided component.
+        /// </summary>
+        public static void UnhighlightObject(Component obj)
+        {
+            if (!obj) return;
+            var rends = obj.GetComponentsInChildren<Renderer>();
+            foreach (var r in rends)
+            {
+                if (!r) continue;
+                r.renderingLayerMask &= ~OutlineRenderingLayerMask;
+            }
+        }
+
         /// <summary>
         /// Converts look rotation values (pitch, yaw) to Euler angles.
         /// </summary>

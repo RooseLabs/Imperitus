@@ -22,6 +22,7 @@ namespace RooseLabs.Gameplay.Spells
         #endregion
 
         private Draggable m_currentGrabbedObject;
+        private Draggable m_currentHighlightedObject;
         private Vector3 m_currentGrabbedLocalHitPoint;
         private float m_currentDragDistance;
         private float m_targetDragDistance;
@@ -32,10 +33,35 @@ namespace RooseLabs.Gameplay.Spells
         private GameObject m_startCap;
         private GameObject m_endCap;
 
+        protected override void OnAim()
+        {
+            // If we're currently dragging an object, keep it highlighted and skip hover visuals
+            if (m_currentGrabbedObject) return;
+
+            var character = PlayerCharacter.LocalCharacter;
+            Vector3 cameraPosition = character.Camera.transform.position;
+            if (character.RaycastIgnoreSelf(cameraPosition, character.Data.lookDirection,
+                    out RaycastHit hitInfo, maxDistance, HelperFunctions.AllPhysicalLayerMask)
+                && hitInfo.collider.TryGetComponent(out Draggable hitDraggable)
+                && hitDraggable.IsDraggable)
+            {
+                HighlightObject(hitDraggable);
+            }
+            else
+            {
+                HighlightObject(null);
+            }
+        }
+
+        protected override void OnStopAim()
+        {
+            HighlightObject(null);
+        }
+
         protected override bool OnCastFinished()
         {
             var character = PlayerCharacter.LocalCharacter;
-            var cameraPosition = character.Camera.transform.position;
+            Vector3 cameraPosition = character.Camera.transform.position;
             if (!character.RaycastIgnoreSelf(cameraPosition, character.Data.lookDirection,
                     out RaycastHit hitInfo, maxDistance, HelperFunctions.AllPhysicalLayerMask))
             {
@@ -71,6 +97,8 @@ namespace RooseLabs.Gameplay.Spells
                 SetGrabbedObject_ServerRpc(hitDraggable, m_currentGrabbedLocalHitPoint);
                 m_currentGrabbedObject = hitDraggable;
             }
+
+            HighlightObject(hitDraggable);
             return true;
         }
 
@@ -131,6 +159,7 @@ namespace RooseLabs.Gameplay.Spells
 
             // Destroy visuals
             DestroyVisuals();
+            HighlightObject(null);
         }
 
         protected override void OnScrollBackwardHeld()
@@ -289,6 +318,30 @@ namespace RooseLabs.Gameplay.Spells
             }
         }
 
+        private void HighlightObject(Draggable obj)
+        {
+            if (obj)
+            {
+                if ((bool)m_currentHighlightedObject)
+                {
+                    if (obj == m_currentHighlightedObject)
+                    {
+                        // This object is already highlighted, do nothing
+                        return;
+                    }
+                    // Object changed, unhighlight previous
+                    HelperFunctions.UnhighlightObject(m_currentHighlightedObject);
+                }
+                HelperFunctions.HighlightObject(obj);
+            }
+            else if ((bool)m_currentHighlightedObject)
+            {
+                HelperFunctions.UnhighlightObject(m_currentHighlightedObject);
+            }
+            m_currentHighlightedObject = obj;
+        }
+
+
         #region Network Sync
         [ServerRpc(RequireOwnership = true)]
         private void SetGrabbedObject_ServerRpc(Draggable draggable, Vector3 localHitPoint)
@@ -308,7 +361,9 @@ namespace RooseLabs.Gameplay.Spells
         {
             base.ResetData();
             DestroyVisuals();
+            HighlightObject(null);
             m_currentGrabbedObject = null;
+            m_currentHighlightedObject = null;
             m_currentGrabbedLocalHitPoint = Vector3.zero;
             m_currentDragDistance = 0f;
             m_targetDragDistance = 0f;
