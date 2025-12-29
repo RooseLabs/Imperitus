@@ -23,13 +23,13 @@ MonoBehaviour:
   renderQueue: 0
   occlusion: 0
   maskingStrategy: 0
-  color: {r: 1, g: 1, b: 0, a: 1}
+  color: {r: 0, g: 1.2045898, b: 4, a: 1}
   enableOcclusion: 0
   occludedColor: {r: 1, g: 0, b: 0, a: 1}
   blendMode: 0
   extrusionMethod: 0
   scaling: 0
-  width: 1
+  width: 0.25
   minWidth: 0
   scaleWithResolution: 1
   referenceResolution: 3
@@ -48,7 +48,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28765dc7302cd49b59c0e9ac8862cf45, type: 3}
   m_Name: OutlineSettings
   m_EditorClassIdentifier: LineworkLite::LineworkLite.FreeOutline.FreeOutlineSettings
-  injectionPoint: 600
+  injectionPoint: 550
   showInSceneView: 1
   outlines:
   - {fileID: 1934418847420473049}
@@ -76,7 +76,7 @@ MonoBehaviour:
   renderQueue: 0
   occlusion: 0
   maskingStrategy: 0
-  color: {r: 1, g: 1, b: 0, a: 1}
+  color: {r: 0, g: 1.2045898, b: 4, a: 1}
   enableOcclusion: 0
   occludedColor: {r: 1, g: 0, b: 0, a: 1}
   blendMode: 0
@@ -84,7 +84,7 @@ MonoBehaviour:
   scaling: 0
   width: 2
   minWidth: 0
-  scaleWithResolution: 0
+  scaleWithResolution: 1
   referenceResolution: 3
   customResolution: 2048
   materialType: 0
