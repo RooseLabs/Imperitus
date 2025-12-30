@@ -3,6 +3,7 @@ namespace RooseLabs.Utils
     public static class LoggingExtensions
     {
         [UnityEngine.HideInCallstack]
+        [System.Diagnostics.Conditional("UNITY_EDITOR")]
         public static void LogInfo(this UnityEngine.MonoBehaviour self, string message)
         {
             var logger = Core.Logger.GetLogger(self.GetType().Name);

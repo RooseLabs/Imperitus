@@ -57,17 +57,14 @@ namespace RooseLabs.Gameplay.Spells
         private float cooldownTime = 0f;
         #endregion
 
-        private float m_castProgress = 0f;
-
-        public PlayerCharacter CasterCharacter { get; private set; }
-        public bool IsAiming { get; private set; }
-        public bool IsCasting { get; private set; }
+        protected PlayerCharacter CasterCharacter { get; private set; }
+        protected float CastTime => castTime;
+        protected float CastProgress { get; private set; } = 0f;
 
         private float CooldownEndTime {
             get => Cooldowns.GetValueOrDefault(GetType(), 0f);
             set => Cooldowns[GetType()] = value;
         }
-        public bool IsOnCooldown => Time.time < CooldownEndTime;
 
         /// <summary>
         /// Static dictionary to track cooldown end times for each spell type.
@@ -87,6 +84,9 @@ namespace RooseLabs.Gameplay.Spells
         #region Public API
         public bool CanAimToSustain => castType == SpellCastType.AimToSustain;
         public bool IsBeingSustained { get; private set; } = false;
+        public bool IsAiming { get; private set; }
+        public bool IsCasting { get; private set; }
+        public bool IsOnCooldown => Time.time < CooldownEndTime;
 
         public void Aim()
         {
@@ -117,7 +117,7 @@ namespace RooseLabs.Gameplay.Spells
             }
 
             IsCasting = true;
-            m_castProgress = 0f;
+            CastProgress = 0f;
 
             OnStartCast();
         }
@@ -127,7 +127,7 @@ namespace RooseLabs.Gameplay.Spells
             if (!IsCasting) return;
 
             IsCasting = false;
-            m_castProgress = 0f;
+            CastProgress = 0f;
             if (IsBeingSustained)
             {
                 IsBeingSustained = false;
@@ -145,9 +145,9 @@ namespace RooseLabs.Gameplay.Spells
         {
             if (!IsCasting) return;
 
-            if (m_castProgress < castTime)
+            if (CastProgress < castTime)
             {
-                m_castProgress += Time.deltaTime;
+                CastProgress += Time.deltaTime;
                 if (castTime > 0f && staminaCost > 0f && staminaConsumptionType == StaminaConsumptionType.LinearlyDuringCast)
                 {
                     float staminaThisFrame = (staminaCost / castTime) * Time.deltaTime;
@@ -260,7 +260,7 @@ namespace RooseLabs.Gameplay.Spells
             else
             {
                 IsCasting = false;
-                m_castProgress = 0f;
+                CastProgress = 0f;
             }
 
             if (successfulCast)
@@ -399,7 +399,7 @@ namespace RooseLabs.Gameplay.Spells
         {
             IsAiming = false;
             IsCasting = false;
-            m_castProgress = 0f;
+            CastProgress = 0f;
             CooldownEndTime = 0f;
             IsBeingSustained = false;
         }
