@@ -11,11 +11,11 @@ GameObject:
   - component: {fileID: 9143015677738296307}
   - component: {fileID: 1213637447784001825}
   - component: {fileID: 5434781886447546225}
-  - component: {fileID: 7852145736884943135}
-  - component: {fileID: -677041948634102469}
-  - component: {fileID: 3554044467333421689}
+  - component: {fileID: 8594471061932230415}
+  - component: {fileID: 2369205557069936941}
+  - component: {fileID: 2125545193582324348}
   m_Layer: 0
-  m_Name: BedFrame
+  m_Name: Bed
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -43,7 +43,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5894589433836513032}
-  m_Mesh: {fileID: 6219867069042382239, guid: 300069c2c03ded449b9cb2027c5cafe0, type: 3}
+  m_Mesh: {fileID: 1214181523629851194, guid: 300069c2c03ded449b9cb2027c5cafe0, type: 3}
 --- !u!23 &5434781886447546225
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -96,7 +96,7 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &7852145736884943135
+--- !u!65 &8594471061932230415
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -115,9 +115,9 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.6828318, y: 1.808557, z: 0.16716069}
-  m_Center: {x: 0.0016174316, y: 0.9042785, z: 0.93172514}
---- !u!65 &-677041948634102469
+  m_Size: {x: 1.682833, y: 1.808558, z: 0.16716123}
+  m_Center: {x: -0.0016176701, y: 0.9042785, z: -1.2617254}
+--- !u!65 &2369205557069936941
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -136,9 +136,9 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.6828318, y: 0.7897034, z: 2.7051897}
-  m_Center: {x: 0.0016174316, y: 0.3948517, z: -0.33728933}
---- !u!65 &3554044467333421689
+  m_Size: {x: 1.6828337, y: 0.78970385, z: 2.705192}
+  m_Center: {x: -0.0016174316, y: 0.39485168, z: 0.0072892904}
+--- !u!65 &2125545193582324348
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -157,5 +157,5 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.693605, y: 1.1119806, z: 0.17128694}
-  m_Center: {x: -0.0037691593, y: 0.5559903, z: -1.6042407}
+  m_Size: {x: 1.6936061, y: 1.111981, z: 0.17128754}
+  m_Center: {x: 0.003769517, y: 0.5559903, z: 1.274241}
