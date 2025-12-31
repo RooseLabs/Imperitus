@@ -30,7 +30,6 @@ namespace RooseLabs.UI.Elements
                 if (Mathf.Approximately(glowWidth, clamped)) return;
                 glowWidth = clamped;
                 UpdateGlowProperties();
-                SetMaterialDirty();
             }
         }
 
@@ -42,7 +41,6 @@ namespace RooseLabs.UI.Elements
                 if (glowColor == value) return;
                 glowColor = value;
                 UpdateGlowProperties();
-                SetMaterialDirty();
             }
         }
 
@@ -112,7 +110,6 @@ namespace RooseLabs.UI.Elements
 
             if (material.HasProperty(ShaderPropGlowColor))
             {
-                // Pass linear HDR color to the shader. The ColorUsage attribute above enables the HDR color picker in the inspector.
                 material.SetColor(ShaderPropGlowColor, glowColor.linear);
             }
         }
