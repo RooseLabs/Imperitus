@@ -3,8 +3,7 @@ using UnityEditor;
 
 namespace RooseLabs.Editor
 {
-    [CustomEditor(typeof(FlexibleGridLayout), true)]
-    [CanEditMultipleObjects]
+    [CustomEditor(typeof(FlexibleGridLayout), true), CanEditMultipleObjects]
     public class FlexibleGridLayoutEditor : UnityEditor.Editor
     {
         private SerializedProperty m_padding;
