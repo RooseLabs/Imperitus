@@ -107,14 +107,7 @@ namespace RooseLabs.Gameplay.Spells
             m_isBeamActive = false;
             beamObject?.SetActive(false);
             particles?.SetActive(false);
-            if (snakeAnimator)
-            {
-                snakeAnimator.speed = 0f;
-                if (m_snakeStateHash != -1)
-                {
-                    PlaySnakeAnimation(0f);
-                }
-            }
+            if (snakeAnimator) snakeAnimator.speed = 0f;
             m_currentScrubNormalized = 0f;
             m_hasPlayedPastScrub = false;
             m_petrifiedTargets.Clear();

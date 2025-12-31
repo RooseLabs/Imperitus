@@ -8,12 +8,12 @@ Shader "Custom/RuneBook"
         _RuneTexture ("Rune Texture", 2D) = "black" {}
 
         // Rune properties
-        [Toggle] _HasRune ("Has Rune", Integer) = 0
+        [Toggle(_HAS_RUNE)] _HAS_RUNE ("Has Rune", Integer) = 0
         _RunePosition ("Rune Position", Vector) = (0.5, 0.5, 0, 0)
         _RuneScale ("Rune Scale", Range(0.01, 1)) = 0.5
         [HDR] _RuneColor ("Rune Color", Color) = (1, 1, 1, 1)
         _RuneOpacity ("Rune Opacity", Range(0, 1)) = 1
-        [Toggle] _PreserveRuneAspectRatio ("Preserve Rune Aspect Ratio", Float) = 0
+        [Toggle(_PRESERVE_RUNE_ASPECT_RATIO)] _PRESERVE_RUNE_ASPECT_RATIO ("Preserve Rune Aspect Ratio", Integer) = 1
 
         [Header(Rune Glow Properties)]
         [HDR] _GlowColor ("Glow Color", Color) = (1, 1, 1, 1)
@@ -26,7 +26,7 @@ Shader "Custom/RuneBook"
         _MaxLightIntensity ("Max Light Intensity", Range(0.5, 5)) = 1.5
 
         [Header(Rune PBR Properties)]
-        [Toggle] _RuneLit ("Rune Is Lit", Float) = 0
+        [Toggle(_RUNE_LIT)] _RUNE_LIT ("Rune Is Lit", Integer) = 0
         _RuneSmoothness ("Rune Smoothness", Range(0, 1)) = 0.5
         _RuneMetallic ("Rune Metallic", Range(0, 1)) = 0
     }
@@ -71,10 +71,14 @@ Shader "Custom/RuneBook"
             #pragma multi_compile _ LIGHTMAP_ON
             #pragma multi_compile_fog
 
+            #pragma multi_compile_local_fragment __ _HAS_RUNE
+            #pragma shader_feature_local_fragment _PRESERVE_RUNE_ASPECT_RATIO
+            #pragma shader_feature_local_fragment _RUNE_LIT
+
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
 
-            struct Attributes
+            struct appdata_t
             {
                 float4 positionOS : POSITION;
                 float2 uv : TEXCOORD0;
@@ -82,7 +86,7 @@ Shader "Custom/RuneBook"
                 float2 lightmapUV : TEXCOORD1;
             };
 
-            struct Varyings
+            struct v2f
             {
                 float4 positionCS : SV_POSITION;
                 float2 uv : TEXCOORD0;
@@ -108,35 +112,32 @@ Shader "Custom/RuneBook"
                 float _RuneScale;
                 half4 _RuneColor;
                 float _RuneOpacity;
-                int _HasRune;
-                float _PreserveRuneAspectRatio;
                 half4 _GlowColor;
                 float _GlowWidth;
                 float _Smoothness;
                 float _Metallic;
                 float _MinLightIntensity;
                 float _MaxLightIntensity;
-                float _RuneLit;
                 float _RuneSmoothness;
                 float _RuneMetallic;
             CBUFFER_END
 
-            Varyings vert(Attributes input)
+            v2f vert(appdata_t v)
             {
-                Varyings output;
+                v2f OUT;
 
-                VertexPositionInputs positionInputs = GetVertexPositionInputs(input.positionOS.xyz);
-                VertexNormalInputs normalInputs = GetVertexNormalInputs(input.normalOS);
+                VertexPositionInputs positionInputs = GetVertexPositionInputs(v.positionOS.xyz);
+                VertexNormalInputs normalInputs = GetVertexNormalInputs(v.normalOS);
 
-                output.positionCS = positionInputs.positionCS;
-                output.positionWS = positionInputs.positionWS;
-                output.normalWS = normalInputs.normalWS;
-                output.uv = TRANSFORM_TEX(input.uv, _BaseTextureArray);
-                output.fogCoord = ComputeFogFactor(positionInputs.positionCS.z);
-                output.shadowCoord = GetShadowCoord(positionInputs);
+                OUT.positionCS = positionInputs.positionCS;
+                OUT.positionWS = positionInputs.positionWS;
+                OUT.normalWS = normalInputs.normalWS;
+                OUT.uv = TRANSFORM_TEX(v.uv, _BaseTextureArray);
+                OUT.fogCoord = ComputeFogFactor(positionInputs.positionCS.z);
+                OUT.shadowCoord = GetShadowCoord(positionInputs);
 
                 // Calculate object scale from transform matrix
-                output.objectScale = float3(
+                OUT.objectScale = float3(
                     length(float3(unity_ObjectToWorld[0].x, unity_ObjectToWorld[1].x, unity_ObjectToWorld[2].x)),
                     length(float3(unity_ObjectToWorld[0].y, unity_ObjectToWorld[1].y, unity_ObjectToWorld[2].y)),
                     length(float3(unity_ObjectToWorld[0].z, unity_ObjectToWorld[1].z, unity_ObjectToWorld[2].z))
@@ -144,15 +145,15 @@ Shader "Custom/RuneBook"
 
                 // Baked GI/Lightmap support
                 OUTPUT_LIGHTMAP_UV(input.lightmapUV, unity_LightmapST, output.lightmapUV);
-                OUTPUT_SH(output.normalWS.xyz, output.vertexSH);
+                OUTPUT_SH(OUT.normalWS.xyz, OUT.vertexSH);
 
-                return output;
+                return OUT;
             }
 
-            half4 frag(Varyings input) : SV_Target
+            half4 frag(v2f i) : SV_Target
             {
                 int slice = clamp(_BaseTextureIndex, 0, 254);
-                half4 baseColor = SAMPLE_TEXTURE2D_ARRAY(_BaseTextureArray, sampler_BaseTextureArray, input.uv, slice);
+                half4 baseColor = SAMPLE_TEXTURE2D_ARRAY(_BaseTextureArray, sampler_BaseTextureArray, i.uv, slice);
 
                 // Early out if no rune is present
                 half3 finalColor = baseColor.rgb;
@@ -160,25 +161,23 @@ Shader "Custom/RuneBook"
                 float finalSmoothness = _Smoothness;
                 half3 unlitEmission = half3(0, 0, 0);
 
-                if (_HasRune)
-                {
+                #if _HAS_RUNE
                     // Transform UVs for rune placement
-                    float2 runeUV = input.uv;
+                    float2 runeUV = i.uv;
 
                     // Center at rune position
                     runeUV -= _RunePosition;
 
                     // Apply aspect ratio correction if enabled
-                    if (_PreserveRuneAspectRatio > 0.5)
-                    {
+                    #if _PRESERVE_RUNE_ASPECT_RATIO
                         // Calculate the aspect ratio of the object's scale
-                        float scaleX = input.objectScale.x;
-                        float scaleY = input.objectScale.y;
+                        float scaleX = i.objectScale.x;
+                        float scaleY = i.objectScale.y;
                         float aspectRatio = scaleY / scaleX;
 
                         // Correct UV to maintain aspect ratio
                         runeUV.y *= aspectRatio;
-                    }
+                    #endif
 
                     // Apply scale
                     runeUV /= _RuneScale;
@@ -241,8 +240,7 @@ Shader "Custom/RuneBook"
                     half glowMask = glowAlpha * (1.0 - runeColor.a);
                     half3 glowContribution = _GlowColor.rgb * glowMask;
 
-                    if (_RuneLit > 0.5)
-                    {
+                    #if _RUNE_LIT
                         // Lit mode: rune is affected by lighting with its own PBR properties
                         // Blend rune over base using alpha
                         finalColor = lerp(baseColor.rgb, runeColor.rgb, runeColor.a);
@@ -253,9 +251,7 @@ Shader "Custom/RuneBook"
 
                         // Add glow on top (glow is always emissive)
                         finalColor += glowContribution;
-                    }
-                    else
-                    {
+                    #else
                         // Unlit mode: rune and glow are rendered as unlit emission
                         unlitEmission = runeColor.rgb * runeColor.a + glowContribution;
 
@@ -266,28 +262,28 @@ Shader "Custom/RuneBook"
                         // Blend PBR properties based on rune alpha (rune area becomes non-metallic/non-smooth)
                         finalMetallic = lerp(_Metallic, 0, runeColor.a);
                         finalSmoothness = lerp(_Smoothness, 0, runeColor.a);
-                    }
-                }
+                    #endif
+                #endif
 
                 // Setup lighting
                 InputData lightingInput = (InputData)0;
-                lightingInput.positionWS = input.positionWS;
-                lightingInput.positionCS = input.positionCS;
-                lightingInput.normalWS = normalize(input.normalWS);
-                lightingInput.viewDirectionWS = GetWorldSpaceNormalizeViewDir(input.positionWS);
-                lightingInput.normalizedScreenSpaceUV = GetNormalizedScreenSpaceUV(input.positionCS);
+                lightingInput.positionWS = i.positionWS;
+                lightingInput.positionCS = i.positionCS;
+                lightingInput.normalWS = normalize(i.normalWS);
+                lightingInput.viewDirectionWS = GetWorldSpaceNormalizeViewDir(i.positionWS);
+                lightingInput.normalizedScreenSpaceUV = GetNormalizedScreenSpaceUV(i.positionCS);
 
                 // Calculate shadow coordinates - for screen-space shadows, use screen position
                 #if defined(_MAIN_LIGHT_SHADOWS_SCREEN)
                     lightingInput.shadowCoord = float4(lightingInput.normalizedScreenSpaceUV, 0, 0);
                 #elif defined(MAIN_LIGHT_CALCULATE_SHADOWS)
-                    lightingInput.shadowCoord = TransformWorldToShadowCoord(input.positionWS);
+                    lightingInput.shadowCoord = TransformWorldToShadowCoord(i.positionWS);
                 #else
                     lightingInput.shadowCoord = float4(0, 0, 0, 0);
                 #endif
 
-                lightingInput.fogCoord = input.fogCoord;
-                lightingInput.bakedGI = SAMPLE_GI(input.lightmapUV, input.vertexSH, lightingInput.normalWS);
+                lightingInput.fogCoord = i.fogCoord;
+                lightingInput.bakedGI = SAMPLE_GI(input.lightmapUV, i.vertexSH, lightingInput.normalWS);
                 lightingInput.shadowMask = SAMPLE_SHADOWMASK(input.lightmapUV);
 
                 // Setup surface data

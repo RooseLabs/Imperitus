@@ -250,17 +250,17 @@ namespace RooseLabs.Gameplay.Notebook
         /// Adds a rune to this player's collection by RuneSO reference.
         /// Call this when the player picks up a rune in the world.
         /// </summary>
-        public void AddRune(RuneSO rune)
+        public bool AddRune(RuneSO rune)
         {
             int runeIndex = GameManager.Instance.RuneDatabase.IndexOf(rune);
 
             if (runeIndex == -1)
             {
-                this.LogInfo("Rune not found in RuneDatabase");
-                return;
+                this.LogWarning("Rune not found in RuneDatabase");
+                return false;
             }
 
-            CollectRune(runeIndex);
+            return CollectRune(runeIndex);
         }
 
         /// <summary>
@@ -312,12 +312,12 @@ namespace RooseLabs.Gameplay.Notebook
         /// Adds a rune to this player's collection.
         /// Call this when the player picks up a rune in the world.
         /// </summary>
-        public void CollectRune(int runeIndex)
+        public bool CollectRune(int runeIndex)
         {
             if (m_runeCollection.collectedRuneIndices.Contains(runeIndex))
             {
-                this.LogWarning($"Player already has rune {runeIndex}");
-                return;
+                this.LogInfo($"Player already has rune {runeIndex}");
+                return false;
             }
 
             m_runeCollection.collectedRuneIndices.Add(runeIndex);
@@ -331,6 +331,7 @@ namespace RooseLabs.Gameplay.Notebook
             OnRuneCollected?.Invoke();
 
             this.LogInfo($"Rune {runeIndex} collected. Total runes: {m_runeCollection.collectedRuneIndices.Count}");
+            return true;
         }
 
         /// <summary>

@@ -19,7 +19,7 @@ namespace RooseLabs.Gameplay.Interactables
         private static readonly int ShaderPropRuneTexture = Shader.PropertyToID("_RuneTexture");
         private static readonly int ShaderPropRuneTextureST = Shader.PropertyToID("_RuneTexture_ST");
         private static readonly int ShaderPropRuneOpacity = Shader.PropertyToID("_RuneOpacity");
-        private static readonly int ShaderPropHasRune = Shader.PropertyToID("_HasRune");
+        private const string ShaderKeywordHasRune = "_HAS_RUNE";
 
         private readonly SyncVar<int> m_bookTextureIndex = new(5);
         private readonly SyncVar<int> m_runeIndex = new(-1, new SyncTypeSettings(WritePermission.ClientUnsynchronized));
@@ -78,8 +78,10 @@ namespace RooseLabs.Gameplay.Interactables
             if (!IsOwner) return;
             if (m_runeIndex.Value > -1)
             {
-                HolderCharacter.Notebook.CollectRune(m_runeIndex.Value);
-                RuneCollected_ServerRPC();
+                if (HolderCharacter.Notebook.CollectRune(m_runeIndex.Value))
+                {
+                    RuneCollected_ServerRPC();
+                }
             }
         }
 
@@ -120,7 +122,7 @@ namespace RooseLabs.Gameplay.Interactables
             if ((bool)rune && (bool)rune.Sprite)
             {
                 m_sharedMaterialInstance.SetTexture(ShaderPropRuneTexture, rune.Sprite.texture);
-                m_sharedMaterialInstance.SetInteger(ShaderPropHasRune, 1);
+                m_sharedMaterialInstance.EnableKeyword(ShaderKeywordHasRune);
                 m_sharedMaterialInstance.SetFloat(ShaderPropRuneOpacity, 1f);
                 if (rune.Sprite.packed)
                 {
@@ -166,7 +168,7 @@ namespace RooseLabs.Gameplay.Interactables
 
             // Ensure completely invisible, then mark as having no rune
             m_sharedMaterialInstance.SetFloat(ShaderPropRuneOpacity, 0f);
-            m_sharedMaterialInstance.SetInteger(ShaderPropHasRune, 0);
+            m_sharedMaterialInstance.DisableKeyword(ShaderKeywordHasRune);
 
             m_runeFadeCoroutine = null;
         }
