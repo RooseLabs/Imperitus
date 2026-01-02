@@ -4,9 +4,6 @@ using UnityEngine;
 
 namespace RooseLabs.Gameplay.Spells
 {
-    /// <summary>
-    /// Rain spell - Player aims to place a cloud that grows, rains, then despawns.
-    /// </summary>
     public class Rain : SpellBase
     {
         #region Serialized Fields
@@ -62,8 +59,6 @@ namespace RooseLabs.Gameplay.Spells
 
         protected override bool OnCastFinished()
         {
-            base.OnCastFinished();
-
             if (!m_hasValidPlacement)
             {
                 Logger.Warning("[Rain] Cast finished but no valid placement found.");
@@ -81,24 +76,16 @@ namespace RooseLabs.Gameplay.Spells
 
         protected override void OnCancelCast()
         {
-            base.OnCancelCast();
             HideIndicators();
         }
         #endregion
 
-        #region Lifecycle
-
         public override void OnStartClient()
         {
             base.OnStartClient();
-
             // Only local player needs indicators
-            if (IsOwner)
-            {
-                InitializeIndicators();
-            }
+            if (IsOwner) InitializeIndicators();
         }
-        #endregion
 
         #region Placement Indicators
         private void InitializeIndicators()
