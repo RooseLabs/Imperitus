@@ -23,20 +23,24 @@ namespace RooseLabs.Gameplay
 
         private GameObject m_explosionInstance;
 
-        protected override void OnProjectileCollision(Collider col)
+        protected override void OnProjectileCollision(ProjectileCollision collision)
         {
-            PerformExplosion(projectileRigidbody.Rigidbody.position);
+            PerformExplosion(collision.hitPoint, collision.hitNormal);
         }
 
         protected override void OnProjectileLifetimeExpired()
         {
-            PerformExplosion(projectileRigidbody.Rigidbody.position);
+            // When lifetime expires, use upward normal as default
+            PerformExplosion(projectileRigidbody.Rigidbody.position, Vector3.up);
         }
 
-        private void PerformExplosion(Vector3 position)
+        private void PerformExplosion(Vector3 position, Vector3 normal)
         {
             // Disable projectile visuals and collider
             projectileRigidbody.gameObject.SetActive(false);
+
+            // Calculate rotation from normal
+            Quaternion rotation = Quaternion.LookRotation(normal);
 
             // Activate explosion VFX
             if (explosionVFX)
@@ -44,13 +48,13 @@ namespace RooseLabs.Gameplay
                 if (string.IsNullOrEmpty(explosionVFX.scene.name))
                 {
                     // This is a prefab, instantiate it
-                    m_explosionInstance = Instantiate(explosionVFX, position, Quaternion.identity, gameObject.transform);
+                    m_explosionInstance = Instantiate(explosionVFX, position, rotation, gameObject.transform);
                 }
                 else
                 {
                     m_explosionInstance = explosionVFX;
                     m_explosionInstance.transform.position = position;
-                    m_explosionInstance.transform.localRotation = Quaternion.identity;
+                    m_explosionInstance.transform.rotation = rotation;
                     m_explosionInstance.SetActive(true);
                 }
             }

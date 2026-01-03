@@ -19,7 +19,11 @@ namespace RooseLabs.Gameplay
 
         private void Awake()
         {
-            Rigidbody = GetComponent<Rigidbody>();
+            if (TryGetComponent(out Rigidbody rb))
+            {
+                Rigidbody = rb;
+                Rigidbody.isKinematic = true;
+            }
         }
 
         private void OnCollisionEnter(Collision collision) => CollisionEnter?.Invoke(collision);

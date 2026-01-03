@@ -60,6 +60,7 @@ namespace RooseLabs.Gameplay.Spells
         protected PlayerCharacter CasterCharacter { get; private set; }
         protected float CastTime => castTime;
         protected float CastProgress { get; private set; } = 0f;
+        protected float CastProgressNormalized => castTime > 0f ? Mathf.Clamp01(CastProgress / castTime) : 1f;
 
         private float CooldownEndTime {
             get => Cooldowns.GetValueOrDefault(GetType(), 0f);

@@ -5,6 +5,13 @@ using Logger = RooseLabs.Core.Logger;
 
 namespace RooseLabs.Gameplay
 {
+    public struct ProjectileCollision
+    {
+        public Collider collider;
+        public Vector3 hitPoint;
+        public Vector3 hitNormal;
+    }
+
     public class Projectile : MonoBehaviour
     {
         protected static Logger Logger => Logger.GetLogger("Projectile");
@@ -15,7 +22,12 @@ namespace RooseLabs.Gameplay
 
         [SerializeField, Tooltip("Time in seconds before the projectile is destroyed")]
         private float projectileLifetime = 10f;
+
+        [SerializeField, Tooltip("The launch VFX that should be enabled on launch. Can be a prefab or a scene object.")]
+        private GameObject launchVFX;
         #endregion
+
+        public Rigidbody Rigidbody => projectileRigidbody.Rigidbody;
 
         private float m_timeSinceLaunch;
         private bool m_hasCollided;
@@ -38,9 +50,26 @@ namespace RooseLabs.Gameplay
         {
             if (!projectileRigidbody) return;
 
+            // Activate launch VFX
+            if (launchVFX)
+            {
+                if (string.IsNullOrEmpty(launchVFX.scene.name))
+                {
+                    // This is a prefab, instantiate it
+                    Instantiate(launchVFX, projectileRigidbody.transform.position, projectileRigidbody.transform.rotation, gameObject.transform);
+                }
+                else
+                {
+                    launchVFX.transform.position = projectileRigidbody.transform.position;
+                    launchVFX.transform.rotation = projectileRigidbody.transform.rotation;
+                    launchVFX.SetActive(true);
+                }
+            }
+
             m_timeSinceLaunch = 0f;
             m_hasCollided = false;
             this.damageInfo = damageInfo;
+            projectileRigidbody.Rigidbody.isKinematic = false;
             projectileRigidbody.Rigidbody.AddForce(force, mode);
         }
 
@@ -83,7 +112,35 @@ namespace RooseLabs.Gameplay
             if (!CanCollideWith(col.collider))
                 return;
             Logger.Info($"Projectile collided with {col.gameObject.name} ({LayerMask.LayerToName(col.gameObject.layer)})");
-            OnProjectileCollision(col.collider);
+
+            ProjectileCollision collision;
+            if (col.contacts.Length > 0)
+            {
+                collision = new ProjectileCollision
+                {
+                    collider = col.collider,
+                    hitPoint = col.contacts[0].point,
+                    hitNormal = col.contacts[0].normal
+                };
+            }
+            else
+            {
+                Vector3 position = projectileRigidbody.Rigidbody.position;
+                Vector3 closestPoint = col.collider.ClosestPoint(position);
+                Vector3 normal = (position - closestPoint).normalized;
+                if (normal.sqrMagnitude < 0.01f)
+                {
+                    normal = -projectileRigidbody.transform.forward;
+                }
+                collision = new ProjectileCollision
+                {
+                    collider = col.collider,
+                    hitPoint = closestPoint,
+                    hitNormal = normal
+                };
+            }
+
+            OnProjectileCollision(collision);
         }
 
         private void OnProjectileTriggerEnter(Collider other)
@@ -94,15 +151,33 @@ namespace RooseLabs.Gameplay
             if (!CanCollideWith(other))
                 return;
             Logger.Info($"Projectile collided with {other.gameObject.name} (trigger, {LayerMask.LayerToName(other.gameObject.layer)})");
-            OnProjectileCollision(other);
+
+            Vector3 position = projectileRigidbody.Rigidbody.position;
+            Vector3 closestPoint = other.ClosestPoint(position);
+            Vector3 normal = (position - closestPoint).normalized;
+
+            // If normal is zero (inside collider), use projectile's forward direction
+            if (normal.sqrMagnitude < 0.01f)
+            {
+                normal = -projectileRigidbody.transform.forward;
+            }
+
+            ProjectileCollision collision = new ProjectileCollision
+            {
+                collider = other,
+                hitPoint = closestPoint,
+                hitNormal = normal
+            };
+
+            OnProjectileCollision(collision);
         }
 
-        protected virtual void OnProjectileCollision(Collider col)
+        protected virtual void OnProjectileCollision(ProjectileCollision collision)
         {
             m_hasCollided = true;
-            if (isServer && col.TryGetComponentInParent(out IDamageable damageable))
+            if (isServer && collision.collider.TryGetComponentInParent(out IDamageable damageable))
             {
-                damageInfo.hitPoint = col.ClosestPointOnBounds(projectileRigidbody.Rigidbody.position);
+                damageInfo.hitPoint = collision.hitPoint;
                 damageable.ApplyDamage(damageInfo);
             }
 
