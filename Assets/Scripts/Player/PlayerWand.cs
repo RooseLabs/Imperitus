@@ -27,12 +27,13 @@ namespace RooseLabs.Player
                 m_customRunes = customRunes;
             }
 
-            public void Instantiate()
+            public SpellBase Instantiate()
             {
                 if ((bool)SpellPrefab && !SpellInstance)
                 {
                     SpellInstance = SpellBase.Instantiate(SpellPrefab);
                 }
+                return SpellInstance;
             }
 
             public void DestroyInstance()
@@ -81,27 +82,33 @@ namespace RooseLabs.Player
         private float m_spellSwitchCooldownTimer = 0f;
 
         private int m_currentSpellIndex = 0;
+        private SpellSlot m_currentSpellSlot;
+        private SpellBase m_currentSpellInstance;
+
         private int CurrentSpellIndex
         {
             get => m_currentSpellIndex;
             set
             {
                 if (m_spellSlots.Count == 0) return;
-                int previousValue = m_currentSpellIndex;
+                int previousIndex = m_currentSpellIndex;
+                SpellSlot previousSpellSlot = m_currentSpellSlot;
+                SpellBase previousSpellInstance = m_currentSpellInstance;
                 m_currentSpellIndex = (value % m_spellSlots.Count + m_spellSlots.Count) % m_spellSlots.Count;
-                if (previousValue != m_currentSpellIndex)
+                if (previousIndex != m_currentSpellIndex)
                 {
-                    SpellSlot previousSlot = m_spellSlots[previousValue];
-                    previousSlot?.SpellInstance?.StopAim();
-                    m_spellSwitchCooldownTimer = SpellSwitchCooldownDuration; // Reset cooldown
-                    SpellSlot slot = m_spellSlots[m_currentSpellIndex];
-                    SetOrbitingRunes(slot.Runes); // Update orbiting runes for the new spell
+                    m_spellSwitchCooldownTimer = SpellSwitchCooldownDuration;
+                    previousSpellInstance?.StopAim();
+                    m_currentSpellInstance = null;
+                }
+                m_currentSpellSlot = m_spellSlots[m_currentSpellIndex];
+                if (previousSpellSlot == null ||
+                    previousSpellSlot.SpellPrefab.SpellInfo != m_currentSpellSlot.SpellPrefab.SpellInfo)
+                {
+                    SetOrbitingRunes(m_currentSpellSlot.Runes);
                 }
             }
         }
-
-        private SpellSlot CurrentSpellSlot => m_spellSlots.Count > 0 ? m_spellSlots[m_currentSpellIndex] : null;
-        private SpellBase CurrentSpellInstance => CurrentSpellSlot?.SpellInstance;
         #endregion
 
         public override void OnStartNetwork()
@@ -122,7 +129,7 @@ namespace RooseLabs.Player
         {
             if (!IsOwner) return;
             InitializeSpellLoadout();
-            SetOrbitingRunes(CurrentSpellSlot?.Runes);
+            SetOrbitingRunes(m_currentSpellSlot?.Runes);
         }
 
         private void Update()
@@ -138,12 +145,13 @@ namespace RooseLabs.Player
             UpdateAimingState();
             if (character.Data.isAiming)
             {
-                if (!CurrentSpellInstance && CurrentSpellSlot != null)
+                m_currentSpellSlot ??= m_spellSlots[m_currentSpellIndex];
+                if (!m_currentSpellInstance && m_currentSpellSlot != null)
                 {
-                    CurrentSpellSlot.Instantiate();
+                    m_currentSpellInstance = m_currentSpellSlot.Instantiate();
                 }
 
-                CurrentSpellInstance?.Aim();
+                m_currentSpellInstance?.Aim();
                 HandleSpellCasting();
 
                 if (!character.Data.isCasting)
@@ -155,10 +163,10 @@ namespace RooseLabs.Player
             {
                 if (character.Data.isCasting)
                 {
-                    CurrentSpellInstance?.CancelCast();
+                    m_currentSpellInstance?.CancelCast();
                     character.Data.isCasting = false;
                 }
-                CurrentSpellInstance?.StopAim();
+                m_currentSpellInstance?.StopAim();
             }
         }
 
@@ -212,7 +220,7 @@ namespace RooseLabs.Player
             // Ensure current spell index is valid
             if (m_currentSpellIndex >= m_spellSlots.Count)
             {
-                m_currentSpellIndex = 0;
+                CurrentSpellIndex = 0;
             }
         }
         #endregion
@@ -222,6 +230,8 @@ namespace RooseLabs.Player
         {
             m_spellSlots.Clear();
             m_spellSlots.Add(new SpellSlot(GameManager.Instance.SpellDatabase[0])); // 0 = Impero (default spell)
+            m_currentSpellIndex = 0;
+            m_currentSpellSlot = m_spellSlots[m_currentSpellIndex];
         }
 
         private void HandleValidSpellSelection(SpellBase spell, ICollection<RuneSO> selectedRunes)
@@ -267,8 +277,7 @@ namespace RooseLabs.Player
                 m_spellSlots[^1] = newTemporarySpellSlot;
 
                 // Instantiate the new temporary spell
-                newTemporarySpellSlot.Instantiate();
-                if (newTemporarySpellSlot.SpellInstance)
+                if (newTemporarySpellSlot.Instantiate())
                 {
                     this.LogInfo($"Instantiated temporary spell '{newTemporarySpellSlot.SpellPrefab.SpellInfo.EnglishName}'");
                 }
@@ -285,8 +294,7 @@ namespace RooseLabs.Player
                 m_spellSlots.Add(newTemporarySpellSlot);
 
                 // Instantiate the new temporary spell
-                newTemporarySpellSlot.Instantiate();
-                if (newTemporarySpellSlot.SpellInstance)
+                if (newTemporarySpellSlot.Instantiate())
                 {
                     this.LogInfo($"Instantiated temporary spell '{newTemporarySpellSlot.SpellPrefab.SpellInfo.EnglishName}'");
                 }
@@ -395,34 +403,34 @@ namespace RooseLabs.Player
 
         private void HandleSpellCasting()
         {
-            if (!CurrentSpellInstance) return;
+            if (!m_currentSpellInstance) return;
 
             // Handle sustained spells
-            if (CurrentSpellInstance.CanAimToSustain && CurrentSpellInstance.IsBeingSustained)
+            if (m_currentSpellInstance.CanAimToSustain && m_currentSpellInstance.IsBeingSustained)
             {
-                CurrentSpellInstance.ContinueCast();
+                m_currentSpellInstance.ContinueCast();
             }
             // Handle spell input
             else if (character.Input.castWasPressed)
             {
-                CurrentSpellInstance.StartCast();
+                m_currentSpellInstance.StartCast();
             }
             else if (character.Input.castIsPressed)
             {
-                CurrentSpellInstance.ContinueCast();
+                m_currentSpellInstance.ContinueCast();
             }
             else if (character.Input.castWasReleased)
             {
-                CurrentSpellInstance.CancelCast();
+                m_currentSpellInstance.CancelCast();
             }
 
             // Handle scroll input during sustained spells
-            if (CurrentSpellInstance.IsBeingSustained)
+            if (m_currentSpellInstance.IsBeingSustained)
             {
                 HandleSustainedSpellScrollInput();
             }
 
-            character.Data.isCasting = CurrentSpellInstance.IsCasting;
+            character.Data.isCasting = m_currentSpellInstance.IsCasting;
         }
 
         private void HandleSustainedSpellScrollInput()
@@ -434,15 +442,15 @@ namespace RooseLabs.Player
             }
 
             if (character.Input.scrollForwardWasPressed)
-                CurrentSpellInstance.ScrollForwardPressed();
+                m_currentSpellInstance.ScrollForwardPressed();
             else if (character.Input.scrollForwardIsPressed)
-                CurrentSpellInstance.ScrollForwardHeld();
+                m_currentSpellInstance.ScrollForwardHeld();
             else if (character.Input.scrollBackwardWasPressed)
-                CurrentSpellInstance.ScrollBackwardPressed();
+                m_currentSpellInstance.ScrollBackwardPressed();
             else if (character.Input.scrollBackwardIsPressed)
-                CurrentSpellInstance.ScrollBackwardHeld();
+                m_currentSpellInstance.ScrollBackwardHeld();
             else if (character.Input.scrollInput != 0f)
-                CurrentSpellInstance.Scroll(character.Input.scrollInput);
+                m_currentSpellInstance.Scroll(character.Input.scrollInput);
         }
 
         private void HandleSpellSwitching()
@@ -457,9 +465,9 @@ namespace RooseLabs.Player
             if (resetToFirst)
                 CurrentSpellIndex = 0;
             else if (character.Input.nextWasPressed || character.Input.scrollInput >= 1f)
-                CurrentSpellIndex++;
-            else if (character.Input.previousWasPressed || character.Input.scrollInput <= -1f)
                 CurrentSpellIndex--;
+            else if (character.Input.previousWasPressed || character.Input.scrollInput <= -1f)
+                CurrentSpellIndex++;
         }
 
         #region Network Sync

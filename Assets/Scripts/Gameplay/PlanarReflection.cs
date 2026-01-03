@@ -2,6 +2,7 @@ using System;
 using RooseLabs.Player;
 using RooseLabs.Utils;
 using UnityEngine;
+using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
@@ -96,7 +97,7 @@ namespace RooseLabs.Gameplay
             }
 
             var oldRenderTexture = m_reflectionCamera.targetTexture;
-            var renderTexture = new RenderTexture(ScaledWidth, ScaledHeight, 16)
+            var renderTexture = new RenderTexture(ScaledWidth, ScaledHeight, 24, DefaultFormat.HDR)
             {
                 name = $"PlanarReflectionRT_{GetInstanceID()}",
                 useMipMap = false,

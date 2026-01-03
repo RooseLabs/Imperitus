@@ -1,12 +1,12 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using FishNet.Connection;
 using FishNet.Object;
 using RooseLabs.Player;
 using RooseLabs.ScriptableObjects;
 using RooseLabs.Utils;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -503,16 +503,48 @@ namespace RooseLabs.Gameplay.Notebook
             m_borrowedRunes.Clear();
 
             // Convert borrowed rune data to BorrowedRune objects with player names
+            HashSet<int> newBorrowedRuneIndices = new HashSet<int>();
             foreach (BorrowedRuneData data in borrowedRuneData)
             {
                 string ownerName = GetPlayerNameByClientId(data.ownerClientId);
                 m_borrowedRunes.Add(new BorrowedRune(data.runeIndex, ownerName));
+                newBorrowedRuneIndices.Add(data.runeIndex);
             }
 
             this.LogInfo($"Updated borrowed runes: {m_borrowedRunes.Count} borrowed");
 
-            // Notify UI
+            // Check if any toggled runes are no longer available
+            List<int> runesToUntoggle = new List<int>();
+            bool toggledRunesChanged = false;
+
+            foreach (int toggledRuneIndex in m_toggledRunes)
+            {
+                // Check if this toggled rune is no longer available
+                if (HasRune(toggledRuneIndex)) continue;
+                if (newBorrowedRuneIndices.Contains(toggledRuneIndex)) continue;
+                // This rune is no longer available, mark it for removal
+                runesToUntoggle.Add(toggledRuneIndex);
+                toggledRunesChanged = true;
+                this.LogInfo($"Rune {toggledRuneIndex} is no longer available and will be untoggled");
+            }
+
+            // Remove runes that are no longer available
+            foreach (int runeIndex in runesToUntoggle)
+            {
+                m_toggledRunes.Remove(runeIndex);
+            }
+
+            // Notify UI about borrowed runes change
             OnBorrowedRunesChanged?.Invoke();
+
+            // If any toggled runes were removed, notify about toggled runes change
+            if (toggledRunesChanged)
+            {
+                OnToggledRunesChanged?.Invoke(new List<int>(m_toggledRunes));
+                OnToggledRuneObjectsChanged?.Invoke(GetToggledRuneObjects());
+
+                this.LogInfo($"Toggled runes updated: {runesToUntoggle.Count} runes untoggled due to loss of access");
+            }
         }
 
         /// <summary>

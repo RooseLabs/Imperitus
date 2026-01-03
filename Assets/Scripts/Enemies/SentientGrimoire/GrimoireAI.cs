@@ -74,7 +74,6 @@ namespace RooseLabs.Enemies
         private PlayerCharacter m_cachedSpotlightTargetCharacter;
         private float m_reinforcementTimer;
         private float m_detectionTimer;
-        private bool m_hasHandledDeath;
         #endregion
 
         #region Network Synchronized Variables
@@ -510,44 +509,26 @@ namespace RooseLabs.Enemies
 
         protected override void OnDeath()
         {
-            if (animator)
-            {
-                HandleDeath_ObserversRPC();
-            }
-            else
-            {
-                this.LogWarning($"No Animator found on {gameObject.name}, cannot play death animation.");
-                Despawn(gameObject);
-            }
-        }
-
-        [ObserversRpc(ExcludeServer = true, RunLocally = true)]
-        private void HandleDeath_ObserversRPC()
-        {
-            if (!animator || m_hasHandledDeath) return;
             currentState = null;
             navAgent.isStopped = true;
             navAgent.velocity = Vector3.zero;
             navAgent.enabled = false;
             rb.useGravity = true;
             rb.isKinematic = false;
-            animator.Play("Death");
-            m_hasHandledDeath = true;
+            Destroy(spotlightTransform.gameObject);
 
-            this.LogWarning($"{gameObject.name} death sequence executed on observer");
-
-            // StartCoroutine(DespawnAfterDeath());
+            if (IsServerInitialized)
+            {
+                animator?.Play("Death");
+                StartCoroutine(DespawnAfterDeath());
+            }
         }
 
         private IEnumerator DespawnAfterDeath()
         {
             // Wait for death animation to finish
             yield return new WaitForSeconds(10f);
-
-            if (IsServerInitialized)
-            {
-                Despawn(gameObject);
-            }
+            Despawn(gameObject);
         }
 
         #if UNITY_EDITOR
