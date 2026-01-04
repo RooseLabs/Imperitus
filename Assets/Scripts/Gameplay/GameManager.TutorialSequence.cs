@@ -1,4 +1,5 @@
 using RooseLabs.Gameplay.Notebook;
+using RooseLabs.Gameplay.Interactables;
 using RooseLabs.ScriptableObjects;
 using RooseLabs.Player;
 using RooseLabs.UI;
@@ -8,6 +9,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Linq;
 using System.Collections.Generic;
+using FishNet.Object;
 
 namespace RooseLabs.Gameplay
 {
@@ -33,12 +35,17 @@ namespace RooseLabs.Gameplay
 
             private bool m_isPaused = false;
 
-            private static readonly Dictionary<TaskType, (string description, string actionName)> TaskConfig = new()
+            private SearchForRunesManager m_searchForRunesManager;
+
+            private static readonly Dictionary<TaskType, (string description, string[] actionNames)> TaskConfig = new()
             {
-                { TaskType.WalkAround, ("Use to walk", "Move") },
-                { TaskType.OpenNotebook, ("Press to open your notebook", "OpenNotebook") },
-                { TaskType.AimWithWand, ("Hold to aim with your wand", "Aim") },
-                { TaskType.CastImperoSpell, ("Hold while aiming with your wand to use the Impero spell and levitate an object", "Cast") }
+                { TaskType.WalkAround, ("Use {Move} to walk around.", new[] { "Move" }) },
+                { TaskType.SearchForRunes, ("Find the 3 Rune Books in this room. Use {Interact} to interact and extract each rune to your own notebook.", new[] { "Interact" }) },
+                { TaskType.OpenNotebook, ("Press {OpenNotebook} to open your notebook.", new[] { "OpenNotebook" }) },
+                { TaskType.CombineRunes, ("Open the Runes tab and toggle ({Cast}) the 3 runes to combine them into the Impero spell in your wand.", new[] { "Cast" }) },
+                { TaskType.AimWithWand, ("The Impero spell has been learned and added to your wand! Hold {Aim} to aim with your wand.", new[] { "Aim" }) },
+                { TaskType.CastImperoSpell, ("Hold {Cast} while aiming ({Aim}) with your wand to use the Impero spell and levitate an object. Try using it on the pillows!", new[] { "Cast", "Aim" }) },
+                { TaskType.TutorialComplete, ("Tutorial Complete!", System.Array.Empty<string>()) }
             };
 
             private Dictionary<TaskType, System.Func<bool>> m_taskCompletionChecks;
@@ -55,56 +62,113 @@ namespace RooseLabs.Gameplay
                 m_taskCompletionChecks = new Dictionary<TaskType, System.Func<bool>>
                 {
                     { TaskType.WalkAround, () => m_player.Input.movementInput.sqrMagnitude > 0.01f },
-                        { TaskType.OpenNotebook, () => 
-                            GUIManager.Instance != null &&
-                            GUIManager.ActiveWindows.Count > 0 &&
-                            GUIManager.ActiveWindows[^1] is NotebookUIController },
-                        { TaskType.AimWithWand, () => m_player.Data.isAiming },
-                        { TaskType.CastImperoSpell, () => false }
-                  };
+                    { TaskType.SearchForRunes, () => m_searchForRunesManager != null && m_searchForRunesManager.AreAllRunesCollected() },
+                    { TaskType.OpenNotebook, () =>
+                        GUIManager.Instance != null &&
+                        GUIManager.ActiveWindows.Count > 0 &&
+                        GUIManager.ActiveWindows[^1] is NotebookUIController },
+                    { TaskType.CombineRunes, () => CheckIfImperoRunesToggled() },
+                    { TaskType.AimWithWand, () => m_player.Data.isAiming },
+                    { TaskType.CastImperoSpell, () => false }, // Handled by OnSpellCastCallback
+                    { TaskType.TutorialComplete, () => true } // Completes immediately after delay
+                };
+            }
+
+            private bool CheckIfImperoRunesToggled()
+            {
+                PlayerNotebook notebook = m_player?.Notebook;
+                if (notebook == null)
+                    return false;
+
+                SpellSO imperoSpell = Instance.m_imperoSpell;
+                if (imperoSpell == null || imperoSpell.Runes == null)
+                    return false;
+
+                // Get the currently toggled runes
+                var toggledRunes = notebook.GetToggledRuneObjects();
+                if (toggledRunes.Count != imperoSpell.Runes.Length)
+                    return false;
+
+                // Check if all Impero runes are toggled
+                foreach (var rune in imperoSpell.Runes)
+                {
+                    if (!toggledRunes.Contains(rune))
+                        return false;
+                }
+
+                return true;
             }
 
             private void InitializeTasks()
             {
                 m_tasks = TaskConfig.Select(kvp =>
-                        new TutorialTask(kvp.Value.description, kvp.Key, GetSpriteTagsForAction(kvp.Value.actionName))).ToArray();
+            new TutorialTask(kvp.Value.description, kvp.Key, kvp.Value.actionNames)).ToArray();
             }
 
-            private string[] GetSpriteTagsForAction(string actionName)
+            private string GetSpriteMarkupForAction(string actionName)
             {
                 var action = InputHandler.GameplayActions?.FindAction(actionName);
                 if (action == null)
-                    return System.Array.Empty<string>();
+                    return $"{{{actionName}}}"; // Return placeholder if action not found
 
-                var kbmTags = InputSpriteData.GetAllSpriteTags(action, InputScheme.KeyboardMouse).ToList();
-                var gamepadTags = InputSpriteData.GetAllSpriteTags(action, InputScheme.Gamepad).ToList();
+                var tags = InputSpriteData.GetAllSpriteTags(action, InputHandler.CurrentInputScheme).ToList();
 
-                // Use keyboard tags if available and current scheme is keyboard/mouse, otherwise use gamepad tags, fallback to keyboard if no gamepad
-                var tagsToUse = (InputHandler.CurrentInputScheme == InputScheme.KeyboardMouse && kbmTags.Count > 0)
-                                ? kbmTags : (gamepadTags.Count > 0 ? gamepadTags : kbmTags);
+                // Fallback to other scheme if no tags found
+                if (tags.Count == 0)
+                {
+                    var fallbackScheme = InputHandler.CurrentInputScheme == InputScheme.KeyboardMouse
+                    ? InputScheme.Gamepad
+                      : InputScheme.KeyboardMouse;
+                    tags = InputSpriteData.GetAllSpriteTags(action, fallbackScheme).ToList();
+                }
 
-                return tagsToUse.ToArray();
+                if (tags.Count == 0)
+                    return $"{{{actionName}}}"; // Return placeholder if no tags found
+
+                // Combine all sprite tags into a single string
+                return string.Join(" ", tags.Select(tag => $"<sprite name=\"{tag}\">"));
             }
 
             public void Initialize()
             {
-                // DELETE LATER ITS FOR DEBUGGING
-                //ResetTutorialProgress();
+                // Check if tutorial was previously completed
+                bool tutorialWasCompleted = PlayerPrefs.GetInt(TutorialCompleteKey, 0) == 1;
 
-                if (PlayerPrefs.GetInt(TutorialCompleteKey, 0) == 1)
+                if (tutorialWasCompleted)
                 {
                     m_tutorialComplete = true;
                     HideTutorial();
                     return;
                 }
 
+                // Load progress from PlayerPrefs
                 m_currentTaskIndex = PlayerPrefs.GetInt(TutorialProgressKey + "Index", 0);
+
+                // If we're past SearchForRunes but before completion,
+                // we need to reset back to SearchForRunes since runes are cleared on heist start
+                // This ensures the player can re-collect runes and complete the tutorial
+                int searchForRunesIndex = GetTaskIndex(TaskType.SearchForRunes);
+
+                if (m_currentTaskIndex > searchForRunesIndex && m_currentTaskIndex <= m_tasks.Length - 1)
+                {
+                    // Check if player has all the required runes - if not, reset to SearchForRunes
+                    bool hasAllRunes = CheckIfPlayerHasAllRequiredRunes();
+                    if (!hasAllRunes)
+                    {
+                       
+                        m_currentTaskIndex = searchForRunesIndex;
+                        SaveProgress();
+                    }
+                }
+
                 for (int i = 0; i < m_currentTaskIndex; i++)
                 {
                     m_tasks[i].MarkComplete();
                 }
 
+                // Check if tutorial was paused
                 bool wasPaused = PlayerPrefs.GetInt(TutorialPausedKey, 0) == 1;
+
                 if (wasPaused)
                 {
                     m_isPaused = true;
@@ -116,6 +180,35 @@ namespace RooseLabs.Gameplay
                 }
 
                 SubscribeToInputEvents();
+            }
+
+            private int GetTaskIndex(TaskType taskType)
+            {
+                for (int i = 0; i < m_tasks.Length; i++)
+                {
+                    if (m_tasks[i].Type == taskType)
+                        return i;
+                }
+                return -1;
+            }
+
+            private bool CheckIfPlayerHasAllRequiredRunes()
+            {
+                PlayerNotebook notebook = PlayerCharacter.LocalCharacter?.Notebook;
+                if (notebook == null)
+                    return false;
+
+                SpellSO imperoSpell = Instance.m_imperoSpell;
+                if (imperoSpell == null || imperoSpell.Runes == null)
+                    return false;
+
+                foreach (var rune in imperoSpell.Runes)
+                {
+                    if (!notebook.HasRune(rune))
+                        return false;
+                }
+
+                return true;
             }
 
             private void SubscribeToInputEvents()
@@ -148,6 +241,19 @@ namespace RooseLabs.Gameplay
                 if (!m_player)
                     return;
 
+                TutorialTask currentTask = m_tasks[m_currentTaskIndex];
+
+                // Handle SearchForRunes task initialization
+                // Request book spawning from server (any client can trigger this)
+                if (currentTask.Type == TaskType.SearchForRunes && !currentTask.Completed && m_searchForRunesManager == null)
+                {
+                    // Create manager on all clients to track state
+                    m_searchForRunesManager = new SearchForRunesManager();
+
+                    // Request the server to spawn books (only happens once due to server-side check)
+                    Instance.RequestSpawnTutorialBooks_ServerRpc();
+                }
+
                 if (m_isTaskCompletionInProgress)
                 {
                     m_taskCompletionTimer -= Time.deltaTime;
@@ -159,9 +265,9 @@ namespace RooseLabs.Gameplay
                     return;
                 }
 
-                TutorialTask currentTask = m_tasks[m_currentTaskIndex];
+                // CastImperoSpell is handled by OnSpellCastCallback, not by continuous check
                 if (currentTask.Type != TaskType.CastImperoSpell && !currentTask.Completed &&
-                  m_taskCompletionChecks[currentTask.Type].Invoke())
+               m_taskCompletionChecks[currentTask.Type].Invoke())
                 {
                     MarkTaskForCompletion();
                 }
@@ -170,6 +276,7 @@ namespace RooseLabs.Gameplay
             private void CompleteCurrentTask()
             {
                 m_tasks[m_currentTaskIndex].MarkComplete();
+
                 m_currentTaskIndex++;
                 if (m_currentTaskIndex >= m_tasks.Length)
                 {
@@ -178,7 +285,6 @@ namespace RooseLabs.Gameplay
                 else
                 {
                     SaveProgress();
-                    RebuildCurrentTaskSpriteTags();
                     UpdateTaskDisplay();
                 }
             }
@@ -232,35 +338,19 @@ namespace RooseLabs.Gameplay
 
                 TutorialTask currentTask = m_tasks[m_currentTaskIndex];
 
-                object[] spriteMarkups = new object[currentTask.SpriteTags.Length];
+                // Start with the base description
+                string formattedText = currentTask.Description;
 
-                InputDevice currentDevice = InputHandler.CurrentInputDevice;
-
-                for (int i = 0; i < currentTask.SpriteTags.Length; i++)
+                // Replace all {ActionName} placeholders with corresponding sprite markup
+                foreach (string actionName in currentTask.ActionNames)
                 {
-                    string spriteTag = currentTask.SpriteTags[i];
-                    spriteMarkups[i] = !string.IsNullOrEmpty(spriteTag) ? $"<sprite name=\"{spriteTag}\">" : $"{{{i}}}";
+                    string placeholder = $"{{{actionName}}}";
+                    string spriteMarkup = GetSpriteMarkupForAction(actionName);
+                    formattedText = formattedText.Replace(placeholder, spriteMarkup);
                 }
 
-                string formattedDescription = BuildFormattedDescription(currentTask.Description, spriteMarkups.Length);
-                m_taskDisplayText.text = string.Format(formattedDescription, spriteMarkups);
-                m_taskDisplayText.spriteAsset = InputSpriteData.GetSpriteAssetForInputDevice(currentDevice);
-            }
-
-            private string BuildFormattedDescription(string baseDescription, int bindingCount)
-            {
-                string result = baseDescription;
-                System.Text.RegularExpressions.Regex placeholderRegex = new System.Text.RegularExpressions.Regex(@"\{\d+\}(\{\d+\})*");
-                result = placeholderRegex.Replace(result, "");
-                string placeholderSequence = string.Join(" ", Enumerable.Range(0, bindingCount).Select(i => $"{{{i}}}"));
-
-                if (result.StartsWith("Use "))
-                    result = "Use " + placeholderSequence + result.Substring(4);
-                else if (result.StartsWith("Press "))
-                    result = "Press " + placeholderSequence + result.Substring(6);
-                else if (result.StartsWith("Hold "))
-                    result = "Hold " + placeholderSequence + result.Substring(5);
-                return result;
+                m_taskDisplayText.text = formattedText;
+                m_taskDisplayText.spriteAsset = InputSpriteData.GetSpriteAssetForInputDevice(InputHandler.CurrentInputDevice);
             }
 
             private void CompleteTutorial()
@@ -271,6 +361,20 @@ namespace RooseLabs.Gameplay
                 PlayerPrefs.Save();
                 HideTutorial();
                 UnsubscribeFromInputEvents();
+
+                // Reinitialize the local player's loadout so Impero becomes a permanent spell
+                var localCharacter = PlayerCharacter.LocalCharacter;
+                if (localCharacter != null)
+                {
+                    // Clear toggled runes since Impero is now permanent
+                    localCharacter.Notebook?.ClearToggledRunes();
+
+                    // Reinitialize notebook loadout
+                    localCharacter.Notebook?.InitializeSpellLoadout();
+
+                    // Reinitialize wand loadout to make Impero permanent
+                    localCharacter.Wand?.ReinitializeSpellLoadout();
+                }
             }
 
             private void SaveProgress()
@@ -320,7 +424,6 @@ namespace RooseLabs.Gameplay
             {
                 if (!m_tutorialComplete && !m_isPaused && m_currentTaskIndex < m_tasks.Length)
                 {
-                    RebuildCurrentTaskSpriteTags();
                     UpdateTaskDisplay();
                 }
             }
@@ -331,14 +434,31 @@ namespace RooseLabs.Gameplay
                     UpdateTaskDisplay();
             }
 
-            private void RebuildCurrentTaskSpriteTags()
+            private class SearchForRunesManager
             {
-                if (m_currentTaskIndex >= m_tasks.Length)
-                    return;
+                public SearchForRunesManager() {}
 
-                TutorialTask currentTask = m_tasks[m_currentTaskIndex];
-                var config = TaskConfig[currentTask.Type];
-                currentTask.SpriteTags = GetSpriteTagsForAction(config.actionName);
+                public bool AreAllRunesCollected()
+                {
+                    // Check if the player's notebook contains all the runes from the Impero spell
+                    PlayerNotebook notebook = PlayerCharacter.LocalCharacter?.Notebook;
+                    if (notebook == null)
+                        return false;
+
+                    // Get the Impero spell's runes to check against
+                    SpellSO imperoSpell = Instance.m_imperoSpell;
+                    if (imperoSpell == null || imperoSpell.Runes == null)
+                        return false;
+
+                    // Check if all runes from the Impero spell are in the player's notebook
+                    foreach (var rune in imperoSpell.Runes)
+                    {
+                        if (!notebook.HasRune(rune))
+                            return false;
+                    }
+
+                    return true;
+                }
             }
         }
         #endregion
@@ -347,20 +467,116 @@ namespace RooseLabs.Gameplay
         private TutorialSequence m_tutorialSequence;
         [SerializeField] private TextMeshProUGUI tutorialTaskDisplayText;
         [SerializeField] private float tutorialTaskCompletionDelay = 2f;
+        [SerializeField] private SpellSO m_imperoSpell;
+        [SerializeField] private GameObject m_runeBookPrefab;
+        [SerializeField] private Vector3[] m_tutorialRuneBookSpawnPositions;
+
+        // Track if tutorial books have been spawned (server-side)
+        private bool m_tutorialBooksSpawned = false;
+        private List<RuneBook> m_spawnedTutorialBooks = new();
 
         public void InitializeTutorial()
         {
+            // Reset tutorial state for fresh initialization
+            // This handles the case of returning from a heist
             if (m_tutorialSequence != null)
-                return;
+            {
+                m_tutorialSequence = null;
+            }
+
+            // Reset tutorial books spawned flag so books can spawn again
+            // The books were destroyed when leaving the lobby scene
+            if (IsServerInitialized)
+            {
+                m_tutorialBooksSpawned = false;
+                m_spawnedTutorialBooks.Clear();
+            }
+
             if (tutorialTaskDisplayText == null)
             {
-                Debug.LogWarning("[Tutorial] Task display text is not assigned!");
+                Debug.LogWarning("[Tutorial] Task display text is not assigned in serialized field!");
                 return;
             }
 
             m_tutorialSequence = new TutorialSequence(tutorialTaskDisplayText);
             m_tutorialSequence.SetTaskCompletionDelay(tutorialTaskCompletionDelay);
             m_tutorialSequence.Initialize();
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        public void RequestSpawnTutorialBooks_ServerRpc()
+        {
+            // Only spawn once
+            if (m_tutorialBooksSpawned)
+            {
+                return;
+            }
+
+            SpawnTutorialBooks();
+        }
+
+        private void SpawnTutorialBooks()
+        {
+            if (m_imperoSpell == null)
+            {
+                Debug.LogError("[Tutorial] Impero spell reference is not assigned!");
+                return;
+            }
+
+            if (m_runeBookPrefab == null)
+            {
+                Debug.LogError("[Tutorial] Rune book prefab is not assigned!");
+                return;
+            }
+
+            if (m_tutorialRuneBookSpawnPositions == null || m_tutorialRuneBookSpawnPositions.Length == 0)
+            {
+                Debug.LogError("[Tutorial] No rune book spawn positions assigned!");
+                return;
+            }
+
+            RuneSO[] imperoRunes = m_imperoSpell.Runes;
+            if (imperoRunes == null || imperoRunes.Length == 0)
+            {
+                Debug.LogError("[Tutorial] Impero spell has no runes!");
+                return;
+            }
+
+            // Spawn a book for each rune in the Impero spell (up to the number of spawn positions)
+            int bookCount = Mathf.Min(imperoRunes.Length, m_tutorialRuneBookSpawnPositions.Length);
+            for (int i = 0; i < bookCount; i++)
+            {
+                SpawnRuneBook(m_tutorialRuneBookSpawnPositions[i], imperoRunes[i]);
+            }
+
+            m_tutorialBooksSpawned = true;
+        }
+
+        private void SpawnRuneBook(Vector3 spawnPosition, RuneSO rune)
+        {
+            // Instantiate the networked prefab
+            GameObject bookInstance = Object.Instantiate(m_runeBookPrefab, spawnPosition, Quaternion.identity);
+
+            if (bookInstance.TryGetComponent(out RuneBook runeBook))
+            {
+                runeBook.SetContainedRune(rune);
+
+                // Enable rune reuse for tutorial books so multiple players can collect the same rune
+                runeBook.AllowRuneReuse = true;
+
+                m_spawnedTutorialBooks.Add(runeBook);
+
+                // Spawn the networked object so all clients see it
+                if (bookInstance.TryGetComponent(out NetworkObject netObj))
+                {
+                    ServerManager.Spawn(netObj);
+                }
+            }
+            else
+            {
+                Debug.LogError("[Tutorial] Spawned rune book prefab does not have RuneBook component!");
+                Object.Destroy(bookInstance);
+            }
         }
 
         public void PauseTutorial()
@@ -392,6 +608,16 @@ namespace RooseLabs.Gameplay
         public static void ResetTutorialProgress()
         {
             TutorialSequence.ResetTutorial();
+        }
+
+        public bool IsTutorialComplete()
+        {
+            if (m_tutorialSequence == null)
+            {
+                // Tutorial not initialized - check PlayerPrefs directly
+                return PlayerPrefs.GetInt("TutorialComplete", 0) == 1;
+            }
+            return m_tutorialSequence.IsTutorialComplete();
         }
         #endregion
     }

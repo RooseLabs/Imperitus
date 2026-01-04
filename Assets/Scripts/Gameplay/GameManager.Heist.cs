@@ -2,6 +2,7 @@ using FishNet.Object;
 using RooseLabs.Enemies;
 using RooseLabs.Gameplay.Notebook;
 using RooseLabs.Network;
+using RooseLabs.Player;
 using RooseLabs.ScriptableObjects;
 using RooseLabs.Utils;
 using System.Collections.Generic;
@@ -24,6 +25,21 @@ namespace RooseLabs.Gameplay
         private void HandleHeistSceneLoaded()
         {
             m_heistTimer.ToggleTimerVisibility(true);
+
+            // Mark heist as ongoing for ALL clients (before reinitializing loadouts)
+            m_isHeistOngoing = true;
+
+            // All clients: Pause tutorial and re-initialize spell loadout for heist
+            PauseTutorial();
+
+            // Re-initialize spell loadout for heist (all players get Impero during heist)
+            var localCharacter = PlayerCharacter.LocalCharacter;
+            if (localCharacter != null)
+            {
+                localCharacter.Notebook?.InitializeSpellLoadout();
+                localCharacter.Wand?.ReinitializeSpellLoadout();
+            }
+
             if (IsServerInitialized)
             {
                 EnemySpawnManager.Instance.RegisterAllSpawners();
@@ -36,7 +52,6 @@ namespace RooseLabs.Gameplay
                 float timeLimit = HeistMaxTime - (PlayerHandler.AllConnectedPlayers.Count() - 1) * HeistTimeReductionPerAdditionalPlayer;
                 timeLimit = Mathf.Clamp(timeLimit, HeistMinTime, HeistMaxTime);
                 m_heistTimer.StartTimer(timeLimit);
-                m_isHeistOngoing = true;
             }
             else
             {
@@ -58,9 +73,6 @@ namespace RooseLabs.Gameplay
 
             // Lock spell loadouts for all players when heist starts
             NotebookManager.Instance?.LockSpellLoadout();
-
-            // Pause tutorial when leaving the lobby
-            PauseTutorial();
 
             // Reset player states to ensure they're at full health and stamina, not dead, etc.
             foreach (var player in PlayerHandler.AllConnectedCharacters)

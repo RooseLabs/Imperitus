@@ -145,6 +145,20 @@ namespace RooseLabs.Player
             UpdateAimingState();
             if (character.Data.isAiming)
             {
+                // If no spells are available, player can still aim but nothing happens on cast
+                if (m_spellSlots.Count == 0)
+                {
+                    // Clear any lingering spell instance
+                    if (m_currentSpellInstance != null)
+                    {
+                        m_currentSpellInstance.StopAim();
+                        m_currentSpellInstance = null;
+                    }
+                    m_currentSpellSlot = null;
+                    // No spells available - aiming is allowed but no casting
+                    return;
+                }
+
                 m_currentSpellSlot ??= m_spellSlots[m_currentSpellIndex];
                 if (!m_currentSpellInstance && m_currentSpellSlot != null)
                 {
@@ -228,10 +242,41 @@ namespace RooseLabs.Player
         #region Spell Management
         private void InitializeSpellLoadout()
         {
+            // Clean up any existing spell instances before clearing
+            foreach (var slot in m_spellSlots)
+            {
+                slot.DestroyInstance();
+            }
+
             m_spellSlots.Clear();
-            m_spellSlots.Add(new SpellSlot(GameManager.Instance.SpellDatabase[0])); // 0 = Impero (default spell)
+            m_currentSpellInstance = null;
+
+            // Always add Impero during heist, or if tutorial is complete
+            bool inHeist = GameManager.Instance != null && GameManager.Instance.IsHeistOngoing;
+            bool tutorialComplete = GameManager.Instance != null && GameManager.Instance.IsTutorialComplete();
+
+            if (inHeist || tutorialComplete)
+            {
+                m_spellSlots.Add(new SpellSlot(GameManager.Instance.SpellDatabase[0])); // 0 = Impero (default spell)
+            }
+
             m_currentSpellIndex = 0;
-            m_currentSpellSlot = m_spellSlots[m_currentSpellIndex];
+            m_currentSpellSlot = m_spellSlots.Count > 0 ? m_spellSlots[m_currentSpellIndex] : null;
+
+            // Clear orbiting runes if no spells available
+            if (m_currentSpellSlot == null)
+            {
+                ClearOrbitingRunes();
+            }
+        }
+
+        /// <summary>
+        /// Reinitializes the spell loadout. Called when tutorial completes to make Impero permanent.
+        /// </summary>
+        public void ReinitializeSpellLoadout()
+        {
+            InitializeSpellLoadout();
+            SetOrbitingRunes(m_currentSpellSlot?.Runes);
         }
 
         private void HandleValidSpellSelection(SpellBase spell, ICollection<RuneSO> selectedRunes)
@@ -270,6 +315,25 @@ namespace RooseLabs.Player
         private void AddOrUpdateTemporarySpell(SpellBase spell, ICollection<RuneSO> runes)
         {
             SpellSlot newTemporarySpellSlot = new SpellSlot(spell, isTemporary: true, customRunes: runes);
+
+            // If no spells exist, just add the temporary spell
+            if (m_spellSlots.Count == 0)
+            {
+                m_spellSlots.Add(newTemporarySpellSlot);
+
+                // Instantiate the new temporary spell
+                if (newTemporarySpellSlot.Instantiate())
+                {
+                    this.LogInfo($"Instantiated temporary spell '{newTemporarySpellSlot.SpellPrefab.SpellInfo.EnglishName}'");
+                }
+
+                // Update current spell slot
+                m_currentSpellIndex = 0;
+                m_currentSpellSlot = newTemporarySpellSlot;
+                SetOrbitingRunes(newTemporarySpellSlot.Runes);
+                return;
+            }
+
             if (m_spellSlots[^1].IsTemporary)
             {
                 // There is already a temporary spell, destroy its instance and replace it with the new one
@@ -369,7 +433,26 @@ namespace RooseLabs.Player
 
         public void RemoveTemporarySpell()
         {
-            // We can only have one temporary spell, and it's always the last one in the list and never the first
+            // Handle case where the only spell is temporary (during tutorial)
+            if (m_spellSlots.Count == 1 && m_spellSlots[0].IsTemporary)
+            {
+                // Destroy the temporary spell instance
+                m_spellSlots[0].DestroyInstance();
+                m_spellSlots.Clear();
+
+                // Reset current spell state
+                m_currentSpellIndex = 0;
+                m_currentSpellSlot = null;
+                m_currentSpellInstance = null;
+
+                // Clear orbiting runes
+                ClearOrbitingRunes();
+
+                this.LogInfo("Removed the only temporary spell.");
+                return;
+            }
+
+            // We can only have one temporary spell, and it's always the last one in the list
             if (m_spellSlots.Count > 1 && m_spellSlots[^1].IsTemporary)
             {
                 bool wasSelected = m_currentSpellIndex == m_spellSlots.Count - 1;

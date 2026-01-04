@@ -170,13 +170,21 @@ namespace RooseLabs.Gameplay.Notebook
 
             if (GameManager.Instance != null && GameManager.Instance.LearnedSpellsIndices.Count > 0)
             {
+                // Always include Impero during heist, or if tutorial is complete
+                bool inHeist = GameManager.Instance.IsHeistOngoing;
+                bool tutorialComplete = GameManager.Instance.IsTutorialComplete();
+                bool includeImpero = inHeist || tutorialComplete;
+
                 foreach (int spellIndex in GameManager.Instance.LearnedSpellsIndices)
                 {
-                    m_spellLoadout.equippedSpellIndices.Add(spellIndex);
+                    // Skip Impero (index 0) in lobby if tutorial is not complete
+                    if (!includeImpero && spellIndex == 0)
+                        continue;
 
+                    m_spellLoadout.equippedSpellIndices.Add(spellIndex);
                 }
 
-                this.LogInfo($"Initialized with {m_spellLoadout.equippedSpellIndices.Count} learned spells");
+                this.LogInfo($"Initialized with {m_spellLoadout.equippedSpellIndices.Count} learned spells (inHeist: {inHeist}, tutorialComplete: {tutorialComplete})");
             }
         }
 

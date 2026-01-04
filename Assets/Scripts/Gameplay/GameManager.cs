@@ -10,6 +10,7 @@ using GameKit.Dependencies.Utilities.Types;
 using RooseLabs.Gameplay.Notebook;
 using RooseLabs.Gameplay.Spells;
 using RooseLabs.Network;
+using RooseLabs.Player;
 using RooseLabs.ScriptableObjects;
 using RooseLabs.UI;
 using UnityEngine;
@@ -105,7 +106,24 @@ namespace RooseLabs.Gameplay
 
         private void HandleLobbyLoaded()
         {
+            m_isHeistOngoing = false;
             m_heistTimer.ToggleTimerVisibility(false);
+
+            // Re-initialize the local player's spell loadout when returning to lobby
+            // This ensures Impero is removed if tutorial is not complete
+            var localCharacter = PlayerCharacter.LocalCharacter;
+            if (localCharacter != null)
+            {
+                localCharacter.Notebook?.InitializeSpellLoadout();
+                localCharacter.Wand?.ReinitializeSpellLoadout();
+            }
+
+            // Initialize tutorial when lobby is loaded (runs on all clients)
+            InitializeTutorial();
+
+            // Resume tutorial if it was paused (runs on all clients)
+            ResumeTutorial();
+
             if (!IsServerInitialized) return;
             if (CurrentAssignment == null) return;
             // If all tasks are complete, generate new assignment.
@@ -151,12 +169,6 @@ namespace RooseLabs.Gameplay
             {
                 NotebookManager.Instance.UnlockSpellLoadout();
             }
-
-            // Initialize tutorial when lobby is loaded
-            InitializeTutorial();
-
-            // Resume tutorial if it was paused
-            ResumeTutorial();
         }
 
         private void GenerateNewAssignment()

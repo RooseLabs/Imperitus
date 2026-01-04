@@ -3,9 +3,12 @@ namespace RooseLabs.Gameplay
     public enum TaskType
     {
         WalkAround,
+        SearchForRunes,
         OpenNotebook,
+        CombineRunes,
         AimWithWand,
-        CastImperoSpell
+        CastImperoSpell,
+        TutorialComplete
     }
 
     public class TutorialTask
@@ -13,13 +16,13 @@ namespace RooseLabs.Gameplay
         public string Description { get; set; }
         public TaskType Type { get; set; }
         public bool Completed { get; private set; } = false;
-        public string[] SpriteTags { get; set; }
+        public string[] ActionNames { get; set; }
 
-        public TutorialTask(string description, TaskType type, string[] spriteTags = null)
+        public TutorialTask(string description, TaskType type, string[] actionNames = null)
         {
             Description = description;
             Type = type;
-            SpriteTags = spriteTags ?? System.Array.Empty<string>();
+            ActionNames = actionNames ?? System.Array.Empty<string>();
         }
 
         public void MarkComplete()

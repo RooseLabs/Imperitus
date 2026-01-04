@@ -668,7 +668,7 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7477250575236604539, guid: 4493a128bbe0a724aa8b34b0d6de86c1, type: 3}
-      propertyPath: 'inputActions.Array.data[0]'
+      propertyPath: inputActions.Array.data[0]
       value: 
       objectReference: {fileID: 1830816681}
     - target: {fileID: 7502765514563939401, guid: 4493a128bbe0a724aa8b34b0d6de86c1, type: 3}
@@ -918,6 +918,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+  m_characterHorizontalScale: 1
 --- !u!1001 &1773707396
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -927,6 +928,14 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 51769672726437127, guid: 7140b76d12e111944af61aadcbdc70fa, type: 3}
+      propertyPath: m_imperoSpell
+      value: 
+      objectReference: {fileID: 11400000, guid: 74d21139607205c4893af88737549570, type: 2}
+    - target: {fileID: 51769672726437127, guid: 7140b76d12e111944af61aadcbdc70fa, type: 3}
+      propertyPath: m_runeBookPrefab
+      value: 
+      objectReference: {fileID: 4204629389324440399, guid: 2b41a62cac5acd440877edd6bced97cb, type: 3}
+    - target: {fileID: 51769672726437127, guid: 7140b76d12e111944af61aadcbdc70fa, type: 3}
       propertyPath: enemySpawnManager
       value: 
       objectReference: {fileID: 832602294}
@@ -934,6 +943,46 @@ PrefabInstance:
       propertyPath: tutorialTaskDisplayText
       value: 
       objectReference: {fileID: 1697552118}
+    - target: {fileID: 51769672726437127, guid: 7140b76d12e111944af61aadcbdc70fa, type: 3}
+      propertyPath: m_tutorialRuneBookSpawnPositions.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 51769672726437127, guid: 7140b76d12e111944af61aadcbdc70fa, type: 3}
+      propertyPath: m_tutorialRuneBookSpawnPositions.Array.data[0].x
+      value: -0.455
+      objectReference: {fileID: 0}
+    - target: {fileID: 51769672726437127, guid: 7140b76d12e111944af61aadcbdc70fa, type: 3}
+      propertyPath: m_tutorialRuneBookSpawnPositions.Array.data[0].y
+      value: 1.3516521
+      objectReference: {fileID: 0}
+    - target: {fileID: 51769672726437127, guid: 7140b76d12e111944af61aadcbdc70fa, type: 3}
+      propertyPath: m_tutorialRuneBookSpawnPositions.Array.data[0].z
+      value: 2.755
+      objectReference: {fileID: 0}
+    - target: {fileID: 51769672726437127, guid: 7140b76d12e111944af61aadcbdc70fa, type: 3}
+      propertyPath: m_tutorialRuneBookSpawnPositions.Array.data[1].x
+      value: -0.40766963
+      objectReference: {fileID: 0}
+    - target: {fileID: 51769672726437127, guid: 7140b76d12e111944af61aadcbdc70fa, type: 3}
+      propertyPath: m_tutorialRuneBookSpawnPositions.Array.data[1].y
+      value: 1.8924849
+      objectReference: {fileID: 0}
+    - target: {fileID: 51769672726437127, guid: 7140b76d12e111944af61aadcbdc70fa, type: 3}
+      propertyPath: m_tutorialRuneBookSpawnPositions.Array.data[1].z
+      value: 4.433
+      objectReference: {fileID: 0}
+    - target: {fileID: 51769672726437127, guid: 7140b76d12e111944af61aadcbdc70fa, type: 3}
+      propertyPath: m_tutorialRuneBookSpawnPositions.Array.data[2].x
+      value: -0.4457
+      objectReference: {fileID: 0}
+    - target: {fileID: 51769672726437127, guid: 7140b76d12e111944af61aadcbdc70fa, type: 3}
+      propertyPath: m_tutorialRuneBookSpawnPositions.Array.data[2].y
+      value: 1.8924826
+      objectReference: {fileID: 0}
+    - target: {fileID: 51769672726437127, guid: 7140b76d12e111944af61aadcbdc70fa, type: 3}
+      propertyPath: m_tutorialRuneBookSpawnPositions.Array.data[2].z
+      value: -2.7953
+      objectReference: {fileID: 0}
     - target: {fileID: 587817716233763778, guid: 7140b76d12e111944af61aadcbdc70fa, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: 0
