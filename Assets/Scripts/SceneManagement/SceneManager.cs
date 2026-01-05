@@ -123,6 +123,7 @@ namespace RooseLabs.SceneManagement
             m_networkManager.ServerManager.OnServerConnectionState += ServerManager_OnServerConnectionState;
             m_networkManager.SceneManager.OnLoadStart += SceneManager_OnLoadStart;
             m_networkManager.SceneManager.OnLoadEnd += SceneManager_OnLoadEnd;
+            m_networkManager.SceneManager.OnActiveSceneSet += SceneManager_OnActiveSceneSet;
             if (startInOffline)
                 LoadOfflineScene();
         }
@@ -135,6 +136,7 @@ namespace RooseLabs.SceneManagement
                 m_networkManager.ServerManager.OnServerConnectionState -= ServerManager_OnServerConnectionState;
                 m_networkManager.SceneManager.OnLoadStart -= SceneManager_OnLoadStart;
                 m_networkManager.SceneManager.OnLoadEnd -= SceneManager_OnLoadEnd;
+                m_networkManager.SceneManager.OnActiveSceneSet -= SceneManager_OnActiveSceneSet;
             }
         }
 
@@ -194,6 +196,13 @@ namespace RooseLabs.SceneManagement
             if (m_postLoadEndCoroutine != null)
                 StopCoroutine(m_postLoadEndCoroutine);
             m_postLoadEndCoroutine = StartCoroutine(PostLoadEnd_Coroutine(args.LoadedScenes));
+        }
+
+        private void SceneManager_OnActiveSceneSet(bool wasSetByUser)
+        {
+            // There's some kind of issue with APV where it loads the data for the first scene loaded additively
+            // correctly, but for subsequent scenes it doesn't load the new APV data. The following seems to fix this.
+            UnityEngine.Rendering.ProbeReferenceVolume.instance.SetActiveScene(UnitySceneManager.GetActiveScene());
         }
 
         private IEnumerator PostLoadEnd_Coroutine(Scene[] loadedScenes)

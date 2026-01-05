@@ -33,7 +33,7 @@ MonoBehaviour:
   m_EnableLODCrossFade: 1
   m_LODCrossFadeDitheringType: 1
   m_ShEvalMode: 0
-  m_LightProbeSystem: 0
+  m_LightProbeSystem: 1
   m_ProbeVolumeMemoryBudget: 1024
   m_ProbeVolumeBlendingMemoryBudget: 256
   m_SupportProbeVolumeGPUStreaming: 0
@@ -47,7 +47,7 @@ MonoBehaviour:
   m_AdditionalLightsRenderingMode: 1
   m_AdditionalLightsPerObjectLimit: 4
   m_AdditionalLightShadowsSupported: 1
-  m_AdditionalLightsShadowmapResolution: 2048
+  m_AdditionalLightsShadowmapResolution: 4096
   m_AdditionalLightsShadowResolutionTierLow: 256
   m_AdditionalLightsShadowResolutionTierMedium: 512
   m_AdditionalLightsShadowResolutionTierHigh: 1024
@@ -77,7 +77,7 @@ MonoBehaviour:
   m_DebugLevel: 0
   m_StoreActionsOptimization: 0
   m_UseAdaptivePerformance: 1
-  m_ColorGradingMode: 0
+  m_ColorGradingMode: 1
   m_ColorGradingLutSize: 32
   m_AllowPostProcessAlphaOutput: 0
   m_UseFastSRGBLinearConversion: 0
@@ -109,7 +109,7 @@ MonoBehaviour:
   m_PrefilteringModeScreenSpaceOcclusion: 2
   m_PrefilterDebugKeywords: 1
   m_PrefilterWriteRenderingLayers: 1
-  m_PrefilterHDROutput: 1
+  m_PrefilterHDROutput: 0
   m_PrefilterAlphaOutput: 1
   m_PrefilterSSAODepthNormals: 0
   m_PrefilterSSAOSourceDepthLow: 1
@@ -128,11 +128,11 @@ MonoBehaviour:
   m_PrefilterSoftShadowsQualityHigh: 1
   m_PrefilterSoftShadows: 0
   m_PrefilterScreenCoord: 1
-  m_PrefilterScreenSpaceIrradiance: 0
+  m_PrefilterScreenSpaceIrradiance: 1
   m_PrefilterNativeRenderPass: 1
   m_PrefilterUseLegacyLightmaps: 0
   m_PrefilterBicubicLightmapSampling: 1
-  m_PrefilterReflectionProbeRotation: 0
+  m_PrefilterReflectionProbeRotation: 1
   m_PrefilterReflectionProbeBlending: 0
   m_PrefilterReflectionProbeBoxProjection: 0
   m_PrefilterReflectionProbeAtlas: 0

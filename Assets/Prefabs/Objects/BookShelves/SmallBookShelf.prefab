@@ -116,6 +116,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &7690637972672681915
 MonoBehaviour:
@@ -1244,15 +1245,15 @@ PrefabInstance:
       objectReference: {fileID: 4204629389324440399, guid: 2b41a62cac5acd440877edd6bced97cb, type: 3}
     - target: {fileID: 8645961222916390646, guid: 53a2831f09be86a4d956dd88bcaab854, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 1.155
+      value: 1.14
       objectReference: {fileID: 0}
     - target: {fileID: 8645961222916390646, guid: 53a2831f09be86a4d956dd88bcaab854, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.323
+      value: 1.324
       objectReference: {fileID: 0}
     - target: {fileID: 8645961222916390646, guid: 53a2831f09be86a4d956dd88bcaab854, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.032
+      value: 0.06
       objectReference: {fileID: 0}
     - target: {fileID: 8645961222916390646, guid: 53a2831f09be86a4d956dd88bcaab854, type: 3}
       propertyPath: m_LocalRotation.w

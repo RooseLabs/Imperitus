@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using FishNet.Connection;
-using FishNet.Object;
 using FishNet.Object.Synchronizing;
 using RooseLabs.Network;
 using RooseLabs.Player;
@@ -77,7 +76,6 @@ namespace RooseLabs.Gameplay.Interactables
             }
         }
 
-        [Server]
         public void Initialize(PlayerCharacter character)
         {
             m_ownerConnection.Value = character.Owner;
