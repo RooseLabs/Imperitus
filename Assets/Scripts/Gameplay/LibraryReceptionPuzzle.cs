@@ -37,6 +37,9 @@ namespace RooseLabs.Gameplay
         private float doorOpeningAngle = -90f;
         #endregion
 
+        private static readonly int ShaderPropLadyOpacity = Shader.PropertyToID("_LadyOpacity");
+        private static readonly int ShaderPropWrath = Shader.PropertyToID("_Wrath");
+
         private static readonly string[] PuzzleSentences =
         {
             "The dragon ate homework",
@@ -98,10 +101,22 @@ namespace RooseLabs.Gameplay
         private Quaternion m_doorClosedRotation;
         private Quaternion m_doorOpenRotation;
         private Coroutine m_doorAnimationCoroutine;
+        private Material m_doorMaterial;
+        private Coroutine m_ladyOpacityCoroutine;
+        private Coroutine m_wrathCoroutine;
+        private bool m_isPlayerInProximity;
 
         private void Awake()
         {
             TryGetComponent(out m_voskSpeechToText);
+
+            // Setup door material for shader effects
+            if ((bool)doorTransform && doorTransform.TryGetComponent(out Renderer r))
+            {
+                m_doorMaterial = r.material;
+                m_doorMaterial.SetFloat(ShaderPropLadyOpacity, 0f);
+                m_doorMaterial.SetFloat(ShaderPropWrath, 0f);
+            }
         }
 
         public override void OnStartServer()
@@ -296,17 +311,25 @@ namespace RooseLabs.Gameplay
             if (!PlayerCharacter.LocalCharacter) return;
 
             float distance = Vector3.Distance(transform.position, PlayerCharacter.LocalCharacter.transform.position);
+            bool inProximity = distance <= hearingRadius;
 
-            // Start/stop recording based on proximity
-            if (distance <= hearingRadius && !m_voskSpeechToText.IsRecording)
+            // Handle proximity state change
+            if (inProximity != m_isPlayerInProximity)
             {
-                this.LogInfo("Player entered hearing radius - starting voice detection");
-                m_voskSpeechToText.StartRecording();
-            }
-            else if (distance > hearingRadius && m_voskSpeechToText.IsRecording)
-            {
-                this.LogInfo("Player left hearing radius - stopping voice detection");
-                m_voskSpeechToText.StopRecording();
+                m_isPlayerInProximity = inProximity;
+
+                if (inProximity)
+                {
+                    this.LogInfo("Player entered hearing radius - starting voice detection");
+                    m_voskSpeechToText.StartRecording();
+                    AnimateLadyOpacity(1f);
+                }
+                else
+                {
+                    this.LogInfo("Player left hearing radius - stopping voice detection");
+                    m_voskSpeechToText.StopRecording();
+                    AnimateLadyOpacity(0f);
+                }
             }
         }
 
@@ -322,6 +345,7 @@ namespace RooseLabs.Gameplay
             string targetSentence = PuzzleSentences[m_targetSentenceIndex.Value].ToLower();
 
             // Check if any recognized phrase matches the target sentence
+            bool foundMatch = false;
             foreach (RecognizedPhrase phrase in recognitionResult.Phrases)
             {
                 if (string.IsNullOrEmpty(phrase.Text)) continue;
@@ -332,8 +356,16 @@ namespace RooseLabs.Gameplay
                 {
                     this.LogInfo("Correct sentence spoken! Sending to server...");
                     ServerValidateAndOpenDoor(phrase.Text);
-                    return;
+                    foundMatch = true;
+                    break;
                 }
+            }
+
+            // If no match was found and we heard something, trigger Wrath
+            if (!foundMatch && recognitionResult.Phrases.Length > 0)
+            {
+                this.LogInfo("Wrong sentence - triggering Wrath effect");
+                AnimateWrath();
             }
         }
         #endregion
@@ -366,6 +398,25 @@ namespace RooseLabs.Gameplay
                 StopCoroutine(m_doorAnimationCoroutine);
             }
             m_doorAnimationCoroutine = StartCoroutine(AnimateDoorOpen());
+
+            // Handle shader effects when door opens
+            if (m_doorMaterial)
+            {
+                // Stop any ongoing wrath animation and disable it
+                if (m_wrathCoroutine != null)
+                {
+                    StopCoroutine(m_wrathCoroutine);
+                    m_wrathCoroutine = null;
+                }
+                m_doorMaterial.SetFloat(ShaderPropWrath, 0f);
+
+                // Handle LadyOpacity: fade to 1 (if not already), stay for 10 seconds, then fade to 0
+                if (m_ladyOpacityCoroutine != null)
+                {
+                    StopCoroutine(m_ladyOpacityCoroutine);
+                }
+                m_ladyOpacityCoroutine = StartCoroutine(DoorOpenLadyOpacitySequence());
+            }
         }
 
         private IEnumerator AnimateDoorOpen()
@@ -385,7 +436,81 @@ namespace RooseLabs.Gameplay
             }
 
             doorTransform.localRotation = m_doorOpenRotation;
-            this.LogInfo("Door fully opened");
+        }
+
+        private void AnimateLadyOpacity(float targetOpacity)
+        {
+            if (!m_doorMaterial ) return;
+
+            if (m_ladyOpacityCoroutine != null)
+            {
+                StopCoroutine(m_ladyOpacityCoroutine);
+            }
+
+            m_ladyOpacityCoroutine = StartCoroutine(AnimateLadyOpacityCoroutine(targetOpacity));
+        }
+
+        private IEnumerator AnimateLadyOpacityCoroutine(float targetOpacity)
+        {
+            float startOpacity = m_doorMaterial.GetFloat(ShaderPropLadyOpacity);
+            float elapsedTime = 0f;
+            float duration = 1f;
+
+            while (elapsedTime < duration)
+            {
+                elapsedTime += Time.deltaTime;
+                float t = Mathf.Clamp01(elapsedTime / duration);
+                float currentOpacity = Mathf.Lerp(startOpacity, targetOpacity, t);
+                m_doorMaterial.SetFloat(ShaderPropLadyOpacity, currentOpacity);
+                yield return null;
+            }
+
+            m_doorMaterial.SetFloat(ShaderPropLadyOpacity, targetOpacity);
+            m_ladyOpacityCoroutine = null;
+        }
+
+        private IEnumerator DoorOpenLadyOpacitySequence()
+        {
+            float currentOpacity = m_doorMaterial.GetFloat(ShaderPropLadyOpacity);
+
+            // Phase 1: Fade to 1 if not already there
+            if (currentOpacity < 1f)
+            {
+                yield return AnimateLadyOpacityCoroutine(1f);
+            }
+
+            // Phase 2: Hold at 1 for 9 seconds (10 total minus 1 second fade out)
+            yield return new WaitForSeconds(9f);
+
+            // Phase 3: Fade to 0 over 1 second
+            yield return AnimateLadyOpacityCoroutine(0f);
+
+            m_ladyOpacityCoroutine = null;
+        }
+
+        private void AnimateWrath()
+        {
+            if (!m_doorMaterial) return;
+
+            if (m_wrathCoroutine != null)
+            {
+                StopCoroutine(m_wrathCoroutine);
+            }
+
+            m_wrathCoroutine = StartCoroutine(AnimateWrathCoroutine());
+        }
+
+        private IEnumerator AnimateWrathCoroutine()
+        {
+            // Set Wrath to 1
+            m_doorMaterial.SetFloat(ShaderPropWrath, 1f);
+
+            // Wait for 1 second
+            yield return new WaitForSeconds(1f);
+
+            // Set Wrath back to 0
+            m_doorMaterial.SetFloat(ShaderPropWrath, 0f);
+            m_wrathCoroutine = null;
         }
 
         private void DestroySpawnPoints()

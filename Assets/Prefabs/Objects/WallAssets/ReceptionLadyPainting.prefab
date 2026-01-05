@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 2398982744317110727}
   - component: {fileID: 2115624298388634861}
   m_Layer: 0
-  m_Name: Painting_Reception.001
+  m_Name: ReceptionLadyPainting
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -67,7 +67,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 001fd649deecef74899b4cd827bc3aa8, type: 2}
+  - {fileID: 2100000, guid: 36304ffcf5a2dee4da61dd2a7b4d0c71, type: 2}
   - {fileID: 2100000, guid: fad44f346fbfcf942a7029d5c1c0a5fa, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
@@ -90,6 +90,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!65 &2115624298388634861
 BoxCollider:
