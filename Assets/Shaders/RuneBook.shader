@@ -8,12 +8,12 @@ Shader "Custom/RuneBook"
         _RuneTexture ("Rune Texture", 2D) = "black" {}
 
         // Rune properties
-        [Toggle(_HAS_RUNE)] _HAS_RUNE ("Has Rune", Integer) = 0
+        [Toggle] _HasRune ("Has Rune", Integer) = 0
         _RunePosition ("Rune Position", Vector) = (0.5, 0.5, 0, 0)
         _RuneScale ("Rune Scale", Range(0.01, 1)) = 0.5
         [HDR] _RuneColor ("Rune Color", Color) = (1, 1, 1, 1)
         _RuneOpacity ("Rune Opacity", Range(0, 1)) = 1
-        [Toggle(_PRESERVE_RUNE_ASPECT_RATIO)] _PRESERVE_RUNE_ASPECT_RATIO ("Preserve Rune Aspect Ratio", Integer) = 1
+        [Toggle] _PreserveRuneAspectRatio ("Preserve Rune Aspect Ratio", Integer) = 1
 
         [Header(Rune Glow Properties)]
         [HDR] _GlowColor ("Glow Color", Color) = (1, 1, 1, 1)
@@ -25,10 +25,10 @@ Shader "Custom/RuneBook"
         _MinLightIntensity ("Min Light Intensity", Range(0, 1)) = 0
         _MaxLightIntensity ("Max Light Intensity", Range(0.5, 5)) = 1.5
 
-        [Header(Rune PBR Properties)]
-        [Toggle(_RUNE_LIT)] _RUNE_LIT ("Rune Is Lit", Integer) = 0
-        _RuneSmoothness ("Rune Smoothness", Range(0, 1)) = 0.5
-        _RuneMetallic ("Rune Metallic", Range(0, 1)) = 0
+        // [Header(Rune PBR Properties)]
+        // [Toggle(_RUNE_LIT)] _RUNE_LIT ("Rune Is Lit", Integer) = 0
+        // _RuneSmoothness ("Rune Smoothness", Range(0, 1)) = 0.5
+        // _RuneMetallic ("Rune Metallic", Range(0, 1)) = 0
     }
 
     SubShader
@@ -71,9 +71,7 @@ Shader "Custom/RuneBook"
             #pragma multi_compile _ LIGHTMAP_ON
             #pragma multi_compile_fog
 
-            #pragma multi_compile_local_fragment __ _HAS_RUNE
-            #pragma shader_feature_local_fragment _PRESERVE_RUNE_ASPECT_RATIO
-            #pragma shader_feature_local_fragment _RUNE_LIT
+            // #pragma shader_feature_local_fragment _RUNE_LIT
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
@@ -108,6 +106,8 @@ Shader "Custom/RuneBook"
                 float4 _BaseTextureArray_ST;
                 int _BaseTextureIndex;
                 float4 _RuneTexture_ST;
+                int _HasRune;
+                int _PreserveRuneAspectRatio;
                 float2 _RunePosition;
                 float _RuneScale;
                 half4 _RuneColor;
@@ -118,8 +118,8 @@ Shader "Custom/RuneBook"
                 float _Metallic;
                 float _MinLightIntensity;
                 float _MaxLightIntensity;
-                float _RuneSmoothness;
-                float _RuneMetallic;
+                // float _RuneSmoothness;
+                // float _RuneMetallic;
             CBUFFER_END
 
             v2f vert(appdata_t v)
@@ -161,7 +161,8 @@ Shader "Custom/RuneBook"
                 float finalSmoothness = _Smoothness;
                 half3 unlitEmission = half3(0, 0, 0);
 
-                #if _HAS_RUNE
+                if (_HasRune != 0)
+                {
                     // Transform UVs for rune placement
                     float2 runeUV = i.uv;
 
@@ -169,7 +170,8 @@ Shader "Custom/RuneBook"
                     runeUV -= _RunePosition;
 
                     // Apply aspect ratio correction if enabled
-                    #if _PRESERVE_RUNE_ASPECT_RATIO
+                    if (_PreserveRuneAspectRatio != 0)
+                    {
                         // Calculate the aspect ratio of the object's scale
                         float scaleX = i.objectScale.x;
                         float scaleY = i.objectScale.y;
@@ -177,7 +179,7 @@ Shader "Custom/RuneBook"
 
                         // Correct UV to maintain aspect ratio
                         runeUV.y *= aspectRatio;
-                    #endif
+                    }
 
                     // Apply scale
                     runeUV /= _RuneScale;
@@ -216,9 +218,9 @@ Shader "Custom/RuneBook"
                         // Gaussian-like falloff based on distance
                         float ringWeight = exp(-3.0 * t); // Exponential falloff
 
-                        for (int i = 0; i < numSamples; ++i)
+                        for (int j = 0; j < numSamples; ++j)
                         {
-                            float angle = (float(i) / float(numSamples)) * 6.28318530718; // 2*PI
+                            float angle = (float(j) / float(numSamples)) * 6.28318530718; // 2*PI
                             float2 offset = float2(cos(angle), sin(angle)) * ringDist;
                             float2 sampleUV = runeUV + offset;
 
@@ -240,6 +242,7 @@ Shader "Custom/RuneBook"
                     half glowMask = glowAlpha * (1.0 - runeColor.a);
                     half3 glowContribution = _GlowColor.rgb * glowMask;
 
+                    /*
                     #if _RUNE_LIT
                         // Lit mode: rune is affected by lighting with its own PBR properties
                         // Blend rune over base using alpha
@@ -252,18 +255,19 @@ Shader "Custom/RuneBook"
                         // Add glow on top (glow is always emissive)
                         finalColor += glowContribution;
                     #else
-                        // Unlit mode: rune and glow are rendered as unlit emission
-                        unlitEmission = runeColor.rgb * runeColor.a + glowContribution;
+                    */
 
-                        // For the base color under the rune, we keep the base texture but mask it out where rune is
-                        // The rune itself will be added as unlit emission
-                        finalColor = baseColor.rgb * (1.0 - runeColor.a) * (1.0 - glowMask);
+                    // Unlit mode: rune and glow are rendered as unlit emission
+                    unlitEmission = runeColor.rgb * runeColor.a + glowContribution;
 
-                        // Blend PBR properties based on rune alpha (rune area becomes non-metallic/non-smooth)
-                        finalMetallic = lerp(_Metallic, 0, runeColor.a);
-                        finalSmoothness = lerp(_Smoothness, 0, runeColor.a);
-                    #endif
-                #endif
+                    // For the base color under the rune, we keep the base texture but mask it out where rune is
+                    // The rune itself will be added as unlit emission
+                    finalColor = baseColor.rgb * (1.0 - runeColor.a) * (1.0 - glowMask);
+
+                    // Blend PBR properties based on rune alpha (rune area becomes non-metallic/non-smooth)
+                    finalMetallic = lerp(_Metallic, 0, runeColor.a);
+                    finalSmoothness = lerp(_Smoothness, 0, runeColor.a);
+                }
 
                 // Setup lighting
                 InputData lightingInput = (InputData)0;
