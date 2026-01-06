@@ -91,39 +91,42 @@ namespace RooseLabs.Player
             m_actionCloseNotebook = uiActionMap.FindAction("CloseNotebook");
         }
 
-        public void Sample()
+        public void Sample(bool isStunned = false)
         {
             ResetInput();
+            if (!isStunned)
+            {
+                movementInput = m_actionMove.ReadValue<Vector2>();
+                lookInput = m_actionLook.ReadValue<Vector2>();
+                aimIsPressed = m_actionAim.IsPressed();
+                castWasPressed = m_actionCast.WasPressedThisFrame();
+                castIsPressed = m_actionCast.IsPressed();
+                castWasReleased = m_actionCast.WasReleasedThisFrame();
+                crouchWasPressed = m_actionCrouch.WasPressedThisFrame();
+                crouchIsPressed = m_actionCrouch.IsPressed();
+                sprintWasPressed = m_actionSprint.WasPressedThisFrame();
+                sprintIsPressed = m_actionSprint.IsPressed();
+                jumpWasPressed = m_actionJump.WasPressedThisFrame();
+                interactWasPressed = m_actionInteract.WasPressedThisFrame();
+                interactIsPressed = m_actionInteract.IsPressed();
+                interactWasReleased = m_actionInteract.WasReleasedThisFrame();
+                dropWasPressed = m_actionDrop.WasPressedThisFrame();
+                previousWasPressed = m_actionPrevious.WasPressedThisFrame();
+                previousIsPressed = m_actionPrevious.IsPressed();
+                nextWasPressed = m_actionNext.WasPressedThisFrame();
+                nextIsPressed = m_actionNext.IsPressed();
+                scrollInput = m_actionScroll.ReadValue<float>();
+                scrollButtonWasPressed = m_actionScrollButton.WasPressedThisFrame();
+                scrollBackwardWasPressed = m_actionScrollBackward.WasPressedThisFrame();
+                scrollBackwardIsPressed = m_actionScrollBackward.IsPressed();
+                scrollForwardWasPressed = m_actionScrollForward.WasPressedThisFrame();
+                scrollForwardIsPressed = m_actionScrollForward.IsPressed();
+                pushToTalkIsPressed = m_actionPushToTalk.IsPressed();
+                openNotebookWasPressed = m_actionOpenNotebook.WasPressedThisFrame();
+                closeNotebookWasPressed = m_actionCloseNotebook.WasPressedThisFrame();
+            }
             pauseWasPressed = m_actionPause.WasPressedThisFrame();
-            movementInput = m_actionMove.ReadValue<Vector2>();
-            lookInput = m_actionLook.ReadValue<Vector2>();
-            aimIsPressed = m_actionAim.IsPressed();
-            castWasPressed = m_actionCast.WasPressedThisFrame();
-            castIsPressed = m_actionCast.IsPressed();
-            castWasReleased = m_actionCast.WasReleasedThisFrame();
-            crouchWasPressed = m_actionCrouch.WasPressedThisFrame();
-            crouchIsPressed = m_actionCrouch.IsPressed();
-            sprintWasPressed = m_actionSprint.WasPressedThisFrame();
-            sprintIsPressed = m_actionSprint.IsPressed();
-            jumpWasPressed = m_actionJump.WasPressedThisFrame();
-            interactWasPressed = m_actionInteract.WasPressedThisFrame();
-            interactIsPressed = m_actionInteract.IsPressed();
-            interactWasReleased = m_actionInteract.WasReleasedThisFrame();
-            dropWasPressed = m_actionDrop.WasPressedThisFrame();
-            previousWasPressed = m_actionPrevious.WasPressedThisFrame();
-            previousIsPressed = m_actionPrevious.IsPressed();
-            nextWasPressed = m_actionNext.WasPressedThisFrame();
-            nextIsPressed = m_actionNext.IsPressed();
-            scrollInput = m_actionScroll.ReadValue<float>();
-            scrollButtonWasPressed = m_actionScrollButton.WasPressedThisFrame();
-            scrollBackwardWasPressed = m_actionScrollBackward.WasPressedThisFrame();
-            scrollBackwardIsPressed = m_actionScrollBackward.IsPressed();
-            scrollForwardWasPressed = m_actionScrollForward.WasPressedThisFrame();
-            scrollForwardIsPressed = m_actionScrollForward.IsPressed();
-            pushToTalkIsPressed = m_actionPushToTalk.IsPressed();
-            openNotebookWasPressed = m_actionOpenNotebook.WasPressedThisFrame();
             resumeWasPressed = m_actionResume.WasPressedThisFrame();
-            closeNotebookWasPressed = m_actionCloseNotebook.WasPressedThisFrame();
         }
 
         private void ResetInput()

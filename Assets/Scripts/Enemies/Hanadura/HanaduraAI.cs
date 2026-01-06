@@ -11,7 +11,7 @@ using Logger = RooseLabs.Core.Logger;
 namespace RooseLabs.Enemies
 {
     [RequireComponent(typeof(NavMeshAgent))]
-    public class HanaduraAI : BaseEnemy, ISoundListener
+    public class HanaduraAI : BaseEnemy, ISoundListener, IPetrifiable
     {
         private static Logger Logger => Logger.GetLogger("Hanadura");
 
@@ -89,6 +89,16 @@ namespace RooseLabs.Enemies
         private float attackLockDuration = 0f;
 
         private bool hasPlayedDeathAnimation = false;
+
+        // Petrify state
+        private bool m_isPetrified;
+        private float m_petrifyDuration;
+        private float m_petrifyElapsed;
+        private float m_originalAnimatorSpeed;
+        private Coroutine m_petrifyCoroutine;
+        private IEnemyState m_stateBeforePetrify;
+
+        public bool IsPetrified => m_isPetrified;
 
         #region Detection Priority System
         public enum DetectionPriority
@@ -244,6 +254,7 @@ namespace RooseLabs.Enemies
         {
             if (!IsServerInitialized) return;
             if (IsDead) return;
+            if (m_isPetrified) return; // Skip all AI updates while petrified
 
             // Check if Detected animation finished
             if (isPlayingDetectedAnimation)
@@ -860,6 +871,146 @@ namespace RooseLabs.Enemies
         public string GetCurrentPatrolRoomId()
         {
             return isPatrollingRandomRoom ? currentRandomRoomId : originalRoomId;
+        }
+        #endregion
+
+        #region IPetrifiable Implementation
+        public void Petrify(float duration)
+        {
+            if (IsDead) return;
+            if (m_isPetrified) return; // Already petrified, no effect
+
+            m_isPetrified = true;
+            m_petrifyDuration = duration;
+            m_petrifyElapsed = 0f;
+
+            // Store current state to restore later
+            m_stateBeforePetrify = currentState;
+
+            // Freeze animator at current frame
+            if (animator)
+            {
+                m_originalAnimatorSpeed = animator.speed;
+                animator.speed = 0f;
+            }
+
+            // Stop NavMeshAgent movement
+            if (navAgent && navAgent.isActiveAndEnabled)
+            {
+                navAgent.isStopped = true;
+                navAgent.velocity = Vector3.zero;
+            }
+
+            Logger.Info($"{gameObject.name} petrified for {duration}s");
+
+            // Sync to all clients
+            if (IsServerInitialized)
+            {
+                Petrify_ObserversRpc(duration);
+            }
+
+            // Start unpetrify timer
+            if (m_petrifyCoroutine != null)
+            {
+                StopCoroutine(m_petrifyCoroutine);
+            }
+            m_petrifyCoroutine = StartCoroutine(PetrifyTimerCoroutine());
+        }
+
+        public void Unpetrify()
+        {
+            if (!m_isPetrified) return;
+
+            m_isPetrified = false;
+
+            // Resume animator
+            if (animator)
+            {
+                animator.speed = m_originalAnimatorSpeed;
+            }
+
+            // Resume NavMeshAgent (will be controlled by state machine)
+            if (navAgent && navAgent.isActiveAndEnabled)
+            {
+                navAgent.isStopped = false;
+            }
+
+            Logger.Info($"{gameObject.name} unpetrified");
+
+            // Sync to all clients
+            if (IsServerInitialized)
+            {
+                Unpetrify_ObserversRpc();
+            }
+
+            if (m_petrifyCoroutine != null)
+            {
+                StopCoroutine(m_petrifyCoroutine);
+                m_petrifyCoroutine = null;
+            }
+        }
+
+        private IEnumerator PetrifyTimerCoroutine()
+        {
+            while (m_petrifyElapsed < m_petrifyDuration)
+            {
+                m_petrifyElapsed += Time.deltaTime;
+                yield return null;
+            }
+
+            Unpetrify();
+        }
+
+        [ObserversRpc(ExcludeServer = true)]
+        private void Petrify_ObserversRpc(float duration)
+        {
+            if (m_isPetrified) return;
+
+            m_isPetrified = true;
+            m_petrifyDuration = duration;
+            m_petrifyElapsed = 0f;
+
+            if (animator)
+            {
+                m_originalAnimatorSpeed = animator.speed;
+                animator.speed = 0f;
+            }
+
+            if (navAgent && navAgent.isActiveAndEnabled)
+            {
+                navAgent.isStopped = true;
+                navAgent.velocity = Vector3.zero;
+            }
+
+            if (m_petrifyCoroutine != null)
+            {
+                StopCoroutine(m_petrifyCoroutine);
+            }
+            m_petrifyCoroutine = StartCoroutine(PetrifyTimerCoroutine());
+        }
+
+        [ObserversRpc(ExcludeServer = true)]
+        private void Unpetrify_ObserversRpc()
+        {
+            if (!m_isPetrified) return;
+
+            m_isPetrified = false;
+
+            if (animator)
+            {
+                animator.speed = m_originalAnimatorSpeed;
+            }
+
+            if (navAgent && navAgent.isActiveAndEnabled)
+            {
+                navAgent.isStopped = false;
+            }
+
+            if (m_petrifyCoroutine != null)
+            {
+                StopCoroutine(m_petrifyCoroutine);
+                m_petrifyCoroutine = null;
+            }
         }
         #endregion
 

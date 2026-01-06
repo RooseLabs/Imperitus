@@ -88,6 +88,22 @@ namespace RooseLabs.Player
             }
         }
 
+        private bool m_isPetrified = false;
+        public bool IsPetrified
+        {
+            get => m_isPetrified;
+            set
+            {
+                if (m_isPetrified == value) return;
+                m_isPetrified = value;
+                if (value)
+                {
+                    m_isSprinting = false;
+                }
+                StateChangedThisFrame = true;
+            }
+        }
+
         private float m_currentSpeed;
         public float CurrentSpeed
         {

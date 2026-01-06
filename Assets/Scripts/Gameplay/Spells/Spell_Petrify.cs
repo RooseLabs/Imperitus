@@ -23,6 +23,8 @@ namespace RooseLabs.Gameplay.Spells
         [SerializeField] private float beamMaxRange = 20f;
         [Tooltip("How long the beam visual remains visible after firing (seconds).")]
         [SerializeField] private float beamDuration = 1f;
+        [Tooltip("How long targets remain petrified (seconds).")]
+        [SerializeField] private float petrifyDuration = 5f;
 
         [Header("Beam Visual")]
         [SerializeField] private GameObject beamObject;
@@ -152,8 +154,18 @@ namespace RooseLabs.Gameplay.Spells
             if (!hitCollider) return;
             // Avoid applying to the same collider repeatedly
             if (!m_petrifiedTargets.Add(hitCollider)) return;
-            // TODO: Implement gameplay effect (petrify / immobilize) hit target here.
-            this.LogInfo($"[Petrify] Apply petrify to {hitCollider.name} at {hitPoint}");
+
+            // Try to find IPetrifiable on the hit object or its parents
+            IPetrifiable petrifiable = hitCollider.GetComponentInParent<IPetrifiable>();
+            if (petrifiable != null)
+            {
+                petrifiable.Petrify(petrifyDuration);
+                this.LogInfo($"[Petrify] Applied petrify to {hitCollider.name} for {petrifyDuration}s");
+            }
+            else
+            {
+                this.LogInfo($"[Petrify] Hit {hitCollider.name} but target is not petrifiable (immune or not implemented)");
+            }
         }
 
         private void PlaySnakeAnimation(float normalized, float speed = 0f)

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
+using RooseLabs.Gameplay;
 using RooseLabs.Player;
 using RooseLabs.Utils;
 using UnityEngine;
@@ -14,7 +15,7 @@ namespace RooseLabs.Enemies
     /// and calls Hanadura reinforcements when a player is spotted
     /// </summary>
     [RequireComponent(typeof(NavMeshAgent))]
-    public class GrimoireAI : BaseEnemy
+    public class GrimoireAI : BaseEnemy, IPetrifiable
     {
         [Header("References")]
         public NavMeshAgent navAgent;
@@ -74,6 +75,13 @@ namespace RooseLabs.Enemies
         private PlayerCharacter m_cachedSpotlightTargetCharacter;
         private float m_reinforcementTimer;
         private float m_detectionTimer;
+
+        // Petrify state
+        private bool m_isPetrified;
+        private float m_petrifyDuration;
+        private float m_petrifyElapsed;
+        private float m_originalAnimatorSpeed;
+        private Coroutine m_petrifyCoroutine;
         #endregion
 
         #region Network Synchronized Variables
@@ -82,6 +90,7 @@ namespace RooseLabs.Enemies
 
         #region Public Properties
         public Transform DetectedPlayer => m_detectedPlayer;
+        public bool IsPetrified => m_isPetrified;
         #endregion
 
         // FSM States
@@ -146,6 +155,7 @@ namespace RooseLabs.Enemies
         {
             if (!IsServerInitialized) return;
             if (IsDead) return;
+            if (m_isPetrified) return; // Skip all AI updates while petrified
 
             if (showDebugRay)
             {
@@ -180,6 +190,7 @@ namespace RooseLabs.Enemies
         private void LateUpdate()
         {
             if (IsDead) return;
+            if (m_isPetrified) return; // Skip visual updates while petrified
 
             // Update all visual elements (spotlight, model rotation) on both server and clients
             UpdateVisuals();
@@ -530,6 +541,143 @@ namespace RooseLabs.Enemies
             yield return new WaitForSeconds(10f);
             Despawn(gameObject);
         }
+
+        #region IPetrifiable Implementation
+        public void Petrify(float duration)
+        {
+            if (IsDead) return;
+            if (m_isPetrified) return; // Already petrified, no effect
+
+            m_isPetrified = true;
+            m_petrifyDuration = duration;
+            m_petrifyElapsed = 0f;
+
+            // Freeze animator at current frame
+            if (animator)
+            {
+                m_originalAnimatorSpeed = animator.speed;
+                animator.speed = 0f;
+            }
+
+            // Stop NavMeshAgent movement
+            if (navAgent && navAgent.isActiveAndEnabled)
+            {
+                navAgent.isStopped = true;
+                navAgent.velocity = Vector3.zero;
+            }
+
+            this.LogInfo($"{gameObject.name} petrified for {duration}s");
+
+            // Sync to all clients
+            if (IsServerInitialized)
+            {
+                Petrify_ObserversRpc(duration);
+            }
+
+            // Start unpetrify timer
+            if (m_petrifyCoroutine != null)
+            {
+                StopCoroutine(m_petrifyCoroutine);
+            }
+            m_petrifyCoroutine = StartCoroutine(PetrifyTimerCoroutine());
+        }
+
+        public void Unpetrify()
+        {
+            if (!m_isPetrified) return;
+
+            m_isPetrified = false;
+
+            // Resume animator
+            if (animator)
+            {
+                animator.speed = m_originalAnimatorSpeed;
+            }
+
+            // Resume NavMeshAgent (will be controlled by state machine)
+            if (navAgent && navAgent.isActiveAndEnabled)
+            {
+                navAgent.isStopped = false;
+            }
+
+            this.LogInfo($"{gameObject.name} unpetrified");
+
+            // Sync to all clients
+            if (IsServerInitialized)
+            {
+                Unpetrify_ObserversRpc();
+            }
+
+            if (m_petrifyCoroutine != null)
+            {
+                StopCoroutine(m_petrifyCoroutine);
+                m_petrifyCoroutine = null;
+            }
+        }
+
+        private IEnumerator PetrifyTimerCoroutine()
+        {
+            while (m_petrifyElapsed < m_petrifyDuration)
+            {
+                m_petrifyElapsed += Time.deltaTime;
+                yield return null;
+            }
+
+            Unpetrify();
+        }
+
+        [ObserversRpc(ExcludeServer = true)]
+        private void Petrify_ObserversRpc(float duration)
+        {
+            if (m_isPetrified) return;
+
+            m_isPetrified = true;
+            m_petrifyDuration = duration;
+            m_petrifyElapsed = 0f;
+
+            if (animator)
+            {
+                m_originalAnimatorSpeed = animator.speed;
+                animator.speed = 0f;
+            }
+
+            if (navAgent && navAgent.isActiveAndEnabled)
+            {
+                navAgent.isStopped = true;
+                navAgent.velocity = Vector3.zero;
+            }
+
+            if (m_petrifyCoroutine != null)
+            {
+                StopCoroutine(m_petrifyCoroutine);
+            }
+            m_petrifyCoroutine = StartCoroutine(PetrifyTimerCoroutine());
+        }
+
+        [ObserversRpc(ExcludeServer = true)]
+        private void Unpetrify_ObserversRpc()
+        {
+            if (!m_isPetrified) return;
+
+            m_isPetrified = false;
+
+            if (animator)
+            {
+                animator.speed = m_originalAnimatorSpeed;
+            }
+
+            if (navAgent && navAgent.isActiveAndEnabled)
+            {
+                navAgent.isStopped = false;
+            }
+
+            if (m_petrifyCoroutine != null)
+            {
+                StopCoroutine(m_petrifyCoroutine);
+                m_petrifyCoroutine = null;
+            }
+        }
+        #endregion
 
         #if UNITY_EDITOR
         protected override void Reset()

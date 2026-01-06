@@ -18,7 +18,7 @@ namespace RooseLabs.Player
     [DefaultExecutionOrder(-97)]
     [RequireComponent(typeof(PlayerInput))]
     [RequireComponent(typeof(PlayerData))]
-    public class PlayerCharacter : NetworkBehaviour, IDamageable
+    public class PlayerCharacter : NetworkBehaviour, IDamageable, IPetrifiable
     {
         #region Serialized
         [field: SerializeField] public Transform ModelTransform { get; private set; }
@@ -55,6 +55,14 @@ namespace RooseLabs.Player
 
         private Vector3 m_lastSpawnPosition;
         private float m_lastSpawnLookX;
+
+        // Petrify state
+        private float m_petrifyDuration;
+        private float m_petrifyElapsed;
+        private float m_originalAnimatorSpeed;
+        private Coroutine m_petrifyCoroutine;
+
+        public bool IsPetrified => Data.IsPetrified;
 
         private void Awake()
         {
@@ -122,7 +130,7 @@ namespace RooseLabs.Player
         private void Update()
         {
             if (!IsOwner) return;
-            Input.Sample();
+            Input.Sample(Data.IsPetrified);
 
             UpdateVariables();
         }
@@ -294,6 +302,119 @@ namespace RooseLabs.Player
             // Reset the runes in the notebook
             Notebook.ResetNotebook();
         }
+
+        #region IPetrifiable Implementation
+        public void Petrify(float duration)
+        {
+            if (Data.isDead) return;
+            if (Data.IsPetrified) return; // Already petrified, no effect
+
+            Data.IsPetrified = true;
+            m_petrifyDuration = duration;
+            m_petrifyElapsed = 0f;
+
+            // Freeze animator at current frame
+            if (Animations && Animations.Animator)
+            {
+                m_originalAnimatorSpeed = Animations.Animator.speed;
+                Animations.Animator.speed = 0f;
+            }
+
+            this.LogInfo($"Player '{Player?.PlayerName ?? "Unknown"}' petrified for {duration}s");
+
+            // Sync to all clients
+            if (IsServerInitialized)
+            {
+                Petrify_ObserversRpc(duration);
+            }
+
+            // Start unpetrify timer
+            if (m_petrifyCoroutine != null)
+            {
+                StopCoroutine(m_petrifyCoroutine);
+            }
+            m_petrifyCoroutine = StartCoroutine(PetrifyTimerCoroutine());
+        }
+
+        public void Unpetrify()
+        {
+            if (!Data.IsPetrified) return;
+
+            Data.IsPetrified = false;
+
+            // Resume animator
+            if (Animations && Animations.Animator)
+            {
+                Animations.Animator.speed = m_originalAnimatorSpeed;
+            }
+
+            this.LogInfo($"Player '{Player?.PlayerName ?? "Unknown"}' unpetrified");
+
+            // Sync to all clients
+            if (IsServerInitialized)
+            {
+                Unpetrify_ObserversRpc();
+            }
+
+            if (m_petrifyCoroutine != null)
+            {
+                StopCoroutine(m_petrifyCoroutine);
+                m_petrifyCoroutine = null;
+            }
+        }
+
+        private IEnumerator PetrifyTimerCoroutine()
+        {
+            while (m_petrifyElapsed < m_petrifyDuration)
+            {
+                m_petrifyElapsed += Time.deltaTime;
+                yield return null;
+            }
+
+            Unpetrify();
+        }
+
+        [ObserversRpc(ExcludeServer = true)]
+        private void Petrify_ObserversRpc(float duration)
+        {
+            if (Data.IsPetrified) return;
+
+            Data.IsPetrified = true;
+            m_petrifyDuration = duration;
+            m_petrifyElapsed = 0f;
+
+            if (Animations && Animations.Animator)
+            {
+                m_originalAnimatorSpeed = Animations.Animator.speed;
+                Animations.Animator.speed = 0f;
+            }
+
+            if (m_petrifyCoroutine != null)
+            {
+                StopCoroutine(m_petrifyCoroutine);
+            }
+            m_petrifyCoroutine = StartCoroutine(PetrifyTimerCoroutine());
+        }
+
+        [ObserversRpc(ExcludeServer = true)]
+        private void Unpetrify_ObserversRpc()
+        {
+            if (!Data.IsPetrified) return;
+
+            Data.IsPetrified = false;
+
+            if (Animations && Animations.Animator)
+            {
+                Animations.Animator.speed = m_originalAnimatorSpeed;
+            }
+
+            if (m_petrifyCoroutine != null)
+            {
+                StopCoroutine(m_petrifyCoroutine);
+                m_petrifyCoroutine = null;
+            }
+        }
+        #endregion
 
         #region Utils
         public Vector3 Center => ModelTransform.position + ModelTransform.up * 1.7f * 0.5f;
