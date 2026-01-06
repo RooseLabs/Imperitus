@@ -1104,6 +1104,52 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4056207075611703185, guid: 0a5f3508e9e257146aabe6af0c28f038, type: 3}
   m_PrefabInstance: {fileID: 56141449}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &59369511
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 59369512}
+  - component: {fileID: 59369513}
+  m_Layer: 0
+  m_Name: WordCarrierPaperSpawnPoint (4)_1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &59369512
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 59369511}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.38460034, y: 0.5933655, z: 0.5933655, w: 0.38460034}
+  m_LocalPosition: {x: -4.8, y: 0.838, z: 1.008}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1242945814}
+  m_LocalEulerAnglesHint: {x: -90, y: 0, z: 114.1}
+--- !u!114 &59369513
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 59369511}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9299db860f724a43bd7954373a0daa40, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Gameplay.ObjectSpawnPoint
+  <AllowedObjects>k__BackingField:
+  - {fileID: 6999498111345733911, guid: 1a0bea8430d21f24b9c9c1162b37802b, type: 3}
 --- !u!1001 &59796946
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1914,6 +1960,52 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4595481999434559604, guid: f1ce3a9c6d3682641b9b5bf4eda3a586, type: 3}
   m_PrefabInstance: {fileID: 117306743}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &117578369
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 117578370}
+  - component: {fileID: 117578371}
+  m_Layer: 0
+  m_Name: WordCarrierPaperSpawnPoint (4)_3
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &117578370
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 117578369}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.3038605, y: 0.63848954, z: 0.63848954, w: 0.3038605}
+  m_LocalPosition: {x: -7.673, y: 0.8439999, z: 2.576}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1242945814}
+  m_LocalEulerAnglesHint: {x: -90, y: 0, z: 129.1}
+--- !u!114 &117578371
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 117578369}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9299db860f724a43bd7954373a0daa40, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Gameplay.ObjectSpawnPoint
+  <AllowedObjects>k__BackingField:
+  - {fileID: 6999498111345733911, guid: 1a0bea8430d21f24b9c9c1162b37802b, type: 3}
 --- !u!1001 &118477520
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2221,6 +2313,52 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5441303951355723906, guid: d3cbf139a70efdf4abe3d89ff64c6fde, type: 3}
   m_PrefabInstance: {fileID: 120863895}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &120989407
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 120989408}
+  - component: {fileID: 120989409}
+  m_Layer: 0
+  m_Name: WordCarrierPaperSpawnPoint (4)_4
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &120989408
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 120989407}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.11793805, y: 0.87891054, z: 0.36405596, w: 0.28472814}
+  m_LocalPosition: {x: -8.432, y: 2.264, z: 3.231}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1242945814}
+  m_LocalEulerAnglesHint: {x: -135, y: -35.899994, z: 180}
+--- !u!114 &120989409
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 120989407}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9299db860f724a43bd7954373a0daa40, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Gameplay.ObjectSpawnPoint
+  <AllowedObjects>k__BackingField:
+  - {fileID: 6999498111345733911, guid: 1a0bea8430d21f24b9c9c1162b37802b, type: 3}
 --- !u!1001 &123661060
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9231,6 +9369,52 @@ Transform:
   - {fileID: 1167507691}
   m_Father: {fileID: 986440844}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &485706396
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 485706397}
+  - component: {fileID: 485706398}
+  m_Layer: 0
+  m_Name: WordCarrierPaperSpawnPoint (4)_6
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &485706397
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 485706396}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.62975633, y: 0.384601, z: 0.32156935, w: -0.5933652}
+  m_LocalPosition: {x: -9.2536, y: 1.6311, z: 5.3139}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1242945814}
+  m_LocalEulerAnglesHint: {x: -210, y: 84.1, z: 90}
+--- !u!114 &485706398
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 485706396}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9299db860f724a43bd7954373a0daa40, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Gameplay.ObjectSpawnPoint
+  <AllowedObjects>k__BackingField:
+  - {fileID: 6999498111345733911, guid: 1a0bea8430d21f24b9c9c1162b37802b, type: 3}
 --- !u!1001 &488760932
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10383,6 +10567,52 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6477355858482040092, guid: c5aacfb3e4672be408066ec40bc01b30, type: 3}
   m_PrefabInstance: {fileID: 541317561}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &543147298
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 543147299}
+  - component: {fileID: 543147300}
+  m_Layer: 0
+  m_Name: WordCarrierPaperSpawnPoint (5)_1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &543147299
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 543147298}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.38460034, y: -0.5933655, z: -0.5933655, w: 0.38460034}
+  m_LocalPosition: {x: 4.799, y: 2.215, z: 1.025}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1242945814}
+  m_LocalEulerAnglesHint: {x: -90, y: 0, z: -114.1}
+--- !u!114 &543147300
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 543147298}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9299db860f724a43bd7954373a0daa40, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Gameplay.ObjectSpawnPoint
+  <AllowedObjects>k__BackingField:
+  - {fileID: 6999498111345733911, guid: 1a0bea8430d21f24b9c9c1162b37802b, type: 3}
 --- !u!1 &552845681
 GameObject:
   m_ObjectHideFlags: 0
@@ -10423,7 +10653,7 @@ Transform:
   m_GameObject: {fileID: 552845681}
   serializedVersion: 2
   m_LocalRotation: {x: -0.38460034, y: 0.5933655, z: 0.5933655, w: 0.38460034}
-  m_LocalPosition: {x: -5.4860005, y: 1.521, z: 1.3400002}
+  m_LocalPosition: {x: -5.549, y: 1.521, z: 1.3400002}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -10858,6 +11088,52 @@ Transform:
   - {fileID: 1047061230}
   m_Father: {fileID: 986440844}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &583103631
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 583103632}
+  - component: {fileID: 583103633}
+  m_Layer: 0
+  m_Name: WordCarrierPaperSpawnPoint (5)_4
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &583103632
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 583103631}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.49474752, y: -0.13963428, z: -0.8507862, w: 0.10904131}
+  m_LocalPosition: {x: 6.4031, y: 1.7893999, z: 1.7797}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1242945814}
+  m_LocalEulerAnglesHint: {x: -159.788, y: -840.158, z: 2.8939972}
+--- !u!114 &583103633
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 583103631}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9299db860f724a43bd7954373a0daa40, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Gameplay.ObjectSpawnPoint
+  <AllowedObjects>k__BackingField:
+  - {fileID: 6999498111345733911, guid: 1a0bea8430d21f24b9c9c1162b37802b, type: 3}
 --- !u!1001 &583526922
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -12878,6 +13154,52 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6442625271601168269, guid: 714114c3112bd8d418e515f6e5594ad8, type: 3}
   m_PrefabInstance: {fileID: 708359782}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &709202389
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 709202390}
+  - component: {fileID: 709202391}
+  m_Layer: 0
+  m_Name: WordCarrierPaperSpawnPoint (4)_7
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &709202390
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 709202389}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.7061697, y: 0.03639224, z: -0.0363904, w: -0.7061697}
+  m_LocalPosition: {x: -9.191, y: 0.845, z: 4.841}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1242945814}
+  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 5.9}
+--- !u!114 &709202391
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 709202389}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9299db860f724a43bd7954373a0daa40, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Gameplay.ObjectSpawnPoint
+  <AllowedObjects>k__BackingField:
+  - {fileID: 6999498111345733911, guid: 1a0bea8430d21f24b9c9c1162b37802b, type: 3}
 --- !u!1 &722360899
 GameObject:
   m_ObjectHideFlags: 0
@@ -14440,6 +14762,52 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3320403904291209154, guid: 0db05b3334ae9b1408443422bd866682, type: 3}
   m_PrefabInstance: {fileID: 853029674}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &854783004
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 854783005}
+  - component: {fileID: 854783006}
+  m_Layer: 0
+  m_Name: WordCarrierPaperSpawnPoint (5)_3
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &854783005
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 854783004}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.28671724, y: -0.6463693, z: -0.6463693, w: 0.28671724}
+  m_LocalPosition: {x: 7.874, y: 0.834, z: 2.712}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1242945814}
+  m_LocalEulerAnglesHint: {x: -90, y: 0, z: -132.158}
+--- !u!114 &854783006
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 854783004}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9299db860f724a43bd7954373a0daa40, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Gameplay.ObjectSpawnPoint
+  <AllowedObjects>k__BackingField:
+  - {fileID: 6999498111345733911, guid: 1a0bea8430d21f24b9c9c1162b37802b, type: 3}
 --- !u!1001 &865820863
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -21066,7 +21434,18 @@ Transform:
   - {fileID: 137907566}
   - {fileID: 1095923964}
   - {fileID: 552845684}
+  - {fileID: 117578370}
+  - {fileID: 1258687255}
+  - {fileID: 485706397}
+  - {fileID: 709202390}
+  - {fileID: 59369512}
+  - {fileID: 1570852965}
+  - {fileID: 120989408}
   - {fileID: 1727153681}
+  - {fileID: 583103632}
+  - {fileID: 543147299}
+  - {fileID: 1779829607}
+  - {fileID: 854783005}
   - {fileID: 1557311017}
   - {fileID: 954938750}
   - {fileID: 1205871856}
@@ -21320,6 +21699,52 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1367626995394045579, guid: bd04f3a294ce8f949a4b1f0670b7591b, type: 3}
   m_PrefabInstance: {fileID: 1252617060}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1258687254
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1258687255}
+  - component: {fileID: 1258687256}
+  m_Layer: 0
+  m_Name: WordCarrierPaperSpawnPoint (4)_5
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1258687255
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1258687254}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.3038605, y: 0.63848954, z: 0.63848954, w: 0.3038605}
+  m_LocalPosition: {x: -8.084, y: 1.521, z: 2.941}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1242945814}
+  m_LocalEulerAnglesHint: {x: -90, y: 0, z: 129.1}
+--- !u!114 &1258687256
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1258687254}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9299db860f724a43bd7954373a0daa40, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Gameplay.ObjectSpawnPoint
+  <AllowedObjects>k__BackingField:
+  - {fileID: 6999498111345733911, guid: 1a0bea8430d21f24b9c9c1162b37802b, type: 3}
 --- !u!1001 &1262843752
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -26985,6 +27410,52 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5441303951355723906, guid: d3cbf139a70efdf4abe3d89ff64c6fde, type: 3}
   m_PrefabInstance: {fileID: 1568641089}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1570852964
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1570852965}
+  - component: {fileID: 1570852966}
+  m_Layer: 0
+  m_Name: WordCarrierPaperSpawnPoint (4)_2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1570852965
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1570852964}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.20814395, y: 0.77526957, z: 0.32112664, w: 0.5025047}
+  m_LocalPosition: {x: -4.2387, y: 2.264, z: 0.762}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1242945814}
+  m_LocalEulerAnglesHint: {x: -135, y: -65.899994, z: 180}
+--- !u!114 &1570852966
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1570852964}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9299db860f724a43bd7954373a0daa40, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Gameplay.ObjectSpawnPoint
+  <AllowedObjects>k__BackingField:
+  - {fileID: 6999498111345733911, guid: 1a0bea8430d21f24b9c9c1162b37802b, type: 3}
 --- !u!1001 &1581559594
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -27467,7 +27938,7 @@ Transform:
   m_GameObject: {fileID: 1622498513}
   serializedVersion: 2
   m_LocalRotation: {x: -0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 9.229769, y: 2.899, z: 5.2689104}
+  m_LocalPosition: {x: 9.229769, y: 2.274, z: 5.47}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -30265,6 +30736,52 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6974132296118548669, guid: fdb4c2a37a77f2243aac279be8e2ddcd, type: 3}
   m_PrefabInstance: {fileID: 1776075916}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1779829606
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1779829607}
+  - component: {fileID: 1779829608}
+  m_Layer: 0
+  m_Name: WordCarrierPaperSpawnPoint (5)_2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1779829607
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1779829606}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.3038605, y: -0.63848954, z: -0.63848954, w: 0.3038605}
+  m_LocalPosition: {x: 8.048, y: 2.215, z: 2.89}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1242945814}
+  m_LocalEulerAnglesHint: {x: -90, y: 0, z: -129.1}
+--- !u!114 &1779829608
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1779829606}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9299db860f724a43bd7954373a0daa40, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Gameplay.ObjectSpawnPoint
+  <AllowedObjects>k__BackingField:
+  - {fileID: 6999498111345733911, guid: 1a0bea8430d21f24b9c9c1162b37802b, type: 3}
 --- !u!1001 &1782017112
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -37123,6 +37640,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1837007889}
     m_Modifications:
+    - target: {fileID: 5074113067893286652, guid: 57f09590df1dad54a994e9671ec65b4b, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 2.928
+      objectReference: {fileID: 0}
     - target: {fileID: 6301437122116156808, guid: 57f09590df1dad54a994e9671ec65b4b, type: 3}
       propertyPath: m_Name
       value: LongBookShelves
