@@ -149,6 +149,22 @@ namespace RooseLabs.Enemies
             SpawnInitialEnemies();
         }
 
+        public void OnHeistEnd()
+        {
+            heistStarted = false;
+            StopAllCoroutines();
+            respawnQueue.Clear();
+            allSpawners.Clear();
+            activeEnemies.Clear();
+            roomActiveEnemies.Clear();
+            roomActiveGrimoires.Clear();
+            roomActiveHanaduras.Clear();
+            roomRandomPatrollers.Clear();
+            lastTaskProgressSpawnTime = -999f;
+
+            this.LogInfo("Heist ended - cleared all spawn manager data");
+        }
+
         /// <summary>
         /// Register a Hanadura as randomly patrolling a room
         /// </summary>
@@ -484,6 +500,12 @@ namespace RooseLabs.Enemies
 
         private GameObject SpawnEnemyAtSpawner(EnemySpawner spawner, bool isGrimoire, Vector3 alertPosition = default, bool isAlert = false)
         {
+            if (spawner == null)
+            {
+                this.LogWarning("Cannot spawn enemy - spawner is null or destroyed");
+                return null;
+            }
+
             GameObject prefabToSpawn = isGrimoire ? grimoirePrefab : hanaduraPrefab;
             if (prefabToSpawn == null)
             {
@@ -1177,6 +1199,12 @@ namespace RooseLabs.Enemies
             while (respawnQueue.Count > 0 && respawnQueue.Peek().spawnTime <= Time.time)
             {
                 PendingRespawn pending = respawnQueue.Dequeue();
+
+                if (pending.preferredSpawner == null)
+                {
+                    LogDebug("Skipped queued respawn - spawner was destroyed", true);
+                    continue;
+                }
 
                 if (pending.isAlertSpawn)
                 {

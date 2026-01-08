@@ -90,6 +90,9 @@ namespace RooseLabs.Gameplay
             m_isEndingHeist = true;
             m_isHeistOngoing = false;
             m_heistTimer.StopTimer();
+
+            EnemySpawnManager.Instance?.OnHeistEnd();
+
             if (!successful)
             {
                 // Mark all tasks as incomplete
