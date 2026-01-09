@@ -4786,7 +4786,7 @@ ParticleSystem:
     vectorLabel1_3: W
 --- !u!199 &3742289983095233802
 ParticleSystemRenderer:
-  serializedVersion: 6
+  serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -4832,6 +4832,7 @@ ParticleSystemRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_RenderMode: 4
   m_MeshDistribution: 0
   m_SortMode: 3
@@ -4863,7 +4864,6 @@ ParticleSystemRenderer:
   m_MeshWeighting1: 1
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
-  m_MaskInteraction: 0
 --- !u!1 &4967241221068748326
 GameObject:
   m_ObjectHideFlags: 0
@@ -9707,7 +9707,7 @@ ParticleSystem:
     vectorLabel1_3: W
 --- !u!199 &4166667221036075642
 ParticleSystemRenderer:
-  serializedVersion: 6
+  serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -9753,6 +9753,7 @@ ParticleSystemRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_RenderMode: 4
   m_MeshDistribution: 0
   m_SortMode: 0
@@ -9784,7 +9785,6 @@ ParticleSystemRenderer:
   m_MeshWeighting1: 1
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
-  m_MaskInteraction: 0
 --- !u!1 &8568110119652573094
 GameObject:
   m_ObjectHideFlags: 0
@@ -9857,7 +9857,7 @@ MonoBehaviour:
   <PredictedOwner>k__BackingField: {fileID: 0}
   NetworkBehaviours:
   - {fileID: 222979764584488480}
-  - {fileID: 0}
+  - {fileID: 8744973044464274324}
   InitializedParentNetworkBehaviour: {fileID: 0}
   InitializedNestedNetworkObjects: []
   RuntimeParentNetworkBehaviour: {fileID: 0}
@@ -9867,8 +9867,8 @@ MonoBehaviour:
   _isGlobal: 0
   _initializeOrder: 0
   _preventDespawnOnDisconnect: 0
-  _defaultDespawnType: 1
-  _initializedTimestamp: -8584372071486486785
+  _defaultDespawnType: 0
+  _initializedTimestamp: -8584338125934615067
   NetworkObserver: {fileID: 0}
   _enablePrediction: 0
   _predictionType: 0
@@ -9883,7 +9883,7 @@ MonoBehaviour:
   _spectatorInterpolation: 2
   _enableTeleport: 0
   _teleportThreshold: 1
-  <PrefabId>k__BackingField: 9
+  <PrefabId>k__BackingField: 4
   <SpawnableCollectionId>k__BackingField: 0
   <AssetPathHash>k__BackingField: 3277100790180427164
   SceneId: 0
@@ -9904,9 +9904,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ad68f188e2c6d9343896906e664d5fc0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  _componentIndexCache: 255
+  _componentIndexCache: 1
   _addedNetworkObject: {fileID: 7572028257010240170}
-  _networkObjectCache: {fileID: 0}
+  _networkObjectCache: {fileID: 7572028257010240170}
   <SpellInfo>k__BackingField: {fileID: 11400000, guid: bd9f934d307ca23419ae0517338ca691, type: 2}
   castType: 1
   castTime: 0

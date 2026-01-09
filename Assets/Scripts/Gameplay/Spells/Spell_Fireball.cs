@@ -120,11 +120,5 @@ namespace RooseLabs.Gameplay.Spells
             LaunchProjectile(direction);
         }
         #endregion
-
-        protected override void ResetData()
-        {
-            base.ResetData();
-            vfxGameObject?.SetActive(false);
-        }
     }
 }

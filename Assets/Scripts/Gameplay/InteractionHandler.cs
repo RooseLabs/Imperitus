@@ -35,6 +35,11 @@ namespace RooseLabs.Gameplay
                     GUIManager.Instance.SetInteractionText(string.Empty);
                     if (m_currentInteractable is Component c)
                     {
+                        if (m_currentInteractable is Draggable { IsBeingDraggedByImpero: true })
+                        {
+                            // Don't unhighlight if being dragged
+                            return;
+                        }
                         HelperFunctions.UnhighlightObject(c);
                     }
                 }
@@ -72,15 +77,22 @@ namespace RooseLabs.Gameplay
         {
             m_bestInteractable = null;
             var character = PlayerCharacter.LocalCharacter;
-            if (character.RaycastIgnoreSelf(
-                    character.Camera.transform.position, character.Camera.transform.forward,
-                    out var hitInfo, InteractMaxDistance, HelperFunctions.AllPhysicalLayerMask,
-                    queryTriggerInteraction: QueryTriggerInteraction.Collide)
-                && hitInfo.collider.TryGetComponent(out IInteractable interactable)
-                && interactable.IsInteractable(character)
+            var ray = new Ray(character.Camera.transform.position, character.Camera.transform.forward);
+            if (character.RaycastIgnoreSelf(ray, out var hitInfo1, InteractMaxDistance,
+                    HelperFunctions.AllPhysicalLayerMask, QueryTriggerInteraction.Collide)
+                && hitInfo1.collider.TryGetComponent(out IInteractable interactable1)
+                && interactable1.IsInteractable(character)
             )
             {
-                m_bestInteractable = interactable;
+                m_bestInteractable = interactable1;
+            }
+            else if (character.SphereCastIgnoreSelf(ray, 0.025f, out var hitInfo2, InteractMaxDistance,
+                    HelperFunctions.AllPhysicalLayerMask, QueryTriggerInteraction.Collide)
+                && hitInfo2.collider.TryGetComponent(out IInteractable interactable2)
+                && interactable2.IsInteractable(character)
+            )
+            {
+                m_bestInteractable = interactable2;
             }
         }
 

@@ -238,13 +238,6 @@ namespace RooseLabs.Gameplay.Spells
         #endregion
 
         #region Cleanup
-        protected override void ResetData()
-        {
-            base.ResetData();
-            HideIndicators();
-            m_hasValidPlacement = false;
-        }
-
         private void OnDestroy()
         {
             // Clean up indicators when spell is destroyed

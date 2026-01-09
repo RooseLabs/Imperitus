@@ -81,8 +81,8 @@ MonoBehaviour:
   _isGlobal: 0
   _initializeOrder: 0
   _preventDespawnOnDisconnect: 0
-  _defaultDespawnType: 1
-  _initializedTimestamp: -8584372071486486785
+  _defaultDespawnType: 0
+  _initializedTimestamp: -8584338125934615067
   NetworkObserver: {fileID: 0}
   _enablePrediction: 0
   _predictionType: 0
@@ -97,7 +97,7 @@ MonoBehaviour:
   _spectatorInterpolation: 2
   _enableTeleport: 0
   _teleportThreshold: 1
-  <PrefabId>k__BackingField: 11
+  <PrefabId>k__BackingField: 19
   <SpawnableCollectionId>k__BackingField: 0
   <AssetPathHash>k__BackingField: 13531082050072313092
   SceneId: 0
@@ -127,6 +127,7 @@ MonoBehaviour:
   staminaCost: 0
   staminaConsumptionType: 1
   staminaCostPerSecond: 5
+  cooldownTime: 0
   maxDistance: 5
   tubeRadius: 0.02
   tubeMaterial: {fileID: 10301, guid: 0000000000000000f000000000000000, type: 0}

@@ -23,10 +23,15 @@ namespace RooseLabs.Gameplay.Spells
             m_timeSinceLastEmit += Time.deltaTime;
             if (m_timeSinceLastEmit >= 0.85f)
             {
-                particles.transform.rotation = Quaternion.LookRotation(CasterCharacter.Data.lookDirection);
                 particles.Emit(1);
                 m_timeSinceLastEmit = 0f;
             }
+        }
+
+        private void Update()
+        {
+            if (!CasterCharacter) return;
+            particles.transform.rotation = Quaternion.LookRotation(CasterCharacter.Data.lookDirection);
         }
 
         protected override void OnCancelCast()

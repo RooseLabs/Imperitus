@@ -356,18 +356,5 @@ namespace RooseLabs.Gameplay.Spells
             m_currentGrabbedLocalHitPoint = localHitPoint;
         }
         #endregion
-
-        protected override void ResetData()
-        {
-            base.ResetData();
-            DestroyVisuals();
-            HighlightObject(null);
-            m_currentGrabbedObject = null;
-            m_currentHighlightedObject = null;
-            m_currentGrabbedLocalHitPoint = Vector3.zero;
-            m_currentDragDistance = 0f;
-            m_targetDragDistance = 0f;
-            m_minSafeDragDistance = 0f;
-        }
     }
 }

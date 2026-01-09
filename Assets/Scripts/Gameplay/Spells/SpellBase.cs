@@ -224,7 +224,7 @@ namespace RooseLabs.Gameplay.Spells
 
         public void Destroy()
         {
-            Despawn(NetworkObject, DespawnType.Pool);
+            Despawn(NetworkObject, DespawnType.Destroy);
         }
 
         public static void ClearCooldowns()
@@ -394,24 +394,6 @@ namespace RooseLabs.Gameplay.Spells
         protected virtual void OnScroll(float value)
         {
             // Logger.Info($"Spell {SpellInfo.Name} Scrolled: {value}");
-        }
-
-        protected virtual void ResetData()
-        {
-            IsAiming = false;
-            IsCasting = false;
-            CastProgress = 0f;
-            CooldownEndTime = 0f;
-            IsBeingSustained = false;
-        }
-
-        public override void ResetState(bool asServer)
-        {
-            ResetData();
-            // Remove Parent Constraint
-            if (TryGetComponent(out ParentConstraint parentConstraint))
-                Destroy(parentConstraint);
-            base.ResetState(asServer);
         }
     }
 }

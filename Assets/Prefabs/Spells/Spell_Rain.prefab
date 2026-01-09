@@ -81,8 +81,8 @@ MonoBehaviour:
   _isGlobal: 0
   _initializeOrder: 0
   _preventDespawnOnDisconnect: 0
-  _defaultDespawnType: 1
-  _initializedTimestamp: -8584365596011851757
+  _defaultDespawnType: 0
+  _initializedTimestamp: -8584338125934615067
   NetworkObserver: {fileID: 0}
   _enablePrediction: 0
   _predictionType: 0
@@ -97,7 +97,7 @@ MonoBehaviour:
   _spectatorInterpolation: 2
   _enableTeleport: 0
   _teleportThreshold: 1
-  <PrefabId>k__BackingField: 10
+  <PrefabId>k__BackingField: 16
   <SpawnableCollectionId>k__BackingField: 0
   <AssetPathHash>k__BackingField: 11297431136963370436
   SceneId: 0
@@ -127,6 +127,7 @@ MonoBehaviour:
   staminaCost: 30
   staminaConsumptionType: 0
   staminaCostPerSecond: 0
+  cooldownTime: 0
   rainCloudPrefab: {fileID: 1013503064612626699, guid: 4ee83407bb0db5641b9990ef19c9f31a, type: 3}
   maxPlacementRange: 50
   placementLayerMask:

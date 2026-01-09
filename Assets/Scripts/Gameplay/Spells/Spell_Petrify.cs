@@ -101,18 +101,6 @@ namespace RooseLabs.Gameplay.Spells
             SetState(PetrifySpellCastingState.Reversing);
         }
 
-        protected override void ResetData()
-        {
-            base.ResetData();
-            m_isBeamActive = false;
-            beamObject?.SetActive(false);
-            particles?.SetActive(false);
-            if (snakeAnimator) snakeAnimator.speed = 0f;
-            m_currentScrubNormalized = 0f;
-            m_hasPlayedPastScrub = false;
-            m_petrifiedTargets.Clear();
-        }
-
         private void Update()
         {
             // State machine

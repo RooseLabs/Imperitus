@@ -301,25 +301,51 @@ namespace RooseLabs.Player
         public Bodypart GetBodypart(HumanBodyBones type) => m_bodyparts[type];
         public ICollection<Bodypart> GetAllBodyparts() => m_bodyparts.Values;
 
-        public bool RaycastIgnoreSelf(Ray ray, out RaycastHit hitInfo, float maxDistance = Mathf.Infinity, int layerMask = Physics.DefaultRaycastLayers, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
-        {
-            return RaycastIgnoreSelf(ray.origin, ray.direction, out hitInfo, maxDistance, layerMask, queryTriggerInteraction);
-        }
-
-        public bool RaycastIgnoreSelf(Vector3 position, Vector3 direction, out RaycastHit hitInfo, float maxDistance = Mathf.Infinity, int layerMask = Physics.DefaultRaycastLayers, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
+        private T PhysicsCastIgnoreSelf<T>(Func<T> castFunc)
         {
             // Set all character colliders to the Ignore Raycast layer
             foreach (var col in m_characterColliders.Keys)
             {
                 col.gameObject.layer = 2; // Ignore Raycast layer
             }
-            bool hit = Physics.Raycast(position, direction, out hitInfo, maxDistance, layerMask, queryTriggerInteraction);
-            // Restore original layers
-            foreach (var (col, layer) in m_characterColliders)
+            try
             {
-                col.gameObject.layer = layer;
+                return castFunc();
             }
-            return hit;
+            finally
+            {
+                // Restore original layers
+                foreach (var (col, layer) in m_characterColliders)
+                {
+                    col.gameObject.layer = layer;
+                }
+            }
+        }
+
+        public bool RaycastIgnoreSelf(Ray ray, out RaycastHit hitInfo, float maxDistance = Mathf.Infinity, int layerMask = Physics.DefaultRaycastLayers, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
+        {
+            RaycastHit hit = default;
+            bool result = PhysicsCastIgnoreSelf(() => Physics.Raycast(ray, out hit, maxDistance, layerMask, queryTriggerInteraction));
+            hitInfo = hit;
+            return result;
+        }
+
+        public bool RaycastIgnoreSelf(Vector3 origin, Vector3 direction, out RaycastHit hitInfo, float maxDistance = Mathf.Infinity, int layerMask = Physics.DefaultRaycastLayers, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
+        {
+            return RaycastIgnoreSelf(new Ray(origin, direction), out hitInfo, maxDistance, layerMask, queryTriggerInteraction);
+        }
+
+        public bool SphereCastIgnoreSelf(Ray ray, float radius, out RaycastHit hitInfo, float maxDistance = Mathf.Infinity, int layerMask = Physics.DefaultRaycastLayers, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
+        {
+            RaycastHit hit = default;
+            bool result = PhysicsCastIgnoreSelf(() => Physics.SphereCast(ray, radius, out hit, maxDistance, layerMask, queryTriggerInteraction));
+            hitInfo = hit;
+            return result;
+        }
+
+        public bool SphereCastIgnoreSelf(Vector3 origin, float radius, Vector3 direction, out RaycastHit hitInfo, float maxDistance = Mathf.Infinity, int layerMask = Physics.DefaultRaycastLayers, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
+        {
+            return SphereCastIgnoreSelf(new Ray(origin, direction), radius, out hitInfo, maxDistance, layerMask, queryTriggerInteraction);
         }
         #endregion
     }
