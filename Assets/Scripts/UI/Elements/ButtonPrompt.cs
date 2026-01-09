@@ -43,7 +43,7 @@ namespace RooseLabs.UI.Elements
             }
             else
             {
-                Debug.LogWarning($"No sprite tag found for action '{inputAction.action.name}' on scheme {scheme}", this);
+                Debug.Log($"No sprite tag found for action '{inputAction.action.name}' on scheme {scheme}", this);
                 m_text.text = "";
             }
         }

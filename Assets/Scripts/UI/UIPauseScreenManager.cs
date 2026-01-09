@@ -7,25 +7,18 @@ namespace RooseLabs.UI
     public class UIPauseScreenManager : MonoBehaviour, IWindow
     {
         [SerializeField] private UIPauseMenu pauseMenuPanel;
+        [SerializeField] private UISettingsScreenManager settingsScreenManager;
 
         private void OnEnable()
         {
-            pauseMenuPanel.OnResumeButtonPressed += ResumeGame;
-            pauseMenuPanel.OnSettingsButtonPressed += OpenSettingsMenu;
-            pauseMenuPanel.OnMainMenuButtonPressed += ReturnToMainMenu;
-            pauseMenuPanel.OnQuitGameButtonPressed += QuitGame;
-
+            OpenMainPanel();
             if (GameManager.IsSinglePlayer)
                 Time.timeScale = 0f;
         }
 
         private void OnDisable()
         {
-            pauseMenuPanel.OnResumeButtonPressed -= ResumeGame;
-            pauseMenuPanel.OnSettingsButtonPressed -= OpenSettingsMenu;
-            pauseMenuPanel.OnMainMenuButtonPressed -= ReturnToMainMenu;
-            pauseMenuPanel.OnQuitGameButtonPressed -= QuitGame;
-
+            CloseMainPanel();
             if (GameManager.IsSinglePlayer)
                 Time.timeScale = 1f;
         }
@@ -40,6 +33,24 @@ namespace RooseLabs.UI
             gameObject.SetActive(false);
         }
 
+        private void OpenMainPanel()
+        {
+            pauseMenuPanel.gameObject.SetActive(true);
+            pauseMenuPanel.OnResumeButtonPressed += ResumeGame;
+            pauseMenuPanel.OnSettingsButtonPressed += OpenSettingsMenu;
+            pauseMenuPanel.OnMainMenuButtonPressed += ReturnToMainMenu;
+            pauseMenuPanel.OnQuitGameButtonPressed += QuitGame;
+        }
+
+        private void CloseMainPanel()
+        {
+            pauseMenuPanel.OnResumeButtonPressed -= ResumeGame;
+            pauseMenuPanel.OnSettingsButtonPressed -= OpenSettingsMenu;
+            pauseMenuPanel.OnMainMenuButtonPressed -= ReturnToMainMenu;
+            pauseMenuPanel.OnQuitGameButtonPressed -= QuitGame;
+            pauseMenuPanel.gameObject.SetActive(false);
+        }
+
         private void ResumeGame()
         {
             GUIManager.CloseWindow(this);
@@ -47,7 +58,13 @@ namespace RooseLabs.UI
 
         private void OpenSettingsMenu()
         {
-            // TODO: Add in-game settings menu
+            CloseMainPanel();
+            GUIManager.OpenWindow(settingsScreenManager);
+            settingsScreenManager.OnCloseButtonPressed += () =>
+            {
+                GUIManager.CloseWindow(settingsScreenManager);
+            };
+            settingsScreenManager.OnClose += OpenMainPanel;
         }
 
         private void ReturnToMainMenu()

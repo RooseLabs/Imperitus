@@ -8,6 +8,7 @@ using FishNet.Object.Synchronizing;
 using FishNet.Transporting;
 using RooseLabs.Gameplay.Interactables;
 using RooseLabs.Player;
+using RooseLabs.Settings;
 using RooseLabs.Utils;
 using RooseLabs.Vosk;
 using UnityEngine;
@@ -137,7 +138,8 @@ namespace RooseLabs.Gameplay
         {
             if (!IsServerInitialized)
                 DestroySpawnPoints();
-            SetupClientVoiceDetection();
+
+            if (m_isDoorOpen.Value) return;
 
             // Store door rotations
             if (doorTransform)
@@ -148,6 +150,8 @@ namespace RooseLabs.Gameplay
 
             // Subscribe to network variable changes
             m_isDoorOpen.OnChange += OnDoorStateChanged;
+
+            SetupClientVoiceDetection();
         }
 
         private void Update()
@@ -313,24 +317,47 @@ namespace RooseLabs.Gameplay
             float distance = Vector3.Distance(transform.position, PlayerCharacter.LocalCharacter.transform.position);
             bool inProximity = distance <= hearingRadius;
 
-            // Handle proximity state change
+            // Handle proximity state change for visual feedback
             if (inProximity != m_isPlayerInProximity)
             {
                 m_isPlayerInProximity = inProximity;
-
-                if (inProximity)
-                {
-                    this.LogInfo("Player entered hearing radius - starting voice detection");
-                    m_voskSpeechToText.StartRecording();
-                    AnimateLadyOpacity(1f);
-                }
-                else
-                {
-                    this.LogInfo("Player left hearing radius - stopping voice detection");
-                    m_voskSpeechToText.StopRecording();
-                    AnimateLadyOpacity(0f);
-                }
+                AnimateLadyOpacity(inProximity ? 1f : 0f);
             }
+
+            switch (inProximity)
+            {
+                case true when GameManager.IsSinglePlayer && Microphone.devices.Length == 0:
+                    // Auto-solve in single-player if no microphone is available
+                    m_isDoorOpen.Value = true;
+                    return;
+                case true when IsSpeaking():
+                    // Start recording when in proximity and speaking
+                    m_voskSpeechToText.StartRecording();
+                    break;
+                default:
+                    // Stop recording otherwise
+                    m_voskSpeechToText.StopRecording();
+                    break;
+            }
+        }
+
+        private bool IsSpeaking()
+        {
+            // Must have valid player character
+            var character = PlayerCharacter.LocalCharacter;
+            if (!character) return false;
+
+            // Don't capture if player is dead
+            if (character.Data.isDead) return false;
+
+            // Check push-to-talk settings
+            PushToTalkMode pttMode = SettingsHandler.GetSetting<PushToTalkSetting>().GetValue();
+            return pttMode switch
+            {
+                PushToTalkMode.PushToTalk => character.Input.pushToTalkIsPressed,
+                PushToTalkMode.PushToMute => !character.Input.pushToTalkIsPressed,
+                _ => true // PushToTalkMode.Off
+            };
         }
 
         private void OnVoiceTranscription(string jsonResult)
@@ -345,24 +372,25 @@ namespace RooseLabs.Gameplay
             string targetSentence = PuzzleSentences[m_targetSentenceIndex.Value].ToLower();
 
             // Check if any recognized phrase matches the target sentence
-            bool foundMatch = false;
+            bool doWrath = false;
             foreach (RecognizedPhrase phrase in recognitionResult.Phrases)
             {
-                if (string.IsNullOrEmpty(phrase.Text)) continue;
+                if (string.IsNullOrEmpty(phrase.Text) || phrase.Text.Trim() == "[unk]") continue;
 
+                doWrath = true;
                 this.LogInfo($"Heard: '{phrase.Text}' (confidence: {phrase.Confidence:F2})");
 
                 if (string.Equals(phrase.Text, targetSentence, StringComparison.CurrentCultureIgnoreCase))
                 {
                     this.LogInfo("Correct sentence spoken! Sending to server...");
                     ServerValidateAndOpenDoor(phrase.Text);
-                    foundMatch = true;
+                    doWrath = false;
                     break;
                 }
             }
 
             // If no match was found and we heard something, trigger Wrath
-            if (!foundMatch && recognitionResult.Phrases.Length > 0)
+            if (doWrath)
             {
                 this.LogInfo("Wrong sentence - triggering Wrath effect");
                 AnimateWrath();
@@ -393,6 +421,10 @@ namespace RooseLabs.Gameplay
         private void OnDoorStateChanged(bool prev, bool next, bool asServer)
         {
             if (!next || !(bool)doorTransform) return;
+
+            // Stop recording when door opens
+            m_voskSpeechToText.StopRecording();
+
             if (m_doorAnimationCoroutine != null)
             {
                 StopCoroutine(m_doorAnimationCoroutine);

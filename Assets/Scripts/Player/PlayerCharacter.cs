@@ -2,11 +2,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using FishNet.Object;
+using MetaVoiceChat;
 using RooseLabs.Core;
 using RooseLabs.Gameplay;
 using RooseLabs.Gameplay.Interactables;
 using RooseLabs.Gameplay.Notebook;
 using RooseLabs.Network;
+using RooseLabs.Settings;
 using RooseLabs.UI;
 using RooseLabs.Utils;
 using UnityEngine;
@@ -21,6 +23,7 @@ namespace RooseLabs.Player
         #region Serialized
         [field: SerializeField] public Transform ModelTransform { get; private set; }
         [field: SerializeField] public Camera Camera { get; private set; }
+        [field: SerializeField] public MetaVc VoiceChat { get; private set; }
 
         [Tooltip("Meshes to hide from the local player (e.g. body, head, accessories)")]
         [SerializeField] private GameObject[] meshesToHide = Array.Empty<GameObject>();
@@ -104,8 +107,16 @@ namespace RooseLabs.Player
             // Hide renderers for local player
             ToggleMeshesVisibility(false);
 
+            // Apply settings to camera and enable it
+            SettingsHandler.GetSetting<AntiAliasingSetting>().ApplyToCamera(Camera);
             Camera.gameObject.SetActive(true);
+
             InputHandler.Instance.EnableGameplayInput();
+
+            // Set microphone device for voice chat based on settings
+            int micDevice = SettingsHandler.GetSetting<MicrophoneDeviceSetting>().GetValue();
+            var vcMicAudioInput = VoiceChat.audioInput as MetaVoiceChat.Input.Mic.VcMicAudioInput;
+            if (vcMicAudioInput) vcMicAudioInput.SetSelectedDevice(Microphone.devices[micDevice]);
         }
 
         private void Update()
@@ -191,11 +202,11 @@ namespace RooseLabs.Player
             Data.Health -= damage.amount;
             if (Data.Health <= 0)
             {
+                Data.isDead = true;
                 if (IsServerInitialized && !Data.isDead)
                 {
                     HandlePlayerDeath(damage);
                 }
-                Data.isDead = true;
                 Items.DropCurrentItem();
                 this.LogInfo($"Player '{Player.PlayerName}' died!");
             }
@@ -273,6 +284,7 @@ namespace RooseLabs.Player
                 Data.IsRagdollActive = false;
                 Data.isDead = false;
             }
+            VoiceChat.RestartClient();
             if (IsOwner)
             {
                 CameraController.Instance.ResetPosition();

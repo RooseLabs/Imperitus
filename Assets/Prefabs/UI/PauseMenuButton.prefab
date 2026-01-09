@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 6490467621397034302}
   - component: {fileID: 455603604648649081}
   - component: {fileID: 8215912704712648390}
-  - component: {fileID: 1639401071252851888}
+  - component: {fileID: 3548050287674567839}
   m_Layer: 5
   m_Name: PauseMenuButton
   m_TagString: Untagged
@@ -77,7 +77,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &1639401071252851888
+--- !u!114 &3548050287674567839
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -86,9 +86,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 2666076210966634956}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Script: {fileID: 11500000, guid: 148c5ff6e43e420cbf3043fd0fe78692, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.UI.Elements.TextButton
   m_Navigation:
     m_Mode: 3
     m_WrapAround: 0
@@ -98,10 +98,10 @@ MonoBehaviour:
     m_SelectOnRight: {fileID: 0}
   m_Transition: 1
   m_Colors:
-    m_NormalColor: {r: 0.40784317, g: 0.16470589, b: 0.5529412, a: 0}
-    m_HighlightedColor: {r: 0.40955022, g: 0.1653415, b: 0.55345905, a: 1}
-    m_PressedColor: {r: 0.3332078, g: 0.16470587, b: 0.5529412, a: 1}
-    m_SelectedColor: {r: 0.40784317, g: 0.16470589, b: 0.5529412, a: 1}
+    m_NormalColor: {r: 0.40784314, g: 0.16470589, b: 0.5529412, a: 0}
+    m_HighlightedColor: {r: 0.40784314, g: 0.16470589, b: 0.5529412, a: 1}
+    m_PressedColor: {r: 0.33333334, g: 0.16470589, b: 0.5529412, a: 1}
+    m_SelectedColor: {r: 0.40784314, g: 0.16470589, b: 0.5529412, a: 1}
     m_DisabledColor: {r: 1, g: 1, b: 1, a: 0}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
@@ -120,7 +120,37 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 8215912704712648390}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: RooseLabs.UI.UIPauseMenu, Assembly-CSharp
+        m_MethodName: QuitGameButton
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  m_TargetText: {fileID: 721895775428691372}
+  m_TextColors:
+    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
+    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
+    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_ColorMultiplier: 1
+    m_FadeDuration: 0.1
+  m_FontSizes:
+    m_NormalSize: 72
+    m_HighlightedSize: 78
+    m_PressedSize: 76
+    m_SelectedSize: 78
+    m_DisabledSize: 72
+    m_SizeDuration: 0.1
+  m_AutoFitMode: 0
+  m_AutoFitPadding: {x: 0, y: 0}
 --- !u!1 &5728241582370301519
 GameObject:
   m_ObjectHideFlags: 0
@@ -186,10 +216,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: T
+  m_text: Text
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: da45ea0cc3c3a944aa451f7df963845a, type: 2}
-  m_sharedMaterial: {fileID: 5773962532613905961, guid: da45ea0cc3c3a944aa451f7df963845a, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 63a051193326ecd4799ce6f9497a5cd4, type: 2}
+  m_sharedMaterial: {fileID: -8619404352433872892, guid: 63a051193326ecd4799ce6f9497a5cd4, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -213,17 +243,18 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 54
-  m_fontSizeBase: 24
+  m_fontSize: 72
+  m_fontSizeBase: 72
   m_fontWeight: 400
-  m_enableAutoSizing: 1
+  m_enableAutoSizing: 0
   m_fontSizeMin: 18
-  m_fontSizeMax: 38
-  m_fontStyle: 33
+  m_fontSizeMax: 76
+  m_fontStyle: 0
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0

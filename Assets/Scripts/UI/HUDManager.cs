@@ -9,10 +9,16 @@ namespace RooseLabs.UI
     public class HUDManager : MonoBehaviour
     {
         #region Serialized
+        [Header("HUD Elements")]
         [SerializeField] private Slider healthSlider;
         [SerializeField] private Slider staminaSlider;
         [SerializeField] private TMP_Text timerText;
         [SerializeField] private TMP_Text joinCodeText;
+
+        [Header("Crosshair")]
+        [SerializeField] private Image crosshairImage;
+        [SerializeField] private Sprite defaultCrosshairSprite;
+        [SerializeField] private Sprite aimingCrosshairSprite;
 
         [Header("Interaction Prompt")]
         [SerializeField] private GameObject interactionPromptSprite;
@@ -35,6 +41,16 @@ namespace RooseLabs.UI
         private void Update()
         {
             var character = PlayerCharacter.ObservedCharacter;
+            if (!character) return;
+            if (character != PlayerCharacter.LocalCharacter)
+            {
+                crosshairImage.enabled = false;
+            }
+            else
+            {
+                crosshairImage.enabled = true;
+                crosshairImage.sprite = character.Data.isAiming ? aimingCrosshairSprite : defaultCrosshairSprite;
+            }
             healthSlider.value = character.Data.Health / character.Data.MaxHealth;
             float targetStaminaValue = character.Data.Stamina / character.Data.MaxStamina;
             staminaSlider.value = Mathf.MoveTowards(staminaSlider.value, targetStaminaValue, Time.deltaTime * 2f);

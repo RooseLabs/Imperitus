@@ -13,6 +13,8 @@ using MetaVoiceChat.NetProviders;
 using MetaVoiceChat.Opus;
 using MetaVoiceChat.Output;
 using MetaVoiceChat.Utils;
+using RooseLabs.Player;
+using RooseLabs.Settings;
 using UnityEngine;
 
 namespace MetaVoiceChat
@@ -54,6 +56,8 @@ namespace MetaVoiceChat
 
         private bool isLocalPlayer;
 
+        private int maxDataBytesPerPacket;
+
         private VcEncoder encoder;
         private VcDecoder decoder;
 
@@ -79,6 +83,8 @@ namespace MetaVoiceChat
             this.netProvider = netProvider;
 
             this.isLocalPlayer = isLocalPlayer;
+
+            this.maxDataBytesPerPacket = maxDataBytesPerPacket;
 
             if (isLocalPlayer)
             {
@@ -121,7 +127,7 @@ namespace MetaVoiceChat
             }
             else
             {
-                shouldRelayEmpty = !isSpeaking || isDeafened || isInputMuted;
+                shouldRelayEmpty = !isSpeaking || isDeafened || IsInputMuted;
             }
 
             if (shouldRelayEmpty)
@@ -149,7 +155,7 @@ namespace MetaVoiceChat
                     ReceiveFrame(index, Timestamp, additionalLatency: 0, ReadOnlySpan<byte>.Empty);
                 }
 
-                if (isDeafened || isInputMuted)
+                if (isDeafened || IsInputMuted)
                 {
                     netProvider.RelayFrame(index, Timestamp, ReadOnlySpan<byte>.Empty);
                 }
@@ -230,6 +236,31 @@ namespace MetaVoiceChat
             }
 
             isSpeaking.Value = value;
+        }
+
+        public void RestartClient()
+        {
+            StopClient();
+            codecStopwatch.Reset();
+            StartClient(netProvider, isLocalPlayer, maxDataBytesPerPacket);
+        }
+
+        private bool IsInputMuted {
+            get
+            {
+                if (isInputMuted.Value) return true;
+                var character = PlayerCharacter.LocalCharacter;
+                if (!character) return true;
+
+                if (character.Data.isDead) return true;
+                PushToTalkMode pttMode = SettingsHandler.GetSetting<PushToTalkSetting>().GetValue();
+                return pttMode switch
+                {
+                    PushToTalkMode.PushToTalk => !character.Input.pushToTalkIsPressed,
+                    PushToTalkMode.PushToMute => character.Input.pushToTalkIsPressed,
+                    _ => false
+                };
+            }
         }
     }
 }

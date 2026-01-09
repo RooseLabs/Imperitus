@@ -67,8 +67,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 63a051193326ecd4799ce6f9497a5cd4, type: 2}
+  m_sharedMaterial: {fileID: -8619404352433872892, guid: 63a051193326ecd4799ce6f9497a5cd4, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -2155,6 +2155,7 @@ MonoBehaviour:
   _networkObjectCache: {fileID: 7652611172026813195}
   <ModelTransform>k__BackingField: {fileID: 6279997357253256316}
   <Camera>k__BackingField: {fileID: 5566422381978464674}
+  <VoiceChat>k__BackingField: {fileID: 2147114966180034455}
   meshesToHide:
   - {fileID: 61080722737630050}
   - {fileID: 3227345478950221755}
@@ -2540,7 +2541,7 @@ GameObject:
   - component: {fileID: 8131720751928638370}
   - component: {fileID: 1046755158235027733}
   - component: {fileID: 6628742010028553836}
-  m_Layer: 13
+  m_Layer: 2
   m_Name: RangeCollider
   m_TagString: Untagged
   m_Icon: {fileID: 0}

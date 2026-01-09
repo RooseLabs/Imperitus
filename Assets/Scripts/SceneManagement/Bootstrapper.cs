@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using RooseLabs.Settings;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnitySceneManager = UnityEngine.SceneManagement.SceneManager;
@@ -9,6 +10,7 @@ namespace RooseLabs.SceneManagement
     {
         private void Start()
         {
+            SettingsHandler.Initialize();
             _ = Boot();
         }
 

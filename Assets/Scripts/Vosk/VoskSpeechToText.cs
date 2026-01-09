@@ -13,6 +13,7 @@ namespace RooseLabs.Vosk
     public class VoskSpeechToText : MonoBehaviour
     {
         private static Logger Logger => Logger.GetLogger("SpeechToText");
+
         [SerializeField, Tooltip("The source of the microphone input.")]
         private VoiceProcessor voiceProcessor;
 
@@ -268,6 +269,13 @@ namespace RooseLabs.Vosk
                     // Wait for some data
                     await Task.Delay(100);
                 }
+            }
+
+            // When recording stops, get the final accumulated recognition result
+            var finalResult = m_recognizer.FinalResult();
+            if (!string.IsNullOrEmpty(finalResult))
+            {
+                m_threadedResultQueue.Enqueue(finalResult);
             }
         }
     }

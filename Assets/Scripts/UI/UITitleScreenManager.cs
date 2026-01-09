@@ -1,6 +1,7 @@
 using RooseLabs.Core;
 using RooseLabs.Network;
 using RooseLabs.Player;
+using RooseLabs.UI.Elements;
 using TMPro;
 using UnityEngine;
 
@@ -9,13 +10,17 @@ namespace RooseLabs.UI
     public class UITitleScreenManager : MonoBehaviour
     {
         [SerializeField] private UIMainMenu mainMenuPanel;
-        [SerializeField] private GameObject usernamePanel;
-        [SerializeField] private TMP_Text currentUsernameGO;
-        // [SerializeField] private UISettingsManager settingsPanel;
+        [SerializeField] private UISettingsScreenManager settingsPanel;
         // [SerializeField] private UICreditsManager creditsPanel;
 
-        // TODO: This should be moved to a JoinGamePanel script
-        [SerializeField] private TMP_InputField joinCodeInputField;
+        [Header("Join Game Panel")]
+        [SerializeField] private UIConfirmPanel joinGamePanel;
+        [SerializeField] private TMP_InputField joinGameInputField;
+
+        [Header("Username Panel")]
+        [SerializeField] private UIConfirmPanel usernamePanel;
+        [SerializeField] private TMP_InputField usernameInputField;
+        [SerializeField] private TMP_Text usernameButtonText;
 
         private const string PrefsUsernameKey = "PlayerUsername";
 
@@ -36,8 +41,6 @@ namespace RooseLabs.UI
             mainMenuPanel.OnCreditsButtonPressed += OpenCreditsScreen;
             mainMenuPanel.OnQuitGameButtonPressed += QuitGame;
             mainMenuPanel.OnUsernameButtonPressed += OpenUsernameScreen;
-            mainMenuPanel.OnCloseUsernameButtonPressed += CloseUsernameScreen;
-            mainMenuPanel.OnSaveUsernameButtonPressed += SaveUsername;
         }
 
         private void UnsubscribeFromEvents()
@@ -49,8 +52,6 @@ namespace RooseLabs.UI
             mainMenuPanel.OnCreditsButtonPressed -= OpenCreditsScreen;
             mainMenuPanel.OnQuitGameButtonPressed -= QuitGame;
             mainMenuPanel.OnUsernameButtonPressed -= OpenUsernameScreen;
-            mainMenuPanel.OnCloseUsernameButtonPressed -= CloseUsernameScreen;
-            mainMenuPanel.OnSaveUsernameButtonPressed -= SaveUsername;
         }
 
         private void SetPlayerName()
@@ -63,7 +64,7 @@ namespace RooseLabs.UI
             {
                 PlayerConnection.Nickname = "Player" + Random.Range(1000, 9999);
             }
-            currentUsernameGO.text = PlayerConnection.Nickname;
+            usernameButtonText.text = PlayerConnection.Nickname;
             PlayerPrefs.SetString(PrefsUsernameKey, PlayerConnection.Nickname);
             PlayerPrefs.Save();
         }
@@ -81,69 +82,60 @@ namespace RooseLabs.UI
             if (result == null) SubscribeToEvents();
         }
 
-        private async void OpenJoinGameScreen()
+        private void OpenJoinGameScreen()
         {
-            if (string.IsNullOrWhiteSpace(joinCodeInputField.text))
+            mainMenuPanel.gameObject.SetActive(false);
+            joinGamePanel.gameObject.SetActive(true);
+            joinGamePanel.OnConfirmButtonPressed += JoinGame;
+            joinGamePanel.OnCancelButtonPressed += CloseJoinGameScreen;
+        }
+
+        private void CloseJoinGameScreen()
+        {
+            joinGamePanel.OnConfirmButtonPressed -= JoinGame;
+            joinGamePanel.OnCancelButtonPressed -= CloseJoinGameScreen;
+            joinGamePanel.gameObject.SetActive(false);
+            mainMenuPanel.gameObject.SetActive(true);
+        }
+
+        private async void JoinGame()
+        {
+            if (string.IsNullOrWhiteSpace(joinGameInputField.text))
             {
                 NetworkConnector.Instance.StartClientLocally();
                 return;
             }
             UnsubscribeFromEvents();
-            var result = await NetworkConnector.Instance.StartClientWithRelay(joinCodeInputField.text);
+            var result = await NetworkConnector.Instance.StartClientWithRelay(joinGameInputField.text);
             if (!result) SubscribeToEvents();
         }
 
         private void OpenUsernameScreen()
         {
-            if (mainMenuPanel != null && mainMenuPanel.gameObject != null)
-            {
-                Transform parentTransform = mainMenuPanel.gameObject.transform;
-                for (int i = 0; i < parentTransform.childCount; i++)
-                {
-                    parentTransform.GetChild(i).gameObject.SetActive(false);
-                }
-            }
-
-            if (usernamePanel != null)
-            {
-                usernamePanel.SetActive(true);
-                var input = usernamePanel.GetComponentInChildren<TMP_InputField>();
-                if (input != null)
-                    input.text = PlayerConnection.Nickname;
-            }
+            mainMenuPanel.gameObject.SetActive(false);
+            usernamePanel.gameObject.SetActive(true);
+            usernameInputField.text = PlayerConnection.Nickname;
+            usernamePanel.OnConfirmButtonPressed += SaveUsername;
+            usernamePanel.OnCancelButtonPressed += CloseUsernameScreen;
         }
 
         private void CloseUsernameScreen()
         {
+            usernamePanel.OnConfirmButtonPressed -= SaveUsername;
+            usernamePanel.OnCancelButtonPressed -= CloseUsernameScreen;
+            usernamePanel.gameObject.SetActive(false);
             mainMenuPanel.gameObject.SetActive(true);
-
-            if (mainMenuPanel != null && mainMenuPanel.gameObject != null)
-            {
-                Transform parentTransform = mainMenuPanel.gameObject.transform;
-                for (int i = 0; i < parentTransform.childCount; i++)
-                {
-                    parentTransform.GetChild(i).gameObject.SetActive(true);
-                }
-            }
-
-            if (usernamePanel != null)
-            {
-                usernamePanel.SetActive(false);
-            }
         }
 
         private void SaveUsername()
         {
-            var input = usernamePanel.GetComponentInChildren<TMP_InputField>();
-            if (input == null) return;
-
-            string newUsername = input.text.Trim();
+            string newUsername = usernameInputField.text.Trim();
 
             if (string.IsNullOrWhiteSpace(newUsername))
                 return;
 
             PlayerConnection.Nickname = newUsername;
-            currentUsernameGO.text = newUsername;
+            usernameButtonText.text = newUsername;
 
             PlayerPrefs.SetString(PrefsUsernameKey, newUsername);
             PlayerPrefs.Save();
@@ -153,13 +145,21 @@ namespace RooseLabs.UI
 
         private void OpenSettingsScreen()
         {
-            // mainMenuPanel.gameObject.SetActive(false);
-            // settingsPanel.gameObject.SetActive(true);
+            mainMenuPanel.gameObject.SetActive(false);
+            settingsPanel.gameObject.SetActive(true);
+            settingsPanel.OnCloseButtonPressed += CloseSettingsScreen;
+        }
+
+        private void CloseSettingsScreen()
+        {
+            settingsPanel.OnCloseButtonPressed -= CloseSettingsScreen;
+            settingsPanel.gameObject.SetActive(false);
+            mainMenuPanel.gameObject.SetActive(true);
         }
 
         private void OpenCreditsScreen()
         {
-            //mainMenuPanel.gameObject.SetActive(false);
+            // mainMenuPanel.gameObject.SetActive(false);
             // creditsPanel.gameObject.SetActive(true);
             // creditsPanel.BackButtonAction += CloseCreditsScreen;
         }
