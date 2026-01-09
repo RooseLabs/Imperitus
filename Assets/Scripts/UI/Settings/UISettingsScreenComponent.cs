@@ -82,13 +82,16 @@ namespace RooseLabs.UI
             m_windowMode.ApplyValue((WindowMode)windowModeSetting.SelectedIndex);
             m_windowMode.Save();
 
-            // Apply and save VSync
+            // Apply and save Frame Rate Limit only if VSync is Off
+            if (vSyncSetting.SelectedIndex == 0)
+            {
+                m_frameRateLimit.ApplyValue(frameRateLimitSetting.Value);
+                m_frameRateLimit.Save();
+            }
+
+            // Apply and save VSync (do it last to so that frame limit doesn't override it)
             m_vSync.ApplyValue(vSyncSetting.SelectedIndex == 1);
             m_vSync.Save();
-
-            // Apply and save Frame Rate Limit
-            m_frameRateLimit.ApplyValue(frameRateLimitSetting.Value);
-            m_frameRateLimit.Save();
         }
 
         private void OnVSyncChanged(int index)
