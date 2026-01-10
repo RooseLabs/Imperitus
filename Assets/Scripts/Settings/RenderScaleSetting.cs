@@ -13,6 +13,7 @@ namespace RooseLabs.Settings
         protected override float MaxValue => 3.0f;
         public override float ExposedMinValue => 0.5f;
         public override float ExposedMaxValue => 2.0f;
+        public override int Precision => 1;
 
         public override float GetDefaultValue() => 1.0f;
 
@@ -33,6 +34,11 @@ namespace RooseLabs.Settings
                 value = renderPipelineAsset.renderScale;
             }
             value = 1.0f;
+        }
+
+        public override string FormatValue(float value)
+        {
+            return $"{value:F1}x";
         }
     }
 }

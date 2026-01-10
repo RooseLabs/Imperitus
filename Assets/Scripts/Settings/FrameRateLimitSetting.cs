@@ -8,7 +8,6 @@ namespace RooseLabs.Settings
         public override string DisplayName => "FPS Limit";
         public override SettingCategory Category => SettingCategory.Screen;
 
-        protected override bool ClampOnLoad => false;
         protected override float MinValue => 30f;
         protected override float MaxValue
         {
@@ -18,6 +17,9 @@ namespace RooseLabs.Settings
                 return Math.Max(refreshRate, 240) + 1;
             }
         }
+
+        protected override bool ClampOnLoad => false;
+        public override int Precision => 0;
 
         public override float GetDefaultValue() => 0f;
 
@@ -43,7 +45,7 @@ namespace RooseLabs.Settings
             value = Application.targetFrameRate;
         }
 
-        public string FormatValue(float value)
+        public override string FormatValue(float value)
         {
             int intValue = Mathf.RoundToInt(value);
             return intValue >= ExposedMaxValue ? "Unlimited" : intValue.ToString();

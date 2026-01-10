@@ -17,23 +17,16 @@ namespace RooseLabs.UI
         [SerializeField] private UIPauseScreenManager pauseScreenManager;
         [SerializeField] private NotebookUIController notebookUIController;
         [SerializeField] private CustomizationMenu customizationMenuController;
+        [SerializeField] private CutsceneManager cutsceneManager;
 
         public static GUIManager Instance { get; private set; }
-        public readonly static List<IWindow> ActiveWindows = new();
+        public static readonly List<IWindow> ActiveWindows = new();
 
         private void Awake()
         {
             Instance = this;
             ActiveWindows.Clear();
         }
-
-        #if !UNITY_EDITOR
-        private void OnApplicationFocus(bool hasFocus)
-        {
-            if (!hasFocus && ActiveWindows.Count == 0)
-                OpenWindow(pauseScreenManager);
-        }
-        #endif
 
         private void LateUpdate()
         {
@@ -89,6 +82,9 @@ namespace RooseLabs.UI
         {
             OpenWindow(customizationMenuController);
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void PlayCutscene(string line1, string line2, string line3) => cutsceneManager.PlayCutscene(line1, line2, line3);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetHUDActive(bool isActive) => hudManager.gameObject.SetActive(isActive);

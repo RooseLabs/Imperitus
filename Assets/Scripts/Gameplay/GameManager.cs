@@ -11,6 +11,7 @@ using RooseLabs.Gameplay.Notebook;
 using RooseLabs.Gameplay.Spells;
 using RooseLabs.Network;
 using RooseLabs.ScriptableObjects;
+using RooseLabs.UI;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -30,6 +31,9 @@ namespace RooseLabs.Gameplay
         #endregion
 
         public static bool IsSinglePlayer => NetworkConnector.Instance.CurrentSessionJoinCode == null;
+
+        public const int MaxAttemptsPerAssignment = 3;
+        public int CurrentAttemptNumber { get; private set; } = 1;
 
         public SyncList<int> LearnedSpellsIndices { get; } = new() { 0 };
 
@@ -103,26 +107,43 @@ namespace RooseLabs.Gameplay
         {
             m_heistTimer.ToggleTimerVisibility(false);
             if (!IsServerInitialized) return;
-            if (CurrentAssignment == null)
+            if (CurrentAssignment == null) return;
+            // If all tasks are complete, generate new assignment.
+            bool allComplete = true;
+            foreach (var taskId in CurrentAssignment.tasks)
+            {
+                var task = TaskDatabase[taskId];
+                if (!task.IsCompleted)
+                {
+                    allComplete = false;
+                    break;
+                }
+            }
+            if (allComplete)
             {
                 GenerateNewAssignment();
             }
             else
             {
-                // If all tasks are complete, generate new assignment.
-                bool allComplete = true;
-                foreach (var taskId in CurrentAssignment.tasks)
+                if (CurrentAttemptNumber >= MaxAttemptsPerAssignment)
                 {
-                    var task = TaskDatabase[taskId];
-                    if (!task.IsCompleted)
-                    {
-                        allComplete = false;
-                        break;
-                    }
-                }
-                if (allComplete)
-                {
+                    // Failed assignment
+                    GUIManager.Instance.PlayCutscene(
+                        "You have failed to complete your assignment in time.",
+                        "Your Magic Theory Professor is disappointed.",
+                        "You have been given a new assignment."
+                    );
                     GenerateNewAssignment();
+                }
+                else
+                {
+                    GUIManager.Instance.PlayCutscene(
+                        "You have returned to the dormitory.",
+                        "Your current assignment is still pending.",
+                        $"You have <color=#FF0000>{MaxAttemptsPerAssignment - CurrentAttemptNumber} attempts</color> " +
+                        $"remaining to complete this assignment."
+                    );
+                    CurrentAttemptNumber++;
                 }
             }
 
@@ -146,6 +167,26 @@ namespace RooseLabs.Gameplay
                 tasks = new List<int> { TaskDatabase.GetRandomIndex(t => !t.IsCompleted) }
             };
             NotebookManager.Instance.InitializeAssignment(CurrentAssignment);
+        }
+
+        public void OnDormitoryDoorInteracted()
+        {
+            if (!IsServerInitialized) return;
+            if (CurrentAssignment == null)
+            {
+                // If assignment is null, we are likely in a new game session.
+                // Instead of starting a heist, we should show a cutscene and generate the first assignment.
+                GenerateNewAssignment();
+                GUIManager.Instance.PlayCutscene(
+                    "Your Magic Theory Professor has given you a new assignment:",
+                    $"<i>{TaskDatabase[CurrentAssignment!.tasks[0]].Description}</i>",
+                    "You have <color=#FF0000>3 days</color> until the deadline to complete this assignment."
+                );
+            }
+            else
+            {
+                StartHeist();
+            }
         }
 
         private void OnSpellCast(SpellSO spell)

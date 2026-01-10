@@ -61,6 +61,7 @@ namespace RooseLabs.UI
 
             // Frame Rate Limit
             frameRateLimitSetting.SetRange(m_frameRateLimit.ExposedMinValue, m_frameRateLimit.ExposedMaxValue);
+            frameRateLimitSetting.SetPrecision(m_frameRateLimit.Precision);
             frameRateLimitSetting.SetCustomFormatter(m_frameRateLimit.FormatValue);
         }
 

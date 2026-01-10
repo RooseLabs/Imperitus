@@ -60,11 +60,22 @@ namespace RooseLabs.UI
         {
             CloseMainPanel();
             GUIManager.OpenWindow(settingsScreenManager);
-            settingsScreenManager.OnCloseButtonPressed += () =>
-            {
-                GUIManager.CloseWindow(settingsScreenManager);
-            };
-            settingsScreenManager.OnClose += OpenMainPanel;
+            settingsScreenManager.OnCloseButtonPressed += CloseSettingsButton;
+            settingsScreenManager.OnClosed += OnSettingsClosed;
+        }
+
+        private void CloseSettingsButton()
+        {
+            // Called when close button is clicked
+            GUIManager.CloseWindow(settingsScreenManager);
+        }
+
+        private void OnSettingsClosed()
+        {
+            // Called when settings window closes (button or ESC key)
+            settingsScreenManager.OnCloseButtonPressed -= CloseSettingsButton;
+            settingsScreenManager.OnClosed -= OnSettingsClosed;
+            OpenMainPanel();
         }
 
         private void ReturnToMainMenu()

@@ -9,6 +9,7 @@ namespace RooseLabs.Settings
 
         protected override float MinValue => 0f;
         protected override float MaxValue => 1f;
+        public override int Precision => 2;
 
         public override float GetDefaultValue() => 0.8f;
 
@@ -20,7 +21,7 @@ namespace RooseLabs.Settings
             value = AudioListener.volume;
         }
 
-        public string FormatValue(float value)
+        public override string FormatValue(float value)
         {
             return $"{Mathf.RoundToInt(value * 100f)}%";
         }

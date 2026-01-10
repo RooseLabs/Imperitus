@@ -50,6 +50,8 @@ namespace RooseLabs.UI
 
             // Render Scale
             renderScaleSetting.SetRange(m_renderScale.ExposedMinValue, m_renderScale.ExposedMaxValue);
+            renderScaleSetting.SetPrecision(m_renderScale.Precision);
+            renderScaleSetting.SetCustomFormatter(m_renderScale.FormatValue);
         }
 
         private void LoadCurrentValues()

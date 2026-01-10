@@ -44,6 +44,7 @@ namespace RooseLabs.UI
         {
             // Master Volume
             masterVolumeSetting.SetRange(m_masterVolume.ExposedMinValue, m_masterVolume.ExposedMaxValue);
+            masterVolumeSetting.SetPrecision(m_masterVolume.Precision);
             masterVolumeSetting.SetCustomFormatter(m_masterVolume.FormatValue);
 
             // Microphone Device

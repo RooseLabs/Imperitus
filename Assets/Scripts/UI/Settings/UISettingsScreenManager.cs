@@ -25,7 +25,7 @@ namespace RooseLabs.UI
             remove => closeButton.onClick.RemoveListener(value);
         }
 
-        public event Action OnClose = delegate {};
+        public event Action OnClosed = delegate {};
 
         private void OnEnable()
         {
@@ -42,6 +42,8 @@ namespace RooseLabs.UI
             audioTabButton.onClick.RemoveListener(ShowAudioTab);
             screenTabButton.onClick.RemoveListener(ShowScreenTab);
             graphicsTabButton.onClick.RemoveListener(ShowGraphicsTab);
+
+            OnClosed.Invoke();
         }
 
         public void Open()
@@ -51,9 +53,7 @@ namespace RooseLabs.UI
 
         public void Close()
         {
-            closeButton.onClick.RemoveAllListeners();
             gameObject.SetActive(false);
-            OnClose.Invoke();
         }
 
         private void ShowAudioTab()

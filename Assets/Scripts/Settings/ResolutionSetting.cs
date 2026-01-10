@@ -35,7 +35,7 @@ namespace RooseLabs.Settings
                     return i;
             }
 
-            return 0;
+            return resolutions.Length - 1;
         }
 
         protected override void ApplyValueInternal(ref int value)

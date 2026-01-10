@@ -213,7 +213,7 @@ MonoBehaviour:
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 0.44
+  m_PixelsPerUnitMultiplier: 0.5
 --- !u!114 &5788126511278642212
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -268,11 +268,11 @@ MonoBehaviour:
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   m_FontSizes:
-    m_NormalSize: 72
-    m_HighlightedSize: 82
-    m_PressedSize: 82
-    m_SelectedSize: 82
-    m_DisabledSize: 72
+    m_NormalSize: 64
+    m_HighlightedSize: 72
+    m_PressedSize: 68
+    m_SelectedSize: 72
+    m_DisabledSize: 64
     m_SizeDuration: 0.1
   m_AutoFitMode: 0
   m_AutoFitPadding: {x: 0, y: 0}

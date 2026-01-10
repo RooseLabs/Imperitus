@@ -9,7 +9,7 @@ namespace RooseLabs.UI.Elements
     {
         [SerializeField] private Slider slider;
         [SerializeField] private TMP_Text sliderValueText;
-        [SerializeField] private int decimalPlaces;
+        [SerializeField] private int precision;
 
         private Func<float, string> m_customFormatter;
 
@@ -25,7 +25,7 @@ namespace RooseLabs.UI.Elements
 
         private void OnEnable()
         {
-            slider.wholeNumbers = decimalPlaces == 0;
+            slider.wholeNumbers = precision == 0;
             slider.onValueChanged.AddListener(OnSliderValueChanged);
         }
 
@@ -36,13 +36,13 @@ namespace RooseLabs.UI.Elements
 
         private void Start()
         {
-            float roundedValue = decimalPlaces == 0 ? slider.value : (float)Math.Round(slider.value, decimalPlaces);
+            float roundedValue = precision == 0 ? slider.value : (float)Math.Round(slider.value, precision);
             SetValueText(roundedValue);
         }
 
         public void SetValue(float value)
         {
-            float roundedValue = decimalPlaces == 0 ? value : (float)Math.Round(value, decimalPlaces);
+            float roundedValue = precision == 0 ? value : (float)Math.Round(value, precision);
             slider.SetValueWithoutNotify(Mathf.Clamp(roundedValue, slider.minValue, slider.maxValue));
             SetValueText(roundedValue);
         }
@@ -53,6 +53,13 @@ namespace RooseLabs.UI.Elements
             slider.maxValue = max;
         }
 
+        public void SetPrecision(int precision)
+        {
+            this.precision = precision;
+            slider.wholeNumbers = this.precision == 0;
+            SetValueText(slider.value);
+        }
+
         public void SetCustomFormatter(Func<float, string> formatter)
         {
             m_customFormatter = formatter;
@@ -61,7 +68,7 @@ namespace RooseLabs.UI.Elements
 
         private void OnSliderValueChanged(float value)
         {
-            float roundedValue = decimalPlaces == 0 ? value : (float)Math.Round(value, decimalPlaces);
+            float roundedValue = precision == 0 ? value : (float)Math.Round(value, precision);
             SetValueText(roundedValue);
             OnValueChanged.Invoke(roundedValue);
             slider.SetValueWithoutNotify(roundedValue);
@@ -71,7 +78,7 @@ namespace RooseLabs.UI.Elements
         {
             sliderValueText.text = m_customFormatter != null
                 ? m_customFormatter(value)
-                : value.ToString(decimalPlaces == 0 ? "F0" : $"F{decimalPlaces}");
+                : value.ToString(precision == 0 ? "F0" : $"F{precision}");
         }
     }
 }
