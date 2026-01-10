@@ -264,7 +264,9 @@ namespace RooseLabs.SceneManagement
             {
                 // Only load offline scene if not also server.
                 if (!m_networkManager.IsServerStarted)
+                {
                     LoadOfflineScene();
+                }
             }
         }
 
@@ -322,6 +324,7 @@ namespace RooseLabs.SceneManagement
             if (UnitySceneManager.GetActiveScene().name == GetSceneName(offlineScene))
                 return;
             UnitySceneManager.LoadScene(offlineScene);
+            CurrentlyLoadedOnlineSceneName = string.Empty;
             Logger.Info($"Loaded offline scene '{GetSceneName(offlineScene)}'.");
         }
 
