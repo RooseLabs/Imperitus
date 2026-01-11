@@ -10,7 +10,12 @@ namespace RooseLabs.UI.Elements
     [RequireComponent(typeof(TextMeshProUGUI))]
     public class ButtonPrompt : MonoBehaviour
     {
+        [SerializeField] private bool useSchemeSpecificActions;
         [SerializeField] private InputActionReference inputAction;
+
+        [Header("Scheme-Specific Actions")]
+        [SerializeField] private InputActionReference keyboardMouseAction;
+        [SerializeField] private InputActionReference gamepadAction;
 
         private TMP_Text m_text;
 
@@ -35,7 +40,15 @@ namespace RooseLabs.UI.Elements
 
         private void UpdateText(InputScheme scheme)
         {
-            string spriteTag = InputSpriteData.GetSpriteTag(inputAction.action, scheme);
+            InputActionReference actionToUse = GetActionForScheme(scheme);
+
+            if (!actionToUse)
+            {
+                m_text.text = "";
+                return;
+            }
+
+            string spriteTag = InputSpriteData.GetSpriteTag(actionToUse.action, scheme);
 
             if (!string.IsNullOrEmpty(spriteTag))
             {
@@ -43,9 +56,24 @@ namespace RooseLabs.UI.Elements
             }
             else
             {
-                Debug.Log($"No sprite tag found for action '{inputAction.action.name}' on scheme {scheme}", this);
+                Debug.Log($"No sprite tag found for action '{actionToUse.action.name}' on scheme {scheme}", this);
                 m_text.text = "";
             }
+        }
+
+        private InputActionReference GetActionForScheme(InputScheme scheme)
+        {
+            if (useSchemeSpecificActions)
+            {
+                return scheme switch
+                {
+                    InputScheme.KeyboardMouse => keyboardMouseAction,
+                    InputScheme.Gamepad => gamepadAction,
+                    _ => inputAction
+                };
+            }
+
+            return inputAction;
         }
 
         private void UpdateSprite(InputDevice device)
@@ -56,10 +84,12 @@ namespace RooseLabs.UI.Elements
         #if UNITY_EDITOR
         private void OnValidate()
         {
-            if (!inputAction || !InputSpriteData.Instance) return;
+            InputActionReference actionToUse = useSchemeSpecificActions ? keyboardMouseAction : inputAction;
+
+            if (!actionToUse || !InputSpriteData.Instance) return;
             if (TryGetComponent(out TMP_Text textComponent))
             {
-                string spriteTag = InputSpriteData.GetSpriteTag(inputAction.action, InputScheme.KeyboardMouse);
+                string spriteTag = InputSpriteData.GetSpriteTag(actionToUse.action, InputScheme.KeyboardMouse);
                 if (!string.IsNullOrEmpty(spriteTag))
                 {
                     textComponent.text = $"<sprite name=\"{spriteTag}\">";

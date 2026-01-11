@@ -23,6 +23,10 @@ namespace RooseLabs.UI
         [Header("Interaction Prompt")]
         [SerializeField] private GameObject interactionPromptSprite;
         [SerializeField] private TMP_Text interactionText;
+
+        [Header("Button Prompts")]
+        [SerializeField] private GameObject dropPrompt;
+        [SerializeField] private GameObject[] spectatePrompts;
         #endregion
 
         private void OnEnable()
@@ -41,8 +45,14 @@ namespace RooseLabs.UI
         private void Update()
         {
             var character = PlayerCharacter.ObservedCharacter;
-            if (!character) return;
-            if (character != PlayerCharacter.LocalCharacter)
+            UpdateCrosshair(character);
+            UpdateStatDisplays(character);
+            UpdateButtonPrompts(character);
+        }
+
+        private void UpdateCrosshair(PlayerCharacter character)
+        {
+            if (!character || character != PlayerCharacter.LocalCharacter)
             {
                 crosshairImage.enabled = false;
             }
@@ -51,9 +61,31 @@ namespace RooseLabs.UI
                 crosshairImage.enabled = true;
                 crosshairImage.sprite = character.Data.isAiming ? aimingCrosshairSprite : defaultCrosshairSprite;
             }
+        }
+
+        private void UpdateStatDisplays(PlayerCharacter character)
+        {
             healthSlider.value = character.Data.Health / character.Data.MaxHealth;
-            float targetStaminaValue = character.Data.Stamina / character.Data.MaxStamina;
-            staminaSlider.value = Mathf.MoveTowards(staminaSlider.value, targetStaminaValue, Time.deltaTime * 2f);
+            staminaSlider.value = character.Data.Stamina / character.Data.MaxStamina;
+        }
+
+        private void UpdateButtonPrompts(PlayerCharacter character)
+        {
+            dropPrompt.SetActive(false);
+            foreach (var prompt in spectatePrompts)
+            {
+                prompt.SetActive(false);
+            }
+            if (!character) return;
+            if (character != PlayerCharacter.LocalCharacter)
+            {
+                foreach (var prompt in spectatePrompts)
+                {
+                    prompt.SetActive(true);
+                }
+                return;
+            }
+            dropPrompt.SetActive((bool)character.Items.CurrentHeldItem);
         }
 
         public void SetTimerActive(bool isActive)

@@ -162,15 +162,18 @@ namespace RooseLabs.Player
         {
             PlayerCharacter character = PlayerCharacter.LocalCharacter;
 
-            if (character.Input.previousWasPressed && character.Input.nextWasPressed)
+            bool previousWasPressed = character.Input.previousWasPressed || character.Input.aimWasPressed;
+            bool nextWasPressed = character.Input.nextWasPressed || character.Input.castWasPressed;
+
+            if (previousWasPressed && nextWasPressed)
             {
                 // No-op
             }
-            else if (character.Input.previousWasPressed)
+            else if (previousWasPressed)
             {
                 SwitchToSpectateTarget(-1);
             }
-            else if (character.Input.nextWasPressed)
+            else if (nextWasPressed)
             {
                 SwitchToSpectateTarget(1);
             }

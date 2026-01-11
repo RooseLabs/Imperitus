@@ -29,6 +29,7 @@ namespace RooseLabs.Player
         public bool pauseWasPressed;
         public Vector2 movementInput;
         public Vector2 lookInput;
+        public bool aimWasPressed;
         public bool aimIsPressed;
         public bool castWasPressed;
         public bool castIsPressed;
@@ -98,6 +99,7 @@ namespace RooseLabs.Player
             {
                 movementInput = m_actionMove.ReadValue<Vector2>();
                 lookInput = m_actionLook.ReadValue<Vector2>();
+                aimWasPressed = m_actionAim.WasPressedThisFrame();
                 aimIsPressed = m_actionAim.IsPressed();
                 castWasPressed = m_actionCast.WasPressedThisFrame();
                 castIsPressed = m_actionCast.IsPressed();
