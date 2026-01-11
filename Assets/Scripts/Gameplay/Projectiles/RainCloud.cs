@@ -1,4 +1,5 @@
 using System.Collections;
+using RooseLabs.ScriptableObjects;
 using UnityEngine;
 
 namespace RooseLabs.Gameplay
@@ -12,6 +13,11 @@ namespace RooseLabs.Gameplay
         [SerializeField] private GameObject cloudMesh;
         [SerializeField] private ParticleSystem rainParticleSystem;
         [SerializeField] private string cloudColorPropertyName = "_Cloud_Color";
+
+        [Header("Sound Effects")]
+        [SerializeField] private string rainSoundKey = "Rain";
+        [SerializeField] private string lightningSoundKey = "Rain_Lightning";
+        [SerializeField] private float soundFadeOutDuration = 1f;
 
         public Vector3 CloudMeshLocalOffset => cloudMesh ? cloudMesh.transform.localPosition : Vector3.zero;
 
@@ -28,6 +34,10 @@ namespace RooseLabs.Gameplay
         private Color m_growthColorEnd;
         private float m_scaleStart;
         private float m_scaleEnd;
+
+        // Audio tracking
+        private AudioSource m_rainAudioSource;
+        private float m_rainAudioOriginalVolume;
 
         private void Awake()
         {
@@ -178,6 +188,9 @@ namespace RooseLabs.Gameplay
                 rainParticleSystem.Play();
             }
 
+            // Play rain sound effects
+            PlayRainSounds();
+
             // Wait for rain duration
             yield return new WaitForSeconds(m_rainDuration);
         }
@@ -188,6 +201,12 @@ namespace RooseLabs.Gameplay
             if (rainParticleSystem)
             {
                 rainParticleSystem.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+            }
+
+            // Start fading out rain sound
+            if (m_rainAudioSource != null && m_rainAudioSource.isPlaying)
+            {
+                StartCoroutine(FadeOutRainSound());
             }
 
             if (!m_cloudMeshTransform)
@@ -216,8 +235,74 @@ namespace RooseLabs.Gameplay
             m_cloudMeshTransform.localScale = m_initialScale * m_scaleStart;
         }
 
+        #region Sound Effects
+        private void PlayRainSounds()
+        {
+            if (SoundManager.Instance == null || SoundManager.Instance.soundDatabase == null)
+                return;
+
+            Vector3 soundPosition = cloudMesh ? cloudMesh.transform.position : transform.position;
+
+            // Play the looping rain sound
+            if (!string.IsNullOrEmpty(rainSoundKey))
+            {
+                SoundType rainSoundType = SoundManager.Instance.soundDatabase.GetByKey(rainSoundKey);
+                if (rainSoundType != null)
+                {
+                    // Create a dedicated AudioSource for the rain sound so we can fade it out
+                    m_rainAudioSource = gameObject.AddComponent<AudioSource>();
+                    m_rainAudioSource.clip = rainSoundType.GetRandomClip();
+                    m_rainAudioSource.volume = rainSoundType.volume;
+                    m_rainAudioSource.spatialBlend = rainSoundType.spatialBlend;
+                    m_rainAudioSource.minDistance = rainSoundType.minDistance;
+                    m_rainAudioSource.maxDistance = rainSoundType.maxDistance;
+                    m_rainAudioSource.rolloffMode = rainSoundType.rolloffMode;
+                    m_rainAudioSource.loop = false; // Don't loop, we control duration
+                    m_rainAudioSource.Play();
+                    m_rainAudioOriginalVolume = rainSoundType.volume;
+                }
+            }
+
+            // Play the lightning sound once
+            if (!string.IsNullOrEmpty(lightningSoundKey))
+            {
+                SoundType lightningSoundType = SoundManager.Instance.soundDatabase.GetByKey(lightningSoundKey);
+                if (lightningSoundType != null)
+                {
+                    SoundManager.Instance.PlaySoundLocal(lightningSoundType, soundPosition);
+                }
+            }
+        }
+
+        private IEnumerator FadeOutRainSound()
+        {
+            if (m_rainAudioSource == null)
+                yield break;
+
+            float elapsed = 0f;
+            float startVolume = m_rainAudioSource.volume;
+
+            while (elapsed < soundFadeOutDuration)
+            {
+                elapsed += Time.deltaTime;
+                float t = Mathf.Clamp01(elapsed / soundFadeOutDuration);
+                m_rainAudioSource.volume = Mathf.Lerp(startVolume, 0f, t);
+                yield return null;
+            }
+
+            m_rainAudioSource.Stop();
+            m_rainAudioSource.volume = 0f;
+        }
+        #endregion
+
         private void OnDestroy()
         {
+            // Stop rain audio if still playing
+            if (m_rainAudioSource != null)
+            {
+                m_rainAudioSource.Stop();
+            }
+
             // Clean up material instances to prevent memory leaks
             if (m_cloudMaterialInstances != null)
             {

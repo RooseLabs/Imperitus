@@ -23,6 +23,7 @@ namespace RooseLabs.Gameplay.Interactables
 
         private Coroutine m_pickupCoroutine;
         private NetworkTransform m_networkTransform;
+        private bool m_wasDropped;
 
         // Perlin noise parameters
         private float m_noiseTime = 0f;
@@ -85,21 +86,21 @@ namespace RooseLabs.Gameplay.Interactables
             }
         }
 
-        // private bool m_hasDropped = false;
-        // private void OnCollisionEnter(Collision collision)
-        // {
-        //     if (m_hasDropped) return; // Only emit once per drop
-        //
-        //     // Emit "ItemDropped" sound
-        //     var soundEmitter = GetComponent<SoundEmitter>();
-        //     if (soundEmitter != null)
-        //     {
-        //         Logger.Info("[Book] Emitting ItemDropped sound.");
-        //         soundEmitter.RequestEmitFromClient("ItemDropped");
-        //     }
-        //
-        //     m_hasDropped = true;
-        // }
+        protected override void OnCollisionEnter(Collision collision)
+        {
+            // Check if this was an interaction drop before calling base
+            // (base handles Impero release sounds)
+            bool shouldPlayDropSound = m_wasDropped;
+            
+            base.OnCollisionEnter(collision);
+            
+            // Play drop sound when item hits surface after being dropped via interaction
+            if (shouldPlayDropSound)
+            {
+                PlayCollisionSound(collision.GetContact(0).point);
+                m_wasDropped = false;
+            }
+        }
 
         [ServerRpc(RequireOwnership = false)]
         private void RequestPickup(PlayerCharacter character)
@@ -137,7 +138,7 @@ namespace RooseLabs.Gameplay.Interactables
             SceneManagement.SceneManager.MoveGameObjectToOnlineScene(gameObject);
             SetState(ItemState.Ground);
             OnDrop();
-            // m_hasDropped = false;
+            m_wasDropped = true;
         }
 
         private IEnumerator DoPickupSequence()

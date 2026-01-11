@@ -29,6 +29,10 @@ namespace RooseLabs.Gameplay.Spells
         [Header("Beam Visual")]
         [SerializeField] private GameObject beamObject;
         [SerializeField] private GameObject particles;
+
+        [Header("Sound Effects")]
+        [SerializeField] private string castSoundKey = "Petrify_Cast";
+        [SerializeField] private string impactSoundKey = "Petrify_Impact";
         #endregion
 
         private enum PetrifySpellCastingState
@@ -55,6 +59,10 @@ namespace RooseLabs.Gameplay.Spells
         private float m_reverseElapsed;
         private float m_reverseFromNormalized;
 
+        // Sound
+        private SoundEmitter m_soundEmitter;
+        private AudioSource m_impactAudioSource;
+
         private void Awake()
         {
             if (!beamObject) this.LogWarning("No beamObject assigned in inspector.");
@@ -79,6 +87,16 @@ namespace RooseLabs.Gameplay.Spells
         protected override void OnStartCast()
         {
             SetState(PetrifySpellCastingState.Casting);
+
+            // Play cast sound
+            if (CasterCharacter != null && !string.IsNullOrEmpty(castSoundKey))
+            {
+                if (m_soundEmitter == null)
+                {
+                    m_soundEmitter = CasterCharacter.GetComponent<SoundEmitter>();
+                }
+                m_soundEmitter?.RequestEmitFromClient(castSoundKey);
+            }
         }
 
         protected override void OnContinueCast()
@@ -188,6 +206,9 @@ namespace RooseLabs.Gameplay.Spells
             m_isBeamActive = false;
             beamObject?.SetActive(false);
             m_petrifiedTargets.Clear();
+
+            // Stop impact sound
+            StopImpactSound();
         }
 
         private void UpdateBeam(Vector3 hitPoint)
@@ -245,6 +266,40 @@ namespace RooseLabs.Gameplay.Spells
             }
         }
 
+        #region Sound Effects
+        private void PlayImpactSound()
+        {
+            if (string.IsNullOrEmpty(impactSoundKey)) return;
+            if (SoundManager.Instance == null || SoundManager.Instance.soundDatabase == null) return;
+
+            var soundType = SoundManager.Instance.soundDatabase.GetByKey(impactSoundKey);
+            if (soundType == null) return;
+
+            // Create a dedicated AudioSource for the impact sound so we can stop it
+            if (m_impactAudioSource == null)
+            {
+                m_impactAudioSource = gameObject.AddComponent<AudioSource>();
+            }
+
+            m_impactAudioSource.clip = soundType.GetRandomClip();
+            m_impactAudioSource.volume = soundType.volume;
+            m_impactAudioSource.spatialBlend = soundType.spatialBlend;
+            m_impactAudioSource.minDistance = soundType.minDistance;
+            m_impactAudioSource.maxDistance = soundType.maxDistance;
+            m_impactAudioSource.rolloffMode = soundType.rolloffMode;
+            m_impactAudioSource.loop = false;
+            m_impactAudioSource.Play();
+        }
+
+        private void StopImpactSound()
+        {
+            if (m_impactAudioSource != null && m_impactAudioSource.isPlaying)
+            {
+                m_impactAudioSource.Stop();
+            }
+        }
+        #endregion
+
         private void SetState(PetrifySpellCastingState newState)
         {
             if (newState == m_currentState) return;
@@ -275,6 +330,9 @@ namespace RooseLabs.Gameplay.Spells
 
                     StartBeam();
                     ToggleParticles(true);
+
+                    // Play impact sound for all players
+                    PlayImpactSound();
 
                     m_reverseRunning = false;
                     break;

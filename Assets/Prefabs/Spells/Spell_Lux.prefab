@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 5177303023764981309}
   - component: {fileID: 6382066292344888791}
   - component: {fileID: 4336472053326456653}
-  - component: {fileID: 5290949147635547262}
+  - component: {fileID: 4961560264677057368}
   m_Layer: 0
   m_Name: GlowingOrb
   m_TagString: Untagged
@@ -187,7 +187,7 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_RenderingLayers: 1
   m_ShadowRenderingLayers: 1
---- !u!114 &5290949147635547262
+--- !u!114 &4961560264677057368
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -281,8 +281,8 @@ MonoBehaviour:
   _isGlobal: 0
   _initializeOrder: 0
   _preventDespawnOnDisconnect: 0
-  _defaultDespawnType: 0
-  _initializedTimestamp: -8584338125934615067
+  _defaultDespawnType: 1
+  _initializedTimestamp: -8584335120487359944
   NetworkObserver: {fileID: 0}
   _enablePrediction: 0
   _predictionType: 0
@@ -297,7 +297,7 @@ MonoBehaviour:
   _spectatorInterpolation: 2
   _enableTeleport: 0
   _teleportThreshold: 1
-  <PrefabId>k__BackingField: 22
+  <PrefabId>k__BackingField: 21
   <SpawnableCollectionId>k__BackingField: 0
   <AssetPathHash>k__BackingField: 17452899135586848408
   SceneId: 0
@@ -328,10 +328,11 @@ MonoBehaviour:
   staminaConsumptionType: 0
   staminaCostPerSecond: 0
   cooldownTime: 120
-  glowingOrb: {fileID: 5290949147635547262}
+  glowingOrb: {fileID: 4961560264677057368}
   offsetPosition: {x: -0.315, y: 0.906, z: 0.436}
   orbMaterializeDuration: 1
   orbLifeDuration: 120
   orbFollowSmoothTime: 0.5
   orbObstacleAvoidanceRadius: 0.5
   orbFadeOutDuration: 10
+  castSoundKey: Light

@@ -16,11 +16,12 @@ MonoBehaviour:
   radius: 5
   duration: 0.5
   priority: 0
+  ignoreDetectionLogic: 0
   audioClips:
   - {fileID: 8300000, guid: 3e1f09f6b64a40f48a0cffea4cd4897c, type: 3}
   - {fileID: 8300000, guid: cb5f09ec7026f414ab5a55d3dc392ba4, type: 3}
   - {fileID: 8300000, guid: 9b941db95ae259244816a30964fa8103, type: 3}
-  volume: 0.1
+  volume: 0.05
   pitchVariation: 0.05
   is3D: 1
   minDistance: 1

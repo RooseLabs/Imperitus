@@ -893,6 +893,30 @@ namespace RooseLabs.Gameplay.Notebook
             this.LogInfo("Player notebook reset");
         }
 
+        /// <summary>
+        /// Gives all available runes to this player.
+        /// </summary>
+        public void GiveAllRunes()
+        {
+            if (GameManager.Instance == null || GameManager.Instance.RuneDatabase == null)
+            {
+                this.LogWarning("Cannot give all runes: GameManager or RuneDatabase is null");
+                return;
+            }
+
+            int runesGranted = 0;
+            for (int i = 0; i < GameManager.Instance.RuneDatabase.Count; i++)
+            {
+                if (!HasRune(i))
+                {
+                    CollectRune(i);
+                    runesGranted++;
+                }
+            }
+
+            this.LogInfo($"Granted {runesGranted} runes to the player. Total runes: {GameManager.Instance.RuneDatabase.Count}");
+        }
+
         #endregion
     }
 }

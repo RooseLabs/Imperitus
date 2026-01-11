@@ -16,6 +16,13 @@ namespace RooseLabs.Gameplay
         [SerializeField] private float rotationSpringStrength = 5f;
         [Tooltip("Damping factor applied when returning to rest position.")]
         [SerializeField] private float dampingFactor = 0.8f;
+
+        [Header("Door Sound Effects")]
+        [SerializeField] private string doorMoveSoundKey = "Door_Draggable";
+        [Tooltip("Minimum velocity (linear or angular) required to trigger the door sound.")]
+        [SerializeField] private float movementSoundThreshold = 0.5f;
+        [Tooltip("Cooldown time between door sounds to prevent spamming.")]
+        [SerializeField] private float doorSoundCooldown = 1.5f;
         #endregion
 
         private static int s_blockingObjectsLayerMask;
@@ -26,6 +33,10 @@ namespace RooseLabs.Gameplay
         private Quaternion m_initialRotation;
         private Coroutine m_returnToRestPosition;
         private float m_notMovingTimer;
+
+        // Door sound tracking
+        private bool m_wasMovingLastFrame;
+        private float m_lastDoorSoundTime;
 
         protected override void Awake()
         {
@@ -54,6 +65,10 @@ namespace RooseLabs.Gameplay
         protected override void FixedUpdate()
         {
             base.FixedUpdate();
+
+            // Check for door movement sound (runs on all clients for local feedback)
+            CheckDoorMovementSound();
+
             if (!IsController) return;
 
             if (isBeingDraggedByImpero) return;
@@ -88,6 +103,66 @@ namespace RooseLabs.Gameplay
                 return;
             }
             m_notMovingTimer = 0f;
+        }
+
+        /// <summary>
+        /// Checks if the door started moving and plays the door sound if cooldown allows.
+        /// </summary>
+        private void CheckDoorMovementSound()
+        {
+            // Calculate combined movement magnitude (linear + angular velocity)
+            float linearSpeed = rb.linearVelocity.magnitude;
+            float angularSpeed = rb.angularVelocity.magnitude;
+            float combinedSpeed = linearSpeed + angularSpeed;
+
+            bool isMoving = combinedSpeed > movementSoundThreshold;
+
+            // Trigger sound when door starts moving (wasn't moving last frame, now is moving)
+            if (isMoving && !m_wasMovingLastFrame)
+            {
+                TryPlayDoorSound();
+            }
+
+            m_wasMovingLastFrame = isMoving;
+        }
+
+        /// <summary>
+        /// Attempts to play the door movement sound if cooldown has elapsed.
+        /// </summary>
+        private void TryPlayDoorSound()
+        {
+            // Check cooldown
+            if (Time.time - m_lastDoorSoundTime < doorSoundCooldown) return;
+
+            m_lastDoorSoundTime = Time.time;
+
+            // Play sound via server to sync across all clients
+            if (IsServerInitialized)
+            {
+                PlayDoorSound_Internal(transform.position);
+            }
+            else if (IsClientInitialized)
+            {
+                PlayDoorSound_ServerRpc(transform.position);
+            }
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        private void PlayDoorSound_ServerRpc(Vector3 position)
+        {
+            PlayDoorSound_Internal(position);
+        }
+
+        private void PlayDoorSound_Internal(Vector3 position)
+        {
+            if (string.IsNullOrEmpty(doorMoveSoundKey)) return;
+            if (SoundManager.Instance == null || SoundManager.Instance.soundDatabase == null) return;
+
+            var soundType = SoundManager.Instance.soundDatabase.GetByKey(doorMoveSoundKey);
+            if (soundType == null) return;
+
+            // Use SoundManager.EmitSound to broadcast to all players
+            SoundManager.Instance.EmitSound(soundType, position, this);
         }
 
         /// <summary>
@@ -151,5 +226,8 @@ namespace RooseLabs.Gameplay
                 m_returnToRestPosition = null;
             }
         }
+
+        // Doors don't make collision sounds (they use movement-based sounds instead)
+        protected override void PlayCollisionSound(Vector3 position) { }
     }
 }

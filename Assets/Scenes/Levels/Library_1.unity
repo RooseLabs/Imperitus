@@ -21260,6 +21260,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bcaf4eee98f52744497cd20b4b25cda1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Gameplay.Interactables.ReturnToLobbyInteractable
+  doorOpenSoundKey: DoorOpen
 --- !u!65 &1240041333
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -21332,6 +21333,7 @@ MonoBehaviour:
   doorTransform: {fileID: 1798993945}
   doorOpeningDuration: 1
   doorOpeningAngle: -90
+  puzzleCompleteSoundKey: ReceptionPuzzleComplete
 --- !u!114 &1242945811
 MonoBehaviour:
   m_ObjectHideFlags: 0

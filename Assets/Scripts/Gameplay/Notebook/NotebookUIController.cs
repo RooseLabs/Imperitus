@@ -41,6 +41,10 @@ namespace RooseLabs.Gameplay.Notebook
         [Header("Spell Loadout Lock")]
         [SerializeField] private Color spellLockedOverlayColor = new Color(0.3f, 0.3f, 0.3f, 0.3f); // Dark overlay when locked
 
+        [Header("Sound Effects")]
+        [SerializeField] private string openSoundKey = "Notebook_Open";
+        [SerializeField] private string closeSoundKey = "Notebook_Close";
+
         private enum NotebookTab
         {
             Assignment,
@@ -110,12 +114,47 @@ namespace RooseLabs.Gameplay.Notebook
         public void Open()
         {
             gameObject.SetActive(true);
+            PlayNotebookSound(openSoundKey);
         }
 
         public void Close()
         {
+            PlayNotebookSound(closeSoundKey);
             gameObject.SetActive(false);
         }
+
+        private void PlayNotebookSound(string soundKey)
+        {
+            if (string.IsNullOrEmpty(soundKey)) return;
+            if (SoundManager.Instance == null || SoundManager.Instance.soundDatabase == null) return;
+
+            var soundType = SoundManager.Instance.soundDatabase.GetByKey(soundKey);
+            if (soundType == null) return;
+
+            AudioClip clip = soundType.GetRandomClip();
+            if (clip == null) return;
+
+            // Stop any currently playing notebook sound to prevent overlap
+            if (!string.IsNullOrEmpty(m_currentPlayingSoundKey))
+            {
+                SoundManager.Instance.StopSoundByKey(m_currentPlayingSoundKey);
+            }
+
+            // Use SoundManager's 2D audio source for true 2D UI sound (no spatial positioning)
+            var audioSource2D = SoundManager.Instance.audioSource2D;
+            if (audioSource2D != null)
+            {
+                audioSource2D.Stop();
+                audioSource2D.clip = clip;
+                audioSource2D.volume = soundType.volume;
+                audioSource2D.spatialBlend = 0f; // Ensure it's fully 2D
+                audioSource2D.Play();
+            }
+
+            m_currentPlayingSoundKey = soundKey;
+        }
+
+        private string m_currentPlayingSoundKey;
 
         /// <summary>
         /// Switches to the Assignment tab. Call this from Unity Events.

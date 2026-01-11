@@ -4767,7 +4767,7 @@ ParticleSystem:
     vectorLabel1_3: W
 --- !u!199 &1341819352706160351
 ParticleSystemRenderer:
-  serializedVersion: 6
+  serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -4813,6 +4813,7 @@ ParticleSystemRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_RenderMode: 0
   m_MeshDistribution: 0
   m_SortMode: 0
@@ -4844,7 +4845,6 @@ ParticleSystemRenderer:
   m_MeshWeighting1: 1
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
-  m_MaskInteraction: 0
 --- !u!1 &2577623497123969498
 GameObject:
   m_ObjectHideFlags: 0
@@ -4886,14 +4886,14 @@ Light:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2577623497123969498}
   m_Enabled: 1
-  serializedVersion: 11
+  serializedVersion: 12
   m_Type: 0
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Intensity: 10
   m_Range: 5
   m_SpotAngle: 60
   m_InnerSpotAngle: 60
-  m_CookieSize: 10
+  m_CookieSize2D: {x: 10, y: 10}
   m_Shadows:
     m_Type: 2
     m_Resolution: -1
@@ -5006,7 +5006,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: -90}
 --- !u!96 &4095892367459871500
 TrailRenderer:
-  serializedVersion: 3
+  serializedVersion: 4
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -5053,6 +5053,7 @@ TrailRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_Time: 1
   m_PreviewTimeScale: 1
   m_Parameters:
@@ -5120,7 +5121,6 @@ TrailRenderer:
     shadowBias: 0.5
     generateLightingData: 1
   m_MinVertexDistance: 0.1
-  m_MaskInteraction: 0
   m_Autodestruct: 0
   m_Emitting: 1
   m_ApplyActiveColorSpace: 1
@@ -5212,7 +5212,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
 --- !u!96 &5200584945756223263
 TrailRenderer:
-  serializedVersion: 3
+  serializedVersion: 4
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -5259,6 +5259,7 @@ TrailRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_Time: 1
   m_PreviewTimeScale: 1
   m_Parameters:
@@ -5326,7 +5327,6 @@ TrailRenderer:
     shadowBias: 0.5
     generateLightingData: 1
   m_MinVertexDistance: 0.1
-  m_MaskInteraction: 0
   m_Autodestruct: 0
   m_Emitting: 1
   m_ApplyActiveColorSpace: 1
@@ -5347,6 +5347,7 @@ GameObject:
   - component: {fileID: 4866373312013150636}
   - component: {fileID: 2923893137017715159}
   - component: {fileID: 6459826222640076540}
+  - component: {fileID: 9209382094262018913}
   m_Layer: 11
   m_Name: SentientGrimoire
   m_TagString: Untagged
@@ -5495,6 +5496,9 @@ MonoBehaviour:
   reinforcementUpdateInterval: 1
   showDebugRay: 1
   debugRayLength: 3
+  patrolSoundKey: Grimoire_Patrol
+  alertSoundKey: Grimoire_Alert
+  trackingSoundKey: Grimoire_Tracking
 --- !u!114 &8735231212856205354
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5642,6 +5646,26 @@ MonoBehaviour:
   _interpolation: 2
   _clientAuthoritative: 1
   _sendToOwner: 0
+--- !u!114 &9209382094262018913
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8490385624122815485}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e1040ac50946b64f99d84e6c7f1ab8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.SoundEmitter
+  _componentIndexCache: 255
+  _addedNetworkObject: {fileID: 4866373312013150636}
+  _networkObjectCache: {fileID: 0}
+  availableSounds:
+  - type: {fileID: 11400000, guid: 78d2a3417677bf34c9d7fdbdd2e533f1, type: 2}
+  - type: {fileID: 11400000, guid: 621e5691bbdaaa74f9e53677551fca7b, type: 2}
+  - type: {fileID: 11400000, guid: 049036bf79856e946bbe9d0e77ae99b8, type: 2}
+  soundOriginOffset: {x: 0, y: 0, z: 0}
 --- !u!1 &8714036502646822057
 GameObject:
   m_ObjectHideFlags: 0
@@ -5731,6 +5755,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &1055448732173619223
 MonoBehaviour:

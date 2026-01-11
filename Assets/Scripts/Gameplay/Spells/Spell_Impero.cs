@@ -33,6 +33,8 @@ namespace RooseLabs.Gameplay.Spells
         private GameObject m_startCap;
         private GameObject m_endCap;
 
+        private SoundEmitter m_soundEmitter;
+
         protected override void OnAim()
         {
             // If we're currently dragging an object, keep it highlighted and skip hover visuals
@@ -99,6 +101,17 @@ namespace RooseLabs.Gameplay.Spells
             }
 
             HighlightObject(hitDraggable);
+
+            if (m_soundEmitter == null)
+            {
+                m_soundEmitter = character.GetComponent<SoundEmitter>();
+            }
+            if (m_soundEmitter != null)
+            {
+                m_soundEmitter.RequestEmitFromClient("Impero_Cast");
+                m_soundEmitter.RequestEmitFromClient("Impero_Cast_Clothing");
+            }
+
             return true;
         }
 

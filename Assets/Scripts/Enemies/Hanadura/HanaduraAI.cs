@@ -45,6 +45,16 @@ namespace RooseLabs.Enemies
         [Header("Death")]
         public float despawnDelayAfterDeath = 5f;
 
+        [Header("Sound Effects")]
+        [SerializeField] private string walkSoundKey = "Hanadura_Walk";
+        [SerializeField] private string detectionSoundKey = "Hanadura_Grunt";
+        [SerializeField] private string deathSoundKey = "Hanadura_Death";
+        [SerializeField] private float chaseSoundPitch = 1.5f;
+
+        private AudioSource m_walkAudioSource;
+        private bool m_isWalkSoundPlaying;
+        private float m_currentWalkPitch = 1f;
+
         private float visualLostSightTimer = 0f;
 
         [Header("Random Room Patrol")]
@@ -215,6 +225,9 @@ namespace RooseLabs.Enemies
             TryGetComponent(out navAgent);
             TryGetComponent(out detection);
             TryGetComponent(out soundEmitter);
+
+            // Initialize walk audio source
+            InitializeWalkAudioSource();
         }
 
         public override void OnStartServer()
@@ -313,12 +326,16 @@ namespace RooseLabs.Enemies
 
             if (detected)
             {
-                if (!hasTriggeredDetectedAnimation && currentState is HanaduraPatrolState)
+                // Check if this is a fresh detection that requires the detection animation
+                // Only trigger if: not already triggered, currently in patrol state, and not playing the animation
+                if (!hasTriggeredDetectedAnimation && currentState is HanaduraPatrolState && !isPlayingDetectedAnimation)
                 {
                     SetAnimatorTrigger("Detected");
                     hasTriggeredDetectedAnimation = true;
                     isPlayingDetectedAnimation = true;
                     StopMovement(); // Stop the enemy
+                    StopWalkSound(); // Stop walk sound during detection animation
+                    PlayDetectionSound(); // Play grunt sound
                     Logger.Info("First visual detection - playing Detected animation");
                 }
 
@@ -364,6 +381,12 @@ namespace RooseLabs.Enemies
 
         private void UpdateStateFromDetection()
         {
+            // Don't transition states while playing the detection animation
+            if (isPlayingDetectedAnimation)
+            {
+                return;
+            }
+
             if (currentDetection == null)
             {
                 // No detection, return to patrol
@@ -651,6 +674,8 @@ namespace RooseLabs.Enemies
         {
             if (hasPlayedDeathAnimation) return;
             StopMovement();
+            StopWalkSound(); // Stop walk sound on death
+            PlayDeathSound(); // Play death sound
             currentState = null;
             ClearCurrentDetection();
 
@@ -887,6 +912,9 @@ namespace RooseLabs.Enemies
             // Store current state to restore later
             m_stateBeforePetrify = currentState;
 
+            // Stop walk sound while petrified
+            StopWalkSound();
+
             // Freeze animator at current frame
             if (animator)
             {
@@ -1021,5 +1049,125 @@ namespace RooseLabs.Enemies
             TryGetComponent(out navAgent);
         }
         #endif
+
+        #region Walk Sound Management
+        private void InitializeWalkAudioSource()
+        {
+            if (m_walkAudioSource != null) return;
+
+            m_walkAudioSource = gameObject.AddComponent<AudioSource>();
+            m_walkAudioSource.playOnAwake = false;
+            m_walkAudioSource.loop = true;
+            m_walkAudioSource.spatialBlend = 1f; // 3D sound
+            m_walkAudioSource.minDistance = 1f;
+            m_walkAudioSource.maxDistance = 20f;
+            m_walkAudioSource.rolloffMode = AudioRolloffMode.Linear;
+        }
+
+        /// <summary>
+        /// Starts playing the walk sound with the specified pitch.
+        /// </summary>
+        /// <param name="pitch">Pitch multiplier (1.0 = normal, 1.5 = chase speed)</param>
+        public void StartWalkSound(float pitch = 1f)
+        {
+            if (m_isWalkSoundPlaying && Mathf.Approximately(m_currentWalkPitch, pitch)) return;
+
+            m_currentWalkPitch = pitch;
+
+            if (IsServerInitialized)
+            {
+                StartWalkSound_ObserversRpc(pitch);
+            }
+
+            StartWalkSoundLocal(pitch);
+        }
+
+        /// <summary>
+        /// Stops the walk sound.
+        /// </summary>
+        public void StopWalkSound()
+        {
+            if (!m_isWalkSoundPlaying) return;
+
+            if (IsServerInitialized)
+            {
+                StopWalkSound_ObserversRpc();
+            }
+
+            StopWalkSoundLocal();
+        }
+
+        private void StartWalkSoundLocal(float pitch)
+        {
+            if (m_walkAudioSource == null) return;
+            if (SoundManager.Instance == null || SoundManager.Instance.soundDatabase == null) return;
+
+            var soundType = SoundManager.Instance.soundDatabase.GetByKey(walkSoundKey);
+            if (soundType == null) return;
+
+            AudioClip clip = soundType.GetRandomClip();
+            if (clip == null) return;
+
+            m_walkAudioSource.clip = clip;
+            m_walkAudioSource.volume = soundType.volume;
+            m_walkAudioSource.pitch = pitch;
+            m_walkAudioSource.Play();
+            m_isWalkSoundPlaying = true;
+            m_currentWalkPitch = pitch;
+        }
+
+        private void StopWalkSoundLocal()
+        {
+            if (m_walkAudioSource == null) return;
+
+            m_walkAudioSource.Stop();
+            m_isWalkSoundPlaying = false;
+        }
+
+        [ObserversRpc(ExcludeServer = true)]
+        private void StartWalkSound_ObserversRpc(float pitch)
+        {
+            StartWalkSoundLocal(pitch);
+        }
+
+        [ObserversRpc(ExcludeServer = true)]
+        private void StopWalkSound_ObserversRpc()
+        {
+            StopWalkSoundLocal();
+        }
+
+        /// <summary>
+        /// Plays the detection grunt sound (one-shot).
+        /// </summary>
+        public void PlayDetectionSound()
+        {
+            if (string.IsNullOrEmpty(detectionSoundKey)) return;
+
+            // Use SoundEmitter to broadcast to all players
+            if (soundEmitter != null)
+            {
+                soundEmitter.RequestEmitFromClient(detectionSoundKey);
+            }
+        }
+
+        /// <summary>
+        /// Plays the death sound (one-shot).
+        /// </summary>
+        private void PlayDeathSound()
+        {
+            if (string.IsNullOrEmpty(deathSoundKey)) return;
+
+            // Use SoundEmitter to broadcast to all players
+            if (soundEmitter != null)
+            {
+                soundEmitter.RequestEmitFromClient(deathSoundKey);
+            }
+        }
+
+        /// <summary>
+        /// Gets the chase sound pitch multiplier.
+        /// </summary>
+        public float ChaseSoundPitch => chaseSoundPitch;
+        #endregion
     }
 }

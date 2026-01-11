@@ -1,6 +1,7 @@
 using System.Collections;
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
+using RooseLabs.Player;
 using RooseLabs.ScriptableObjects;
 using UnityEngine;
 
@@ -11,6 +12,10 @@ namespace RooseLabs.Gameplay.Interactables
         #region Serialized
         [Header("Rune Book Data")]
         [SerializeField] private Animator animator;
+
+        [Header("Sound Effects")]
+        [SerializeField] private string pickupSoundKey = "Book_Pickup";
+        [SerializeField] private string runeCollectedSoundKey = "Rune_Collected";
         #endregion
 
         private static readonly int AnimParamIsOpen = Animator.StringToHash("IsOpen");
@@ -80,6 +85,7 @@ namespace RooseLabs.Gameplay.Interactables
             {
                 if (HolderCharacter.Notebook.CollectRune(m_runeIndex.Value))
                 {
+                    PlayRuneCollectedSound();
                     RuneCollected_ServerRPC();
                 }
             }
@@ -98,6 +104,38 @@ namespace RooseLabs.Gameplay.Interactables
         }
 
         public override string GetInteractionText() => "Open";
+
+        public override void Interact(PlayerCharacter interactor)
+        {
+            // Play pickup sound locally for the interacting player
+            PlayPickupSound();
+
+            base.Interact(interactor);
+        }
+
+        private void PlayPickupSound()
+        {
+            if (string.IsNullOrEmpty(pickupSoundKey)) return;
+            if (SoundManager.Instance == null || SoundManager.Instance.soundDatabase == null) return;
+
+            var soundType = SoundManager.Instance.soundDatabase.GetByKey(pickupSoundKey);
+            if (soundType != null)
+            {
+                SoundManager.Instance.PlaySoundLocal(soundType, transform.position);
+            }
+        }
+
+        private void PlayRuneCollectedSound()
+        {
+            if (string.IsNullOrEmpty(runeCollectedSoundKey)) return;
+            if (SoundManager.Instance == null || SoundManager.Instance.soundDatabase == null) return;
+
+            var soundType = SoundManager.Instance.soundDatabase.GetByKey(runeCollectedSoundKey);
+            if (soundType != null)
+            {
+                SoundManager.Instance.PlaySoundLocal(soundType, transform.position);
+            }
+        }
 
         public void SetContainedRune(RuneSO rune)
         {

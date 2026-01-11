@@ -26,6 +26,7 @@ namespace RooseLabs.Enemies
         public Transform spotlightTransform;
         public SpotlightConeVisualizer coneVisualizer;
         public PatrolRoute patrolRoute;
+        public SoundEmitter soundEmitter;
 
         [Header("Movement & Patrol")]
         public float patrolSpeed = 2f;
@@ -61,6 +62,15 @@ namespace RooseLabs.Enemies
         [Header("Debug")]
         public bool showDebugRay = true;
         public float debugRayLength = 3f;
+
+        [Header("Sound Effects")]
+        [SerializeField] private string patrolSoundKey = "Grimoire_Patrol";
+        [SerializeField] private string alertSoundKey = "Grimoire_Alert";
+        [SerializeField] private string trackingSoundKey = "Grimoire_Tracking";
+
+        private AudioSource m_loopingAudioSource;
+        private bool m_isLoopingSoundPlaying;
+        private string m_currentLoopingSoundKey;
 
         #region Animation Parameters
         private static readonly int AnimParamIsPatrolling = Animator.StringToHash("isPatrolling");
@@ -103,12 +113,16 @@ namespace RooseLabs.Enemies
             TryGetComponent(out navAgent);
             modelTransform.TryGetComponent(out animator);
             TryGetComponent(out rb);
+            TryGetComponent(out soundEmitter);
 
             // Store initial spotlight rotation
             if (spotlightTransform)
             {
                 m_defaultSpotlightRotation = spotlightTransform.rotation;
             }
+
+            // Initialize looping audio source
+            InitializeLoopingAudioSource();
         }
 
         public override void OnStartNetwork()
@@ -520,6 +534,7 @@ namespace RooseLabs.Enemies
 
         protected override void OnDeath()
         {
+            StopLoopingSound(); // Stop any playing sound
             currentState = null;
             navAgent.isStopped = true;
             navAgent.velocity = Vector3.zero;
@@ -551,6 +566,9 @@ namespace RooseLabs.Enemies
             m_isPetrified = true;
             m_petrifyDuration = duration;
             m_petrifyElapsed = 0f;
+
+            // Stop looping sound while petrified
+            StopLoopingSound();
 
             // Freeze animator at current frame
             if (animator)
@@ -712,5 +730,111 @@ namespace RooseLabs.Enemies
         }
         #endregion
         #endif
+
+        #region Sound Management
+        private void InitializeLoopingAudioSource()
+        {
+            if (m_loopingAudioSource != null) return;
+
+            m_loopingAudioSource = gameObject.AddComponent<AudioSource>();
+            m_loopingAudioSource.playOnAwake = false;
+            m_loopingAudioSource.loop = true;
+            m_loopingAudioSource.spatialBlend = 1f; // 3D sound
+            m_loopingAudioSource.minDistance = 1f;
+            m_loopingAudioSource.maxDistance = 20f;
+            m_loopingAudioSource.rolloffMode = AudioRolloffMode.Linear;
+        }
+
+        /// <summary>
+        /// Starts playing a looping sound by key.
+        /// </summary>
+        public void StartLoopingSound(string soundKey)
+        {
+            if (m_isLoopingSoundPlaying && m_currentLoopingSoundKey == soundKey) return;
+
+            m_currentLoopingSoundKey = soundKey;
+
+            if (IsServerInitialized)
+            {
+                StartLoopingSound_ObserversRpc(soundKey);
+            }
+
+            StartLoopingSoundLocal(soundKey);
+        }
+
+        /// <summary>
+        /// Stops the currently playing looping sound.
+        /// </summary>
+        public void StopLoopingSound()
+        {
+            if (!m_isLoopingSoundPlaying) return;
+
+            if (IsServerInitialized)
+            {
+                StopLoopingSound_ObserversRpc();
+            }
+
+            StopLoopingSoundLocal();
+        }
+
+        private void StartLoopingSoundLocal(string soundKey)
+        {
+            if (m_loopingAudioSource == null) return;
+            if (string.IsNullOrEmpty(soundKey)) return;
+            if (SoundManager.Instance == null || SoundManager.Instance.soundDatabase == null) return;
+
+            var soundType = SoundManager.Instance.soundDatabase.GetByKey(soundKey);
+            if (soundType == null) return;
+
+            AudioClip clip = soundType.GetRandomClip();
+            if (clip == null) return;
+
+            m_loopingAudioSource.clip = clip;
+            m_loopingAudioSource.volume = soundType.volume;
+            m_loopingAudioSource.Play();
+            m_isLoopingSoundPlaying = true;
+            m_currentLoopingSoundKey = soundKey;
+        }
+
+        private void StopLoopingSoundLocal()
+        {
+            if (m_loopingAudioSource == null) return;
+
+            m_loopingAudioSource.Stop();
+            m_isLoopingSoundPlaying = false;
+            m_currentLoopingSoundKey = null;
+        }
+
+        [ObserversRpc(ExcludeServer = true)]
+        private void StartLoopingSound_ObserversRpc(string soundKey)
+        {
+            StartLoopingSoundLocal(soundKey);
+        }
+
+        [ObserversRpc(ExcludeServer = true)]
+        private void StopLoopingSound_ObserversRpc()
+        {
+            StopLoopingSoundLocal();
+        }
+
+        /// <summary>
+        /// Plays a one-shot sound (non-looping) via SoundEmitter.
+        /// </summary>
+        public void PlayOneShotSound(string soundKey)
+        {
+            if (string.IsNullOrEmpty(soundKey)) return;
+
+            // Use SoundEmitter to broadcast to all players
+            if (soundEmitter != null)
+            {
+                soundEmitter.RequestEmitFromClient(soundKey);
+            }
+        }
+
+        // Sound key properties for states to access
+        public string PatrolSoundKey => patrolSoundKey;
+        public string AlertSoundKey => alertSoundKey;
+        public string TrackingSoundKey => trackingSoundKey;
+        #endregion
     }
 }

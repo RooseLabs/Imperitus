@@ -15,6 +15,9 @@ namespace RooseLabs.Gameplay.Interactables
         [SerializeField, Tooltip("Duration for the glow power animation in seconds.")]
         private float glowAnimationDuration = 2f;
 
+        [Header("Word Carrier Sound Effects")]
+        [SerializeField] private string pickupSoundKey = "WordCarrier_Pickup";
+
         private readonly SyncVar<string> m_word = new();
         private readonly SyncVar<int> m_visibleToClientId = new(-1);
 
@@ -106,6 +109,29 @@ namespace RooseLabs.Gameplay.Interactables
             StopCoroutine(m_glowAnimationCoroutine);
             m_glowAnimationCoroutine = null;
         }
+
+        public override void Interact(PlayerCharacter interactor)
+        {
+            // Play pickup sound locally for the interacting player
+            PlayPickupSound();
+
+            base.Interact(interactor);
+        }
+
+        private void PlayPickupSound()
+        {
+            if (string.IsNullOrEmpty(pickupSoundKey)) return;
+            if (SoundManager.Instance == null || SoundManager.Instance.soundDatabase == null) return;
+
+            var soundType = SoundManager.Instance.soundDatabase.GetByKey(pickupSoundKey);
+            if (soundType != null)
+            {
+                SoundManager.Instance.PlaySoundLocal(soundType, transform.position);
+            }
+        }
+
+        // Word carrier papers don't make a collision/drop sound
+        protected override void PlayCollisionSound(Vector3 position) { }
 
         private IEnumerator AnimateGlowPower()
         {

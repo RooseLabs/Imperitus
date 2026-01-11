@@ -14,6 +14,9 @@ namespace RooseLabs.Gameplay
         [Header("Draggable Settings")]
         [SerializeField] private float force = 600;
         [SerializeField] private float damping = 50;
+
+        [Header("Sound Effects")]
+        [SerializeField] protected string collisionSoundKey = "Item_Drop";
         #endregion
 
         public virtual bool IsDoor => false;
@@ -42,6 +45,7 @@ namespace RooseLabs.Gameplay
         private Vector3 m_targetPosition;
         private float m_initialAngularDamping;
         private bool m_wasLastInteractionDrag;
+        private bool m_wasReleasedFromDrag;
 
         protected virtual void Awake()
         {
@@ -86,6 +90,8 @@ namespace RooseLabs.Gameplay
         protected virtual void HandleDragEnd_Internal()
         {
             rb.angularDamping = m_initialAngularDamping;
+            // Set flag so collision will trigger sound when released from Impero drag
+            m_wasReleasedFromDrag = true;
         }
 
         private void AttachJoint(Vector3 attachmentPosition)
@@ -151,6 +157,7 @@ namespace RooseLabs.Gameplay
 
         protected virtual void OnCollisionEnter(Collision other)
         {
+            // Handle ownership transfer
             if (other.gameObject.TryGetComponent(out NetworkObject networkObject))
             {
                 if (isBeingDraggedByImpero || !IsDraggable) return;
@@ -158,6 +165,46 @@ namespace RooseLabs.Gameplay
                 m_wasLastInteractionDrag = false;
                 if (!networkObject.IsOwner) return;
                 predictedOwner.TakeOwnership(true);
+            }
+
+            // Play collision sound when released from drag
+            if (m_wasReleasedFromDrag)
+            {
+                PlayCollisionSound(other.GetContact(0).point);
+                m_wasReleasedFromDrag = false;
+            }
+        }
+
+        protected virtual void PlayCollisionSound(Vector3 position)
+        {
+            if (string.IsNullOrEmpty(collisionSoundKey)) return;
+            if (SoundManager.Instance == null || SoundManager.Instance.soundDatabase == null) return;
+
+            var soundType = SoundManager.Instance.soundDatabase.GetByKey(collisionSoundKey);
+            if (soundType == null) return;
+
+            // Use SoundManager.EmitSound to broadcast to all players (for AI detection)
+            if (IsServerInitialized)
+            {
+                SoundManager.Instance.EmitSound(soundType, position, this);
+            }
+            else
+            {
+                // Client requests server to emit the sound
+                RequestPlayCollisionSound_ServerRpc(position);
+            }
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        private void RequestPlayCollisionSound_ServerRpc(Vector3 position)
+        {
+            if (string.IsNullOrEmpty(collisionSoundKey)) return;
+            if (SoundManager.Instance == null || SoundManager.Instance.soundDatabase == null) return;
+
+            var soundType = SoundManager.Instance.soundDatabase.GetByKey(collisionSoundKey);
+            if (soundType != null)
+            {
+                SoundManager.Instance.EmitSound(soundType, position, this);
             }
         }
 

@@ -31,6 +31,11 @@ namespace RooseLabs.Player
         [field: SerializeField] public Transform RaycastTarget { get; private set; }
 
         [SerializeField] private GameObject droppedNotebookPrefab;
+
+        [Header("Death Sound Effects")]
+        [SerializeField] private string deathAnnouncerSoundKey = "Player_Death_Announcer";
+        [SerializeField] private string deathLocalSoundKey = "Player_Death";
+        [SerializeField] private float deathLocalSoundDelay = 3f;
         #endregion
 
         #region References
@@ -223,6 +228,9 @@ namespace RooseLabs.Player
         [Server]
         private void HandlePlayerDeath(DamageInfo? damage = null)
         {
+            // Play death announcer sound for all players (3D positional)
+            PlayDeathAnnouncerSound_ObserversRpc(transform.position);
+
             if (GameManager.Instance.IsHeistOngoing)
             {
                 // Spawn dropped notebook
@@ -412,6 +420,61 @@ namespace RooseLabs.Player
             {
                 StopCoroutine(m_petrifyCoroutine);
                 m_petrifyCoroutine = null;
+            }
+        }
+        #endregion
+
+        #region Death Sound Effects
+        /// <summary>
+        /// Plays the death announcer sound for all players (3D positional).
+        /// </summary>
+        [ObserversRpc]
+        private void PlayDeathAnnouncerSound_ObserversRpc(Vector3 position)
+        {
+            if (string.IsNullOrEmpty(deathAnnouncerSoundKey)) return;
+            if (SoundManager.Instance == null || SoundManager.Instance.soundDatabase == null) return;
+
+            var soundType = SoundManager.Instance.soundDatabase.GetByKey(deathAnnouncerSoundKey);
+            if (soundType == null) return;
+
+            // Play announcer sound at the player's death position (3D)
+            SoundManager.Instance.PlaySoundLocal(soundType, position);
+
+            // If this is the local player who died, start coroutine to play death sound after delay
+            if (IsOwner)
+            {
+                StartCoroutine(PlayLocalDeathSoundAfterDelay());
+            }
+        }
+
+        /// <summary>
+        /// Plays the local death sound after a delay (only for the player who died).
+        /// </summary>
+        private IEnumerator PlayLocalDeathSoundAfterDelay()
+        {
+            yield return new WaitForSeconds(deathLocalSoundDelay);
+
+            // Cancel if heist has ended (player was teleported to lobby)
+            if (!GameManager.Instance.IsHeistOngoing) yield break;
+
+            if (string.IsNullOrEmpty(deathLocalSoundKey)) yield break;
+            if (SoundManager.Instance == null || SoundManager.Instance.soundDatabase == null) yield break;
+
+            var soundType = SoundManager.Instance.soundDatabase.GetByKey(deathLocalSoundKey);
+            if (soundType == null) yield break;
+
+            // Play as 2D sound (centered, no spatial positioning) for the local player only
+            var audioSource2D = SoundManager.Instance.audioSource2D;
+            if (audioSource2D != null)
+            {
+                AudioClip clip = soundType.GetRandomClip();
+                if (clip != null)
+                {
+                    audioSource2D.clip = clip;
+                    audioSource2D.volume = soundType.volume;
+                    audioSource2D.spatialBlend = 0f;
+                    audioSource2D.Play();
+                }
             }
         }
         #endregion

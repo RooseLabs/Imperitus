@@ -22,6 +22,9 @@ namespace RooseLabs.Enemies
             m_ai.navAgent.isStopped = true;
             m_alertTimer = m_alertDuration;
 
+            // Play alert sound (one-shot)
+            m_ai.PlayOneShotSound(m_ai.AlertSoundKey);
+
             // RPC to show visual alert to all clients
             m_ai.RPC_ShowAlert();
 

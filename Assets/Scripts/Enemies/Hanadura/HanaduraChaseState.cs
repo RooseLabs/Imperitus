@@ -21,11 +21,15 @@ namespace RooseLabs.Enemies
             updateTimer = 0f;
             ai.SetAnimatorBool("IsChasing", true);
             ai.SetAnimatorBool("IsLookingAround", false);
+
+            // Start chase walk sound at faster pitch
+            ai.StartWalkSound(ai.ChaseSoundPitch);
         }
 
         public void OnExit()
         {
             ai.SetAnimatorBool("IsChasing", false);
+            ai.StopWalkSound();
         }
 
         public void Update()

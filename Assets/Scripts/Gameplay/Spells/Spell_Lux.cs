@@ -21,6 +21,9 @@ namespace RooseLabs.Gameplay.Spells
         private float orbObstacleAvoidanceRadius = 0.5f;
         [SerializeField, Tooltip("Number of seconds before the orb dies out at which fading out begins.")]
         private float orbFadeOutDuration = 10f;
+
+        [Header("Sound Effects")]
+        [SerializeField] private string castSoundKey = "Light";
         #endregion
 
         private void Awake()
@@ -58,6 +61,17 @@ namespace RooseLabs.Gameplay.Spells
             glowingOrb.StartAnimation(transform.position, orbMaterializeDuration, orbLifeDuration, orbFadeOutDuration);
         }
 
+        private void PlayCastSound()
+        {
+            if (string.IsNullOrEmpty(castSoundKey)) return;
+            if (SoundManager.Instance == null || SoundManager.Instance.soundDatabase == null) return;
+
+            var soundType = SoundManager.Instance.soundDatabase.GetByKey(castSoundKey);
+            if (soundType == null) return;
+
+            SoundManager.Instance.PlaySoundLocal(soundType, transform.position);
+        }
+
         [ServerRpc(RequireOwnership = true)]
         private void ActivateOrb_ServerRpc()
         {
@@ -68,6 +82,7 @@ namespace RooseLabs.Gameplay.Spells
         private void ActivateOrb_ObserversRpc()
         {
             ActivateOrb();
+            PlayCastSound();
         }
 
         private void OnDestroy()

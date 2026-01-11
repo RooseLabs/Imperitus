@@ -41,12 +41,16 @@ namespace RooseLabs.Enemies
             owner.navAgent.isStopped = false;
             owner.navAgent.SetDestination(investigatePoint);
 
+            // Start walk sound at normal pitch while walking to investigation point
+            owner.StartWalkSound(1f);
+
             Logger.Info($"[InvestigateState] Starting investigation at {investigatePoint}");
         }
 
         public void OnExit()
         {
             owner.SetAnimatorBool("IsLookingAround", false);
+            owner.StopWalkSound();
             Logger.Info("[InvestigateState] Finished investigating.");
         }
 
@@ -59,6 +63,7 @@ namespace RooseLabs.Enemies
                 {
                     hasReachedPoint = true;
                     owner.StopMovement();
+                    owner.StopWalkSound(); // Stop walk sound when looking around
                     owner.SetAnimatorBool("IsLookingAround", true);
                     Logger.Info("[InvestigateState] Reached investigation point, looking around...");
                 }

@@ -27,6 +27,7 @@ namespace RooseLabs.Enemies
             if (m_route == null || m_route.Count == 0)
             {
                 m_ai.navAgent.isStopped = true;
+                m_ai.StopLoopingSound();
                 return;
             }
 
@@ -34,12 +35,15 @@ namespace RooseLabs.Enemies
             FindNearestWaypoint();
             MoveToWaypoint(m_currentWaypointIndex);
 
+            // Start patrol sound
+            m_ai.StartLoopingSound(m_ai.PatrolSoundKey);
+
             // Debug.Log("[GrimoirePatrolState] Entered - starting patrol");
         }
 
         public void OnExit()
         {
-
+            m_ai.StopLoopingSound();
         }
 
         public void Update()

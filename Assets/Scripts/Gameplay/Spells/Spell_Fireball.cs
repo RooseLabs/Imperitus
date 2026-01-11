@@ -14,10 +14,22 @@ namespace RooseLabs.Gameplay.Spells
         [SerializeField] private GameObject vfxGameObject;
         #endregion
 
+        private SoundEmitter m_soundEmitter;
+
         protected override void OnStartCast()
         {
             base.OnStartCast();
             ToggleCastVFX(true);
+
+            // Play fireball casting sound effect
+            if (CasterCharacter != null)
+            {
+                if (m_soundEmitter == null)
+                {
+                    m_soundEmitter = CasterCharacter.GetComponent<SoundEmitter>();
+                }
+                m_soundEmitter?.RequestEmitFromClient("Fireball_Cast");
+            }
         }
 
         protected override void OnCancelCast()

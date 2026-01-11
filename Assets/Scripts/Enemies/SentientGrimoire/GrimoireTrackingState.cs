@@ -19,12 +19,16 @@ namespace RooseLabs.Enemies
             m_ai.navAgent.isStopped = false;
             m_ai.navAgent.speed = m_ai.trackingSpeed;
 
+            // Start tracking sound
+            m_ai.StartLoopingSound(m_ai.TrackingSoundKey);
+
             //Debug.Log("[GrimoireTrackingState] Entered - actively tracking player");
         }
 
         public void OnExit()
         {
             m_ai.navAgent.speed = m_ai.patrolSpeed;
+            m_ai.StopLoopingSound();
         }
 
         public void Update()

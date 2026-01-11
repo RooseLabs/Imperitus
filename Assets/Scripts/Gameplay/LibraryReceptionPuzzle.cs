@@ -36,6 +36,9 @@ namespace RooseLabs.Gameplay
 
         [SerializeField, Tooltip("The angle (in degrees) the door rotates around Y axis when opening")]
         private float doorOpeningAngle = -90f;
+
+        [Header("Sound Effects")]
+        [SerializeField] private string puzzleCompleteSoundKey = "ReceptionPuzzleComplete";
         #endregion
 
         private static readonly int ShaderPropLadyOpacity = Shader.PropertyToID("_LadyOpacity");
@@ -431,6 +434,9 @@ namespace RooseLabs.Gameplay
             }
             m_doorAnimationCoroutine = StartCoroutine(AnimateDoorOpen());
 
+            // Play puzzle complete sound for all players
+            PlayPuzzleCompleteSound();
+
             // Handle shader effects when door opens
             if (m_doorMaterial)
             {
@@ -448,6 +454,20 @@ namespace RooseLabs.Gameplay
                     StopCoroutine(m_ladyOpacityCoroutine);
                 }
                 m_ladyOpacityCoroutine = StartCoroutine(DoorOpenLadyOpacitySequence());
+            }
+        }
+
+        private void PlayPuzzleCompleteSound()
+        {
+            if (string.IsNullOrEmpty(puzzleCompleteSoundKey)) return;
+            if (SoundManager.Instance == null || SoundManager.Instance.soundDatabase == null) return;
+
+            var soundType = SoundManager.Instance.soundDatabase.GetByKey(puzzleCompleteSoundKey);
+            if (soundType != null)
+            {
+                // Play at the door position for all players (each client plays locally)
+                Vector3 soundPosition = doorTransform ? doorTransform.position : transform.position;
+                SoundManager.Instance.PlaySoundLocal(soundType, soundPosition);
             }
         }
 

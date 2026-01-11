@@ -25,6 +25,9 @@ namespace RooseLabs.Gameplay
 
         [SerializeField, Tooltip("The launch VFX that should be enabled on launch. Can be a prefab or a scene object.")]
         private GameObject launchVFX;
+
+        [SerializeField, Tooltip("Sound effect key to play on impact. Leave empty for no sound.")]
+        private string impactSoundKey;
         #endregion
 
         public Rigidbody Rigidbody => projectileRigidbody.Rigidbody;
@@ -75,6 +78,11 @@ namespace RooseLabs.Gameplay
 
         private void OnEnable()
         {
+            if (projectileRigidbody == null)
+            {
+                Debug.LogError("[Projectile] projectileRigidbody is null in OnEnable!");
+                return;
+            }
             projectileRigidbody.CollisionEnter += OnProjectileCollisionEnter;
             projectileRigidbody.TriggerEnter += OnProjectileTriggerEnter;
         }
@@ -112,6 +120,17 @@ namespace RooseLabs.Gameplay
             if (!CanCollideWith(col.collider))
                 return;
             Logger.Info($"Projectile collided with {col.gameObject.name} ({LayerMask.LayerToName(col.gameObject.layer)})");
+
+            // Play impact sound effect
+            if (!string.IsNullOrEmpty(impactSoundKey) && SoundManager.Instance != null && SoundManager.Instance.soundDatabase != null)
+            {
+                var soundType = SoundManager.Instance.soundDatabase.GetByKey(impactSoundKey);
+                if (soundType != null)
+                {
+                    Vector3 hitPoint = col.contacts.Length > 0 ? col.contacts[0].point : col.collider.ClosestPoint(projectileRigidbody.Rigidbody.position);
+                    SoundManager.Instance.PlaySoundLocal(soundType, hitPoint);
+                }
+            }
 
             ProjectileCollision collision;
             if (col.contacts.Length > 0)

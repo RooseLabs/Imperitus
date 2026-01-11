@@ -25,6 +25,7 @@ namespace RooseLabs.Enemies
             if (route == null || route.Count == 0)
             {
                 ai.StopMovement();
+                ai.StopWalkSound();
                 return;
             }
 
@@ -48,10 +49,14 @@ namespace RooseLabs.Enemies
 
             currentIndex = nearestIndex;
             MoveToCurrentWaypoint();
+
+            // Start patrol walk sound at normal pitch
+            ai.StartWalkSound(1f);
         }
 
         public void OnExit()
         {
+            ai.StopWalkSound();
         }
 
         public void Update()

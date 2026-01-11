@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 1679694528654709541}
   - component: {fileID: 8315585727845273366}
   - component: {fileID: 3742289983095233802}
+  - component: {fileID: 966894532881141539}
   m_Layer: 1
   m_Name: Particle System
   m_TagString: Untagged
@@ -3824,7 +3825,7 @@ ParticleSystem:
     maxCollisionShapes: 256
     quality: 0
     voxelSize: 0.5
-    collisionMessages: 0
+    collisionMessages: 1
     collidesWithDynamic: 1
     interiorCollisions: 0
   TriggerModule:
@@ -4832,7 +4833,6 @@ ParticleSystemRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_MaskInteraction: 0
   m_RenderMode: 4
   m_MeshDistribution: 0
   m_SortMode: 3
@@ -4864,6 +4864,20 @@ ParticleSystemRenderer:
   m_MeshWeighting1: 1
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
+  m_MaskInteraction: 0
+--- !u!114 &966894532881141539
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1430994602932531451}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8dbfa80788a5f17439cd922506e614a9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Gameplay.Spells.BubbleParticleCollisionHandler
+  popSoundKey: Bubble_Pop
 --- !u!1 &4967241221068748326
 GameObject:
   m_ObjectHideFlags: 0
@@ -9753,7 +9767,6 @@ ParticleSystemRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_MaskInteraction: 0
   m_RenderMode: 4
   m_MeshDistribution: 0
   m_SortMode: 0
@@ -9785,6 +9798,7 @@ ParticleSystemRenderer:
   m_MeshWeighting1: 1
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
+  m_MaskInteraction: 0
 --- !u!1 &8568110119652573094
 GameObject:
   m_ObjectHideFlags: 0
@@ -9915,3 +9929,4 @@ MonoBehaviour:
   staminaCostPerSecond: 5
   cooldownTime: 0
   particles: {fileID: 8315585727845273366}
+  castSoundKey: Bubble_Cast

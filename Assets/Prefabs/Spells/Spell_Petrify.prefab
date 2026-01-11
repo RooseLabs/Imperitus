@@ -85,7 +85,7 @@ MonoBehaviour:
   _initializeOrder: 0
   _preventDespawnOnDisconnect: 0
   _defaultDespawnType: 0
-  _initializedTimestamp: -8584338125934615067
+  _initializedTimestamp: -8584335352463064828
   NetworkObserver: {fileID: 0}
   _enablePrediction: 0
   _predictionType: 0
@@ -100,7 +100,7 @@ MonoBehaviour:
   _spectatorInterpolation: 2
   _enableTeleport: 0
   _teleportThreshold: 1
-  <PrefabId>k__BackingField: 17
+  <PrefabId>k__BackingField: 16
   <SpawnableCollectionId>k__BackingField: 0
   <AssetPathHash>k__BackingField: 11596967883979387744
   SceneId: 0
@@ -137,9 +137,12 @@ MonoBehaviour:
   reverseAnimDuration: 0.75
   beamShootTransform: {fileID: 7745911691216507386}
   beamMaxRange: 20
-  beamDuration: 0.8
+  beamDuration: 1.5
+  petrifyDuration: 5
   beamObject: {fileID: 9000961543511819675}
   particles: {fileID: 2493910877602635300}
+  castSoundKey: Petrify_Cast
+  impactSoundKey: Petrify_Impact
 --- !u!1 &2493910877602635300
 GameObject:
   m_ObjectHideFlags: 0

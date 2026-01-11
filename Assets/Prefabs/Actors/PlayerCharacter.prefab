@@ -2167,6 +2167,9 @@ MonoBehaviour:
   - {fileID: 7358083918770435597}
   <RaycastTarget>k__BackingField: {fileID: 4398373416247838343}
   droppedNotebookPrefab: {fileID: 3228943848150757951, guid: 4bc14a557ea0a1c4f8efc1cf374dfd2d, type: 3}
+  deathAnnouncerSoundKey: Player_Death_Announcer
+  deathLocalSoundKey: Player_Death
+  deathLocalSoundDelay: 3
 --- !u!114 &2194619057779025337
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2342,6 +2345,21 @@ MonoBehaviour:
   - type: {fileID: 11400000, guid: 64fc0e7fe7c7e8440aca02ddc5dec609, type: 2}
   - type: {fileID: 11400000, guid: ba721dd56b8fcb54a86a42331ad37b18, type: 2}
   - type: {fileID: 11400000, guid: 33e38525bf72b9c47906476556cf6b11, type: 2}
+  - type: {fileID: 11400000, guid: 60045a69d97cb6e43af2c31c7f4e573e, type: 2}
+  - type: {fileID: 11400000, guid: d2f5a596bc1cc6a45b050fff93c14141, type: 2}
+  - type: {fileID: 11400000, guid: b14e117db9fdf6e42a5549a437a71c80, type: 2}
+  - type: {fileID: 11400000, guid: 8b89fd147034df1459772d130afd4a25, type: 2}
+  - type: {fileID: 11400000, guid: 18b535ac302ec6b4a8b437d1d61ed870, type: 2}
+  - type: {fileID: 11400000, guid: 517378db3229dd44d85c0d0ca33ab45f, type: 2}
+  - type: {fileID: 11400000, guid: 005c928261503594483709e30cd247b0, type: 2}
+  - type: {fileID: 11400000, guid: 6984eee51d9888643ade83b0c1fde2aa, type: 2}
+  - type: {fileID: 11400000, guid: b2c1d0eb8e834794cbef40f8d5204f05, type: 2}
+  - type: {fileID: 11400000, guid: cdc16350490d49141917f8e735369fe8, type: 2}
+  - type: {fileID: 11400000, guid: b2c1d0eb8e834794cbef40f8d5204f05, type: 2}
+  - type: {fileID: 11400000, guid: dbdedaed768070449a451acd47a1a4ec, type: 2}
+  - type: {fileID: 11400000, guid: 375b345ada8233b408cab5b94827f690, type: 2}
+  - type: {fileID: 11400000, guid: 375b345ada8233b408cab5b94827f690, type: 2}
+  - type: {fileID: 11400000, guid: 375b345ada8233b408cab5b94827f690, type: 2}
   soundOriginOffset: {x: 0, y: 0, z: 0}
 --- !u!114 &7652611172026813195
 MonoBehaviour:
