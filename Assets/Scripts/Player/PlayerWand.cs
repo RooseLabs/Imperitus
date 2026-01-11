@@ -118,6 +118,8 @@ namespace RooseLabs.Player
                 SpellSlot previousSpellSlot = m_currentSpellSlot;
                 m_currentSpellSlot = value;
                 if (previousSpellSlot == null ||
+                    previousSpellSlot.SpellPrefab == null ||
+                    m_currentSpellSlot.SpellPrefab == null ||
                     previousSpellSlot.SpellPrefab.SpellInfo != m_currentSpellSlot.SpellPrefab.SpellInfo)
                 {
                     SetOrbitingRunes(m_currentSpellSlot.Runes);
@@ -291,6 +293,11 @@ namespace RooseLabs.Player
         {
             // Add failed spell as temporary
             SpellBase failedSpell = spellDatabase[1]; // 1 = Failed Spell
+            if (failedSpell == null)
+            {
+                this.LogWarning("Failed Spell prefab is not assigned at index 1 in SpellDatabase!");
+                return;
+            }
             AddOrUpdateTemporarySpell(failedSpell, selectedRunes);
             CurrentSpellIndex = m_spellSlots.Count - 1;
             this.LogInfo("Set temporary spell to 'Failed Spell' due to invalid rune combination.");

@@ -42,7 +42,7 @@ namespace RooseLabs.ScriptableObjects
         public float minDistance = 1f;
 
         [Tooltip("Maximum distance where sound is audible")]
-        public float maxDistance = 50f;
+        public float maxDistance = 25f;
 
         [Tooltip("How volume falls off with distance")]
         public AudioRolloffMode rolloffMode = AudioRolloffMode.Custom;

@@ -16,12 +16,13 @@ MonoBehaviour:
   radius: 1
   duration: 0.5
   priority: 0
+  ignoreDetectionLogic: 0
   audioClips: []
   volume: 1
   pitchVariation: 0.05
   is3D: 1
   minDistance: 1
-  maxDistance: 50
+  maxDistance: 25
   rolloffMode: 2
   customRolloff:
     serializedVersion: 2

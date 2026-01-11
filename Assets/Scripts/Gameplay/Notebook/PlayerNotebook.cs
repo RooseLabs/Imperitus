@@ -143,6 +143,9 @@ namespace RooseLabs.Gameplay.Notebook
             {
                 StartContinuousProximityCheck();
             }
+
+            // DEBUG: Give all runes to the player for testing
+            GiveAllRunes();
         }
 
         public override void OnStopClient()
