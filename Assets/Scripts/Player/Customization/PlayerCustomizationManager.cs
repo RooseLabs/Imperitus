@@ -247,8 +247,8 @@ namespace RooseLabs.Player.Customization
 
             CustomizationItem item = equippedItems[key];
 
-            bool isAccessory = item.category == CustomizationCategory.EyeAccessories
-                                || item.category == CustomizationCategory.HeadAccessories;
+            bool isAccessory = item.category == CustomizationCategory.Glasses
+                                || item.category == CustomizationCategory.Hats;
 
             // Handle removal based on application mode
             switch (item.applicationMode)
@@ -645,8 +645,8 @@ namespace RooseLabs.Player.Customization
                         continue;
                     }
 
-                    bool isAccessory = item.category == CustomizationCategory.EyeAccessories
-                                        || item.category == CustomizationCategory.HeadAccessories;
+                    bool isAccessory = item.category == CustomizationCategory.Glasses
+                                        || item.category == CustomizationCategory.Hats;
 
                     // Handle SkinnedMeshRenderer
                     if (pair.renderer is SkinnedMeshRenderer skinnedRenderer)
@@ -850,8 +850,8 @@ namespace RooseLabs.Player.Customization
 
             CustomizationItem item = equippedItems[key];
 
-            bool isAccessory = item.category == CustomizationCategory.EyeAccessories
-                                || item.category == CustomizationCategory.HeadAccessories;
+            bool isAccessory = item.category == CustomizationCategory.Glasses
+                                || item.category == CustomizationCategory.Hats;
 
             // Handle removal based on application mode
             switch (item.applicationMode)

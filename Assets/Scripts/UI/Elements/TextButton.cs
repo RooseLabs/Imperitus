@@ -116,8 +116,7 @@ namespace RooseLabs.UI.Elements
         {
             base.Awake();
 
-            // Try to find text component if not already set
-            m_TargetText ??= GetComponentInChildren<TMP_Text>();
+            m_TargetText = GetComponentInChildren<TMP_Text>();
 
             // Cache RectTransform
             m_RectTransform = GetComponent<RectTransform>();

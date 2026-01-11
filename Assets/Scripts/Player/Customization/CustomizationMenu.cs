@@ -2,60 +2,81 @@ using System;
 using System.Collections.Generic;
 using RooseLabs.ScriptableObjects;
 using RooseLabs.UI;
+using RooseLabs.Utils;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Logger = RooseLabs.Core.Logger;
 
 namespace RooseLabs.Player.Customization
 {
-    /// <summary>
-    /// Manages the customization menu UI, displaying and filtering customization items.
-    /// </summary>
     public class CustomizationMenu : MonoBehaviour, IWindow
     {
+        private Logger Logger => Logger.GetLogger("CustomizationMenu");
+
+        [Serializable]
+        private struct UICustomizationCategory
+        {
+            public CustomizationCategory category;
+            public Color color;
+        }
+
         [Header("References")]
         [Tooltip("Database containing all available customization items.")]
         [SerializeField] private CustomizationItemDatabase itemDatabase;
 
+        [Tooltip("Prefab for category tab buttons.")]
+        [SerializeField] private GameObject categoryTabPrefab;
+
         [Header("UI Elements")]
-        [Tooltip("Container where item buttons will be spawned (should have GridLayoutGroup).")]
-        [SerializeField] private Transform itemContainer;
+        [Tooltip("Container for category tabs.")]
+        [SerializeField] private Transform tabContainer;
 
         [Tooltip("Title text that displays the current category name.")]
         [SerializeField] private TMP_Text categoryTitleText;
 
+        [Tooltip("Background graphics for the category title.")]
+        [SerializeField] private Graphic[] categoryTitleBackgrounds;
+
+        [Tooltip("Container where item buttons will be spawned.")]
+        [SerializeField] private Transform itemContainer;
+
         [Tooltip("Text displayed when no items are found for the selected category.")]
         [SerializeField] private TMP_Text noItemsFoundText;
 
-        [Header("Button Appearance")]
-        [Tooltip("Color for the equipped item border.")]
-        [SerializeField] private Color equippedBorderColor = Color.black;
+        [Header("Categories")]
+        [Tooltip("List of UI customization categories with their associated colors.")]
+        [SerializeField] private UICustomizationCategory[] categories;
 
-        [Tooltip("Width of the equipped item border.")]
-        [SerializeField] private float equippedBorderWidth = 5f;
+        private readonly List<GameObject> m_itemButtons = new();
+        private bool m_isFirstTimeOpening = true;
+        private PlayerCustomizationManager m_customizationManager;
 
-        // Currently selected category filter
-        private CustomizationCategory? currentCategory = null;
-
-        // Track spawned buttons: Key = CustomizationItem, Value = Button GameObject
-        private Dictionary<CustomizationItem, GameObject> spawnedButtons = new Dictionary<CustomizationItem, GameObject>();
-
-        // Runtime reference to the local player's customization manager
-        private PlayerCustomizationManager customizationManager;
-
-        /// <summary>
-        /// Finds the local player's PlayerCustomizationManager in the scene.
-        /// Called when the menu is opened.
-        /// </summary>
         private void FindCustomizationManager()
         {
-            if (customizationManager == null)
+            if (m_customizationManager) return;
+            if (!PlayerCharacter.LocalCharacter.TryGetComponentInChildren(out m_customizationManager))
             {
-                customizationManager = PlayerCharacter.LocalCharacter.GetComponentInChildren<PlayerCustomizationManager>();
+                Logger.Error("No local PlayerCustomizationManager found in scene!");
+            }
+        }
 
-                if (customizationManager == null)
+        private void Start()
+        {
+            // Create category tabs
+            foreach (var uiCategory in categories)
+            {
+                GameObject tabObj = Instantiate(categoryTabPrefab, tabContainer);
+                TMP_Text tabText = tabObj.GetComponentInChildren<TMP_Text>();
+                if (tabText)
                 {
-                    Debug.LogError("[CustomizationMenu] No local PlayerCustomizationManager found in scene!");
+                    tabText.text = uiCategory.category.ToString();
+                }
+                Button tabButton = tabObj.GetComponent<Button>();
+                if (tabButton)
+                {
+                    tabButton.targetGraphic.color = uiCategory.color;
+                    tabButton.onClick.AddListener(() => OpenCategory(uiCategory));
                 }
             }
         }
@@ -63,7 +84,11 @@ namespace RooseLabs.Player.Customization
         public void Open()
         {
             FindCustomizationManager();
-            ShowAllItems();
+            if (m_isFirstTimeOpening)
+            {
+                OpenCategory(categories[0]);
+                m_isFirstTimeOpening = false;
+            }
             gameObject.SetActive(true);
         }
 
@@ -72,45 +97,16 @@ namespace RooseLabs.Player.Customization
             gameObject.SetActive(false);
         }
 
-        /// <summary>
-        /// Shows all items from every category.
-        /// </summary>
-        public void ShowAllItems()
+        private void OpenCategory(UICustomizationCategory uiCategory)
         {
-            currentCategory = null;
-            UpdateCategoryTitle("All");
-            PopulateItems(itemDatabase);
+            categoryTitleText.text = uiCategory.category.ToString();
+            foreach (var graphic in categoryTitleBackgrounds)
+            {
+                graphic.color = uiCategory.color;
+            }
+            PopulateItems(itemDatabase.GetItemsByCategory(uiCategory.category));
         }
 
-        /// <summary>
-        /// Filters items by a specific category.
-        /// Pass empty string or null to show all items.
-        /// </summary>
-        public void FilterByCategory(string categoryName)
-        {
-            // If category name is empty or null, show all items
-            if (string.IsNullOrEmpty(categoryName))
-            {
-                ShowAllItems();
-                return;
-            }
-
-            // Try to parse the category name
-            if (Enum.TryParse(categoryName, out CustomizationCategory category))
-            {
-                currentCategory = category;
-                UpdateCategoryTitle(categoryName);
-                PopulateItems(itemDatabase.GetItemsByCategory(category));
-            }
-            else
-            {
-                Debug.LogError($"Invalid category name: {categoryName}");
-            }
-        }
-
-        /// <summary>
-        /// Populates the container with item buttons.
-        /// </summary>
         private void PopulateItems(IEnumerable<CustomizationItem> items)
         {
             // Clear existing buttons
@@ -132,9 +128,6 @@ namespace RooseLabs.Player.Customization
             }
         }
 
-        /// <summary>
-        /// Creates a button for a customization item.
-        /// </summary>
         private void CreateItemButton(CustomizationItem item)
         {
             // Create button GameObject
@@ -152,94 +145,40 @@ namespace RooseLabs.Player.Customization
             button.targetGraphic = buttonImage;
             button.onClick.AddListener(() => OnItemButtonClicked(item));
 
-            // Track the button
-            spawnedButtons[item] = buttonObj;
+            m_itemButtons.Add(buttonObj);
         }
 
-        /// <summary>
-        /// Handles when an item button is clicked.
-        /// </summary>
         private void OnItemButtonClicked(CustomizationItem item)
         {
-            if (customizationManager == null)
+            if (!m_customizationManager)
             {
-                Debug.LogError("CustomizationManager is not assigned!");
+                Logger.Error("CustomizationManager not found!");
                 return;
             }
 
             // Check if item is already equipped
-            bool isEquipped = customizationManager.IsItemEquipped(item);
+            bool isEquipped = m_customizationManager.IsItemEquipped(item);
 
             if (isEquipped)
             {
                 // Unequip the item
-                customizationManager.RemoveItem(item.category);
+                m_customizationManager.RemoveItem(item.category);
                 //customizationManager.RemoveItem(item.category, item.allowStacking ? item.subCategory : null);
             }
             else
             {
                 // Equip the item (will automatically replace any existing item in that slot)
-                customizationManager.EquipItem(item);
+                m_customizationManager.EquipItem(item);
             }
         }
 
-        /// <summary>
-        /// Updates the border state of a button based on equipped status.
-        /// </summary>
-        private void UpdateButtonBorderState(CustomizationItem item, GameObject buttonObj)
-        {
-            if (customizationManager == null || buttonObj == null) return;
-
-            bool isEquipped = customizationManager.IsItemEquipped(item);
-
-            // Find the border child object
-            Transform borderTransform = buttonObj.transform.Find("EquippedBorder");
-            if (borderTransform != null)
-            {
-                borderTransform.gameObject.SetActive(isEquipped);
-            }
-        }
-
-        /// <summary>
-        /// Updates the category title text.
-        /// </summary>
-        private void UpdateCategoryTitle(string categoryName)
-        {
-            if (categoryTitleText != null)
-            {
-                categoryTitleText.text = categoryName;
-            }
-        }
-
-        /// <summary>
-        /// Clears all spawned buttons from the container.
-        /// </summary>
         private void ClearContainer()
         {
-            foreach (var buttonObj in spawnedButtons.Values)
+            foreach (var buttonObj in m_itemButtons)
             {
-                if (buttonObj != null)
-                {
-                    Destroy(buttonObj);
-                }
+                if (buttonObj) Destroy(buttonObj);
             }
-
-            spawnedButtons.Clear();
-        }
-
-        /// <summary>
-        /// Refreshes the current view (useful if items are equipped externally).
-        /// </summary>
-        public void RefreshView()
-        {
-            if (currentCategory.HasValue)
-            {
-                FilterByCategory(currentCategory.Value.ToString());
-            }
-            else
-            {
-                ShowAllItems();
-            }
+            m_itemButtons.Clear();
         }
     }
 }

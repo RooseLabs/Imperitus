@@ -13,6 +13,6 @@ namespace RooseLabs.Gameplay.Interactables
             GUIManager.Instance.OpenCustomizationMenu();
         }
 
-        public string GetInteractionText() => "Customize Appearance";
+        public string GetInteractionText() => "Change Appearance";
     }
 }

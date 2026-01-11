@@ -41,9 +41,17 @@ namespace RooseLabs.UI.Elements
         private int m_actualMinRowCount;
         private int m_currentColumnCount;
         private int m_currentRowCount;
+        private bool m_isInitialized;
 
         #if UNITY_EDITOR
         protected override void OnValidate()
+        {
+            InitializeMinimumDimensions();
+            base.OnValidate();
+        }
+        #endif
+
+        private void InitializeMinimumDimensions()
         {
             GetCellSize(minColumnCount, minRowCount, out float initialCellWidth, out float initialCellHeight);
 
@@ -62,18 +70,25 @@ namespace RooseLabs.UI.Elements
             m_CellSize.y = initialCellHeight;
 
             UpdateGridDimensions();
-            base.OnValidate();
+            m_isInitialized = true;
         }
-        #endif
 
         public override void SetLayoutHorizontal()
         {
+            if (!m_isInitialized)
+            {
+                InitializeMinimumDimensions();
+            }
             UpdateGridDimensions();
             base.SetLayoutHorizontal();
         }
 
         public override void SetLayoutVertical()
         {
+            if (!m_isInitialized)
+            {
+                InitializeMinimumDimensions();
+            }
             UpdateGridDimensions();
             base.SetLayoutVertical();
         }
