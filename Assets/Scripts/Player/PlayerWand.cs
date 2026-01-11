@@ -92,7 +92,6 @@ namespace RooseLabs.Player
             {
                 if (m_spellSlots.Count == 0) return;
                 int previousIndex = m_currentSpellIndex;
-                SpellSlot previousSpellSlot = m_currentSpellSlot;
                 SpellBase previousSpellInstance = m_currentSpellInstance;
                 m_currentSpellIndex = (value % m_spellSlots.Count + m_spellSlots.Count) % m_spellSlots.Count;
                 if (previousIndex != m_currentSpellIndex)
@@ -101,7 +100,23 @@ namespace RooseLabs.Player
                     previousSpellInstance?.StopAim();
                     m_currentSpellInstance = null;
                 }
-                m_currentSpellSlot = m_spellSlots[m_currentSpellIndex];
+                CurrentSpellSlot = m_spellSlots[m_currentSpellIndex];
+            }
+        }
+
+        private SpellSlot CurrentSpellSlot
+        {
+            get => m_currentSpellSlot;
+            set
+            {
+                if (value == null)
+                {
+                    m_currentSpellSlot = null;
+                    ClearOrbitingRunes();
+                    return;
+                }
+                SpellSlot previousSpellSlot = m_currentSpellSlot;
+                m_currentSpellSlot = value;
                 if (previousSpellSlot == null ||
                     previousSpellSlot.SpellPrefab.SpellInfo != m_currentSpellSlot.SpellPrefab.SpellInfo)
                 {
@@ -128,8 +143,10 @@ namespace RooseLabs.Player
         public override void OnStartClient()
         {
             if (!IsOwner) return;
-            InitializeSpellLoadout();
-            SetOrbitingRunes(m_currentSpellSlot?.Runes);
+            if ((bool)GameManager.Instance && GameManager.Instance.IsTutorialComplete() || GameManager.Instance.IsHeistOngoing)
+            {
+                InitializeSpellLoadout();
+            }
         }
 
         private void Update()
@@ -143,26 +160,13 @@ namespace RooseLabs.Player
             }
 
             UpdateAimingState();
+            if (m_spellSlots.Count == 0) return;
             if (character.Data.isAiming)
             {
-                // If no spells are available, player can still aim but nothing happens on cast
-                if (m_spellSlots.Count == 0)
+                CurrentSpellSlot ??= m_spellSlots[m_currentSpellIndex];
+                if (!m_currentSpellInstance && CurrentSpellSlot != null)
                 {
-                    // Clear any lingering spell instance
-                    if (m_currentSpellInstance != null)
-                    {
-                        m_currentSpellInstance.StopAim();
-                        m_currentSpellInstance = null;
-                    }
-                    m_currentSpellSlot = null;
-                    // No spells available - aiming is allowed but no casting
-                    return;
-                }
-
-                m_currentSpellSlot ??= m_spellSlots[m_currentSpellIndex];
-                if (!m_currentSpellInstance && m_currentSpellSlot != null)
-                {
-                    m_currentSpellInstance = m_currentSpellSlot.Instantiate();
+                    m_currentSpellInstance = CurrentSpellSlot.Instantiate();
                 }
 
                 m_currentSpellInstance?.Aim();
@@ -240,43 +244,23 @@ namespace RooseLabs.Player
         #endregion
 
         #region Spell Management
-        private void InitializeSpellLoadout()
+        public void InitializeSpellLoadout(bool addDefaultSpell = true)
         {
             // Clean up any existing spell instances before clearing
             foreach (var slot in m_spellSlots)
             {
                 slot.DestroyInstance();
             }
-
             m_spellSlots.Clear();
             m_currentSpellInstance = null;
 
-            // Always add Impero during heist, or if tutorial is complete
-            bool inHeist = GameManager.Instance != null && GameManager.Instance.IsHeistOngoing;
-            bool tutorialComplete = GameManager.Instance != null && GameManager.Instance.IsTutorialComplete();
-
-            if (inHeist || tutorialComplete)
+            if (addDefaultSpell)
             {
                 m_spellSlots.Add(new SpellSlot(GameManager.Instance.SpellDatabase[0])); // 0 = Impero (default spell)
             }
 
             m_currentSpellIndex = 0;
-            m_currentSpellSlot = m_spellSlots.Count > 0 ? m_spellSlots[m_currentSpellIndex] : null;
-
-            // Clear orbiting runes if no spells available
-            if (m_currentSpellSlot == null)
-            {
-                ClearOrbitingRunes();
-            }
-        }
-
-        /// <summary>
-        /// Reinitializes the spell loadout. Called when tutorial completes to make Impero permanent.
-        /// </summary>
-        public void ReinitializeSpellLoadout()
-        {
-            InitializeSpellLoadout();
-            SetOrbitingRunes(m_currentSpellSlot?.Runes);
+            CurrentSpellSlot = m_spellSlots.Count > 0 ? m_spellSlots[m_currentSpellIndex] : null;
         }
 
         private void HandleValidSpellSelection(SpellBase spell, ICollection<RuneSO> selectedRunes)
@@ -315,26 +299,7 @@ namespace RooseLabs.Player
         private void AddOrUpdateTemporarySpell(SpellBase spell, ICollection<RuneSO> runes)
         {
             SpellSlot newTemporarySpellSlot = new SpellSlot(spell, isTemporary: true, customRunes: runes);
-
-            // If no spells exist, just add the temporary spell
-            if (m_spellSlots.Count == 0)
-            {
-                m_spellSlots.Add(newTemporarySpellSlot);
-
-                // Instantiate the new temporary spell
-                if (newTemporarySpellSlot.Instantiate())
-                {
-                    this.LogInfo($"Instantiated temporary spell '{newTemporarySpellSlot.SpellPrefab.SpellInfo.EnglishName}'");
-                }
-
-                // Update current spell slot
-                m_currentSpellIndex = 0;
-                m_currentSpellSlot = newTemporarySpellSlot;
-                SetOrbitingRunes(newTemporarySpellSlot.Runes);
-                return;
-            }
-
-            if (m_spellSlots[^1].IsTemporary)
+            if (m_spellSlots.Count > 0 && m_spellSlots[^1].IsTemporary)
             {
                 // There is already a temporary spell, destroy its instance and replace it with the new one
                 m_spellSlots[^1].DestroyInstance();
@@ -424,36 +389,26 @@ namespace RooseLabs.Player
             m_spellSlots[existingIndex].DestroyInstance();
             m_spellSlots.RemoveAt(existingIndex);
 
-            if (wasSelected && m_spellSlots.Count > 0)
+            if (wasSelected)
             {
-                // If we removed the selected spell, switch to first spell
-                CurrentSpellIndex = 0;
+                if (m_spellSlots.Count > 0)
+                {
+                    // If we removed the selected spell, switch to first spell
+                    CurrentSpellIndex = 0;
+                }
+                else
+                {
+                    // No spells left, clear current spell
+                    m_currentSpellInstance = null;
+                    CurrentSpellSlot = null;
+                }
             }
         }
 
         public void RemoveTemporarySpell()
         {
-            // Handle case where the only spell is temporary (during tutorial)
-            if (m_spellSlots.Count == 1 && m_spellSlots[0].IsTemporary)
-            {
-                // Destroy the temporary spell instance
-                m_spellSlots[0].DestroyInstance();
-                m_spellSlots.Clear();
-
-                // Reset current spell state
-                m_currentSpellIndex = 0;
-                m_currentSpellSlot = null;
-                m_currentSpellInstance = null;
-
-                // Clear orbiting runes
-                ClearOrbitingRunes();
-
-                this.LogInfo("Removed the only temporary spell.");
-                return;
-            }
-
             // We can only have one temporary spell, and it's always the last one in the list
-            if (m_spellSlots.Count > 1 && m_spellSlots[^1].IsTemporary)
+            if (m_spellSlots.Count > 0 && m_spellSlots[^1].IsTemporary)
             {
                 bool wasSelected = m_currentSpellIndex == m_spellSlots.Count - 1;
 
@@ -461,10 +416,19 @@ namespace RooseLabs.Player
                 m_spellSlots[^1].DestroyInstance();
                 m_spellSlots.RemoveAt(m_spellSlots.Count - 1);
 
-                if (wasSelected && m_spellSlots.Count > 0)
+                if (wasSelected)
                 {
-                    // If we removed the selected spell, switch to first spell
-                    CurrentSpellIndex = 0;
+                    if (m_spellSlots.Count > 0)
+                    {
+                        // If we removed the selected spell, switch to first spell
+                        CurrentSpellIndex = 0;
+                    }
+                    else
+                    {
+                        // No spells left, clear current spell (this should only happen during the tutorial)
+                        m_currentSpellInstance = null;
+                        CurrentSpellSlot = null;
+                    }
                 }
 
                 this.LogInfo("Removed temporary spell.");

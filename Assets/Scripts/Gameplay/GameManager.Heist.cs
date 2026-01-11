@@ -24,20 +24,18 @@ namespace RooseLabs.Gameplay
 
         private void HandleHeistSceneLoaded()
         {
+            m_isHeistOngoing = true;
             m_heistTimer.ToggleTimerVisibility(true);
 
-            // Mark heist as ongoing for ALL clients (before reinitializing loadouts)
-            m_isHeistOngoing = true;
-
-            // All clients: Pause tutorial and re-initialize spell loadout for heist
+            // Pause tutorial and re-initialize spell loadout for heist
             PauseTutorial();
 
-            // Re-initialize spell loadout for heist (all players get Impero during heist)
-            var localCharacter = PlayerCharacter.LocalCharacter;
-            if (localCharacter != null)
+            var character = PlayerCharacter.LocalCharacter;
+            if (character)
             {
-                localCharacter.Notebook?.InitializeSpellLoadout();
-                localCharacter.Wand?.ReinitializeSpellLoadout();
+                character.Notebook.InitializeSpellLoadout();
+                character.Wand.InitializeSpellLoadout();
+                character.ResetState();
             }
 
             if (IsServerInitialized)
@@ -73,12 +71,6 @@ namespace RooseLabs.Gameplay
 
             // Lock spell loadouts for all players when heist starts
             NotebookManager.Instance?.LockSpellLoadout();
-
-            // Reset player states to ensure they're at full health and stamina, not dead, etc.
-            foreach (var player in PlayerHandler.AllConnectedCharacters)
-            {
-                player.ResetState();
-            }
         }
 
         private void UpdateHeist()
@@ -138,10 +130,7 @@ namespace RooseLabs.Gameplay
             SceneManagement.SceneManager.LoadOnlineScene(GetSceneName(lobbyScene));
 
             // Unlock spell loadouts for all players when heist starts
-            if (NotebookManager.Instance != null)
-            {
-                NotebookManager.Instance.UnlockSpellLoadout();
-            }
+            NotebookManager.Instance?.UnlockSpellLoadout();
         }
 
         private void SpawnHeistRuneContainerObjects()

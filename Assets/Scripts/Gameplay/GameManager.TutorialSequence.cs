@@ -1,15 +1,16 @@
-using RooseLabs.Gameplay.Notebook;
-using RooseLabs.Gameplay.Interactables;
-using RooseLabs.ScriptableObjects;
-using RooseLabs.Player;
-using RooseLabs.UI;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using FishNet.Object;
 using RooseLabs.Core;
+using RooseLabs.Gameplay.Interactables;
+using RooseLabs.Gameplay.Notebook;
+using RooseLabs.Player;
+using RooseLabs.ScriptableObjects;
+using RooseLabs.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using System.Linq;
-using System.Collections.Generic;
-using FishNet.Object;
 
 namespace RooseLabs.Gameplay
 {
@@ -40,15 +41,15 @@ namespace RooseLabs.Gameplay
             private static readonly Dictionary<TaskType, (string description, string[] actionNames)> TaskConfig = new()
             {
                 { TaskType.WalkAround, ("Use {Move} to walk around.", new[] { "Move" }) },
-                { TaskType.SearchForRunes, ("Find the 3 Rune Books in this room. Use {Interact} to interact and extract each rune to your own notebook.", new[] { "Interact" }) },
+                { TaskType.SearchForRunes, ("Find the 3 Rune Books in this room.\nUse {Interact} to interact and extract each rune to your own notebook.", new[] { "Interact" }) },
                 { TaskType.OpenNotebook, ("Press {OpenNotebook} to open your notebook.", new[] { "OpenNotebook" }) },
                 { TaskType.CombineRunes, ("Open the Runes tab and toggle ({Cast}) the 3 runes to combine them into the Impero spell in your wand.", new[] { "Cast" }) },
-                { TaskType.AimWithWand, ("The Impero spell has been learned and added to your wand! Hold {Aim} to aim with your wand.", new[] { "Aim" }) },
-                { TaskType.CastImperoSpell, ("Hold {Cast} while aiming ({Aim}) with your wand to use the Impero spell and levitate an object. Try using it on the pillows!", new[] { "Cast", "Aim" }) },
-                { TaskType.TutorialComplete, ("Tutorial Complete!", System.Array.Empty<string>()) }
+                { TaskType.AimWithWand, ("The Impero spell has been learned and added to your wand!\nHold {Aim} to aim with your wand.", new[] { "Aim" }) },
+                { TaskType.CastImperoSpell, ("Hold {Cast} while aiming ({Aim}) with your wand to use the Impero spell and levitate an object.\nTry using it on the pillows!", new[] { "Cast", "Aim" }) },
+                { TaskType.TutorialComplete, ("Tutorial Complete!", Array.Empty<string>()) }
             };
 
-            private Dictionary<TaskType, System.Func<bool>> m_taskCompletionChecks;
+            private Dictionary<TaskType, Func<bool>> m_taskCompletionChecks;
 
             public TutorialSequence(TextMeshProUGUI taskDisplayText)
             {
@@ -59,7 +60,7 @@ namespace RooseLabs.Gameplay
 
             private void InitializeTaskCompletionChecks()
             {
-                m_taskCompletionChecks = new Dictionary<TaskType, System.Func<bool>>
+                m_taskCompletionChecks = new Dictionary<TaskType, Func<bool>>
                 {
                     { TaskType.WalkAround, () => m_player.Input.movementInput.sqrMagnitude > 0.01f },
                     { TaskType.SearchForRunes, () => m_searchForRunesManager != null && m_searchForRunesManager.AreAllRunesCollected() },
@@ -67,7 +68,7 @@ namespace RooseLabs.Gameplay
                         GUIManager.Instance != null &&
                         GUIManager.ActiveWindows.Count > 0 &&
                         GUIManager.ActiveWindows[^1] is NotebookUIController },
-                    { TaskType.CombineRunes, () => CheckIfImperoRunesToggled() },
+                    { TaskType.CombineRunes, CheckIfImperoRunesToggled },
                     { TaskType.AimWithWand, () => m_player.Data.isAiming },
                     { TaskType.CastImperoSpell, () => false }, // Handled by OnSpellCastCallback
                     { TaskType.TutorialComplete, () => true } // Completes immediately after delay
@@ -373,7 +374,7 @@ namespace RooseLabs.Gameplay
                     localCharacter.Notebook?.InitializeSpellLoadout();
 
                     // Reinitialize wand loadout to make Impero permanent
-                    localCharacter.Wand?.ReinitializeSpellLoadout();
+                    localCharacter.Wand?.InitializeSpellLoadout();
                 }
             }
 
@@ -555,14 +556,11 @@ namespace RooseLabs.Gameplay
         private void SpawnRuneBook(Vector3 spawnPosition, RuneSO rune)
         {
             // Instantiate the networked prefab
-            GameObject bookInstance = Object.Instantiate(m_runeBookPrefab, spawnPosition, Quaternion.identity);
+            GameObject bookInstance = Instantiate(m_runeBookPrefab, spawnPosition, Quaternion.identity);
 
             if (bookInstance.TryGetComponent(out RuneBook runeBook))
             {
                 runeBook.SetContainedRune(rune);
-
-                // Enable rune reuse for tutorial books so multiple players can collect the same rune
-                runeBook.AllowRuneReuse = true;
 
                 m_spawnedTutorialBooks.Add(runeBook);
 
@@ -575,34 +573,28 @@ namespace RooseLabs.Gameplay
             else
             {
                 Debug.LogError("[Tutorial] Spawned rune book prefab does not have RuneBook component!");
-                Object.Destroy(bookInstance);
+                Destroy(bookInstance);
             }
         }
 
         public void PauseTutorial()
         {
-            if (m_tutorialSequence != null)
-                m_tutorialSequence.Pause();
+            m_tutorialSequence?.Pause();
         }
 
         public void ResumeTutorial()
         {
-            if (m_tutorialSequence != null)
-                m_tutorialSequence.Resume();
+            m_tutorialSequence?.Resume();
         }
 
         private void UpdateTutorial()
         {
-            if (m_tutorialSequence == null)
-                return;
-            m_tutorialSequence.Update();
+            m_tutorialSequence?.Update();
         }
 
         private void OnTutorialSpellCast(SpellSO spell)
         {
-            if (m_tutorialSequence == null)
-                return;
-            m_tutorialSequence.OnSpellCastCallback(spell);
+            m_tutorialSequence?.OnSpellCastCallback(spell);
         }
 
         public static void ResetTutorialProgress()

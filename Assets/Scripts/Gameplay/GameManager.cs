@@ -109,20 +109,19 @@ namespace RooseLabs.Gameplay
             m_isHeistOngoing = false;
             m_heistTimer.ToggleTimerVisibility(false);
 
-            // Re-initialize the local player's spell loadout when returning to lobby
-            // This ensures Impero is removed if tutorial is not complete
-            var localCharacter = PlayerCharacter.LocalCharacter;
-            if (localCharacter != null)
+            if (!IsTutorialComplete())
             {
-                localCharacter.Notebook?.InitializeSpellLoadout();
-                localCharacter.Wand?.ReinitializeSpellLoadout();
+                var character = PlayerCharacter.LocalCharacter;
+                if (character)
+                {
+                    character.Notebook.InitializeSpellLoadout();
+                    character.Wand.InitializeSpellLoadout(addDefaultSpell: false);
+                }
+                // Initialize tutorial when lobby is loaded
+                InitializeTutorial();
+                // Resume tutorial if it was paused
+                ResumeTutorial();
             }
-
-            // Initialize tutorial when lobby is loaded (runs on all clients)
-            InitializeTutorial();
-
-            // Resume tutorial if it was paused (runs on all clients)
-            ResumeTutorial();
 
             if (!IsServerInitialized) return;
             if (CurrentAssignment == null) return;
@@ -165,10 +164,7 @@ namespace RooseLabs.Gameplay
                 }
             }
 
-            if (NotebookManager.Instance != null)
-            {
-                NotebookManager.Instance.UnlockSpellLoadout();
-            }
+            NotebookManager.Instance?.UnlockSpellLoadout();
         }
 
         private void GenerateNewAssignment()

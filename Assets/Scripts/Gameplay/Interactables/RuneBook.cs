@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
 using RooseLabs.Player;
@@ -13,9 +12,6 @@ namespace RooseLabs.Gameplay.Interactables
         #region Serialized
         [Header("Rune Book Data")]
         [SerializeField] private Animator animator;
-
-        [Header("Tutorial Settings")]
-        [SerializeField] private bool allowRuneReuse = false;
 
         [Header("Sound Effects")]
         [SerializeField] private string pickupSoundKey = "Book_Pickup";
@@ -33,15 +29,9 @@ namespace RooseLabs.Gameplay.Interactables
         private readonly SyncVar<int> m_bookTextureIndex = new(5);
         private readonly SyncVar<int> m_runeIndex = new(-1, new SyncTypeSettings(WritePermission.ClientUnsynchronized));
 
-        // Track which players have collected the rune from this book (server-side)
-        private HashSet<int> m_playersWhoCollected = new();
-
         private Renderer[] m_renderers;
         private Material m_sharedMaterialInstance;
         private Coroutine m_runeFadeCoroutine;
-
-        // Local player's collection state
-        private bool m_hasLocalPlayerCollected = false;
 
         protected override void Awake()
         {
@@ -96,14 +86,7 @@ namespace RooseLabs.Gameplay.Interactables
                 if (HolderCharacter.Notebook.CollectRune(m_runeIndex.Value))
                 {
                     PlayRuneCollectedSound();
-                    // Mark locally that this player has collected before calling server
-                    m_hasLocalPlayerCollected = true;
-
-                    // Start the rune removal animation for this client
-                    StartRuneRemoval();
-
-                    // Mark this player as having collected the rune on the server
-                    NotifyRuneCollected_ServerRPC();
+                    RuneCollected_ServerRPC();
                 }
             }
         }
@@ -114,21 +97,10 @@ namespace RooseLabs.Gameplay.Interactables
             animator.SetBool(AnimParamIsOpen, false);
         }
 
-        [ServerRpc(RunLocally = false)]
-        private void NotifyRuneCollected_ServerRPC()
+        [ServerRpc(RunLocally = true)]
+        private void RuneCollected_ServerRPC()
         {
-            // Track that this player has collected the rune (server-side only)
-            if (HolderCharacter != null)
-            {
-                int playerId = HolderCharacter.GetComponent<NetworkObject>().OwnerId;
-                m_playersWhoCollected.Add(playerId);
-            }
-
-            // Only remove the rune from the book globally if rune reuse is disabled
-            if (!allowRuneReuse)
-            {
-                m_runeIndex.Value = -1;
-            }
+            m_runeIndex.Value = -1;
         }
 
         public override string GetInteractionText() => "Open";
@@ -153,7 +125,7 @@ namespace RooseLabs.Gameplay.Interactables
             }
         }
 
-        private void PlayRuneCollectedSound()
+        protected void PlayRuneCollectedSound()
         {
             if (string.IsNullOrEmpty(runeCollectedSoundKey)) return;
             if (SoundManager.Instance == null || SoundManager.Instance.soundDatabase == null) return;
@@ -175,7 +147,7 @@ namespace RooseLabs.Gameplay.Interactables
             m_sharedMaterialInstance?.SetInteger(ShaderPropBaseTextureIndex, index);
         }
 
-        private void SetRuneTexture(RuneSO rune)
+        protected void SetRuneTexture(RuneSO rune)
         {
             if (!m_sharedMaterialInstance) return;
 
@@ -246,19 +218,9 @@ namespace RooseLabs.Gameplay.Interactables
 
         private void RuneIndex_OnChange(int prev, int next, bool asServer)
         {
-            // If local player has collected, don't change the visual (keep it hidden)
-            if (m_hasLocalPlayerCollected)
-                return;
-
-            // Show or hide the rune based on the synced value
             SetRuneTexture(next > -1 ? GameManager.Instance.RuneDatabase[next] : null);
         }
 
-        // Public property to toggle rune reuse for tutorial mode
-        public bool AllowRuneReuse
-        {
-            get => allowRuneReuse;
-            set => allowRuneReuse = value;
-        }
+        protected int RuneIndex => m_runeIndex.Value;
     }
 }
