@@ -82,7 +82,7 @@ MonoBehaviour:
   _initializeOrder: 0
   _preventDespawnOnDisconnect: 0
   _defaultDespawnType: 0
-  _initializedTimestamp: -8584338125934615067
+  _initializedTimestamp: -8584334389176662442
   NetworkObserver: {fileID: 0}
   _enablePrediction: 0
   _predictionType: 0
@@ -97,7 +97,7 @@ MonoBehaviour:
   _spectatorInterpolation: 2
   _enableTeleport: 0
   _teleportThreshold: 1
-  <PrefabId>k__BackingField: 15
+  <PrefabId>k__BackingField: 14
   <SpawnableCollectionId>k__BackingField: 0
   <AssetPathHash>k__BackingField: 11164319623637677980
   SceneId: 0
@@ -127,4 +127,15 @@ MonoBehaviour:
   staminaCost: 0
   staminaConsumptionType: 1
   staminaCostPerSecond: 0
-  cooldownTime: 0
+  cooldownTime: 2
+  effects:
+  - vfxPrefab: {fileID: 9157105887693468085, guid: c4f829cb7dd4b864caf8832ec5b1ee55, type: 3}
+    soundKey: Fail_MagicPoof
+    scale: 0.15
+  - vfxPrefab: {fileID: 2504214343621411456, guid: fdd7fb3037c99d743bdc77c6403d40d3, type: 3}
+    soundKey: Fail_Fire
+    scale: 0.15
+  - vfxPrefab: {fileID: 141433446842962268, guid: efbaf05bfaf04a7409dbd579dd96d2f1, type: 3}
+    soundKey: Fail_Smoke
+    scale: 0.15
+  spawnOffset: {x: 0, y: 0, z: 0}
