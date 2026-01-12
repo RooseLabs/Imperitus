@@ -2,7 +2,6 @@ using System;
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
 using RooseLabs.Utils;
-using UnityEngine;
 
 namespace RooseLabs.Gameplay.Notebook
 {

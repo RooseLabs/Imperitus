@@ -4,7 +4,7 @@ using FishNet.Object;
 using RooseLabs.ScriptableObjects;
 using UnityEngine;
 
-namespace RooseLabs
+namespace RooseLabs.Gameplay
 {
     [RequireComponent(typeof(NetworkObject))]
     public class SoundEmitter : NetworkBehaviour

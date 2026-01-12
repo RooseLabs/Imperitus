@@ -6,7 +6,7 @@ using RooseLabs.Utils;
 using UnityEngine;
 using Logger = RooseLabs.Core.Logger;
 
-namespace RooseLabs
+namespace RooseLabs.Gameplay
 {
     [RequireComponent(typeof(NetworkObject))]
     public class SoundManager : NetworkBehaviour

@@ -258,24 +258,25 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
-  m_TargetText: {fileID: 6066271991841457848}
-  m_TextColors:
-    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
-    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
-    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
-    m_ColorMultiplier: 1
-    m_FadeDuration: 0.1
-  m_FontSizes:
-    m_NormalSize: 72
-    m_HighlightedSize: 82
-    m_PressedSize: 78
-    m_SelectedSize: 82
-    m_DisabledSize: 72
-    m_SizeDuration: 0.1
-  m_AutoFitMode: 0
-  m_AutoFitPadding: {x: 0, y: 0}
+  m_TextTransition:
+    m_TargetText: {fileID: 6066271991841457848}
+    m_TextColors:
+      m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
+      m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+      m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
+      m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+      m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+      m_ColorMultiplier: 1
+      m_FadeDuration: 0.1
+    m_FontSizes:
+      m_NormalSize: 72
+      m_HighlightedSize: 82
+      m_PressedSize: 78
+      m_SelectedSize: 82
+      m_DisabledSize: 72
+      m_SizeDuration: 0.1
+    m_AutoFitMode: 0
+    m_AutoFitPadding: {x: 0, y: 0}
 --- !u!1 &6240052568682172205
 GameObject:
   m_ObjectHideFlags: 0
@@ -597,24 +598,25 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
-  m_TargetText: {fileID: 1351978824728183049}
-  m_TextColors:
-    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
-    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
-    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
-    m_ColorMultiplier: 1
-    m_FadeDuration: 0.1
-  m_FontSizes:
-    m_NormalSize: 72
-    m_HighlightedSize: 82
-    m_PressedSize: 78
-    m_SelectedSize: 82
-    m_DisabledSize: 72
-    m_SizeDuration: 0.1
-  m_AutoFitMode: 0
-  m_AutoFitPadding: {x: 0, y: 0}
+  m_TextTransition:
+    m_TargetText: {fileID: 1351978824728183049}
+    m_TextColors:
+      m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
+      m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+      m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
+      m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+      m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+      m_ColorMultiplier: 1
+      m_FadeDuration: 0.1
+    m_FontSizes:
+      m_NormalSize: 72
+      m_HighlightedSize: 82
+      m_PressedSize: 78
+      m_SelectedSize: 82
+      m_DisabledSize: 72
+      m_SizeDuration: 0.1
+    m_AutoFitMode: 0
+    m_AutoFitPadding: {x: 0, y: 0}
 --- !u!1 &8328401673090098595
 GameObject:
   m_ObjectHideFlags: 0

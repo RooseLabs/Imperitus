@@ -1,6 +1,6 @@
-using UnityEngine;
-using UnityEditor;
 using RooseLabs.Enemies;
+using UnityEditor;
+using UnityEngine;
 
 namespace RooseLabs.Editor
 {

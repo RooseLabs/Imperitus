@@ -4,9 +4,11 @@ using RooseLabs.ScriptableObjects;
 using RooseLabs.Utils;
 using System.Collections.Generic;
 using RooseLabs.UI;
+using RooseLabs.UI.Elements;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Toggle = RooseLabs.UI.Elements.Toggle;
 
 namespace RooseLabs.Gameplay.Notebook
 {
@@ -33,13 +35,15 @@ namespace RooseLabs.Gameplay.Notebook
         [Header("Spells Page Elements")]
         [SerializeField] private Transform spellsContainer;
         [SerializeField] private GameObject spellSlotPrefab;
+        [SerializeField] private GameObject spellRuneIconPrefab;
 
-        [Header("Spell Toggle Visual Settings")]
-        [SerializeField] private Color spellToggledColor = new Color(1f, 1f, 1f, 1f); // White/full opacity when toggled
-        [SerializeField] private Color spellUntoggledColor = new Color(0.5f, 0.5f, 0.5f, 0.5f); // Gray/semi-transparent when not toggled
-
-        [Header("Spell Loadout Lock")]
-        [SerializeField] private Color spellLockedOverlayColor = new Color(0.3f, 0.3f, 0.3f, 0.3f); // Dark overlay when locked
+        [Header("Spell Visual Settings")]
+        [SerializeField, ColorUsage(false, true)]
+        private Color spellToggledColor = new(1f, 1f, 1f, 1f);
+        [SerializeField, ColorUsage(false, true)]
+        private Color spellUntoggledColor = new(0.5f, 0.5f, 0.5f, 0.5f);
+        [SerializeField, ColorUsage(false, true)]
+        private Color spellLockedColor = new(0.3f, 0.3f, 0.3f, 0.3f);
 
         [Header("Sound Effects")]
         [SerializeField] private string openSoundKey = "Notebook_Open";
@@ -56,9 +60,9 @@ namespace RooseLabs.Gameplay.Notebook
         private PlayerNotebook m_localPlayerNotebook;
 
         // Track which rune slots have been filled (indices of Image components in runesContainer)
-        private List<int> m_availableRuneSlots = new();
-        private Dictionary<int, int> m_runeIndexToSlotIndex = new(); // Maps rune index to slot index
-        private Dictionary<int, GameObject> m_borrowedRuneSlots = new(); // Maps slot index to the Image GameObject for borrowed runes
+        private readonly List<int> m_availableRuneSlots = new();
+        private readonly Dictionary<int, int> m_runeIndexToSlotIndex = new(); // Maps rune index to slot index
+        private readonly Dictionary<int, GameObject> m_borrowedRuneSlots = new(); // Maps slot index to the Image GameObject for borrowed runes
 
         private void OnEnable()
         {
@@ -426,25 +430,20 @@ namespace RooseLabs.Gameplay.Notebook
                 Image slotImage = runesContainer.GetChild(slotIndex).GetComponent<Image>();
                 if (slotImage != null)
                 {
-                    slotImage.sprite = rune.Sprite;
+                    slotImage.sprite = rune.SmallSprite;
                     slotImage.enabled = true;
-
-                    // Add Button component if it doesn't exist
-                    Button runeButton = slotImage.gameObject.GetComponent<Button>();
-                    if (runeButton == null)
-                    {
-                        runeButton = slotImage.gameObject.AddComponent<Button>();
-                    }
 
                     // Store the rune index for the click handler
                     int capturedRuneIndex = runeIndex; // Capture for closure
 
-                    // Remove old listeners and add new one
-                    runeButton.onClick.RemoveAllListeners();
-                    runeButton.onClick.AddListener(() => OnRuneClicked(capturedRuneIndex));
-
-                    // Update visual state based on toggle status
-                    UpdateRuneToggleVisual(slotImage.gameObject, m_localPlayerNotebook.IsRuneToggled(runeIndex));
+                    // Add Toggle component if it doesn't exist
+                    if (slotImage.gameObject.TryGetOrAddComponent(out Toggle runeToggle))
+                    {
+                        // Remove old listeners and add new one
+                        runeToggle.onValueChanged.RemoveAllListeners();
+                        runeToggle.onValueChanged.AddListener((isToggled) => OnRuneClicked(capturedRuneIndex));
+                        runeToggle.SetIsOn(m_localPlayerNotebook.IsRuneToggled(capturedRuneIndex), false);
+                    }
 
                     // If this was a borrowed rune that we now own, remove the label
                     if (m_borrowedRuneSlots.ContainsKey(slotIndex))
@@ -475,30 +474,6 @@ namespace RooseLabs.Gameplay.Notebook
 
             // Toggle the rune
             m_localPlayerNotebook.ToggleRune(runeIndex);
-
-            // Update the visual state
-            if (m_runeIndexToSlotIndex.TryGetValue(runeIndex, out int slotIndex))
-            {
-                GameObject slotObject = runesContainer.GetChild(slotIndex).gameObject;
-                UpdateRuneToggleVisual(slotObject, m_localPlayerNotebook.IsRuneToggled(runeIndex));
-            }
-
-            //Debug.Log($"[NotebookUI] Rune {runeIndex} clicked");
-        }
-
-        /// <summary>
-        /// Updates the visual state of a rune to show if it's toggled.
-        /// </summary>
-        private void UpdateRuneToggleVisual(GameObject runeSlot, bool isToggled)
-        {
-            Image slotImage = runeSlot.GetComponent<Image>();
-            if (slotImage == null)
-                return;
-
-            // Reduce alpha by half when toggled, full alpha when not toggled
-            Color currentColor = slotImage.color;
-            currentColor.a = isToggled ? 0.5f : 1f;
-            slotImage.color = currentColor;
         }
 
         /// <summary>
@@ -521,9 +496,9 @@ namespace RooseLabs.Gameplay.Notebook
                 int slotIndex;
 
                 // Check if we've already placed this borrowed rune
-                if (m_runeIndexToSlotIndex.ContainsKey(borrowedRune.runeIndex))
+                if (m_runeIndexToSlotIndex.TryGetValue(borrowedRune.runeIndex, out var indexValue))
                 {
-                    slotIndex = m_runeIndexToSlotIndex[borrowedRune.runeIndex];
+                    slotIndex = indexValue;
                 }
                 else
                 {
@@ -555,25 +530,20 @@ namespace RooseLabs.Gameplay.Notebook
                 Image slotImage = slotTransform.GetComponent<Image>();
                 if (slotImage != null)
                 {
-                    slotImage.sprite = rune.Sprite;
+                    slotImage.sprite = rune.SmallSprite;
                     slotImage.enabled = true;
-
-                    // Add Button component if it doesn't exist
-                    Button runeButton = slotImage.gameObject.GetComponent<Button>();
-                    if (runeButton == null)
-                    {
-                        runeButton = slotImage.gameObject.AddComponent<Button>();
-                    }
 
                     // Store the rune index for the click handler
                     int capturedRuneIndex = borrowedRune.runeIndex; // Capture for closure
 
-                    // Remove old listeners and add new one
-                    runeButton.onClick.RemoveAllListeners();
-                    runeButton.onClick.AddListener(() => OnRuneClicked(capturedRuneIndex));
-
-                    // Update visual state based on toggle status
-                    UpdateRuneToggleVisual(slotImage.gameObject, m_localPlayerNotebook.IsRuneToggled(borrowedRune.runeIndex));
+                    // Add Toggle component if it doesn't exist
+                    if (slotImage.gameObject.TryGetOrAddComponent(out Toggle runeToggle))
+                    {
+                        // Remove old listeners and add new one
+                        runeToggle.onValueChanged.RemoveAllListeners();
+                        runeToggle.onValueChanged.AddListener((isToggled) => OnRuneClicked(capturedRuneIndex));
+                        runeToggle.SetIsOn(m_localPlayerNotebook.IsRuneToggled(capturedRuneIndex), false);
+                    }
 
                     // Remove old label if it exists
                     TMP_Text existingLabel = slotImage.GetComponentInChildren<TMP_Text>();
@@ -624,10 +594,9 @@ namespace RooseLabs.Gameplay.Notebook
             int newRuneIndex = collectedIndices[collectedIndices.Count - 1];
 
             // Check if we already placed this rune (either as collected or borrowed)
-            if (m_runeIndexToSlotIndex.ContainsKey(newRuneIndex))
+            if (m_runeIndexToSlotIndex.TryGetValue(newRuneIndex, out var existingSlotIndex))
             {
                 // If it was borrowed, we need to remove the owner name label
-                int existingSlotIndex = m_runeIndexToSlotIndex[newRuneIndex];
                 Transform slotTransform = runesContainer.GetChild(existingSlotIndex);
                 TMP_Text existingLabel = slotTransform.GetComponentInChildren<TMP_Text>();
                 if (existingLabel != null)
@@ -671,7 +640,7 @@ namespace RooseLabs.Gameplay.Notebook
             Image slotImage = runesContainer.GetChild(slotIndex).GetComponent<Image>();
             if (slotImage != null)
             {
-                slotImage.sprite = rune.Sprite;
+                slotImage.sprite = rune.SmallSprite;
                 slotImage.enabled = true;
             }
 
@@ -816,25 +785,20 @@ namespace RooseLabs.Gameplay.Notebook
                 Image slotImage = slotTransform.GetComponent<Image>();
                 if (slotImage != null)
                 {
-                    slotImage.sprite = rune.Sprite;
+                    slotImage.sprite = rune.SmallSprite;
                     slotImage.enabled = true;
-
-                    // Add Button component if it doesn't exist
-                    Button runeButton = slotImage.gameObject.GetComponent<Button>();
-                    if (runeButton == null)
-                    {
-                        runeButton = slotImage.gameObject.AddComponent<Button>();
-                    }
 
                     // Store the rune index for the click handler
                     int capturedRuneIndex = borrowedRune.runeIndex; // Capture for closure
 
-                    // Remove old listeners and add new one
-                    runeButton.onClick.RemoveAllListeners();
-                    runeButton.onClick.AddListener(() => OnRuneClicked(capturedRuneIndex));
-
-                    // Update visual state based on toggle status
-                    UpdateRuneToggleVisual(slotImage.gameObject, m_localPlayerNotebook.IsRuneToggled(borrowedRune.runeIndex));
+                    // Add Toggle component if it doesn't exist
+                    if (slotImage.gameObject.TryGetOrAddComponent(out Toggle runeToggle))
+                    {
+                        // Remove old listeners and add new one
+                        runeToggle.onValueChanged.RemoveAllListeners();
+                        runeToggle.onValueChanged.AddListener((isToggled) => OnRuneClicked(capturedRuneIndex));
+                        runeToggle.SetIsOn(m_localPlayerNotebook.IsRuneToggled(capturedRuneIndex), false);
+                    }
 
                     // Create the owner name label
                     GameObject nameLabel = new GameObject("OwnerNameLabel");
@@ -901,10 +865,10 @@ namespace RooseLabs.Gameplay.Notebook
                 int spellIndex = GameManager.Instance.SpellDatabase.FindIndex(s => s.SpellInfo == spell);
 
                 // Find the toggle component within the spell slot prefab
-                Toggle spellToggle = spellSlot.GetComponent<Toggle>();
+                UnityEngine.UI.Toggle spellToggle = spellSlot.GetComponent<UnityEngine.UI.Toggle>();
                 if (spellToggle == null)
                 {
-                    spellToggle = spellSlot.GetComponentInChildren<Toggle>();
+                    spellToggle = spellSlot.GetComponentInChildren<UnityEngine.UI.Toggle>();
                 }
 
                 if (spellToggle != null)
@@ -935,20 +899,16 @@ namespace RooseLabs.Gameplay.Notebook
                     }
                 }
 
-                // Find the runes container within the spell slot prefab
-                Transform runesTransform = spellSlot.transform.Find("Runes");
-
-                if (runesTransform != null && spell.Runes != null)
+                if (spell.Runes != null)
                 {
                     // Create rune icons for this spell
                     foreach (RuneSO rune in spell.Runes)
                     {
-                        GameObject runeIcon = new GameObject("RuneIcon");
-                        runeIcon.transform.SetParent(runesTransform, false);
-
-                        Image img = runeIcon.AddComponent<Image>();
-                        img.sprite = rune.Sprite;
-                        img.preserveAspect = true;
+                        GameObject runeIcon = Instantiate(spellRuneIconPrefab, spellSlot.transform);
+                        if (runeIcon.TryGetComponent(out Image runeImage))
+                        {
+                            runeImage.sprite = rune.SmallSprite;
+                        }
                     }
                 }
             }
@@ -972,9 +932,9 @@ namespace RooseLabs.Gameplay.Notebook
                 // If toggle failed (limit reached or locked), revert the UI toggle
                 if (!success)
                 {
-                    Toggle toggle = spellSlot.GetComponent<Toggle>();
+                    UnityEngine.UI.Toggle toggle = spellSlot.GetComponent<UnityEngine.UI.Toggle>();
                     if (toggle == null)
-                        toggle = spellSlot.GetComponentInChildren<Toggle>();
+                        toggle = spellSlot.GetComponentInChildren<UnityEngine.UI.Toggle>();
 
                     if (toggle != null)
                     {
@@ -1017,23 +977,33 @@ namespace RooseLabs.Gameplay.Notebook
         private void UpdateSpellToggleVisual(GameObject spellSlot, bool isToggled, bool isImpero)
         {
             // Find all Image components in the spell slot (including runes)
-            Image[] images = spellSlot.GetComponentsInChildren<Image>();
+            GlowingImage[] sprites = spellSlot.GetComponentsInChildren<GlowingImage>();
 
-            Color targetColor = isToggled ? spellToggledColor : spellUntoggledColor;
+            // Check if loadout is locked
+            bool isLocked = (bool)NotebookManager.Instance && NotebookManager.Instance.IsSpellLoadoutLocked;
 
-            // If it's Impero, always use toggled color since it's always active
-            if (isImpero)
+            Color targetColor;
+
+            if (isLocked)
             {
-                targetColor = spellToggledColor;
+                // If locked use locked color
+                targetColor = spellLockedColor;
+            }
+            else
+            {
+                // Otherwise, use toggled/untoggled color
+                targetColor = isToggled ? spellToggledColor : spellUntoggledColor;
+
+                // If it's Impero, always use toggled color since it's always active
+                if (isImpero)
+                {
+                    targetColor = spellToggledColor;
+                }
             }
 
-            foreach (Image img in images)
+            foreach (GlowingImage sprite in sprites)
             {
-                // Skip the Toggle's background/checkmark images if you want to keep them unchanged
-                if (img.gameObject.name == "Background" || img.gameObject.name == "Checkmark")
-                    continue;
-
-                img.color = targetColor;
+                sprite.GlowColor = targetColor;
             }
         }
 
@@ -1076,11 +1046,7 @@ namespace RooseLabs.Gameplay.Notebook
 
             foreach (Transform child in spellsContainer)
             {
-                Toggle toggle = child.GetComponent<Toggle>();
-                if (toggle == null)
-                    toggle = child.GetComponentInChildren<Toggle>();
-
-                if (toggle != null)
+                if (child.TryGetComponentInChildren(out UnityEngine.UI.Toggle toggle))
                 {
                     // Get spell index to check if it's Impero
                     int spellIndex = GetSpellIndexFromToggle(child);
@@ -1095,57 +1061,11 @@ namespace RooseLabs.Gameplay.Notebook
                         // Other spells are interactable only when unlocked
                         toggle.interactable = !isLocked;
                     }
+
+                    // Update visual state to reflect locked/unlocked state
+                    bool isToggled = m_localPlayerNotebook != null && m_localPlayerNotebook.IsSpellToggled(spellIndex);
+                    UpdateSpellToggleVisual(child.gameObject, isToggled, spellIndex == 0);
                 }
-
-                // Add visual overlay when locked
-                if (isLocked)
-                {
-                    AddLockedOverlay(child.gameObject);
-                }
-                else
-                {
-                    RemoveLockedOverlay(child.gameObject);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Adds a visual overlay to indicate the spell is locked.
-        /// </summary>
-        private void AddLockedOverlay(GameObject spellSlot)
-        {
-            // Check if overlay already exists
-            Transform existingOverlay = spellSlot.transform.Find("LockedOverlay");
-            if (existingOverlay != null)
-                return;
-
-            // Create overlay
-            GameObject overlay = new GameObject("LockedOverlay");
-            overlay.transform.SetParent(spellSlot.transform, false);
-
-            Image overlayImage = overlay.AddComponent<Image>();
-            overlayImage.color = spellLockedOverlayColor;
-
-            // Set RectTransform to fill parent
-            RectTransform rectTransform = overlay.GetComponent<RectTransform>();
-            rectTransform.anchorMin = Vector2.zero;
-            rectTransform.anchorMax = Vector2.one;
-            rectTransform.sizeDelta = Vector2.zero;
-            rectTransform.anchoredPosition = Vector2.zero;
-
-            // Make sure overlay is on top
-            overlay.transform.SetAsLastSibling();
-        }
-
-        /// <summary>
-        /// Removes the locked overlay from a spell slot.
-        /// </summary>
-        private void RemoveLockedOverlay(GameObject spellSlot)
-        {
-            Transform existingOverlay = spellSlot.transform.Find("LockedOverlay");
-            if (existingOverlay != null)
-            {
-                Destroy(existingOverlay.gameObject);
             }
         }
 

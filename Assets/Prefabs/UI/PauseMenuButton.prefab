@@ -133,24 +133,25 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  m_TargetText: {fileID: 721895775428691372}
-  m_TextColors:
-    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
-    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
-    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
-    m_ColorMultiplier: 1
-    m_FadeDuration: 0.1
-  m_FontSizes:
-    m_NormalSize: 72
-    m_HighlightedSize: 78
-    m_PressedSize: 76
-    m_SelectedSize: 78
-    m_DisabledSize: 72
-    m_SizeDuration: 0.1
-  m_AutoFitMode: 0
-  m_AutoFitPadding: {x: 0, y: 0}
+  m_TextTransition:
+    m_TargetText: {fileID: 721895775428691372}
+    m_TextColors:
+      m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
+      m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+      m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
+      m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+      m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+      m_ColorMultiplier: 1
+      m_FadeDuration: 0.1
+    m_FontSizes:
+      m_NormalSize: 72
+      m_HighlightedSize: 78
+      m_PressedSize: 76
+      m_SelectedSize: 78
+      m_DisabledSize: 72
+      m_SizeDuration: 0.1
+    m_AutoFitMode: 0
+    m_AutoFitPadding: {x: 0, y: 0}
 --- !u!1 &5728241582370301519
 GameObject:
   m_ObjectHideFlags: 0

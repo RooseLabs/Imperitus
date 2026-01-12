@@ -7,9 +7,11 @@ namespace RooseLabs.ScriptableObjects
     {
         [SerializeField] private string runeName;
         [SerializeField] private Sprite runeIcon;
+        [SerializeField] private Sprite runeSmallIcon;
 
         public string Name => runeName;
         public Sprite Sprite => runeIcon;
+        public Sprite SmallSprite => runeSmallIcon;
 
         #if UNITY_EDITOR
         private void Awake()

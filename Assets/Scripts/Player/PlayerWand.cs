@@ -58,6 +58,8 @@ namespace RooseLabs.Player
         [SerializeField] private Vector3 orbitingRunesLocalScale = Vector3.one * 0.35f;
         [Tooltip("Radius at which the runes orbit around the wand.")]
         [SerializeField] private float orbitingRunesRadius = 3.5f;
+        [Tooltip("Material used for the orbiting runes.")]
+        [SerializeField] private Material orbitingRunesMaterial;
         #endregion
 
         #region Public Properties
@@ -561,6 +563,7 @@ namespace RooseLabs.Player
                 var orbitingRuneComp = runeObj.AddComponent<OrbitingRune>();
                 orbitingRuneComp.SetRune(rune);
                 orbitingRuneComp.SetVisible(character.Data.isAiming);
+                orbitingRuneComp.SetMaterial(orbitingRunesMaterial);
                 m_orbitingRunes.Add(orbitingRuneComp);
             }
 

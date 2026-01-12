@@ -1,13 +1,15 @@
 using System.Collections;
 using RooseLabs.Player;
+using RooseLabs.Rendering;
 using RooseLabs.ScriptableObjects;
 using UnityEngine;
 
 namespace RooseLabs.Gameplay
 {
-    [RequireComponent(typeof(SpriteRenderer))]
+    [RequireComponent(typeof(GlowingSprite))]
     public class OrbitingRune : MonoBehaviour
     {
+        private GlowingSprite m_glowingSprite;
         private SpriteRenderer m_spriteRenderer;
         private Vector3 m_initialPosition;
 
@@ -18,6 +20,7 @@ namespace RooseLabs.Gameplay
 
         private void Awake()
         {
+            TryGetComponent(out m_glowingSprite);
             TryGetComponent(out m_spriteRenderer);
             m_spriteRenderer.flipX = true;
             m_spriteRenderer.color = new Color(1f, 1f, 1f, 0f);
@@ -50,6 +53,11 @@ namespace RooseLabs.Gameplay
         public void SetPosition(Vector3 position)
         {
             m_initialPosition = position;
+        }
+
+        public void SetMaterial(Material material)
+        {
+            m_glowingSprite.SetMaterial(material);
         }
 
         public void SetVisible(bool isVisible)

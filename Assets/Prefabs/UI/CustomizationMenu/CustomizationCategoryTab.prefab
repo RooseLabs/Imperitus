@@ -259,24 +259,25 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
-  m_TargetText: {fileID: 2836234944088886631}
-  m_TextColors:
-    m_NormalColor: {r: 0, g: 0, b: 0, a: 1}
-    m_HighlightedColor: {r: 0, g: 0, b: 0, a: 1}
-    m_PressedColor: {r: 0, g: 0, b: 0, a: 1}
-    m_SelectedColor: {r: 0, g: 0, b: 0, a: 1}
-    m_DisabledColor: {r: 0, g: 0, b: 0, a: 1}
-    m_ColorMultiplier: 1
-    m_FadeDuration: 0.1
-  m_FontSizes:
-    m_NormalSize: 26
-    m_HighlightedSize: 32
-    m_PressedSize: 32
-    m_SelectedSize: 32
-    m_DisabledSize: 26
-    m_SizeDuration: 0.1
-  m_AutoFitMode: 0
-  m_AutoFitPadding: {x: 0, y: 0}
+  m_TextTransition:
+    m_TargetText: {fileID: 2836234944088886631}
+    m_TextColors:
+      m_NormalColor: {r: 0, g: 0, b: 0, a: 1}
+      m_HighlightedColor: {r: 0, g: 0, b: 0, a: 1}
+      m_PressedColor: {r: 0, g: 0, b: 0, a: 1}
+      m_SelectedColor: {r: 0, g: 0, b: 0, a: 1}
+      m_DisabledColor: {r: 0, g: 0, b: 0, a: 1}
+      m_ColorMultiplier: 1
+      m_FadeDuration: 0.1
+    m_FontSizes:
+      m_NormalSize: 26
+      m_HighlightedSize: 32
+      m_PressedSize: 32
+      m_SelectedSize: 32
+      m_DisabledSize: 26
+      m_SizeDuration: 0.1
+    m_AutoFitMode: 0
+    m_AutoFitPadding: {x: 0, y: 0}
 --- !u!114 &2929254101101929949
 MonoBehaviour:
   m_ObjectHideFlags: 0

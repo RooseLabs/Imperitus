@@ -21228,7 +21228,8 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 2005397493145543771, guid: 69faf03ceb776ff48bdcdff6edf91386, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 4682063195481342977, guid: 69faf03ceb776ff48bdcdff6edf91386, type: 3}
@@ -21362,10 +21363,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf39116cc6db44d47b2eaf534e0f6682, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.Vosk.VoiceProcessor
-  microphoneIndex: 0
-  minimumSpeakingSampleValue: 0.05
-  silenceTimer: 1
-  autoDetect: 0
 --- !u!114 &1242945813
 MonoBehaviour:
   m_ObjectHideFlags: 0

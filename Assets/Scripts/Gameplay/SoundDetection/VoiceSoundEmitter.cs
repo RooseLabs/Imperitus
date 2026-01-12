@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace RooseLabs
+namespace RooseLabs.Gameplay
 {
     /// <summary>
     /// Attach this to each player GameObject that has a voice-reactive sphere collider.
