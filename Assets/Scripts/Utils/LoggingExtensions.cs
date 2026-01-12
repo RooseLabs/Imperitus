@@ -1,3 +1,5 @@
+using UnityEngine;
+
 namespace RooseLabs.Utils
 {
     public static class LoggingExtensions
@@ -27,7 +29,7 @@ namespace RooseLabs.Utils
         [UnityEngine.HideInCallstack]
         private static string GetContext(UnityEngine.MonoBehaviour self)
         {
-            if (self is FishNet.Object.NetworkBehaviour nb)
+            if (self is FishNet.Object.NetworkBehaviour nb && (bool)nb.NetworkObject)
             {
                 var player = RooseLabs.Network.PlayerHandler.GetPlayer(nb.Owner);
                 string ownerId = player && !string.IsNullOrEmpty(player.PlayerName)

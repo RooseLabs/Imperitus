@@ -43,12 +43,12 @@ namespace RooseLabs.Player.Customization
             BuildRendererLookup();
         }
 
-        public override void OnStartNetwork()
+        public override void OnStartClient()
         {
             // Subscribe to SyncList changes
             m_syncedCustomizationIndices.OnChange += OnCustomizationSynced;
 
-            if (Owner.IsLocalClient)
+            if (IsOwner)
             {
                 // This is the local player - load their saved customization
                 LoadCustomization();
@@ -64,7 +64,7 @@ namespace RooseLabs.Player.Customization
             }
         }
 
-        public override void OnStopNetwork()
+        public override void OnStopClient()
         {
             // Unsubscribe from SyncList changes
             m_syncedCustomizationIndices.OnChange -= OnCustomizationSynced;

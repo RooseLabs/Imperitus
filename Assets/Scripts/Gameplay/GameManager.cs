@@ -51,27 +51,33 @@ namespace RooseLabs.Gameplay
 
         private void OnEnable()
         {
+            InstanceFinder.SceneManager.OnLoadEnd += HandleSceneLoaded;
             SpellBase.OnSpellCast += OnSpellCast;
             SpellBase.OnSpellCast += OnTutorialSpellCast;
+
+            if (!InstanceFinder.IsServerStarted && CurrentScene.IsValid())
+            {
+                // If the online scene is already loaded at this point, we won't get a scene load event,
+                // so we need to check the current scene here and handle it accordingly.
+                // This can happen when clients join a game hosted by another player, and they're loading
+                // the current globally loaded scenes in the server.
+                if (CurrentScene.name == GetSceneName(lobbyScene))
+                {
+                    HandleLobbyLoaded();
+                }
+                else if (heistScenes.Any(heistScene => CurrentScene.name == GetSceneName(heistScene)))
+                {
+                    HandleHeistSceneLoaded();
+                }
+            }
         }
 
         private void OnDisable()
         {
-            SpellBase.OnSpellCast -= OnSpellCast;
-            SpellBase.OnSpellCast -= OnTutorialSpellCast;
-        }
-
-        private void OnDestroy()
-        {
             if (InstanceFinder.SceneManager != null)
                 InstanceFinder.SceneManager.OnLoadEnd -= HandleSceneLoaded;
-        }
-
-        public override void OnStartNetwork()
-        {
-            base.OnStartNetwork();
-
-            InstanceFinder.SceneManager.OnLoadEnd += HandleSceneLoaded;
+            SpellBase.OnSpellCast -= OnSpellCast;
+            SpellBase.OnSpellCast -= OnTutorialSpellCast;
         }
 
         private void Update()

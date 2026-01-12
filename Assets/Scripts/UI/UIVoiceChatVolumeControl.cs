@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using MetaVoiceChat.Output.AudioSource;
@@ -15,14 +16,22 @@ namespace RooseLabs.UI
         [SerializeField] private GameObject playerVolumeControlPrefab;
 
         private readonly Dictionary<PlayerCharacter, GameObject> m_playerVolumeControls = new();
+        private Coroutine m_refreshCheckCoroutine;
 
         private void OnEnable()
         {
-            RefreshPlayerList();
+            m_refreshCheckCoroutine = StartCoroutine(RefreshCheckCoroutine());
         }
 
         private void OnDisable()
         {
+            // Stop the refresh check coroutine
+            if (m_refreshCheckCoroutine != null)
+            {
+                StopCoroutine(m_refreshCheckCoroutine);
+                m_refreshCheckCoroutine = null;
+            }
+
             // Destroy all instantiated volume controls
             foreach (var kvp in m_playerVolumeControls)
             {
@@ -31,21 +40,28 @@ namespace RooseLabs.UI
             m_playerVolumeControls.Clear();
         }
 
-        private void LateUpdate()
+        private IEnumerator RefreshCheckCoroutine()
         {
-            // Check if players have joined or left
-            var currentPlayers = PlayerHandler.AllConnectedCharacters
-                .Where(p => p != PlayerCharacter.LocalCharacter)
-                .ToList();
+            var waitForSeconds = new WaitForSeconds(1f);
+            while (true)
+            {
+                // Check if players have joined or left
+                var currentPlayers = PlayerHandler.AllConnectedCharacters
+                    .Where(p => p != PlayerCharacter.LocalCharacter)
+                    .ToList();
 
-            // Check if count changed or if any player is missing from dictionary
-            bool needsRefresh = currentPlayers.Count != m_playerVolumeControls.Count ||
-                                currentPlayers.Any(p => !m_playerVolumeControls.ContainsKey(p));
+                // Check if count changed or if any player is missing from dictionary
+                bool needsRefresh = currentPlayers.Count != m_playerVolumeControls.Count ||
+                                    currentPlayers.Any(p => !m_playerVolumeControls.ContainsKey(p));
 
-            if (needsRefresh) RefreshPlayerList();
+                if (needsRefresh)
+                    yield return RefreshPlayerList();
+
+                yield return waitForSeconds;
+            }
         }
 
-        private void RefreshPlayerList()
+        private IEnumerator RefreshPlayerList()
         {
             var currentPlayers = PlayerHandler.AllConnectedCharacters
                 .Where(p => p != PlayerCharacter.LocalCharacter)
@@ -65,10 +81,22 @@ namespace RooseLabs.UI
                 m_playerVolumeControls.Remove(player);
             }
 
-            // Add controls for new players
+            // Add controls for new players with delay until PlayerName is available
             foreach (var player in currentPlayers)
             {
-                if (!m_playerVolumeControls.ContainsKey(player))
+                if (m_playerVolumeControls.ContainsKey(player)) continue;
+                // Wait until the character has a valid PlayerName
+                float timeout = 10f; // 10 second timeout
+                float elapsed = 0f;
+
+                while (elapsed < timeout && (bool)player && string.IsNullOrEmpty(player.Player?.PlayerName))
+                {
+                    yield return new WaitForSeconds(0.1f);
+                    elapsed += 0.1f;
+                }
+
+                // Only create the control if the character still exists and has a name
+                if ((bool)player && !string.IsNullOrEmpty(player.Player?.PlayerName))
                 {
                     CreatePlayerVolumeControl(player);
                 }
