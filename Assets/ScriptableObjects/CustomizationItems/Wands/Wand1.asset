@@ -13,12 +13,10 @@ MonoBehaviour:
   m_Name: Wand1
   m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.CustomizationItem
   category: 7
-  applicationMode: 1
+  applicationMode: 0
   slots:
   - mesh: {fileID: -5220590045393546675, guid: 135cc71d114f8b34595d2347465e88c0, type: 3}
-    material: {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+    materials: []
     targetRendererId: 8
   itemName: Wand 1
-  description: 
-  icon: {fileID: 21300000, guid: 86e5cf8517c543f41b0a3846bc7ffd52, type: 3}
-  femaleOutfitFix: 0
+  icon: {fileID: 21300000, guid: 8c92c91bdbc068a4b870f8147e315fd7, type: 3}

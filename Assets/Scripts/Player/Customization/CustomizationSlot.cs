@@ -3,25 +3,16 @@ using UnityEngine;
 
 namespace RooseLabs.Player.Customization
 {
-    /// <summary>
-    /// Represents a single visual component that can be applied to a renderer.
-    /// Multiple slots can be combined to create complete customization items.
-    /// </summary>
     [Serializable]
     public class CustomizationSlot
     {
-        [Tooltip("The mesh to apply. Can be null for material-only changes.")]
+        [Tooltip("The mesh to apply to the renderer.")]
         public Mesh mesh;
 
-        [Tooltip("The material to apply. Should never be null.")]
-        public Material material;
+        [Tooltip("The materials to apply to the renderer, in order.")]
+        public Material[] materials;
 
         [Tooltip("The ID of the target renderer group.")]
         public RendererID targetRendererId;
-
-        public bool IsValid()
-        {
-            return material != null;
-        }
     }
 }

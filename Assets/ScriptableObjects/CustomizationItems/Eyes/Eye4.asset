@@ -13,12 +13,11 @@ MonoBehaviour:
   m_Name: Eye4
   m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.ScriptableObjects.CustomizationItem
   category: 1
-  applicationMode: 0
+  applicationMode: 1
   slots:
   - mesh: {fileID: 0}
-    material: {fileID: 2100000, guid: a0a339031e9106a45a1acf8df883f0a5, type: 2}
+    materials:
+    - {fileID: 2100000, guid: a0a339031e9106a45a1acf8df883f0a5, type: 2}
     targetRendererId: 1
   itemName: Eye4
-  description: 
   icon: {fileID: 21300000, guid: 6e8e740a106bf89479a07337bf54bfe8, type: 3}
-  femaleOutfitFix: 0

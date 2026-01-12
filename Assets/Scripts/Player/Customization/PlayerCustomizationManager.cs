@@ -1,27 +1,22 @@
+using System;
 using System.Collections.Generic;
 using FishNet.Connection;
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
 using RooseLabs.ScriptableObjects;
 using UnityEngine;
-using Logger = RooseLabs.Core.Logger;
 
 namespace RooseLabs.Player.Customization
 {
-    /// <summary>
-    /// Manages character customization for a player prefab.
-    /// </summary>
     public class PlayerCustomizationManager : NetworkBehaviour
     {
-        private Logger Logger => Logger.GetLogger("PlayerCustomization");
-
         [Header("Renderer Mappings")]
-        [Tooltip("Map string IDs to actual renderers in your prefab. These IDs are used in CustomizationItem slots.")]
-        [SerializeField] private List<RendererMapping> rendererMappings = new List<RendererMapping>();
+        [Tooltip("Map RendererIDs to actual renderers in your prefab. These IDs are used in CustomizationItem slots.")]
+        [SerializeField] private List<RendererMapping> rendererMappings = new();
 
         [Header("Default Configurations")]
-        [Tooltip("Define default meshes and materials for each category. Used when removing items.")]
-        [SerializeField] private List<DefaultCustomizationData> defaultConfigurations = new List<DefaultCustomizationData>();
+        [Tooltip("Define default meshes and materials for each renderer. Used when removing items.")]
+        [SerializeField] private List<DefaultRendererData> defaultConfigurations = new();
 
         [Header("Save/Load")]
         [Tooltip("Reference to the item database for save/load functionality.")]
@@ -29,96 +24,73 @@ namespace RooseLabs.Player.Customization
 
         [Header("Runtime Data")]
         [Tooltip("Debug view of currently equipped items.")]
-        [SerializeField] private List<string> equippedItemNames = new List<string>();
+        [SerializeField] private List<string> equippedItemNames = new();
 
         [Header("Networking")]
         [Tooltip("If true, disable auto-save for network sync (server will handle saves).")]
         [SerializeField] private bool disableAutoSaveForNetworking = false;
 
-        private readonly SyncVar<int[]> syncedCustomizationIndices = new SyncVar<int[]>(new int[0]);
+        private readonly SyncList<int> m_syncedCustomizationIndices = new();
 
-        // Tracks currently equipped items: Key = equipment key (category or category_subcategory)
-        private Dictionary<string, CustomizationItem> equippedItems = new Dictionary<string, CustomizationItem>();
+        private readonly Dictionary<string, CustomizationItem> m_equippedItems = new();
 
-        // Tracks instantiated GameObjects for InstantiateNew mode: Key = equipment key
-        private Dictionary<string, List<GameObject>> instantiatedObjects = new Dictionary<string, List<GameObject>>();
-
-        // Cached renderer lookup: Key = renderer ID
-        private Dictionary<RendererID, List<RendererMaterialPair>> rendererLookup = new Dictionary<RendererID, List<RendererMaterialPair>>();
-
-        // ADDED: Flag to track if we've done initial sync
-        private bool hasInitializedCustomization = false;
+        private readonly Dictionary<RendererID, Renderer> m_rendererLookup = new();
 
         private const string SAVE_KEY = "PlayerCustomization";
 
-        private Color CurrentSkinColor;
-
         private void Awake()
         {
-            ClearSavedCustomization();
-
             BuildRendererLookup();
-            ValidateDefaultConfigurations();
         }
 
         public override void OnStartNetwork()
         {
-            base.OnStartNetwork();
+            // Subscribe to SyncList changes
+            m_syncedCustomizationIndices.OnChange += OnCustomizationSynced;
 
-            // Subscribe to SyncVar changes
-            syncedCustomizationIndices.OnChange += OnCustomizationSynced;
-
-            if (base.Owner.IsLocalClient)
+            if (Owner.IsLocalClient)
             {
                 // This is the local player - load their saved customization
                 LoadCustomization();
-
                 Invoke(nameof(BroadcastCustomizationDelayed), 0.1f);
             }
             else
             {
                 // This is a remote player - apply their synced customization if available
-                if (syncedCustomizationIndices.Value != null && syncedCustomizationIndices.Value.Length > 0)
+                if (m_syncedCustomizationIndices.Count > 0)
                 {
-                    ApplyNetworkedCustomization(syncedCustomizationIndices.Value);
+                    ApplyNetworkedCustomization();
                 }
             }
         }
 
         public override void OnStopNetwork()
         {
-            base.OnStopNetwork();
-
-            // Unsubscribe from SyncVar changes
-            syncedCustomizationIndices.OnChange -= OnCustomizationSynced;
+            // Unsubscribe from SyncList changes
+            m_syncedCustomizationIndices.OnChange -= OnCustomizationSynced;
         }
 
         public override void OnStartServer()
         {
-            base.OnStartServer();
-
-            if (base.IsServerInitialized)
+            if (IsServerInitialized)
             {
-                base.NetworkManager.SceneManager.OnClientLoadedStartScenes += OnClientLoadedStartScenes;
+                NetworkManager.SceneManager.OnClientLoadedStartScenes += OnClientLoadedStartScenes;
             }
         }
 
         public override void OnStopServer()
         {
-            base.OnStopServer();
-
-            if (base.NetworkManager != null && base.NetworkManager.SceneManager != null)
+            if (NetworkManager != null && NetworkManager.SceneManager != null)
             {
-                base.NetworkManager.SceneManager.OnClientLoadedStartScenes -= OnClientLoadedStartScenes;
+                NetworkManager.SceneManager.OnClientLoadedStartScenes -= OnClientLoadedStartScenes;
             }
         }
 
         private void OnClientLoadedStartScenes(NetworkConnection conn, bool asServer)
         {
             // Only the owner should send their customization when new clients join
-            if (base.Owner.IsLocalClient && asServer)
+            if (Owner.IsLocalClient && asServer)
             {
-                //Debug.Log($"[PlayerCustomizationManager] Client {conn.ClientId} loaded scenes, re-broadcasting customization");
                 Invoke(nameof(BroadcastCustomizationDelayed), 0.2f);
             }
         }
@@ -126,7 +98,7 @@ namespace RooseLabs.Player.Customization
         // Delayed broadcast to ensure network is ready
         private void BroadcastCustomizationDelayed()
         {
-            if (base.Owner.IsLocalClient)
+            if (Owner.IsLocalClient)
             {
                 BroadcastCustomization();
             }
@@ -137,39 +109,37 @@ namespace RooseLabs.Player.Customization
         /// </summary>
         private void BuildRendererLookup()
         {
-            rendererLookup.Clear();
+            m_rendererLookup.Clear();
 
             foreach (var mapping in rendererMappings)
             {
-                if (!mapping.IsValid())
+                if (mapping.renderer == null)
                 {
-                    Debug.LogWarning($"Invalid renderer mapping detected on '{gameObject.name}'.");
+                    Debug.LogWarning($"Invalid renderer mapping detected on '{gameObject.name}': null renderer for ID '{mapping.id}'.");
                     continue;
                 }
 
-                if (!rendererLookup.ContainsKey(mapping.id))
+                if (m_rendererLookup.ContainsKey(mapping.id))
                 {
-                    rendererLookup[mapping.id] = new List<RendererMaterialPair>();
+                    Debug.LogWarning($"Duplicate renderer mapping for ID '{mapping.id}' on '{gameObject.name}'. Using first mapping.");
+                    continue;
                 }
 
-                rendererLookup[mapping.id].AddRange(mapping.rendererPairs);
+                m_rendererLookup[mapping.id] = mapping.renderer;
             }
         }
 
-        private List<RendererMaterialPair> GetRendererPairsById(RendererID id)
+        private Renderer GetRendererById(RendererID id)
         {
-            if (!rendererLookup.ContainsKey(id))
+            if (!m_rendererLookup.TryGetValue(id, out Renderer renderer))
             {
-                Debug.LogError($"No renderers found with ID '{id}'.");
-                return new List<RendererMaterialPair>();
+                Debug.LogError($"No renderer found with ID '{id}'.");
+                return null;
             }
 
-            return rendererLookup[id];
+            return renderer;
         }
 
-        /// <summary>
-        /// Equips a customization item on the player.
-        /// </summary>
         public void EquipItem(CustomizationItem item)
         {
             if (item == null)
@@ -187,107 +157,68 @@ namespace RooseLabs.Player.Customization
             string key = item.GetEquipmentKey();
 
             // Remove existing item in this slot
-            if (equippedItems.ContainsKey(key))
+            if (m_equippedItems.ContainsKey(key))
             {
                 RemoveItem(key);
             }
 
             // Apply the new item based on its application mode
-            switch (item.applicationMode)
-            {
-                case ApplicationMode.SwapMaterialOnly:
-                    ApplySwapMaterialOnly(item);
-                    break;
-                case ApplicationMode.SwapMeshAndMaterial:
-                    ApplySwapMeshAndMaterial(item);
-                    break;
-                case ApplicationMode.InstantiateNew:
-                    ApplyInstantiateNew(item, key);
-                    break;
-            }
+            ApplyItem(item);
 
             // Track the equipped item
-            equippedItems[key] = item;
+            m_equippedItems[key] = item;
             UpdateDebugList();
 
-            //Debug.Log($"Equipped: {item.itemName} ({key})");
-
             // Auto-save after equipping (only for owner)
-            if (base.Owner.IsLocalClient && !disableAutoSaveForNetworking)
+            if (Owner.IsLocalClient && !disableAutoSaveForNetworking)
             {
                 SaveCustomization();
             }
 
-            // FIXED: Broadcast to network (only for owner)
-            if (base.Owner.IsLocalClient)
+            // Broadcast to network (only for owner)
+            if (Owner.IsLocalClient)
             {
                 BroadcastCustomization();
             }
         }
 
-        /// <summary>
-        /// Removes an item by category and optional subcategory.
-        /// </summary>
         public void RemoveItem(CustomizationCategory category, string subCategory = null)
         {
             string key = GetEquipmentKey(category, subCategory);
             RemoveItem(key);
         }
 
-        /// <summary>
-        /// Removes an item by its equipment key.
-        /// </summary>
         private void RemoveItem(string key)
         {
-            if (!equippedItems.ContainsKey(key))
+            if (!m_equippedItems.TryGetValue(key, out var item))
             {
                 Debug.LogWarning($"No item equipped in slot '{key}' to remove.");
                 return;
             }
 
-            CustomizationItem item = equippedItems[key];
+            // Restore defaults for the slots used by this item
+            RestoreDefaults(item);
 
-            bool isAccessory = item.category == CustomizationCategory.Glasses
-                                || item.category == CustomizationCategory.Hats;
-
-            // Handle removal based on application mode
-            switch (item.applicationMode)
-            {
-                case ApplicationMode.SwapMaterialOnly:
-                case ApplicationMode.SwapMeshAndMaterial:
-                    if (isAccessory)
-                        RestoreDefaults(item);
-                    break;
-                case ApplicationMode.InstantiateNew:
-                    DestroyInstantiatedObjects(key);
-                    break;
-            }
-
-            equippedItems.Remove(key);
+            m_equippedItems.Remove(key);
             UpdateDebugList();
 
-            //Debug.Log($"Removed: {item.itemName} ({key})");
-
             // Auto-save after removing (only for owner)
-            if (base.Owner.IsLocalClient && !disableAutoSaveForNetworking)
+            if (Owner.IsLocalClient && !disableAutoSaveForNetworking)
             {
                 SaveCustomization();
             }
 
             // Broadcast to network (only for owner)
-            if (base.Owner.IsLocalClient)
+            if (Owner.IsLocalClient)
             {
                 BroadcastCustomization();
             }
         }
 
-        /// <summary>
-        /// Removes all equipped items and restores defaults.
-        /// </summary>
-        public void RemoveAllItems()
+        private void RemoveAllItems()
         {
             // Copy keys to avoid modification during iteration
-            List<string> keys = new List<string>(equippedItems.Keys);
+            List<string> keys = new List<string>(m_equippedItems.Keys);
 
             foreach (string key in keys)
             {
@@ -295,31 +226,18 @@ namespace RooseLabs.Player.Customization
             }
         }
 
-        /// <summary>
-        /// Checks if an item is currently equipped.
-        /// </summary>
         public bool IsItemEquipped(CustomizationItem item)
         {
             if (item == null) return false;
             string key = item.GetEquipmentKey();
-            return equippedItems.ContainsKey(key) && equippedItems[key] == item;
-        }
-
-        /// <summary>
-        /// Gets the currently equipped item for a category/subcategory.
-        /// </summary>
-        public CustomizationItem GetEquippedItem(CustomizationCategory category, string subCategory = null)
-        {
-            string key = GetEquipmentKey(category, subCategory);
-            return equippedItems.ContainsKey(key) ? equippedItems[key] : null;
+            return m_equippedItems.ContainsKey(key) && m_equippedItems[key] == item;
         }
 
         #region Save/Load Methods
-
         /// <summary>
         /// Saves the current customization to PlayerPrefs.
         /// </summary>
-        public void SaveCustomization()
+        private void SaveCustomization()
         {
             if (itemDatabase == null)
             {
@@ -329,7 +247,7 @@ namespace RooseLabs.Player.Customization
 
             CustomizationSaveData saveData = new CustomizationSaveData();
 
-            foreach (var kvp in equippedItems)
+            foreach (var kvp in m_equippedItems)
             {
                 int itemIndex = itemDatabase.IndexOf(kvp.Value);
 
@@ -346,14 +264,12 @@ namespace RooseLabs.Player.Customization
             string json = JsonUtility.ToJson(saveData);
             PlayerPrefs.SetString(SAVE_KEY, json);
             PlayerPrefs.Save();
-
-            //Debug.Log($"[PlayerCustomizationManager] Saved {saveData.equippedItems.Count} equipped items.");
         }
 
         /// <summary>
         /// Loads and applies saved customization from PlayerPrefs.
         /// </summary>
-        public void LoadCustomization()
+        private void LoadCustomization()
         {
             if (itemDatabase == null)
             {
@@ -363,7 +279,6 @@ namespace RooseLabs.Player.Customization
 
             if (!PlayerPrefs.HasKey(SAVE_KEY))
             {
-                //Debug.Log("[PlayerCustomizationManager] No saved customization found.");
                 return;
             }
 
@@ -380,7 +295,6 @@ namespace RooseLabs.Player.Customization
             RemoveAllItems();
 
             // Apply each saved item
-            int loadedCount = 0;
             foreach (var itemData in saveData.equippedItems)
             {
                 CustomizationItem item = itemDatabase[itemData.itemIndex];
@@ -388,335 +302,166 @@ namespace RooseLabs.Player.Customization
                 if (item != null)
                 {
                     EquipItemWithoutSaving(item);
-                    loadedCount++;
                 }
                 else
                 {
                     Debug.LogWarning($"[PlayerCustomizationManager] Could not find item at index {itemData.itemIndex}");
                 }
             }
-
-            //Debug.Log($"[PlayerCustomizationManager] Loaded {loadedCount} equipped items.");
         }
 
-        /// <summary>
-        /// Clears all saved customization data.
-        /// </summary>
         public void ClearSavedCustomization()
         {
             PlayerPrefs.DeleteKey(SAVE_KEY);
             PlayerPrefs.Save();
-            //Debug.Log("[PlayerCustomizationManager] Cleared saved customization.");
         }
 
         #endregion
 
         #region Application Methods
+        /// <summary>
+        /// Applies a customization item based on its application mode.
+        /// </summary>
+        private void ApplyItem(CustomizationItem item)
+        {
+            switch (item.applicationMode)
+            {
+                case ApplicationMode.SwapMeshOnly:
+                    ApplySwapMeshOnly(item);
+                    break;
+                case ApplicationMode.SwapMaterialOnly:
+                    ApplySwapMaterialOnly(item);
+                    break;
+                case ApplicationMode.SwapMeshAndMaterial:
+                    ApplySwapMeshAndMaterial(item);
+                    break;
+            }
+        }
 
+        /// <summary>
+        /// Applies only the mesh from the customization item slots.
+        /// </summary>
+        private void ApplySwapMeshOnly(CustomizationItem item)
+        {
+            foreach (var slot in item.slots)
+            {
+                Renderer renderer = GetRendererById(slot.targetRendererId);
+                if (renderer == null) continue;
+
+                ApplyMesh(renderer, slot.mesh);
+            }
+        }
+
+        /// <summary>
+        /// Applies only the materials from the customization item slots.
+        /// </summary>
         private void ApplySwapMaterialOnly(CustomizationItem item)
         {
             foreach (var slot in item.slots)
             {
-                List<RendererMaterialPair> pairs = GetRendererPairsById(slot.targetRendererId);
+                Renderer renderer = GetRendererById(slot.targetRendererId);
+                if (renderer == null) continue;
 
-                foreach (var pair in pairs)
-                {
-                    if (pair.renderer != null && slot.material != null)
-                    {
-                        ApplyMaterialToRenderer(pair.renderer, slot.material, pair.materialIndex);
-
-                        if (item.category == CustomizationCategory.SkinColor)
-                        {
-                            CurrentSkinColor = slot.material.color;
-                            //Debug.Log("[PlayerCustomizationManager] Updated CurrentSkinColor to " + CurrentSkinColor);
-
-                            if (rendererLookup.ContainsKey(RendererID.Ears))
-                            {
-                                foreach (var earPair in rendererLookup[RendererID.Ears])
-                                {
-                                    if (earPair.renderer != null)
-                                    {
-                                        Material earMaterial = earPair.renderer.materials[0];
-                                        earMaterial.color = CurrentSkinColor;
-                                        //Debug.Log("[PlayerCustomizationManager] Applied CurrentSkinColor to Ears: " + CurrentSkinColor);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+                ApplyMaterials(renderer, slot.materials);
             }
         }
 
+        /// <summary>
+        /// Applies both mesh and materials from the customization item slots.
+        /// </summary>
         private void ApplySwapMeshAndMaterial(CustomizationItem item)
         {
             foreach (var slot in item.slots)
             {
-                List<RendererMaterialPair> pairs = GetRendererPairsById(slot.targetRendererId);
+                Renderer renderer = GetRendererById(slot.targetRendererId);
+                if (renderer == null) continue;
 
-                foreach (var pair in pairs)
+                ApplyMesh(renderer, slot.mesh);
+                ApplyMaterials(renderer, slot.materials);
+            }
+        }
+
+        /// <summary>
+        /// Applies a mesh to a renderer.
+        /// </summary>
+        private void ApplyMesh(Renderer renderer, Mesh mesh)
+        {
+            if (mesh == null) return;
+
+            if (renderer is SkinnedMeshRenderer skinnedRenderer)
+            {
+                skinnedRenderer.sharedMesh = mesh;
+            }
+            else if (renderer is MeshRenderer meshRenderer)
+            {
+                MeshFilter meshFilter = meshRenderer.GetComponent<MeshFilter>();
+                if (meshFilter != null)
                 {
-                    if (pair.renderer == null) continue;
-
-                    // Handle SkinnedMeshRenderer
-                    if (pair.renderer is SkinnedMeshRenderer skinnedRenderer)
-                    {
-                        if (slot.mesh != null)
-                        {
-                            skinnedRenderer.sharedMesh = slot.mesh;
-                        }
-
-                        if (slot.material != null)
-                        {
-                            if (item.category == CustomizationCategory.Outfit && !item.femaleOutfitFix)
-                            {
-                                Material[] mats = skinnedRenderer.sharedMaterials;
-
-                                if (mats.Length >= 2)
-                                {
-                                    // Swap index 1 and 0
-                                    Material temp = mats[1];
-                                    mats[1] = mats[0];
-                                    mats[0] = temp;
-                                    skinnedRenderer.sharedMaterials = mats;
-                                }
-                            }
-
-                            ApplyMaterialToRenderer(pair.renderer, slot.material, pair.materialIndex);
-
-                            if (item.femaleOutfitFix)
-                            {
-                                Material[] mats = skinnedRenderer.sharedMaterials;
-
-                                if (mats.Length >= 2)
-                                {
-                                    // Swap index 0 and 1
-                                    Material temp = mats[0];
-                                    mats[0] = mats[1];
-                                    mats[1] = temp;
-
-                                    skinnedRenderer.sharedMaterials = mats;
-
-                                    //Debug.Log($"Swapped material order on {gameObject.name}");
-                                }
-                            }
-                        }
-                    }
-                    // Handle MeshRenderer
-                    else if (pair.renderer is MeshRenderer meshRenderer)
-                    {
-                        MeshFilter meshFilter = meshRenderer.GetComponent<MeshFilter>();
-
-                        if (meshFilter != null && slot.mesh != null)
-                        {
-                            meshFilter.mesh = slot.mesh;
-                        }
-
-                        if (slot.material != null)
-                        {
-                            ApplyMaterialToRenderer(pair.renderer, slot.material, pair.materialIndex);
-
-                            if (item.category == CustomizationCategory.Ears)
-                            {
-                                // Apply the current skin color to the new ear material
-                                Material earMaterial = pair.renderer.materials[0];
-                                earMaterial.color = CurrentSkinColor;
-                                //Debug.Log("[PlayerCustomizationManager] Applied CurrentSkinColor to Ears: " + CurrentSkinColor);
-                            }
-                        }
-                    }
+                    meshFilter.sharedMesh = mesh;
                 }
             }
         }
 
-        private void ApplyInstantiateNew(CustomizationItem item, string key)
+        /// <summary>
+        /// Applies materials to a renderer, clearing existing materials and assigning new ones in order.
+        /// </summary>
+        private void ApplyMaterials(Renderer renderer, Material[] materials)
         {
-            List<GameObject> spawnedObjects = new List<GameObject>();
+            if (materials == null || materials.Length == 0) return;
 
-            foreach (var slot in item.slots)
-            {
-                List<RendererMaterialPair> pairs = GetRendererPairsById(slot.targetRendererId);
-
-                foreach (var pair in pairs)
-                {
-                    if (pair.renderer == null) continue;
-
-                    // Create new GameObject at the attachment point
-                    GameObject newObj = new GameObject($"{item.itemName}_Instance");
-                    newObj.transform.SetParent(pair.renderer.transform, false);
-                    newObj.transform.localPosition = Vector3.zero;
-                    newObj.transform.localRotation = Quaternion.identity;
-                    newObj.transform.localScale = Vector3.one;
-
-                    // Add appropriate renderer and assign mesh/material
-                    if (slot.mesh != null)
-                    {
-                        MeshFilter meshFilter = newObj.AddComponent<MeshFilter>();
-                        MeshRenderer meshRenderer = newObj.AddComponent<MeshRenderer>();
-
-                        meshFilter.mesh = slot.mesh;
-                        meshRenderer.material = slot.material;
-                    }
-
-                    spawnedObjects.Add(newObj);
-                }
-            }
-
-            instantiatedObjects[key] = spawnedObjects;
-        }
-
-        private void ApplyMaterialToRenderer(Renderer renderer, Material material, int materialIndex)
-        {
-            if (materialIndex == -1)
-            {
-                // Replace ALL materials
-                Material[] materials = renderer.materials;
-                for (int i = 0; i < materials.Length; i++)
-                {
-                    materials[i] = material;
-                }
-                renderer.materials = materials;
-            }
-            else
-            {
-                // Replace SPECIFIC material index
-                Material[] materials = renderer.materials;
-                if (materialIndex < materials.Length)
-                {
-                    
-                    materials[materialIndex] = material;
-                    renderer.materials = materials;
-                }
-            }
+            renderer.sharedMaterials = materials;
         }
 
         #endregion
 
         #region Restoration Methods
-
+        /// <summary>
+        /// Restores default mesh and materials for the slots used by an item.
+        /// </summary>
         private void RestoreDefaults(CustomizationItem item)
         {
             foreach (var slot in item.slots)
             {
-                List<RendererMaterialPair> pairs = GetRendererPairsById(slot.targetRendererId);
+                Renderer renderer = GetRendererById(slot.targetRendererId);
+                if (renderer == null) continue;
 
-                if (item.category == CustomizationCategory.SkinColor)
+                // Find the default configuration for this renderer ID
+                DefaultRendererData defaultData = defaultConfigurations.Find(d => d.rendererId == slot.targetRendererId);
+
+                if (defaultData == null)
                 {
-                    CurrentSkinColor = Color.white;
-                    //Debug.Log("[PlayerCustomizationManager] Updated CurrentSkinColor to " + CurrentSkinColor);
-
-                    if (rendererLookup.ContainsKey(RendererID.Ears))
-                    {
-                        foreach (var earPair in rendererLookup[RendererID.Ears])
-                        {
-                            if (earPair.renderer != null)
-                            {
-                                Material earMaterial = earPair.renderer.materials[0];
-                                earMaterial.color = CurrentSkinColor;
-                                //Debug.Log("[PlayerCustomizationManager] Applied CurrentSkinColor to Ears: " + CurrentSkinColor);
-                            }
-                        }
-                    }
+                    Debug.LogWarning($"No default configuration found for renderer ID '{slot.targetRendererId}'.");
+                    continue;
                 }
 
-                foreach (var pair in pairs)
+                // Restore based on the item's application mode
+                switch (item.applicationMode)
                 {
-                    if (pair.renderer == null) continue;
-
-                    // Find the default configuration that contains this renderer/material pair
-                    DefaultCustomizationData defaultConfig = null;
-                    DefaultRendererData defaultRendererData = null;
-
-                    foreach (var config in defaultConfigurations)
-                    {
-                        defaultRendererData = config.defaultRendererData.Find(d =>
-                            d.renderer == pair.renderer && d.materialIndex == pair.materialIndex);
-
-                        if (defaultRendererData != null)
-                        {
-                            defaultConfig = config;
-                            break;
-                        }
-                    }
-
-                    if (defaultConfig == null || defaultRendererData == null)
-                    {
-                        Debug.LogWarning($"No default configuration found for renderer '{pair.renderer.name}' at material index {pair.materialIndex}.");
-                        continue;
-                    }
-
-                    bool isAccessory = item.category == CustomizationCategory.Glasses
-                                        || item.category == CustomizationCategory.Hats;
-
-                    // Handle SkinnedMeshRenderer
-                    if (pair.renderer is SkinnedMeshRenderer skinnedRenderer)
-                    {
-                        if (isAccessory || defaultRendererData.defaultMesh != null)
-                        {
-                            skinnedRenderer.sharedMesh = defaultRendererData.defaultMesh;
-                        }
-
-                        if (isAccessory || defaultRendererData.defaultMaterial != null)
-                        {
-                            ApplyMaterialToRenderer(pair.renderer, defaultRendererData.defaultMaterial, pair.materialIndex);
-                        }
-                    }
-                    // Handle MeshRenderer
-                    else if (pair.renderer is MeshRenderer meshRenderer)
-                    {
-                        MeshFilter meshFilter = meshRenderer.GetComponent<MeshFilter>();
-
-                        if (isAccessory || (meshFilter != null && defaultRendererData.defaultMesh != null))
-                        {
-                            meshFilter.mesh = defaultRendererData.defaultMesh;
-                        }
-
-                        if (isAccessory || defaultRendererData.defaultMaterial != null)
-                        {
-                            ApplyMaterialToRenderer(pair.renderer, defaultRendererData.defaultMaterial, pair.materialIndex);
-
-                            if (item.category == CustomizationCategory.Ears)
-                            {
-                                Material earMaterial = pair.renderer.materials[0];
-                                earMaterial.color = CurrentSkinColor;
-                                //Debug.Log("[PlayerCustomizationManager] Applied CurrentSkinColor to Ears: " + CurrentSkinColor);
-                            } 
-                        }
-                    }
+                    case ApplicationMode.SwapMeshOnly:
+                        ApplyMesh(renderer, defaultData.mesh);
+                        break;
+                    case ApplicationMode.SwapMaterialOnly:
+                        ApplyMaterials(renderer, defaultData.materials);
+                        break;
+                    case ApplicationMode.SwapMeshAndMaterial:
+                        ApplyMesh(renderer, defaultData.mesh);
+                        ApplyMaterials(renderer, defaultData.materials);
+                        break;
                 }
             }
         }
-
-        private void DestroyInstantiatedObjects(string key)
-        {
-            if (!instantiatedObjects.ContainsKey(key)) return;
-
-            foreach (GameObject obj in instantiatedObjects[key])
-            {
-                if (obj != null)
-                {
-                    Destroy(obj);
-                }
-            }
-
-            instantiatedObjects.Remove(key);
-        }
-
         #endregion
 
         #region Networking Methods
-
         /// <summary>
-        /// Called when the SyncVar changes. Applies customization from other players.
+        /// Called when the SyncList changes. Applies customization from other players.
         /// </summary>
-        private void OnCustomizationSynced(int[] prev, int[] next, bool asServer)
+        private void OnCustomizationSynced(SyncListOperation op, int index, int oldItem, int newItem, bool asServer)
         {
-            // FIXED: Only apply if we're not the owner
-            if (!base.Owner.IsLocalClient && next != null && next.Length > 0)
+            // Only apply if we're not the owner
+            if (!Owner.IsLocalClient && m_syncedCustomizationIndices.Count > 0)
             {
-                //Debug.Log($"[PlayerCustomizationManager] OnCustomizationSynced called - applying {next.Length} items");
-                ApplyNetworkedCustomization(next);
-                hasInitializedCustomization = true;
+                ApplyNetworkedCustomization();
             }
         }
 
@@ -727,7 +472,7 @@ namespace RooseLabs.Player.Customization
         private void BroadcastCustomization()
         {
             // Only the owner should broadcast
-            if (!base.Owner.IsLocalClient)
+            if (!Owner.IsLocalClient)
             {
                 Debug.LogWarning("[PlayerCustomizationManager] Only the owner can broadcast customization.");
                 return;
@@ -735,8 +480,6 @@ namespace RooseLabs.Player.Customization
 
             // Convert current equipped items to index array
             int[] indices = GetEquippedItemIndices();
-
-            //Debug.Log($"[PlayerCustomizationManager] Broadcasting customization: {indices.Length} items");
 
             // Send to server using ServerRpc
             ServerReceiveCustomization(indices);
@@ -748,16 +491,15 @@ namespace RooseLabs.Player.Customization
         [ServerRpc(RequireOwnership = true)]
         private void ServerReceiveCustomization(int[] indices)
         {
-            //Debug.Log($"[PlayerCustomizationManager] Server received customization from client: {indices.Length} items");
-
-            // Update the SyncVar - this automatically syncs to all clients including potencial late joiners
-            syncedCustomizationIndices.Value = indices;
+            // Update the SyncList - this automatically syncs to all clients including potential late joiners
+            m_syncedCustomizationIndices.Clear();
+            m_syncedCustomizationIndices.AddRange(indices);
         }
 
         /// <summary>
         /// Applies customization received from the network.
         /// </summary>
-        private void ApplyNetworkedCustomization(int[] indices)
+        private void ApplyNetworkedCustomization()
         {
             if (itemDatabase == null)
             {
@@ -765,13 +507,11 @@ namespace RooseLabs.Player.Customization
                 return;
             }
 
-            //Debug.Log($"[PlayerCustomizationManager] Applying networked customization: {indices.Length} items");
-
             // Clear current customization (but don't save - this is from network)
             RemoveAllItemsWithoutSaving();
 
             // Apply each item by index
-            foreach (int index in indices)
+            foreach (int index in m_syncedCustomizationIndices)
             {
                 CustomizationItem item = itemDatabase[index];
 
@@ -791,11 +531,11 @@ namespace RooseLabs.Player.Customization
         /// </summary>
         private int[] GetEquippedItemIndices()
         {
-            if (itemDatabase == null) return new int[0];
+            if (itemDatabase == null) return Array.Empty<int>();
 
             List<int> indices = new List<int>();
 
-            foreach (var kvp in equippedItems)
+            foreach (var kvp in m_equippedItems)
             {
                 int index = itemDatabase.IndexOf(kvp.Value);
                 if (index >= 0)
@@ -808,7 +548,7 @@ namespace RooseLabs.Player.Customization
         }
 
         /// <summary>
-        /// Equips an item without saving or broadcasting (used for networked sync).
+        /// Equips an item without saving or broadcasting (used for networked sync and loading).
         /// </summary>
         private void EquipItemWithoutSaving(CustomizationItem item)
         {
@@ -817,27 +557,16 @@ namespace RooseLabs.Player.Customization
             string key = item.GetEquipmentKey();
 
             // Remove existing item in this slot
-            if (equippedItems.ContainsKey(key))
+            if (m_equippedItems.ContainsKey(key))
             {
                 RemoveItemWithoutSaving(key);
             }
 
             // Apply the item based on its application mode
-            switch (item.applicationMode)
-            {
-                case ApplicationMode.SwapMaterialOnly:
-                    ApplySwapMaterialOnly(item);
-                    break;
-                case ApplicationMode.SwapMeshAndMaterial:
-                    ApplySwapMeshAndMaterial(item);
-                    break;
-                case ApplicationMode.InstantiateNew:
-                    ApplyInstantiateNew(item, key);
-                    break;
-            }
+            ApplyItem(item);
 
             // Track the equipped item
-            equippedItems[key] = item;
+            m_equippedItems[key] = item;
             UpdateDebugList();
         }
 
@@ -846,27 +575,12 @@ namespace RooseLabs.Player.Customization
         /// </summary>
         private void RemoveItemWithoutSaving(string key)
         {
-            if (!equippedItems.ContainsKey(key)) return;
+            if (!m_equippedItems.TryGetValue(key, out var item)) return;
 
-            CustomizationItem item = equippedItems[key];
+            // Restore defaults for the slots used by this item
+            RestoreDefaults(item);
 
-            bool isAccessory = item.category == CustomizationCategory.Glasses
-                                || item.category == CustomizationCategory.Hats;
-
-            // Handle removal based on application mode
-            switch (item.applicationMode)
-            {
-                case ApplicationMode.SwapMaterialOnly:
-                case ApplicationMode.SwapMeshAndMaterial:
-                    if(isAccessory)
-                        RestoreDefaults(item);
-                    break;
-                case ApplicationMode.InstantiateNew:
-                    DestroyInstantiatedObjects(key);
-                    break;
-            }
-
-            equippedItems.Remove(key);
+            m_equippedItems.Remove(key);
             UpdateDebugList();
         }
 
@@ -875,17 +589,15 @@ namespace RooseLabs.Player.Customization
         /// </summary>
         private void RemoveAllItemsWithoutSaving()
         {
-            List<string> keys = new List<string>(equippedItems.Keys);
+            List<string> keys = new List<string>(m_equippedItems.Keys);
             foreach (string key in keys)
             {
                 RemoveItemWithoutSaving(key);
             }
         }
-
         #endregion
 
         #region Helper Methods
-
         private string GetEquipmentKey(CustomizationCategory category, string subCategory)
         {
             if (!string.IsNullOrEmpty(subCategory))
@@ -895,34 +607,14 @@ namespace RooseLabs.Player.Customization
             return category.ToString();
         }
 
-        private void ValidateDefaultConfigurations()
-        {
-            foreach (var config in defaultConfigurations)
-            {
-                if (!config.IsValid())
-                {
-                    Debug.LogWarning($"Invalid default configuration detected. Check PlayerCustomizationManager on '{gameObject.name}'.");
-                }
-
-                foreach (var rendererData in config.defaultRendererData)
-                {
-                    if (rendererData.renderer == null)
-                    {
-                        Debug.LogWarning($"Default configuration has null renderer. Check PlayerCustomizationManager on '{gameObject.name}'.");
-                    }
-                }
-            }
-        }
-
         private void UpdateDebugList()
         {
             equippedItemNames.Clear();
-            foreach (var kvp in equippedItems)
+            foreach (var kvp in m_equippedItems)
             {
                 equippedItemNames.Add($"{kvp.Key}: {kvp.Value.itemName}");
             }
         }
-
         #endregion
     }
 }

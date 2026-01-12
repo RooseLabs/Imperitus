@@ -6,6 +6,7 @@ using RooseLabs.Utils;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Toggle = RooseLabs.UI.Elements.Toggle;
 using Logger = RooseLabs.Core.Logger;
 
 namespace RooseLabs.Player.Customization
@@ -49,6 +50,7 @@ namespace RooseLabs.Player.Customization
         [SerializeField] private UICustomizationCategory[] categories;
 
         private readonly List<GameObject> m_itemButtons = new();
+        private readonly List<Toggle> m_categoryTabs = new();
         private bool m_isFirstTimeOpening = true;
         private PlayerCustomizationManager m_customizationManager;
 
@@ -61,7 +63,7 @@ namespace RooseLabs.Player.Customization
             }
         }
 
-        private void Start()
+        private void CreateCategoryTabs()
         {
             // Create category tabs
             foreach (var uiCategory in categories)
@@ -72,11 +74,15 @@ namespace RooseLabs.Player.Customization
                 {
                     tabText.text = uiCategory.category.ToString();
                 }
-                Button tabButton = tabObj.GetComponent<Button>();
-                if (tabButton)
+                Toggle tabToggle = tabObj.GetComponent<Toggle>();
+                if (tabToggle)
                 {
-                    tabButton.targetGraphic.color = uiCategory.color;
-                    tabButton.onClick.AddListener(() => OpenCategory(uiCategory));
+                    tabToggle.targetGraphic.color = uiCategory.color;
+                    tabToggle.onValueChanged.AddListener((isToggled) =>
+                    {
+                        if (isToggled) OpenCategory(uiCategory, tabToggle);
+                    });
+                    m_categoryTabs.Add(tabToggle);
                 }
             }
         }
@@ -86,7 +92,12 @@ namespace RooseLabs.Player.Customization
             FindCustomizationManager();
             if (m_isFirstTimeOpening)
             {
-                OpenCategory(categories[0]);
+                CreateCategoryTabs();
+                // Toggle on the first tab
+                if (m_categoryTabs.Count > 0)
+                {
+                    m_categoryTabs[0].IsOn = true;
+                }
                 m_isFirstTimeOpening = false;
             }
             gameObject.SetActive(true);
@@ -97,8 +108,20 @@ namespace RooseLabs.Player.Customization
             gameObject.SetActive(false);
         }
 
-        private void OpenCategory(UICustomizationCategory uiCategory)
+        private void OpenCategory(UICustomizationCategory uiCategory, Toggle activeToggle = null)
         {
+            // Untoggle all other tabs
+            if (activeToggle)
+            {
+                foreach (var otherTab in m_categoryTabs)
+                {
+                    if (otherTab != activeToggle && otherTab.IsOn)
+                    {
+                        otherTab.SetIsOn(false, false);
+                    }
+                }
+            }
+
             categoryTitleText.text = uiCategory.category.ToString();
             foreach (var graphic in categoryTitleBackgrounds)
             {

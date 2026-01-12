@@ -148,8 +148,8 @@ GameObject:
   - component: {fileID: 4938920090096466582}
   - component: {fileID: 531370630777218709}
   - component: {fileID: 2639484071470912199}
-  - component: {fileID: 4659653827150652375}
   - component: {fileID: 2929254101101929949}
+  - component: {fileID: 8858871453729047020}
   m_Layer: 5
   m_Name: CustomizationCategoryTab
   m_TagString: Untagged
@@ -215,7 +215,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 3
---- !u!114 &4659653827150652375
+--- !u!114 &2929254101101929949
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -224,9 +224,24 @@ MonoBehaviour:
   m_GameObject: {fileID: 7991021289796331133}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 148c5ff6e43e420cbf3043fd0fe78692, type: 3}
+  m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.UI.Elements.TextButton
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Outline
+  m_EffectColor: {r: 0, g: 0, b: 0, a: 1}
+  m_EffectDistance: {x: 1.5, y: -1.5}
+  m_UseGraphicAlpha: 1
+--- !u!114 &8858871453729047020
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7991021289796331133}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 560387673a2f1464890b311268c5303c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.UI.Elements.TextToggle
   m_Navigation:
     m_Mode: 3
     m_WrapAround: 0
@@ -256,9 +271,11 @@ MonoBehaviour:
     m_DisabledTrigger: Disabled
   m_Interactable: 1
   m_TargetGraphic: {fileID: 2639484071470912199}
-  m_OnClick:
+  m_IsOn: 0
+  m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
+  m_toggledOnState: 3
   m_TextTransition:
     m_TargetText: {fileID: 2836234944088886631}
     m_TextColors:
@@ -278,18 +295,3 @@ MonoBehaviour:
       m_SizeDuration: 0.1
     m_AutoFitMode: 0
     m_AutoFitPadding: {x: 0, y: 0}
---- !u!114 &2929254101101929949
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7991021289796331133}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Outline
-  m_EffectColor: {r: 0, g: 0, b: 0, a: 1}
-  m_EffectDistance: {x: 1.5, y: -1.5}
-  m_UseGraphicAlpha: 1

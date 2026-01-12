@@ -9,7 +9,7 @@ namespace RooseLabs.Player.Customization
     [Serializable]
     public class CustomizationSaveData
     {
-        public List<EquippedItemData> equippedItems = new List<EquippedItemData>();
+        public List<EquippedItemData> equippedItems = new();
 
         /// <summary>
         /// Converts the save data to an array of indices for network transmission.
@@ -45,7 +45,7 @@ namespace RooseLabs.Player.Customization
     [Serializable]
     public class EquippedItemData
     {
-        public int itemIndex;           // Index in the database
-        public string equipmentKey;     // Category or Category_Subcategory
+        public int itemIndex;        // Index in the database
+        public string equipmentKey;  // Category or Category_Subcategory
     }
 }

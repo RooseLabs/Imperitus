@@ -13,14 +13,10 @@ MonoBehaviour:
   m_Name: Ear3
   m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.ScriptableObjects.CustomizationItem
   category: 3
-  applicationMode: 1
+  applicationMode: 0
   slots:
   - mesh: {fileID: -3525559952214489829, guid: d4661e9eea52fb34794de2c448187555, type: 3}
-    material: {fileID: 2100000, guid: b91701fc91203014cab146ff617e8274, type: 2}
+    materials: []
     targetRendererId: 3
   itemName: Elf Ears
-  description: 'Yup, this is elf Ears.
-
-'
   icon: {fileID: 21300000, guid: d3369dec8dd6e4d44ab4f8c1aaea47f4, type: 3}
-  femaleOutfitFix: 0

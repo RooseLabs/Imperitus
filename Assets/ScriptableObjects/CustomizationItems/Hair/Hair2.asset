@@ -13,12 +13,11 @@ MonoBehaviour:
   m_Name: Hair2
   m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.ScriptableObjects.CustomizationItem
   category: 0
-  applicationMode: 0
+  applicationMode: 2
   slots:
   - mesh: {fileID: -2439352532998724759, guid: d4661e9eea52fb34794de2c448187555, type: 3}
-    material: {fileID: 2100000, guid: 7c27c6bd958f1a2429927e99685f5574, type: 2}
+    materials:
+    - {fileID: 2100000, guid: 7c27c6bd958f1a2429927e99685f5574, type: 2}
     targetRendererId: 0
   itemName: Hair2
-  description: Boy Hair
   icon: {fileID: 21300000, guid: 4549754008b61264b825e3fdd0610dca, type: 3}
-  femaleOutfitFix: 0
