@@ -20,6 +20,7 @@ namespace RooseLabs.Player.Customization
         {
             public CustomizationCategory category;
             public Color color;
+            public Sprite icon;
         }
 
         [Header("References")]
@@ -69,18 +70,29 @@ namespace RooseLabs.Player.Customization
             foreach (var uiCategory in categories)
             {
                 GameObject tabObj = Instantiate(categoryTabPrefab, tabContainer);
-                TMP_Text tabText = tabObj.GetComponentInChildren<TMP_Text>();
-                if (tabText)
+                if (tabObj.TryGetComponent(out Toggle tabToggle) && tabObj.TryGetComponent(out Image backgroundImage))
                 {
-                    tabText.text = uiCategory.category.ToString();
-                }
-                Toggle tabToggle = tabObj.GetComponent<Toggle>();
-                if (tabToggle)
-                {
-                    tabToggle.targetGraphic.color = uiCategory.color;
+                    backgroundImage.color = uiCategory.color;
+                    if (tabObj.transform.childCount > 0 && tabObj.transform.GetChild(0).TryGetComponent(out Image icon))
+                    {
+                        icon.sprite = uiCategory.icon;
+                    }
+                    tabToggle.colors = new ColorBlock
+                    {
+                        normalColor = new Color(uiCategory.color.r * 0.7f, uiCategory.color.g * 0.7f, uiCategory.color.b * 0.7f, 1f),
+                        highlightedColor = Color.black,
+                        pressedColor = Color.black,
+                        selectedColor = Color.black,
+                        disabledColor = Color.black,
+                        colorMultiplier = 1f,
+                        fadeDuration = 0.1f
+                    };
                     tabToggle.onValueChanged.AddListener((isToggled) =>
                     {
-                        if (isToggled) OpenCategory(uiCategory, tabToggle);
+                        if (isToggled)
+                        {
+                            OpenCategory(uiCategory, tabToggle);
+                        }
                     });
                     m_categoryTabs.Add(tabToggle);
                 }

@@ -382,12 +382,10 @@ namespace RooseLabs.Player.Customization
         }
 
         /// <summary>
-        /// Applies a mesh to a renderer.
+        /// Applies a mesh to a renderer. Null values will clear the mesh.
         /// </summary>
         private void ApplyMesh(Renderer renderer, Mesh mesh)
         {
-            if (mesh == null) return;
-
             if (renderer is SkinnedMeshRenderer skinnedRenderer)
             {
                 skinnedRenderer.sharedMesh = mesh;
@@ -404,12 +402,11 @@ namespace RooseLabs.Player.Customization
 
         /// <summary>
         /// Applies materials to a renderer, clearing existing materials and assigning new ones in order.
+        /// Null or empty array will clear all materials.
         /// </summary>
         private void ApplyMaterials(Renderer renderer, Material[] materials)
         {
-            if (materials == null || materials.Length == 0) return;
-
-            renderer.sharedMaterials = materials;
+            renderer.sharedMaterials = materials ?? Array.Empty<Material>();
         }
 
         #endregion
@@ -434,20 +431,9 @@ namespace RooseLabs.Player.Customization
                     continue;
                 }
 
-                // Restore based on the item's application mode
-                switch (item.applicationMode)
-                {
-                    case ApplicationMode.SwapMeshOnly:
-                        ApplyMesh(renderer, defaultData.mesh);
-                        break;
-                    case ApplicationMode.SwapMaterialOnly:
-                        ApplyMaterials(renderer, defaultData.materials);
-                        break;
-                    case ApplicationMode.SwapMeshAndMaterial:
-                        ApplyMesh(renderer, defaultData.mesh);
-                        ApplyMaterials(renderer, defaultData.materials);
-                        break;
-                }
+                // Always restore both mesh and materials regardless of application mode
+                ApplyMesh(renderer, defaultData.mesh);
+                ApplyMaterials(renderer, defaultData.materials);
             }
         }
         #endregion
