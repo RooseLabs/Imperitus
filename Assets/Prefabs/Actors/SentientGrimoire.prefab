@@ -5460,7 +5460,7 @@ MonoBehaviour:
   _componentIndexCache: 0
   _addedNetworkObject: {fileID: 4866373312013150636}
   _networkObjectCache: {fileID: 4866373312013150636}
-  maxHealth: 1
+  maxHealth: 50
   attackDamage: 0
   navAgent: {fileID: 2039317095261099087}
   animator: {fileID: 0}
@@ -5470,6 +5470,7 @@ MonoBehaviour:
   spotlightTransform: {fileID: 7769504255186393303}
   coneVisualizer: {fileID: 1055448732173619223}
   patrolRoute: {fileID: 0}
+  soundEmitter: {fileID: 0}
   patrolSpeed: 2
   trackingSpeed: 1.5
   startWaypointIndex: 0
