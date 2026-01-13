@@ -151,7 +151,7 @@ namespace RooseLabs.Gameplay
                 if (CurrentAttemptNumber >= MaxAttemptsPerAssignment)
                 {
                     // Failed assignment
-                    GUIManager.Instance.PlayCutscene(
+                    PlayCutscene_ObserversRpc(
                         "You have failed to complete your assignment in time.",
                         "Your Magic Theory Professor is disappointed.",
                         "You have been given a new assignment."
@@ -160,7 +160,7 @@ namespace RooseLabs.Gameplay
                 }
                 else
                 {
-                    GUIManager.Instance.PlayCutscene(
+                    PlayCutscene_ObserversRpc(
                         "You have returned to the dormitory.",
                         "Your current assignment is still pending.",
                         $"You have <color=#FF0000>{MaxAttemptsPerAssignment - CurrentAttemptNumber} attempts</color> " +
@@ -191,7 +191,7 @@ namespace RooseLabs.Gameplay
                 // If assignment is null, we are likely in a new game session.
                 // Instead of starting a heist, we should show a cutscene and generate the first assignment.
                 GenerateNewAssignment();
-                GUIManager.Instance.PlayCutscene(
+                PlayCutscene_ObserversRpc(
                     "Your Magic Theory Professor has given you a new assignment:",
                     $"<i>{TaskDatabase[CurrentAssignment!.tasks[0]].Description}</i>",
                     "You have <color=#FF0000>3 days</color> until the deadline to complete this assignment."
@@ -245,6 +245,12 @@ namespace RooseLabs.Gameplay
         private static string GetSceneName(string fullPath)
         {
             return Path.GetFileNameWithoutExtension(fullPath);
+        }
+
+        [ObserversRpc(RunLocally = true)]
+        private void PlayCutscene_ObserversRpc(string line1, string line2, string line3)
+        {
+            GUIManager.Instance.PlayCutscene(line1, line2, line3);
         }
     }
 }

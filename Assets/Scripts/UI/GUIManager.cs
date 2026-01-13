@@ -51,6 +51,7 @@ namespace RooseLabs.UI
             }
             else if (character.Input.openNotebookWasPressed)
             {
+                if (character.Data.isDead) return;
                 OpenWindow(notebookUIController);
             }
             else if (character.Input.pauseWasPressed)

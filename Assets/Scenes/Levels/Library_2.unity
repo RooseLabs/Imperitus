@@ -17082,7 +17082,7 @@ GameObject:
   - component: {fileID: 1003785718}
   - component: {fileID: 1003785721}
   - component: {fileID: 1003785720}
-  - component: {fileID: 1003785719}
+  - component: {fileID: 1003785722}
   m_Layer: 7
   m_Name: FloorStairsCorridor.001
   m_TagString: Untagged
@@ -17105,27 +17105,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1911735433}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &1003785719
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1003785717}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 41.551407, y: 13.67358, z: 0.21969791}
-  m_Center: {x: 0.14126778, y: 0.38965273, z: -0.00021817535}
 --- !u!23 &1003785720
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -17182,6 +17161,28 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1003785717}
+  m_Mesh: {fileID: 75927262817369530, guid: bed588565a067944291c12700acd6bd3, type: 3}
+--- !u!64 &1003785722
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1003785717}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
   m_Mesh: {fileID: 75927262817369530, guid: bed588565a067944291c12700acd6bd3, type: 3}
 --- !u!1 &1010896182
 GameObject:

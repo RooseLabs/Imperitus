@@ -221,8 +221,9 @@ namespace RooseLabs.Player
 
         private void HandlePlayerDeath(DamageInfo? damage = null)
         {
-            this.LogInfo($"Player '{Player.PlayerName}' died!");
+            if (Data.isDead) return;
             Data.isDead = true;
+            this.LogInfo($"Player '{Player.PlayerName}' died!");
             Items.DropCurrentItem();
 
             // Play death announcer sound for all players
@@ -300,6 +301,7 @@ namespace RooseLabs.Player
                 Data.isDead = false;
             }
             VoiceChat.RestartClient();
+            StartCoroutine(VoiceChatRestartCoroutine());
             if (IsOwner)
             {
                 CameraController.Instance.ResetPosition();
@@ -308,6 +310,12 @@ namespace RooseLabs.Player
             Items.DestroyCurrentItem();
             // Reset the runes in the notebook
             Notebook.ResetNotebook();
+        }
+
+        private IEnumerator VoiceChatRestartCoroutine(float delay = 2.0f)
+        {
+            yield return new WaitForSeconds(delay);
+            VoiceChat.RestartClient();
         }
 
         #region IPetrifiable Implementation

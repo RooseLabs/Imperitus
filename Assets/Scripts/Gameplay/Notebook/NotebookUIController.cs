@@ -80,7 +80,7 @@ namespace RooseLabs.Gameplay.Notebook
             if (NotebookManager.Instance != null)
             {
                 NotebookManager.Instance.OnAssignmentDataChanged += RefreshAssignmentPage;
-                NotebookManager.Instance.OnSpellLoadoutLockChanged += OnSpellLoadoutLockChanged; // Add this
+                NotebookManager.Instance.OnSpellLoadoutLockChanged += OnSpellLoadoutLockChanged;
             }
 
             if (m_localPlayerNotebook != null)
@@ -408,9 +408,9 @@ namespace RooseLabs.Gameplay.Notebook
 
                 int slotIndex;
 
-                if (m_runeIndexToSlotIndex.ContainsKey(runeIndex))
+                if (m_runeIndexToSlotIndex.TryGetValue(runeIndex, out var indexValue))
                 {
-                    slotIndex = m_runeIndexToSlotIndex[runeIndex];
+                    slotIndex = indexValue;
                 }
                 else
                 {
