@@ -205,7 +205,7 @@ namespace RooseLabs.Gameplay
 
         private void OnSpellCast(SpellSO spell)
         {
-            if (CurrentAssignment == null) return;
+            // if (CurrentAssignment == null) return;
             if (IsServerInitialized)
             {
                 OnSpellCast_Internal(spell);
