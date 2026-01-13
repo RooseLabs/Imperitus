@@ -1391,6 +1391,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1697552118}
     - target: {fileID: 51769672726437127, guid: 7140b76d12e111944af61aadcbdc70fa, type: 3}
+      propertyPath: 'heistScenes.Array.data[0]'
+      value: Assets/Scenes/Levels/Library_2.unity
+      objectReference: {fileID: 0}
+    - target: {fileID: 51769672726437127, guid: 7140b76d12e111944af61aadcbdc70fa, type: 3}
       propertyPath: m_tutorialRuneBookSpawnPositions.Array.size
       value: 3
       objectReference: {fileID: 0}
