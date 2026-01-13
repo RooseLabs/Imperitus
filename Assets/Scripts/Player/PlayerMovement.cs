@@ -269,7 +269,7 @@ namespace RooseLabs.Player
 
         private void HandleLookInput()
         {
-            float lookSensitivity = InputHandler.CurrentInputScheme == InputScheme.KeyboardMouse ? 0.1f : 0.4f;
+            float lookSensitivity = InputHandler.CurrentInputScheme == InputScheme.KeyboardMouse ? 0.1f : 0.8f;
             Vector2 delta = m_character.Input.lookInput * lookSensitivity;
             m_character.Data.lookValues += delta;
             m_character.Data.lookValues.y = Mathf.Clamp(m_character.Data.lookValues.y, -85f, 85f);

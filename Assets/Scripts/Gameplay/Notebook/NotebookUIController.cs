@@ -293,28 +293,28 @@ namespace RooseLabs.Gameplay.Notebook
             }
 
             // Clear existing task images
-            if (assignmentTaskImagesContainer != null)
-            {
-                foreach (Transform child in assignmentTaskImagesContainer)
-                {
-                    Destroy(child.gameObject);
-                }
-
-                // Populate task images
-                foreach (var taskId in assignmentData.tasks)
-                {
-                    var task = GameManager.Instance.TaskDatabase[taskId];
-                    if (task.Image != null)
-                    {
-                        GameObject imageObj = new GameObject("TaskImage");
-                        imageObj.transform.SetParent(assignmentTaskImagesContainer, false);
-
-                        Image img = imageObj.AddComponent<Image>();
-                        img.sprite = task.Image;
-                        img.preserveAspect = true;
-                    }
-                }
-            }
+            // if (assignmentTaskImagesContainer != null)
+            // {
+            //     foreach (Transform child in assignmentTaskImagesContainer)
+            //     {
+            //         Destroy(child.gameObject);
+            //     }
+            //
+            //     // Populate task images
+            //     foreach (var taskId in assignmentData.tasks)
+            //     {
+            //         var task = GameManager.Instance.TaskDatabase[taskId];
+            //         if (task.Image != null)
+            //         {
+            //             GameObject imageObj = new GameObject("TaskImage");
+            //             imageObj.transform.SetParent(assignmentTaskImagesContainer, false);
+            //
+            //             Image img = imageObj.AddComponent<Image>();
+            //             img.sprite = task.Image;
+            //             img.preserveAspect = true;
+            //         }
+            //     }
+            // }
 
             //Debug.Log($"[NotebookUI] Assignment page refreshed with {assignmentData.tasks.Count} tasks");
         }

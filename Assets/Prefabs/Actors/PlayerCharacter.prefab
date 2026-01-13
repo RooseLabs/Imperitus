@@ -2195,7 +2195,7 @@ MonoBehaviour:
   crouchSpeed: 0.75
   crawlSpeed: 0.5
   jumpHeight: 0.5
-  sprintStaminaUsage: 20
+  sprintStaminaUsage: 15
   standingCollider: {fileID: 910997788957776308}
   crouchingCollider: {fileID: 1079084056669295952}
   crawlingCollider: {fileID: 5542213905719861265}
@@ -2342,7 +2342,7 @@ MonoBehaviour:
   - {fileID: 8664526776978465645}
   - {fileID: 6442695042307711170}
   - {fileID: 8476560507943759219}
-  - {fileID: 0}
+  - {fileID: 1061150272878122509}
   - {fileID: 2954016431569174323}
   - {fileID: 1046755158235027733}
   - {fileID: 7047589884357707370}
@@ -2357,7 +2357,7 @@ MonoBehaviour:
   _initializeOrder: 0
   _preventDespawnOnDisconnect: 0
   _defaultDespawnType: 0
-  _initializedTimestamp: -8584367189863762007
+  _initializedTimestamp: -8584333322910691944
   NetworkObserver: {fileID: 0}
   _enablePrediction: 0
   _predictionType: 1
@@ -2372,7 +2372,7 @@ MonoBehaviour:
   _spectatorInterpolation: 2
   _enableTeleport: 0
   _teleportThreshold: 1
-  <PrefabId>k__BackingField: 8
+  <PrefabId>k__BackingField: 14
   <SpawnableCollectionId>k__BackingField: 0
   <AssetPathHash>k__BackingField: 9876715584152176679
   SceneId: 0

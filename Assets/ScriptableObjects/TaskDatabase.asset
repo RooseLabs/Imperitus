@@ -14,13 +14,30 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RooseLabs.ScriptableObjects.TaskDatabase
   objects:
   - <Description>k__BackingField: Discover the runes that make up the Fireball spell.
-    <Image>k__BackingField: {fileID: 21300000, guid: 60439f2d6685ac849b08c5d45ef6a80d, type: 3}
+    <Image>k__BackingField: {fileID: 0}
     <CompletionCondition>k__BackingField:
       rid: 4843676729035194832
   - <Description>k__BackingField: Discover the runes that make up the Waterball spell.
-    <Image>k__BackingField: {fileID: 21300000, guid: 4f9b3087b431e8044ac77cac7053f318, type: 3}
+    <Image>k__BackingField: {fileID: 0}
     <CompletionCondition>k__BackingField:
       rid: 4843676773740445796
+  - <Description>k__BackingField: Discover the runes that make up the Bubbles spell.
+    <Image>k__BackingField: {fileID: 0}
+    <CompletionCondition>k__BackingField:
+      rid: 6300241507143909477
+  - <Description>k__BackingField: Discover the runes that make up the Petrificare
+      spell.
+    <Image>k__BackingField: {fileID: 0}
+    <CompletionCondition>k__BackingField:
+      rid: 6300241507143909478
+  - <Description>k__BackingField: Discover the runes that make up the Lux spell.
+    <Image>k__BackingField: {fileID: 0}
+    <CompletionCondition>k__BackingField:
+      rid: 6300241507143909479
+  - <Description>k__BackingField: Discover the runes that make up the Rain spell.
+    <Image>k__BackingField: {fileID: 0}
+    <CompletionCondition>k__BackingField:
+      rid: 6300241507143909480
   references:
     version: 2
     RefIds:
@@ -32,3 +49,19 @@ MonoBehaviour:
       type: {class: CastSpellCondition, ns: RooseLabs.ScriptableObjects, asm: Assembly-CSharp}
       data:
         <Spell>k__BackingField: {fileID: 11400000, guid: 5395674b563c12a4ca763b5eec6e5d3a, type: 2}
+    - rid: 6300241507143909477
+      type: {class: CastSpellCondition, ns: RooseLabs.ScriptableObjects, asm: Assembly-CSharp}
+      data:
+        <Spell>k__BackingField: {fileID: 11400000, guid: bd9f934d307ca23419ae0517338ca691, type: 2}
+    - rid: 6300241507143909478
+      type: {class: CastSpellCondition, ns: RooseLabs.ScriptableObjects, asm: Assembly-CSharp}
+      data:
+        <Spell>k__BackingField: {fileID: 11400000, guid: 3808283ffcedd4243a56c54099b26c1e, type: 2}
+    - rid: 6300241507143909479
+      type: {class: CastSpellCondition, ns: RooseLabs.ScriptableObjects, asm: Assembly-CSharp}
+      data:
+        <Spell>k__BackingField: {fileID: 11400000, guid: e16329852726f864e88c4748802a79bf, type: 2}
+    - rid: 6300241507143909480
+      type: {class: CastSpellCondition, ns: RooseLabs.ScriptableObjects, asm: Assembly-CSharp}
+      data:
+        <Spell>k__BackingField: {fileID: 11400000, guid: 3cfb3c1d3890e6f40a845c10a52e2b2f, type: 2}
