@@ -71,7 +71,7 @@ namespace RooseLabs.Gameplay
         {
             currentRequiredRunes.Clear();
 
-            if (CurrentAssignment == null)
+            if (CurrentAssignment.tasks == null)
                 return;
 
             foreach (var taskId in CurrentAssignment.tasks)

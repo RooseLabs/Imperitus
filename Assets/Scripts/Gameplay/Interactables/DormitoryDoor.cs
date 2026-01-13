@@ -22,7 +22,7 @@ namespace RooseLabs.Gameplay.Interactables
 
         public string GetInteractionText()
         {
-            return GameManager.Instance.CurrentAssignment != null ? "Start Heist" : "Go to class";
+            return GameManager.Instance.CurrentAssignment.tasks != null ? "Start Heist" : "Go to class";
         }
 
         private void PlayDoorSound()

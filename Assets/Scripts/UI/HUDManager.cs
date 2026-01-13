@@ -77,7 +77,7 @@ namespace RooseLabs.UI
                 prompt.SetActive(false);
             }
             if (!character) return;
-            if (character != PlayerCharacter.LocalCharacter)
+            if (character != PlayerCharacter.LocalCharacter || character.Data.isDead)
             {
                 foreach (var prompt in spectatePrompts)
                 {

@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using System;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -13,6 +13,7 @@ using RooseLabs.Network;
 using RooseLabs.Player;
 using RooseLabs.ScriptableObjects;
 using RooseLabs.UI;
+using RooseLabs.Utils;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -31,22 +32,50 @@ namespace RooseLabs.Gameplay
         [field: SerializeField] public TaskDatabase TaskDatabase { get; private set; }
         #endregion
 
+        #region Events
+        /// <summary>Invoked when the current assignment is changed or initialized</summary>
+        public event Action OnAssignmentChanged;
+        #endregion
+
         public static bool IsSinglePlayer => NetworkConnector.Instance.CurrentSessionJoinCode == null;
 
         public const int MaxAttemptsPerAssignment = 3;
         public int CurrentAttemptNumber { get; private set; } = 1;
 
         public SyncList<int> LearnedSpellsIndices { get; } = new() { 0 };
+        private readonly SyncVar<AssignmentData> m_currentAssignment = new();
 
         private HeistTimer m_heistTimer;
 
         public Scene CurrentScene => SceneManagement.SceneManager.Instance.CurrentOnlineScene;
-        public AssignmentData CurrentAssignment { get; private set; }
+
+        public AssignmentData CurrentAssignment
+        {
+            get => m_currentAssignment.Value;
+            private set => m_currentAssignment.Value = value;
+        }
 
         private void Awake()
         {
             Instance = this;
             TryGetComponent(out m_heistTimer);
+        }
+
+        public override void OnStartNetwork()
+        {
+            base.OnStartNetwork();
+            m_currentAssignment.OnChange += OnAssignmentSynced;
+        }
+
+        public override void OnStopNetwork()
+        {
+            base.OnStopNetwork();
+            m_currentAssignment.OnChange -= OnAssignmentSynced;
+        }
+
+        private void OnAssignmentSynced(AssignmentData prev, AssignmentData next, bool asServer)
+        {
+            OnAssignmentChanged?.Invoke();
         }
 
         private void OnEnable()
@@ -130,7 +159,7 @@ namespace RooseLabs.Gameplay
             }
 
             if (!IsServerInitialized) return;
-            if (CurrentAssignment == null) return;
+            if (CurrentAssignment.tasks == null) return;
             // If all tasks are complete, generate new assignment.
             bool allComplete = true;
             foreach (var taskId in CurrentAssignment.tasks)
@@ -177,23 +206,27 @@ namespace RooseLabs.Gameplay
         {
             CurrentAssignment = new AssignmentData
             {
-                assignmentNumber = CurrentAssignment != null ? CurrentAssignment.assignmentNumber + 1 : 1,
-                tasks = new List<int> { TaskDatabase.GetRandomIndex(t => !t.IsCompleted) }
+                assignmentNumber = CurrentAssignment.tasks != null ? CurrentAssignment.assignmentNumber + 1 : 1,
+                tasks = new[] { TaskDatabase.GetRandomIndex(t => !t.IsCompleted) }
             };
-            NotebookManager.Instance.InitializeAssignment(CurrentAssignment);
         }
 
         public void OnDormitoryDoorInteracted()
         {
             if (!IsServerInitialized) return;
-            if (CurrentAssignment == null)
+            if (CurrentAssignment.tasks == null)
             {
                 // If assignment is null, we are likely in a new game session.
                 // Instead of starting a heist, we should show a cutscene and generate the first assignment.
                 GenerateNewAssignment();
+                if (CurrentAssignment.tasks == null)
+                {
+                    this.LogError("Failed to generate new assignment on dormitory door interaction!");
+                    return;
+                }
                 PlayCutscene_ObserversRpc(
                     "Your Magic Theory Professor has given you a new assignment:",
-                    $"<i>{TaskDatabase[CurrentAssignment!.tasks[0]].Description}</i>",
+                    $"<i>{TaskDatabase[CurrentAssignment.tasks[0]].Description}</i>",
                     "You have <color=#FF0000>3 days</color> until the deadline to complete this assignment."
                 );
             }
@@ -205,7 +238,6 @@ namespace RooseLabs.Gameplay
 
         private void OnSpellCast(SpellSO spell)
         {
-            // if (CurrentAssignment == null) return;
             if (IsServerInitialized)
             {
                 OnSpellCast_Internal(spell);
@@ -218,7 +250,7 @@ namespace RooseLabs.Gameplay
 
         private void OnSpellCast_Internal(SpellSO spell)
         {
-            if (CurrentAssignment == null) return;
+            if (CurrentAssignment.tasks == null) return;
             foreach (var taskId in CurrentAssignment.tasks)
             {
                 var task = TaskDatabase[taskId];

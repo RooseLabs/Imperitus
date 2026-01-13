@@ -8,10 +8,10 @@ namespace RooseLabs.Gameplay.Notebook
     /// Shared across all players
     /// </summary>
     [Serializable]
-    public class AssignmentData
+    public struct AssignmentData
     {
         public int assignmentNumber;
-        public List<int> tasks = new();
+        public int[] tasks;
     }
 
     /// <summary>

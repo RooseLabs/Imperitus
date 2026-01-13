@@ -79,8 +79,12 @@ namespace RooseLabs.Gameplay.Notebook
             // Subscribe to data changes
             if (NotebookManager.Instance != null)
             {
-                NotebookManager.Instance.OnAssignmentDataChanged += RefreshAssignmentPage;
                 NotebookManager.Instance.OnSpellLoadoutLockChanged += OnSpellLoadoutLockChanged;
+            }
+
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.OnAssignmentChanged += RefreshAssignmentPage;
             }
 
             if (m_localPlayerNotebook != null)
@@ -103,8 +107,12 @@ namespace RooseLabs.Gameplay.Notebook
             // Unsubscribe from events
             if (NotebookManager.Instance != null)
             {
-                NotebookManager.Instance.OnAssignmentDataChanged -= RefreshAssignmentPage;
-                NotebookManager.Instance.OnSpellLoadoutLockChanged -= OnSpellLoadoutLockChanged; // Add this
+                NotebookManager.Instance.OnSpellLoadoutLockChanged -= OnSpellLoadoutLockChanged;
+            }
+
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.OnAssignmentChanged -= RefreshAssignmentPage;
             }
 
             if (m_localPlayerNotebook != null)
@@ -252,11 +260,11 @@ namespace RooseLabs.Gameplay.Notebook
 
         private void RefreshAssignmentPage()
         {
-            if (NotebookManager.Instance == null)
+            if (GameManager.Instance == null)
                 return;
 
-            var assignmentData = NotebookManager.Instance.GetCurrentAssignment();
-            if (assignmentData == null)
+            var assignmentData = GameManager.Instance.CurrentAssignment;
+            if (assignmentData.tasks == null)
             {
                 //Debug.LogWarning("[NotebookUI] No assignment data available");
                 return;
@@ -316,7 +324,7 @@ namespace RooseLabs.Gameplay.Notebook
             //     }
             // }
 
-            //Debug.Log($"[NotebookUI] Assignment page refreshed with {assignmentData.tasks.Count} tasks");
+            //Debug.Log($"[NotebookUI] Assignment page refreshed with {assignmentData.tasks.Length} tasks");
         }
 
         #endregion
@@ -591,7 +599,7 @@ namespace RooseLabs.Gameplay.Notebook
             if (collectedIndices.Count == 0)
                 return;
 
-            int newRuneIndex = collectedIndices[collectedIndices.Count - 1];
+            int newRuneIndex = collectedIndices[^1];
 
             // Check if we already placed this rune (either as collected or borrowed)
             if (m_runeIndexToSlotIndex.TryGetValue(newRuneIndex, out var existingSlotIndex))
