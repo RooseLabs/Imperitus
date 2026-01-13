@@ -10,6 +10,7 @@ namespace RooseLabs.Player
 {
     public class PlayerRagdoll : NetworkBehaviour
     {
+        [Serializable]
         private struct BoneTransform
         {
             public Vector3 Position;
@@ -61,8 +62,7 @@ namespace RooseLabs.Player
             m_collider = GetComponent<CapsuleCollider>();
 
             m_ragdollBodyparts = m_character.GetAllBodyparts().Where(bp => (bool)bp.Rigidbody).ToArray();
-            m_bones = HipsBone.parent.GetComponentsInChildren<Transform>();
-
+            m_bones = GetRagdollBonesFiltered();
             int boneCount = m_bones.Length;
             m_ragdollBoneTransforms = new BoneTransform[boneCount];
             m_interpolatedBoneTransforms = new BoneTransform[boneCount];
@@ -83,6 +83,16 @@ namespace RooseLabs.Player
                 PopulateAnimationStartBoneTransforms(s_faceDownStandUpBoneTransforms, false);
                 s_standUpAnimationsSampled = true;
             }
+        }
+
+        private Transform[] GetRagdollBonesFiltered()
+        {
+            return HipsBone.parent.GetComponentsInChildren<Transform>()
+                .Where(t => t.name.Contains("Def") ||
+                            t.name.Contains("Bone") ||
+                            t.name.Contains("ParentSkirt") ||
+                            t.name.Contains("CTRL"))
+                .ToArray();
         }
 
         public override void OnStartServer()

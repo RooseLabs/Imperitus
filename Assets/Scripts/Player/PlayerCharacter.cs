@@ -215,13 +215,13 @@ namespace RooseLabs.Player
             Data.Health -= damage.amount;
             if (Data.Health <= 0)
             {
-                Data.isDead = true;
                 if (IsServerInitialized && !Data.isDead)
                 {
                     HandlePlayerDeath(damage);
                 }
                 Items.DropCurrentItem();
                 this.LogInfo($"Player '{Player.PlayerName}' died!");
+                Data.isDead = true;
             }
         }
 
