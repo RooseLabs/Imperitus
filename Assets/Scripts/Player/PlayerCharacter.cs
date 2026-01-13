@@ -215,21 +215,20 @@ namespace RooseLabs.Player
             Data.Health -= damage.amount;
             if (Data.Health <= 0)
             {
-                if (IsServerInitialized && !Data.isDead)
-                {
-                    HandlePlayerDeath(damage);
-                }
-                Items.DropCurrentItem();
-                this.LogInfo($"Player '{Player.PlayerName}' died!");
-                Data.isDead = true;
+                HandlePlayerDeath(damage);
             }
         }
 
-        [Server]
         private void HandlePlayerDeath(DamageInfo? damage = null)
         {
-            // Play death announcer sound for all players (3D positional)
-            PlayDeathAnnouncerSound_ObserversRpc(transform.position);
+            this.LogInfo($"Player '{Player.PlayerName}' died!");
+            Data.isDead = true;
+            Items.DropCurrentItem();
+
+            // Play death announcer sound for all players
+            PlayDeathAnnouncerSound(transform.position);
+
+            if (!IsServerInitialized) return;
 
             if (GameManager.Instance.IsHeistOngoing)
             {
@@ -428,8 +427,7 @@ namespace RooseLabs.Player
         /// <summary>
         /// Plays the death announcer sound for all players (3D positional).
         /// </summary>
-        [ObserversRpc]
-        private void PlayDeathAnnouncerSound_ObserversRpc(Vector3 position)
+        private void PlayDeathAnnouncerSound(Vector3 position)
         {
             if (string.IsNullOrEmpty(deathAnnouncerSoundKey)) return;
             if (SoundManager.Instance == null || SoundManager.Instance.soundDatabase == null) return;

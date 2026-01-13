@@ -17,15 +17,15 @@ namespace RooseLabs.Settings
 
             // Register all settings
             Register(new MasterVolumeSetting());
-            Register(new RenderScaleSetting());
-            Register(new FrameRateLimitSetting());
-            Register(new VSyncSetting());
+            Register(new MicrophoneDeviceSetting());
             Register(new PushToTalkSetting());
+            Register(new ResolutionSetting());
+            Register(new WindowModeSetting());
+            Register(new VSyncSetting());
+            Register(new FrameRateLimitSetting());
             Register(new TextureQualitySetting());
             Register(new AntiAliasingSetting());
-            Register(new WindowModeSetting());
-            Register(new ResolutionSetting());
-            Register(new MicrophoneDeviceSetting());
+            Register(new RenderScaleSetting());
 
             s_initialized = true;
 

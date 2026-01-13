@@ -52,10 +52,16 @@ MonoBehaviour:
   lobbyScene: Assets/Scenes/Levels/Dormitory.unity
   heistScenes:
   - Assets/Scenes/Levels/Library_1.unity
+  - Assets/Scenes/Levels/Library_2.unity
   <RuneDatabase>k__BackingField: {fileID: 11400000, guid: 5e955f610ead9a946b30436dad306e3e, type: 2}
   <SpellDatabase>k__BackingField: {fileID: 11400000, guid: 9989f6ae5baf9cf40a61f0ef300f97fe, type: 2}
   <TaskDatabase>k__BackingField: {fileID: 11400000, guid: 3622dc21f1cf0be4783ca38e43c41d80, type: 2}
   enemySpawnManager: {fileID: 0}
+  tutorialTaskDisplayText: {fileID: 0}
+  tutorialTaskCompletionDelay: 2
+  m_imperoSpell: {fileID: 0}
+  m_runeBookPrefab: {fileID: 0}
+  m_tutorialRuneBookSpawnPositions: []
 --- !u!114 &6570541006987429080
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -100,6 +106,7 @@ MonoBehaviour:
   _initializeOrder: 0
   _preventDespawnOnDisconnect: 1
   _defaultDespawnType: 0
+  _initializedTimestamp: 0
   NetworkObserver: {fileID: 0}
   _enablePrediction: 0
   _predictionType: 0
@@ -117,7 +124,7 @@ MonoBehaviour:
   <PrefabId>k__BackingField: 65535
   <SpawnableCollectionId>k__BackingField: 0
   <AssetPathHash>k__BackingField: 13719158169703633065
-  <SceneId>k__BackingField: 0
+  SceneId: 0
   SerializedTransformProperties:
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0, w: 0}

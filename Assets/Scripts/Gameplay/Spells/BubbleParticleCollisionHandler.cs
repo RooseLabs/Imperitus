@@ -9,44 +9,29 @@ namespace RooseLabs.Gameplay.Spells
         [SerializeField] private string popSoundKey = "Bubble_Pop";
 
         private ParticleSystem m_particleSystem;
-        private Bubbles m_bubblesSpell;
         private readonly List<ParticleCollisionEvent> m_collisionEvents = new();
 
         private void Awake()
         {
             m_particleSystem = GetComponent<ParticleSystem>();
-            // Find the Bubbles spell in parent hierarchy
-            m_bubblesSpell = GetComponentInParent<Bubbles>();
         }
 
         private void OnParticleCollision(GameObject other)
         {
             if (string.IsNullOrEmpty(popSoundKey)) return;
+            if (SoundManager.Instance == null || SoundManager.Instance.soundDatabase == null) return;
 
             // Get collision events to find the hit positions
             int numCollisionEvents = m_particleSystem.GetCollisionEvents(other, m_collisionEvents);
             
+            var soundType = SoundManager.Instance.soundDatabase.GetByKey(popSoundKey);
+            if (soundType == null) return;
+
+            // Play sound locally for each collision - no need to network since particles simulate independently on each client
             for (int i = 0; i < numCollisionEvents; i++)
             {
                 Vector3 hitPosition = m_collisionEvents[i].intersection;
-                
-                // Use the spell to broadcast the sound to all players
-                if (m_bubblesSpell != null)
-                {
-                    m_bubblesSpell.PlayPopSound(hitPosition);
-                }
-                else
-                {
-                    // Fallback to local-only if spell reference not found
-                    if (SoundManager.Instance != null && SoundManager.Instance.soundDatabase != null)
-                    {
-                        var soundType = SoundManager.Instance.soundDatabase.GetByKey(popSoundKey);
-                        if (soundType != null)
-                        {
-                            SoundManager.Instance.PlaySoundLocal(soundType, hitPosition);
-                        }
-                    }
-                }
+                SoundManager.Instance.PlaySoundLocal(soundType, hitPosition);
             }
         }
     }

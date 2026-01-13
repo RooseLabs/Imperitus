@@ -1130,7 +1130,7 @@ Transform:
   m_GameObject: {fileID: 59369511}
   serializedVersion: 2
   m_LocalRotation: {x: -0.38460034, y: 0.5933655, z: 0.5933655, w: 0.38460034}
-  m_LocalPosition: {x: -4.8, y: 0.838, z: 1.008}
+  m_LocalPosition: {x: -4.8, y: 0.832, z: 1.008}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1986,7 +1986,7 @@ Transform:
   m_GameObject: {fileID: 117578369}
   serializedVersion: 2
   m_LocalRotation: {x: -0.3038605, y: 0.63848954, z: 0.63848954, w: 0.3038605}
-  m_LocalPosition: {x: -7.673, y: 0.8439999, z: 2.576}
+  m_LocalPosition: {x: -7.673, y: 0.834, z: 2.576}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2339,7 +2339,7 @@ Transform:
   m_GameObject: {fileID: 120989407}
   serializedVersion: 2
   m_LocalRotation: {x: -0.11793805, y: 0.87891054, z: 0.36405596, w: 0.28472814}
-  m_LocalPosition: {x: -8.432, y: 2.264, z: 3.231}
+  m_LocalPosition: {x: -8.4437, y: 2.263, z: 3.2402}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -10593,7 +10593,7 @@ Transform:
   m_GameObject: {fileID: 543147298}
   serializedVersion: 2
   m_LocalRotation: {x: -0.38460034, y: -0.5933655, z: -0.5933655, w: 0.38460034}
-  m_LocalPosition: {x: 4.799, y: 2.215, z: 1.025}
+  m_LocalPosition: {x: 4.781, y: 2.21, z: 1.066}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -11114,7 +11114,7 @@ Transform:
   m_GameObject: {fileID: 583103631}
   serializedVersion: 2
   m_LocalRotation: {x: -0.49474752, y: -0.13963428, z: -0.8507862, w: 0.10904131}
-  m_LocalPosition: {x: 6.4031, y: 1.7893999, z: 1.7797}
+  m_LocalPosition: {x: 6.4054, y: 1.7827, z: 1.7806}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -13180,7 +13180,7 @@ Transform:
   m_GameObject: {fileID: 709202389}
   serializedVersion: 2
   m_LocalRotation: {x: -0.7061697, y: 0.03639224, z: -0.0363904, w: -0.7061697}
-  m_LocalPosition: {x: -9.191, y: 0.845, z: 4.841}
+  m_LocalPosition: {x: -9.196, y: 0.832, z: 4.84}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -14788,7 +14788,7 @@ Transform:
   m_GameObject: {fileID: 854783004}
   serializedVersion: 2
   m_LocalRotation: {x: -0.28671724, y: -0.6463693, z: -0.6463693, w: 0.28671724}
-  m_LocalPosition: {x: 7.874, y: 0.834, z: 2.712}
+  m_LocalPosition: {x: 7.866, y: 0.834, z: 2.705}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -27435,7 +27435,7 @@ Transform:
   m_GameObject: {fileID: 1570852964}
   serializedVersion: 2
   m_LocalRotation: {x: -0.20814395, y: 0.77526957, z: 0.32112664, w: 0.5025047}
-  m_LocalPosition: {x: -4.2387, y: 2.264, z: 0.762}
+  m_LocalPosition: {x: -4.251, y: 2.263, z: 0.762}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -27937,7 +27937,7 @@ Transform:
   m_GameObject: {fileID: 1622498513}
   serializedVersion: 2
   m_LocalRotation: {x: -0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 9.229769, y: 2.274, z: 5.47}
+  m_LocalPosition: {x: 9.229769, y: 2.266, z: 5.47}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -30761,7 +30761,7 @@ Transform:
   m_GameObject: {fileID: 1779829606}
   serializedVersion: 2
   m_LocalRotation: {x: -0.3038605, y: -0.63848954, z: -0.63848954, w: 0.3038605}
-  m_LocalPosition: {x: 8.048, y: 2.215, z: 2.89}
+  m_LocalPosition: {x: 8.048, y: 2.212, z: 2.89}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -37639,10 +37639,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1837007889}
     m_Modifications:
-    - target: {fileID: 5074113067893286652, guid: 57f09590df1dad54a994e9671ec65b4b, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 2.928
-      objectReference: {fileID: 0}
     - target: {fileID: 6301437122116156808, guid: 57f09590df1dad54a994e9671ec65b4b, type: 3}
       propertyPath: m_Name
       value: LongBookShelves
